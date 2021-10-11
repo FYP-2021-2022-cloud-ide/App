@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+option java_package = "ex.dockerGet";
+option objc_class_prefix = "HSW";
+option go_package = "github.com/proto/dockerGet";
+option java_multiple_files = true;
+option java_outer_classname = "docker";
+
+package dockerGet;
+
+
+service Docker {
+  rpc login(LoginRequest)returns ( ListReply) {}
+  rpc checkHaveContainer(CheckHaveContainerRequest)returns( StringReply ){}
+  rpc listContainers(SubRequest)returns( ListReply ){}
+  rpc listCourses(SubRequest)returns( ListReply ){}
+  rpc listEnvironments(SectionRequest)returns(ListReply){}
+  rpc listTemplates(SectionRequest)returns(ListReply){}
+  rpc addContainer(AddContainerRequest)returns(StringReply){}
+  rpc removeContainer(RemoveContainerRequest)returns(StringReply){}
+}
+
+message LoginRequest {
+  string sub = 1;
+  string name = 2;
+}
+
+message EmptyRequest {
+}
+message AddContainerRequest{
+  string imageName =1;
+  float memLimit =2;
+  float numCPU=3;
+  string section_user_id=4;  
+  string template_id=5; 
+}
+
+message RemoveContainerRequest {
+  string containerID=1;
+}
+
+message CheckHaveContainerRequest {
+  string sub = 1; 
+  string containerID = 3;
+}
+
+message SubRequest {
+  string sub = 1; 
+}
+
+message SectionRequest{
+  string sectionID = 1; 
+}
+
+message StringReply {
+  string message = 1;
+}
+
+message ListReply {
+  repeated string message = 1;
+}
