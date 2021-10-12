@@ -27,10 +27,20 @@ const Home = ()=>{
     }, [])
 
     return (
-      <div className="flex flex-col font-bold pl-10 w-full pt-10 min-h-screen">
-        {/* pathBar */}
-        <CourseBar role={"Student"}  courseName={courseName!}></CourseBar>
-        <WorkspacesList containers={thisTemplateList!}></WorkspacesList>
+      <div className="w-full">
+          {courseName&&thisTemplateList ? (
+              <div className="flex flex-col font-bold px-8 w-full pt-10 min-h-screen">
+                {/* pathBar */}
+                <CourseBar role={"Student"}  courseName={courseName!}></CourseBar>
+                <WorkspacesList containers={thisTemplateList!}></WorkspacesList>
+            </div>
+          ):(
+              <div className="flex h-screen w-screen">
+                  <div className="m-auto">
+                      <img src='/circle.svg'/> 
+                  </div>
+              </div>
+          )}
       </div>
     )
 }

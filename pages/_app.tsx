@@ -6,13 +6,15 @@ import { CnailsProvider } from "../contexts/cnails";
 
 interface CnailsProps extends AppProps{
   sub: string
+  name: string
+  email: string
 }
 
-function CnailsApp({ Component, pageProps, sub}: CnailsProps) {
-  //console.log(sub)
+function CnailsApp({ Component, pageProps, sub, name, email}: CnailsProps) {
+  console.log(sub)
   return(
     <CnailsProvider>
-      <Layout sub={sub}>
+      <Layout sub={sub} name={name} email={email}>
         <Component {...pageProps} />
       </Layout>
     </CnailsProvider>
@@ -20,21 +22,23 @@ function CnailsApp({ Component, pageProps, sub}: CnailsProps) {
   ) 
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  var cookies = context.req.cookies
-
-  return {
-      props:{
-          sub: cookies.sub,
-      }
-  }
-}
-
-// CnailsApp.getInitialProps = async (ctx: any) => {
-//   var cookies = ctx.ctx.req.cookies
+// export const getServerSideProps: GetServerSideProps = async (context) => {
+//   var cookies = context
+//   console.log(cookies)
 //   return {
-//     user: cookies.sub
+//       props:{
+//           sub: "cookies.sub",
+//       }
 //   }
 // }
+
+CnailsApp.getInitialProps = async (ctx: any) => {
+  var cookies = ctx.ctx.req.cookies
+  return {
+    sub: cookies.sub,
+    name: cookies.name,
+    email: cookies.email
+  }
+}
 
 export default CnailsApp

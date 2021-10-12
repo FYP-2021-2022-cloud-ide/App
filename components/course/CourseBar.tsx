@@ -57,18 +57,19 @@ const CourseBar = ({courseName, role}:props) => {
                 </div>
             </div>
             {/* title and settings */}
-            <div className="flex flex-row justify-between py-6">
-                <div className="flex flex-row justify-start gap-x-4 w-1/2">
+            <div className="grid grid-cols-3 gap-8 py-8">
+                <div className="flex flex-row justify-start gap-x-4">
                     <img src="/coursePage/manageDocRole.svg"  className="" />
                     <div className="text-lg mt-1 ">{courseName}</div>
                     {/* <RoleBlock role={role}></RoleBlock> */}
                 </div>
-                <div className="flex flex-row gap-x-4 mr-8">
-                    <button className="">
+                <div></div>
+                <div className="flex flex-row gap-x-4 justify-end">
+                    <button className="hover:scale-110 transition transition-all ease-in-out duration-300">
                         {/* <img src="/coursePage/barWithDots.svg"  className="" /> */}
                         <MenuIcon className="w-7 h-7"></MenuIcon>
                     </button>
-                    <button className="">
+                    <button className="hover:scale-110 transition transition-all ease-in-out duration-300">
                         {/* <img src="/coursePage/repairing.svg"  className="" /> */}
                         <CogIcon className="w-7 h-7"></CogIcon>
                     </button>

@@ -78,13 +78,14 @@ app.prepare().then(() => {
           req.appSession!.openidTokens = session.access_token;
           // @ts-ignore
           req.appSession!.userIdentity = additionalUserClaims.data;
-          const { sub, name } = additionalUserClaims.data;
+          const { sub, name, email } = additionalUserClaims.data;
           // const { userId, semesterId } = await getUserData(sub, name!);
           // const userId = '20605387'
           // const semesterId = 'testing2213'
           // res.cookie('semester', semesterId, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `.${process.env.HOSTNAME}` });
           res.cookie('sub', sub);
-          res.cookie('user', name);
+          res.cookie('name', name);
+          res.cookie('email', email);
         } catch (error) {
           throw error
         }

@@ -5,6 +5,8 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
 import Modal from "../../Modal"
 import ListBox from "../../ListBox"
+import Select from 'react-select'
+
 
 interface image{
     imageId:string
@@ -33,6 +35,13 @@ const ImageList = ({images}:props)=>{//
         setIsOpen(false)
     }
 
+    const options = [
+        { value: 'g++', label: 'g++' },
+        { value: 'gcc', label: 'gcc' },
+        { value: 'python', label: 'python' },
+        { value: 'python3', label: 'python3' },
+    ]
+
     return(
         <div className="flex flex-col justify-start">
             <div className="flex flex-row text-gray-600 justify-start gap-x-4 pb-4">
@@ -44,7 +53,7 @@ const ImageList = ({images}:props)=>{//
                 </button>
             </div>
             {images?.length? 
-            <div className="grid grid-cols-2 gap-8 pr-4"> {images.map((image)=>{
+            <div className="flex flex-col space-y-5"> {images.map((image)=>{
                 return(
                     <Environment image={image}></Environment>
                 );
@@ -61,7 +70,7 @@ const ImageList = ({images}:props)=>{//
                 </div>
             </button>}
             <Modal isOpen={isOpen} setOpen={setIsOpen}>
-                <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl text-[#415A6E]">
+                <div className="inline-block overflow-visible w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl text-[#415A6E]">
                     <Dialog.Title
                         as="h3"
                         className="text-xl font-medium leading-6"
@@ -71,16 +80,16 @@ const ImageList = ({images}:props)=>{//
                     <div className="mt-2 font-medium mt-4">
                         Pick Libray needed
                     </div>
-                    <ListBox></ListBox>
+                    <Select options={options} isMulti />
 
                     <div className="mt-2 font-medium mt-4">
                         Environment name
                     </div>
                     
-                    <div className="p-1 border flex text-gray-500 flex-row space-x-2 focus:border-black-600 text-left rounded-xl w-96 shadow-lg">
+                    <div className="p-1 border w-full flex text-gray-500 flex-row space-x-2 focus:border-black-600 text-left rounded-xl shadow-lg">
                         <input placeholder="e.g. COMP2012" className="focus:outline-none"></input>
                     </div>
-                    <div className="px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <div className="py-3 sm:flex sm:flex-row-reverse">
                         <span className="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
                             <button
                             type="button"
