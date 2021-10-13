@@ -1,8 +1,10 @@
 import React, { MouseEventHandler, useRef, useState } from "react"
 import { Dialog, Transition } from "@headlessui/react";
 import ListBox from "../../ListBox"
+import { useCnails } from "../../../contexts/cnails";
 
 interface TemplateCreateProps{
+    sectionUserID:string
     environments: Environment[]
     closeModal: MouseEventHandler<HTMLButtonElement> | undefined
 }
@@ -12,9 +14,10 @@ interface Environment{
     id: string
   }
 
-const TemplateCreate = React.forwardRef(({environments, closeModal}:TemplateCreateProps, ref)=>{
+const TemplateCreate = React.forwardRef(({sectionUserID,environments, closeModal}:TemplateCreateProps, ref)=>{
 
     const [step, setStep] = useState(1);
+
 
     const prevStep = () => {
         setStep(step - 1);
@@ -23,6 +26,9 @@ const TemplateCreate = React.forwardRef(({environments, closeModal}:TemplateCrea
         setStep(step + 1);
     }
 
+    const [templateName, setTemplateName]= useState("")
+    const { addTemplate,addContainer} = useCnails();
+    const [containerID,setContainerID]=useState("")
     switch(step){
         case 1:
             return(
@@ -38,14 +44,34 @@ const TemplateCreate = React.forwardRef(({environments, closeModal}:TemplateCrea
                         Environment
                     </div>
                     <ListBox environments={environments}/>
+
+                    <div className="mt-2 font-medium mt-4">
+                        Template name
+                    </div>
+                    
+                    <div className="p-1 border w-full flex text-gray-500 flex-row space-x-2 focus:border-black-600 text-left rounded-xl shadow-lg">
+                        <input  className="focus:outline-none" 
+                        placeholder="e.g. Assignment 1"
+                        value={templateName}
+                        onChange={(e) => setTemplateName(e.target.value)}></input>
+                    </div>
+
                     <div className="py-3 sm:flex sm:flex-row-reverse">
                         <span className="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
                             <button
                             type="button"
-                            onClick={()=>{
+                            onClick={async()=>{
+                                nextStep()
+                                const fakeWindow= window.open("",'_blank')
+                                const response = await addContainer("06979193acbf",100,0.5,sectionUserID,"",false)//non-existent template id
+                                const container = JSON.parse(response.message)
+                                if(container.success){
+                                    setContainerID(container.containerId)
+                                    fakeWindow?.location.replace("https://codespace.ust.dev/user/container/"+container.containerId+"/")
+                                }
                                 // open the container link from the API response
                                 // window.open('https://codespace.ust.dev', '_blank')
-                                nextStep()
+                                
                             }}
                             className="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-[#65A9E0] text-base leading-6 font-medium text-white shadow-sm hover:text-gray-900 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
                             Next
@@ -76,7 +102,11 @@ const TemplateCreate = React.forwardRef(({environments, closeModal}:TemplateCrea
                         <span className="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
                             <button
                             type="button"
-                            onClick={closeModal}
+                            onClick={async()=>{
+                                closeModal
+                                const response = await addTemplate(templateName,"06979193acbf",sectionUserID,"Dummy string",containerID)//non-existent template id
+                                const template = JSON.parse(response.message)
+                            }}
                             className="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-[#65A9E0] text-base leading-6 font-medium text-white shadow-sm hover:text-gray-900 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
                             Finish
                             </button>

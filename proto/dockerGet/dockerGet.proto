@@ -16,8 +16,15 @@ service Docker {
   rpc listCourses(SubRequest)returns( ListReply ){}
   rpc listEnvironments(SectionRequest)returns(ListReply){}
   rpc listTemplates(SectionRequest)returns(ListReply){}
+
   rpc addContainer(AddContainerRequest)returns(StringReply){}
   rpc removeContainer(RemoveContainerRequest)returns(StringReply){}
+
+  rpc addTemplate(AddTemplateRequest)returns(StringReply){}
+  rpc removeTemplate(RemoveTemplateRequest)returns(StringReply){}
+
+  rpc addEnvironment(AddEnvironmentRequest)returns(StringReply){}
+  rpc removeEnvironment(RemoveEnvironmentRequest)returns(StringReply){}
 }
 
 message LoginRequest {
@@ -27,17 +34,43 @@ message LoginRequest {
 
 message EmptyRequest {
 }
+
 message AddContainerRequest{
   string imageName =1;
   float memLimit =2;
   float numCPU=3;
   string section_user_id=4;  
   string template_id=5; 
+  bool dbStored =6;
 }
 
 message RemoveContainerRequest {
   string containerID=1;
 }
+
+
+message AddTemplateRequest{
+  string environmentID =1;
+  string name = 2;
+  string assignment_config_id = 3;
+  string section_user_id = 4;  
+  string containerID =5;
+}
+
+message RemoveTemplateRequest {
+  string templateID=1;
+}
+
+message AddEnvironmentRequest{
+  repeated string libraries =1;
+  string section_user_id = 2;
+  string name = 3;
+}
+
+message RemoveEnvironmentRequest {
+  string environmentID=1;
+}
+
 
 message CheckHaveContainerRequest {
   string sub = 1; 

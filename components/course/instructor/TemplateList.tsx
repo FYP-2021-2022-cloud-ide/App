@@ -97,7 +97,7 @@ const TemplateList = ({templates,sectionUserID, images}:props)=>{//{
                     </div>
                 </button>}
                 <Modal isOpen={isOpen} setOpen={setIsOpen}>
-                    <TemplateCreate closeModal={closeModal} environments={environments} ref={ref}></TemplateCreate>
+                    <TemplateCreate closeModal={closeModal} environments={environments} ref={ref} sectionUserID={sectionUserID}></TemplateCreate>
                 </Modal>
         </div>
     )

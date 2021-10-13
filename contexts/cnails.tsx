@@ -5,8 +5,12 @@ interface CnailsContextState {
     courseList: (sub:string) => Promise<any>,
     environmentList: (sectionid:string) => Promise<any>,
     templateList: (sectionid:string) => Promise<any>,
-    addContainer: (imageName :string,memLimit :Number,numCPU:Number,section_user_id :string,template_id :string) => Promise<any>,
+    addContainer: (imageName :string,memLimit :Number,numCPU:Number,section_user_id :string,template_id :string,dbStored:boolean) => Promise<any>,
     removeContainer: (containerId:string) => Promise<any>,
+    addTemplate: (templateName :string,envId :string,section_user_id:string,assignment_config_id :string,containerId :string) => Promise<any>,
+    removeTemplate: (templateId:string) => Promise<any>,
+    addEnvironment: (libraries :string[],name :string, section_user_id:string)=> Promise<any>,
+    removeEnvironment: (envId :string)=>  Promise<any>,
 }
 
 interface CnailsProviderProps {
@@ -63,7 +67,8 @@ export const CnailsProvider = (props: CnailsProviderProps) => {
         memLimit :Number,
         numCPU:Number,
         section_user_id :string,
-        template_id :string)=>{
+        template_id :string,
+        dbStored:boolean)=>{
         var res =  await fetch('/api/addContainer',{
             method: 'POST', 
             body:JSON.stringify({ 
@@ -72,6 +77,7 @@ export const CnailsProvider = (props: CnailsProviderProps) => {
                 "numCPU":numCPU,
                 "section_user_id" :section_user_id ,
                 "template_id" :template_id,
+                "dbStored":dbStored,
             }),
         })
         return res.json()
@@ -85,6 +91,57 @@ export const CnailsProvider = (props: CnailsProviderProps) => {
         })
         return res.json()
     }
+    const addTemplate = async (
+        templateName :string,
+        envId :string,
+        section_user_id:string,
+        assignment_config_id :string,
+        containerId :string)=>{
+        var res =  await fetch('/api/addTemplate',{
+            method: 'POST', 
+            body:JSON.stringify({ 
+                "templateName":templateName,
+                "envId" : envId ,
+                "section_user_id":section_user_id,
+                "assignment_config_id" :assignment_config_id ,
+                "containerId" :containerId,
+            }),
+        })
+        return res.json()
+    }
+    const removeTemplate = async (templateId :string)=>{
+        var res =  await fetch('/api/removeTemplate',{
+            method: 'POST', 
+            body:JSON.stringify({ 
+                "templateId":templateId,
+            }),
+        })
+        return res.json()
+    }
+
+    const addEnvironment = async (
+        libraries :string[],
+        name :string,
+        section_user_id:string)=>{
+        var res =  await fetch('/api/addEnvironment',{
+            method: 'POST', 
+            body:JSON.stringify({ 
+                "libraries":libraries,
+                "name" : name ,
+                "section_user_id":section_user_id,
+            }),
+        })
+        return res.json()
+    }
+    const removeEnvironment = async (envId :string)=>{
+        var res =  await fetch('/api/removeEnvironment',{
+            method: 'POST', 
+            body:JSON.stringify({ 
+                "envId":envId,
+            }),
+        })
+        return res.json()
+    }
     return (
         <CnailsContext.Provider
             value={{
@@ -94,6 +151,10 @@ export const CnailsProvider = (props: CnailsProviderProps) => {
                 templateList,
                 addContainer,
                 removeContainer,
+                addTemplate,
+                removeTemplate,
+                addEnvironment,
+                removeEnvironment,
             }}
         >
         { props.children }

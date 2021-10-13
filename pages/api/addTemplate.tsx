@@ -7,7 +7,7 @@ type Data = {
 }
 import * as grpc from 'grpc';
 
-import {  StringReply,  AddContainerRequest } from '../../proto/dockerGet/dockerGet_pb';
+import {  StringReply,  AddTemplateRequest } from '../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../proto/dockerGet/dockerGet_grpc_pb';
 
 export default function handler(
@@ -20,15 +20,14 @@ export default function handler(
        grpc.credentials.createInsecure());
     
     var body = JSON.parse(req.body);console.log(body)
-    var docReq = new AddContainerRequest();
-    docReq.setImagename(body.imageName);
-    docReq.setMemlimit(body.memLimit);
-    docReq.setNumcpu(body.numCPU);
+    var docReq = new AddTemplateRequest();
+    docReq.setName(body.templateName);
+    docReq.setEnvironmentid(body.envId);
     docReq.setSectionUserId(body.section_user_id);
-    docReq.setTemplateId(body.template_id);
-    docReq.setDbstored(body.dbStored);
+    docReq.setAssignmentConfigId(body.assignment_config_id);
+    docReq.setContainerid(body.containerId);
     try{
-      client.addContainer(docReq, function(err, GoLangResponse: StringReply) {
+      client.addTemplate(docReq, function(err, GoLangResponse: StringReply) {
         var mes= GoLangResponse.getMessage();
         console.log(mes)
         res.json({ message : mes });

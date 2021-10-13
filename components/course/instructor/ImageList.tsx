@@ -7,26 +7,31 @@ import Modal from "../../Modal"
 import ListBox from "../../ListBox"
 import Select from 'react-select'
 
+import { useCnails } from "../../../contexts/cnails";
 
 interface image{
+    id:string
     imageId:string
     imageName: string
     description: string
 }
 
 interface props{
+    sectionUserID:string
     images: image[]
 }
  
-const ImageList = ({images}:props)=>{//
+const ImageList = ({sectionUserID,images}:props)=>{//
     // var images=[
     //     { name: "fdgsdd",
     //     description: "sdfgdga gdfgggfdgdgdfgdf dfg sdfgsfd gsd gs dd"},
     //     { name: "fdgsdd",
     //     description: "sdfgdga gdfgggfdgdgdfgdf dfg sdfgsfd gsd gs dd"}
     // ]
+    
+    const { addEnvironment} = useCnails();
     let [isOpen, setIsOpen] = useState(false)
-
+    const [environmentName, setEnvironmentName] = useState("")
     function openModal() {
         setIsOpen(true)
     }
@@ -87,13 +92,20 @@ const ImageList = ({images}:props)=>{//
                     </div>
                     
                     <div className="p-1 border w-full flex text-gray-500 flex-row space-x-2 focus:border-black-600 text-left rounded-xl shadow-lg">
-                        <input placeholder="e.g. COMP2012" className="focus:outline-none"></input>
+                        <input  className="focus:outline-none" 
+                        placeholder="e.g. COMP2012"
+                        value={environmentName}
+                        onChange={(e) => setEnvironmentName(e.target.value)}></input>
                     </div>
                     <div className="py-3 sm:flex sm:flex-row-reverse">
                         <span className="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
                             <button
                             type="button"
-                            onClick={()=>{}}
+                            onClick={async()=>{
+                                const response = await addEnvironment(["python","python3"],environmentName,sectionUserID)//non-existent template id
+                                const images = JSON.parse(response.message)
+                                closeModal
+                            }}
                             className="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-[#65A9E0] text-base leading-6 font-medium text-white shadow-sm hover:text-gray-900 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
                             Done
                             </button>

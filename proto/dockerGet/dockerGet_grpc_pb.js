@@ -15,6 +15,28 @@ function deserialize_dockerGet_AddContainerRequest(buffer_arg) {
   return dockerGet_pb.AddContainerRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_dockerGet_AddEnvironmentRequest(arg) {
+  if (!(arg instanceof dockerGet_pb.AddEnvironmentRequest)) {
+    throw new Error('Expected argument of type dockerGet.AddEnvironmentRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_AddEnvironmentRequest(buffer_arg) {
+  return dockerGet_pb.AddEnvironmentRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_dockerGet_AddTemplateRequest(arg) {
+  if (!(arg instanceof dockerGet_pb.AddTemplateRequest)) {
+    throw new Error('Expected argument of type dockerGet.AddTemplateRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_AddTemplateRequest(buffer_arg) {
+  return dockerGet_pb.AddTemplateRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_dockerGet_CheckHaveContainerRequest(arg) {
   if (!(arg instanceof dockerGet_pb.CheckHaveContainerRequest)) {
     throw new Error('Expected argument of type dockerGet.CheckHaveContainerRequest');
@@ -57,6 +79,28 @@ function serialize_dockerGet_RemoveContainerRequest(arg) {
 
 function deserialize_dockerGet_RemoveContainerRequest(buffer_arg) {
   return dockerGet_pb.RemoveContainerRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_dockerGet_RemoveEnvironmentRequest(arg) {
+  if (!(arg instanceof dockerGet_pb.RemoveEnvironmentRequest)) {
+    throw new Error('Expected argument of type dockerGet.RemoveEnvironmentRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_RemoveEnvironmentRequest(buffer_arg) {
+  return dockerGet_pb.RemoveEnvironmentRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_dockerGet_RemoveTemplateRequest(arg) {
+  if (!(arg instanceof dockerGet_pb.RemoveTemplateRequest)) {
+    throw new Error('Expected argument of type dockerGet.RemoveTemplateRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_RemoveTemplateRequest(buffer_arg) {
+  return dockerGet_pb.RemoveTemplateRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_dockerGet_SectionRequest(arg) {
@@ -179,6 +223,50 @@ var DockerService = exports.DockerService = {
     responseType: dockerGet_pb.StringReply,
     requestSerialize: serialize_dockerGet_RemoveContainerRequest,
     requestDeserialize: deserialize_dockerGet_RemoveContainerRequest,
+    responseSerialize: serialize_dockerGet_StringReply,
+    responseDeserialize: deserialize_dockerGet_StringReply,
+  },
+  addTemplate: {
+    path: '/dockerGet.Docker/addTemplate',
+    requestStream: false,
+    responseStream: false,
+    requestType: dockerGet_pb.AddTemplateRequest,
+    responseType: dockerGet_pb.StringReply,
+    requestSerialize: serialize_dockerGet_AddTemplateRequest,
+    requestDeserialize: deserialize_dockerGet_AddTemplateRequest,
+    responseSerialize: serialize_dockerGet_StringReply,
+    responseDeserialize: deserialize_dockerGet_StringReply,
+  },
+  removeTemplate: {
+    path: '/dockerGet.Docker/removeTemplate',
+    requestStream: false,
+    responseStream: false,
+    requestType: dockerGet_pb.RemoveTemplateRequest,
+    responseType: dockerGet_pb.StringReply,
+    requestSerialize: serialize_dockerGet_RemoveTemplateRequest,
+    requestDeserialize: deserialize_dockerGet_RemoveTemplateRequest,
+    responseSerialize: serialize_dockerGet_StringReply,
+    responseDeserialize: deserialize_dockerGet_StringReply,
+  },
+  addEnvironment: {
+    path: '/dockerGet.Docker/addEnvironment',
+    requestStream: false,
+    responseStream: false,
+    requestType: dockerGet_pb.AddEnvironmentRequest,
+    responseType: dockerGet_pb.StringReply,
+    requestSerialize: serialize_dockerGet_AddEnvironmentRequest,
+    requestDeserialize: deserialize_dockerGet_AddEnvironmentRequest,
+    responseSerialize: serialize_dockerGet_StringReply,
+    responseDeserialize: deserialize_dockerGet_StringReply,
+  },
+  removeEnvironment: {
+    path: '/dockerGet.Docker/removeEnvironment',
+    requestStream: false,
+    responseStream: false,
+    requestType: dockerGet_pb.RemoveEnvironmentRequest,
+    responseType: dockerGet_pb.StringReply,
+    requestSerialize: serialize_dockerGet_RemoveEnvironmentRequest,
+    requestDeserialize: deserialize_dockerGet_RemoveEnvironmentRequest,
     responseSerialize: serialize_dockerGet_StringReply,
     responseDeserialize: deserialize_dockerGet_StringReply,
   },

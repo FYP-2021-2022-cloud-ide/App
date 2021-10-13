@@ -46,7 +46,7 @@ const Home = ()=>{
                   <CourseBar role={ "Instructor"}  courseName={courseName!}></CourseBar>
           
                   <div className="grid grid-cols-3 gap-8">
-                      <ImageList images={imageList!}></ImageList>
+                      <ImageList images={imageList!} sectionUserID={sectionUserID}></ImageList>
                       <TemplateList images={imageList!} templates={thisTemplateList!} sectionUserID={sectionUserID}></TemplateList>
                       <WorkSpaceList containers={null}></WorkSpaceList>
                   </div>

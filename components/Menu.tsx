@@ -10,7 +10,7 @@ interface props{
 
 const Menu = ({sub, name, email}:props) => {
     return (
-        <div className="grid grid-cols-3 gap-8">
+        <div className="grid grid-cols-3 gap-8 w-full">
             <div></div>
             <div className="border flex text-gray-500 flex-row space-x-2 focus:border-black-600 text-left rounded-xl hover:border-blue-600 w-96 shadow-2xl">
                 <SearchIcon className="w-6 h-6"></SearchIcon>
