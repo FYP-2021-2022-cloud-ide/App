@@ -1,10 +1,10 @@
 import CodeSpace from "./CodeSpace";
 
 interface container{
-    courseTitle: String
-    asmName: String
-    existedTime: String
-    containerId: String
+    courseTitle: string
+    assignmentName: string
+    existedTime: string
+    containerID: string
 }
 interface containerInfo  {
 	containersAlive :number
@@ -19,7 +19,7 @@ interface props{
 }
 
 const ContainersList = ({containers,containerInfo}:props  )=>{
-    //console.log(containers)
+    console.log(containerInfo)
     var percentage = containerInfo.containersAlive/containerInfo.containersTotal;
     return(
         <div className="flex flex-col justiy-start w-full font-bold">
@@ -37,9 +37,9 @@ const ContainersList = ({containers,containerInfo}:props  )=>{
             </div>
           </div>
           <div className="flex flex-wrap justify-start">
-            {containers.map((li, i)=>{
+            {containers.map((container, i)=>{
               return(
-                  <CodeSpace item={li}></CodeSpace>
+                  <CodeSpace item={container}></CodeSpace>
               );
               })
             }

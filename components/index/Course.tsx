@@ -8,11 +8,12 @@ interface CourseProps{
 }
 
 interface Course{
-    courseCode: String
-    session: String
-    name: String
-    role: String
-    lastUpdateTime: String
+    sectionID: string
+    courseCode: string
+    section: string
+    name: string
+    sectionRole: string
+    lastUpdateTime: string
 }
 
 function Course({link, course}:CourseProps){
@@ -21,7 +22,7 @@ function Course({link, course}:CourseProps){
             <a className="border broder-gray-200 shadow-sm rounded-lg bg-white p-4 hover:shadow-lg transition-all ease-in-out duration-300">
                 <div className="flex flex-row">
                     <div className="flex flex-col space-y-1">
-                        <b className="font-semibold text-sm text-gray-800">{course.courseCode + " (" +course.session+")"}</b>
+                        <b className="font-semibold text-sm text-gray-800">{course.courseCode + " (" +course.section+")"}</b>
                         <div className="font-medium text-xs text-gray-600">{course.name}</div>
                         {/* {course.role == "INSTRUCTOR" ?(
                         <div className = "rounded-lg bg-purple-700 w-24 py-1.5 font-bold text-center text-white text-sm">

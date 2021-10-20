@@ -19,18 +19,16 @@ const Home = ()=>{
     useEffect(()=>{
         const fetchEnvironments = async ()=>{
           const response = await environmentList(courseId)//
-          const images = JSON.parse(response.message)
-          if(images.success){
-            setImageList(images.environments)
+          if(response.success){
+            setImageList(response.environments)
           }
         }
         const fetchTemplates = async ()=>{
           const response = await templateList(courseId)//
-          const templates = JSON.parse(response.message)
-          if(templates.success){
-            setCourseName(templates.sectionInfo[0])
-            setSUID(templates.sectionInfo[1])
-            setTemplateList(templates.templates)
+          if(response.success){
+            setCourseName(response.sectionInfo[0])
+            setSUID(response.sectionInfo[1])
+            setTemplateList(response.templates)
           }
         }
         fetchEnvironments()

@@ -3,12 +3,12 @@ import Link from 'next/link'
 import Course from './Course'
 
 interface course{
-    sessionId: String
-    courseCode: String
-    session: String
-    role: String
-    name: String
-    lastUpdateTime: String
+    sectionID: string
+    courseCode: string
+    section: string
+    name: string
+    sectionRole: string
+    lastUpdateTime: string
 }
 
 interface props{
@@ -22,7 +22,7 @@ const CoursesList = ({courses}:props)=>{
             <div className = "my-4 text-gray-600 font-bold text-xl">Courses</div>
             <div className = "space-x-4 flex flex-wrap">
                 {courses.map((course:course)=>{
-                    var link = "https://codespace.ust.dev/course/"+course.sessionId+"/"+course.role.toLowerCase()
+                    var link = "https://codespace.ust.dev/course/"+course.sectionID+"/"+course.sectionRole.toLowerCase()
                     return(
                         <Course link={link} course={course}></Course>
                     )

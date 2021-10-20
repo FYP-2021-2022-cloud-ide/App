@@ -12,19 +12,19 @@ package dockerGet;
 service Docker {
   rpc login(LoginRequest)returns ( ListReply) {}
   rpc checkHaveContainer(CheckHaveContainerRequest)returns( StringReply ){}
-  rpc listContainers(SubRequest)returns( ListReply ){}
-  rpc listCourses(SubRequest)returns( ListReply ){}
-  rpc listEnvironments(SectionRequest)returns(ListReply){}
-  rpc listTemplates(SectionRequest)returns(ListReply){}
+  rpc listContainers(SubRequest)returns( ListContainerReply ){}
+  rpc listCourses(SubRequest)returns( ListCoursesReply ){}
+  rpc listEnvironments(SectionRequest)returns(ListEnvironmentsReply){}
+  rpc listTemplates(SectionRequest)returns(ListTemplatesReply){}
 
-  rpc addContainer(AddContainerRequest)returns(StringReply){}
-  rpc removeContainer(RemoveContainerRequest)returns(StringReply){}
+  rpc addContainer(AddContainerRequest)returns(AddContainerReply){}
+  rpc removeContainer(RemoveContainerRequest)returns(SuccessStringReply){}
 
-  rpc addTemplate(AddTemplateRequest)returns(StringReply){}
-  rpc removeTemplate(RemoveTemplateRequest)returns(StringReply){}
+  rpc addTemplate(AddTemplateRequest)returns(AddTemplateReply){}
+  rpc removeTemplate(RemoveTemplateRequest)returns(SuccessStringReply){}
 
-  rpc addEnvironment(AddEnvironmentRequest)returns(StringReply){}
-  rpc removeEnvironment(RemoveEnvironmentRequest)returns(StringReply){}
+  rpc addEnvironment(AddEnvironmentRequest)returns(AddEnvironmentReply){}
+  rpc removeEnvironment(RemoveEnvironmentRequest)returns(SuccessStringReply){}
 }
 
 message LoginRequest {
@@ -35,13 +35,78 @@ message LoginRequest {
 message EmptyRequest {
 }
 
+message ListContainerReply{
+  bool success=1;
+  string message = 4;
+ 	message ContainersInfo{
+    int64 containersAlive =1;
+    int64 containersTotal=2;
+  }
+  ContainersInfo containerInfo=2;
+
+  message Container {
+    string courseTitle =1;
+    string assignmentName   =2;
+    string existedTime  =3; 
+    string containerID   =4;
+  }
+	repeated Container containers=3;
+}
+
+message ListCoursesReply {
+	bool success = 1;
+  string message = 2;
+  message Course {
+    string sectionID = 1;
+    string courseCode = 2;
+    string section = 3;
+    string name = 4;
+    string sectionRole = 5;
+    string lastUpdateTime =6;
+  }
+	repeated Course courses =3;
+}
+
+message ListEnvironmentsReply{
+  bool success=1;
+  string message = 4;
+
+  message Environment {
+    string id =1;
+    string imageId   =2;
+    string imageName  =3; 
+    string description   =4;
+  }
+	repeated Environment environments=3;
+}
+
+message ListTemplatesReply{
+  bool success=1;
+  string message = 4;
+  repeated string sectionInfo=2;
+  message Template {
+    string id =1;
+    string name   =2;
+    string imageId  =3; 
+    string assignment_config_id   =4;
+    string storage=5;
+  }
+	repeated Template templates=3;
+}
+
 message AddContainerRequest{
   string imageName =1;
   float memLimit =2;
   float numCPU=3;
   string section_user_id=4;  
-  string template_id=5; 
+  string template_id=5;
   bool dbStored =6;
+}
+
+message AddContainerReply {
+	bool success=1;
+	string message=2;
+	string containerID=3;
 }
 
 message RemoveContainerRequest {
@@ -49,27 +114,47 @@ message RemoveContainerRequest {
 }
 
 
+
+
+
 message AddTemplateRequest{
   string environmentID =1;
   string name = 2;
   string assignment_config_id = 3;
-  string section_user_id = 4;  
+  string section_user_id = 4;
   string containerID =5;
 }
+
+message AddTemplateReply {
+	bool success=1;
+	string message=2;
+	string templateID=3;
+}
+
 
 message RemoveTemplateRequest {
   string templateID=1;
 }
+
+
+
 
 message AddEnvironmentRequest{
   repeated string libraries =1;
   string section_user_id = 2;
   string name = 3;
 }
+message AddEnvironmentReply {
+	bool success=1;
+	string message=2;
+	string environmentID=3;
+}
 
 message RemoveEnvironmentRequest {
   string environmentID=1;
 }
+
+
 
 
 message CheckHaveContainerRequest {
@@ -85,6 +170,11 @@ message SectionRequest{
   string sectionID = 1; 
 }
 
+message SuccessStringReply{
+  bool success=1;
+	string message=2;
+}
+
 message StringReply {
   string message = 1;
 }
@@ -92,3 +182,4 @@ message StringReply {
 message ListReply {
   repeated string message = 1;
 }
+

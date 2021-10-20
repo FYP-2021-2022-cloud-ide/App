@@ -3,11 +3,25 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 type Data = {
-  message: string[]
+  success: boolean
+  message:string
+  sectionInfo:string[]
+  templates: Template []
+  //cutMes: string[]
 }
+
+type Template = {
+  id: string
+  name: string
+  imageId: string
+  assignment_config_id: string
+  storage:string
+}
+
+
 import * as grpc from 'grpc';
 
-import {  ListReply,  SectionRequest } from '../../proto/dockerGet/dockerGet_pb';
+import {    ListTemplatesReply,  SectionRequest } from '../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../proto/dockerGet/dockerGet_grpc_pb';
 
 export default  function handler(
@@ -24,10 +38,23 @@ export default  function handler(
     var docReq = new SectionRequest();
     docReq.setSectionid(body.sectionid);
     try{
-      client.listTemplates(docReq, function(err, GoLangResponse: ListReply) {
-        var mes= GoLangResponse.getMessageList();
-        //console.log(mes)
-        res.json({ message : mes });
+      client.listTemplates(docReq, function(err, GoLangResponse: ListTemplatesReply) {
+        var templates= GoLangResponse.getTemplatesList();
+        //console.log(templates)
+        res.json({
+          success : GoLangResponse.getSuccess(),
+          message: GoLangResponse.getMessage(),
+          sectionInfo:GoLangResponse.getSectioninfoList(),
+          templates:templates.map(t=>{
+            return ({
+              id: t.getId(),
+              name:t.getName(),
+              imageId: t.getImageid(),
+              assignment_config_id: t.getAssignmentConfigId(),
+              storage: t.getStorage(),
+            })
+          })
+        })
         res.status(200).end();
       })
     }

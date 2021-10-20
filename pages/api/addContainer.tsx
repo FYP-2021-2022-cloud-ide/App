@@ -2,12 +2,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 type Data = {
+  success:boolean
   message: string
-  //cutMes: string[]
+  containerID:string
 }
 import * as grpc from 'grpc';
 
-import {  StringReply,  AddContainerRequest } from '../../proto/dockerGet/dockerGet_pb';
+import {  AddContainerReply,  AddContainerRequest } from '../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../proto/dockerGet/dockerGet_grpc_pb';
 
 export default function handler(
@@ -19,7 +20,7 @@ export default function handler(
        target,
        grpc.credentials.createInsecure());
     
-    var body = JSON.parse(req.body);console.log(body)
+    var body = JSON.parse(req.body);//console.log(body)
     var docReq = new AddContainerRequest();
     docReq.setImagename(body.imageName);
     docReq.setMemlimit(body.memLimit);
@@ -28,10 +29,12 @@ export default function handler(
     docReq.setTemplateId(body.template_id);
     docReq.setDbstored(body.dbStored);
     try{
-      client.addContainer(docReq, function(err, GoLangResponse: StringReply) {
-        var mes= GoLangResponse.getMessage();
-        console.log(mes)
-        res.json({ message : mes });
+      client.addContainer(docReq, function(err, GoLangResponse: AddContainerReply) {
+        res.json({ 
+          success:GoLangResponse.getSuccess(),
+          message : GoLangResponse.getMessage(), 
+          containerID:GoLangResponse.getContainerid(), 
+        });
         res.status(200).end();
       })
     }

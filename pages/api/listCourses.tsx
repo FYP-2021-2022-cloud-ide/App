@@ -2,12 +2,24 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 type Data = {
-  message: string[]
+  success: boolean
+  message: string
+  courses: Course[]
   //cutMes: string[]
 }
+
+type Course = {
+  sectionID: string
+  courseCode: string
+  section: string
+  name: string
+  sectionRole: string
+  lastUpdateTime: string
+}
+
 import * as grpc from 'grpc';
 
-import {  ListReply,  SubRequest } from '../../proto/dockerGet/dockerGet_pb';
+import {  ListCoursesReply,  SubRequest } from '../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../proto/dockerGet/dockerGet_grpc_pb';
 
 export default function handler(
@@ -23,10 +35,23 @@ export default function handler(
     var docReq = new SubRequest();
     docReq.setSub(body.sub);
     try{
-      client.listCourses(docReq, function(err, GoLangResponse: ListReply) {
-        var mes= GoLangResponse.getMessageList();
+      client.listCourses(docReq, function(err, GoLangResponse: ListCoursesReply) {
         //console.log(mes)
-        res.json({ message : mes });
+        var courses = GoLangResponse.getCoursesList();
+        res.json({
+          success: GoLangResponse.getSuccess(),
+          message: GoLangResponse.getMessage(),
+          courses: courses.map( course =>{
+            return ({
+              sectionID: course.getSectionid(),
+              courseCode: course.getCoursecode(),
+              section: course.getSection(),
+              name: course.getName(),
+              sectionRole: course.getSectionrole(),
+              lastUpdateTime: course.getLastupdatetime()
+            })
+          })
+        });
         res.status(200).end();
       })
     }

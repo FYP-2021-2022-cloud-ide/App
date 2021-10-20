@@ -2,12 +2,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 type Data = {
+  success:boolean
   message: string
-  //cutMes: string[]
+  templateID:string
 }
 import * as grpc from 'grpc';
 
-import {  StringReply,  AddTemplateRequest } from '../../proto/dockerGet/dockerGet_pb';
+import {  AddTemplateReply,  AddTemplateRequest } from '../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../proto/dockerGet/dockerGet_grpc_pb';
 
 export default function handler(
@@ -27,10 +28,14 @@ export default function handler(
     docReq.setAssignmentConfigId(body.assignment_config_id);
     docReq.setContainerid(body.containerId);
     try{
-      client.addTemplate(docReq, function(err, GoLangResponse: StringReply) {
+      client.addTemplate(docReq, function(err, GoLangResponse: AddTemplateReply) {
         var mes= GoLangResponse.getMessage();
         console.log(mes)
-        res.json({ message : mes });
+        res.json({ 
+          success:GoLangResponse.getSuccess(),
+          message : GoLangResponse.getMessage(), 
+          templateID:GoLangResponse.getTemplateid()
+        });
         res.status(200).end();
       })
     }

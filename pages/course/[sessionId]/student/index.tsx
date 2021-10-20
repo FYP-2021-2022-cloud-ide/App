@@ -16,11 +16,10 @@ const Home = ()=>{
     useEffect(()=>{
       const fetchTemplates = async ()=>{
         const response = await templateList(courseId)//
-        const templates = JSON.parse(response.message)
-        if(templates.success){
-          setCourseName(templates.sectionInfo[0])
-          setSUID(templates.sectionInfo[1])
-          setTemplateList(templates.templates)
+        if(response.success){
+          setCourseName(response.sectionInfo[0])
+          setSUID(response.sectionInfo[1])
+          setTemplateList(response.templates)
         }
       }
       fetchTemplates()

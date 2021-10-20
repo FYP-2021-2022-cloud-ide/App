@@ -64,10 +64,9 @@ const TemplateCreate = React.forwardRef(({sectionUserID,environments, closeModal
                                 nextStep()
                                 const fakeWindow= window.open("",'_blank')
                                 const response = await addContainer("06979193acbf",100,0.5,sectionUserID,"",false)//non-existent template id
-                                const container = JSON.parse(response.message)
-                                if(container.success){
-                                    setContainerID(container.containerId)
-                                    fakeWindow?.location.replace("https://codespace.ust.dev/user/container/"+container.containerId+"/")
+                                if(response.success){
+                                    setContainerID(response.containerID)
+                                    fakeWindow?.location.replace("https://codespace.ust.dev/user/container/"+response.containerID+"/")
                                 }
                                 // open the container link from the API response
                                 // window.open('https://codespace.ust.dev', '_blank')
@@ -105,7 +104,6 @@ const TemplateCreate = React.forwardRef(({sectionUserID,environments, closeModal
                             onClick={async()=>{
                                 closeModal
                                 const response = await addTemplate(templateName,"06979193acbf",sectionUserID,"Dummy string",containerID)//non-existent template id
-                                const template = JSON.parse(response.message)
                             }}
                             className="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-[#65A9E0] text-base leading-6 font-medium text-white shadow-sm hover:text-gray-900 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
                             Finish

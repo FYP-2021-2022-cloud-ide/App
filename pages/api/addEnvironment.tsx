@@ -2,12 +2,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 type Data = {
+  success:boolean
   message: string
-  //cutMes: string[]
+  environmentID:string
 }
 import * as grpc from 'grpc';
 
-import {  StringReply,  AddEnvironmentRequest } from '../../proto/dockerGet/dockerGet_pb';
+import {  AddEnvironmentReply,  AddEnvironmentRequest } from '../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../proto/dockerGet/dockerGet_grpc_pb';
 
 export default function handler(
@@ -25,10 +26,12 @@ export default function handler(
     docReq.setName(body.name);
     docReq.setSectionUserId(body.section_user_id);
     try{
-      client.addEnvironment(docReq, function(err, GoLangResponse: StringReply) {
-        var mes= GoLangResponse.getMessage();
-        console.log(mes)
-        res.json({ message : mes });
+      client.addEnvironment(docReq, function(err, GoLangResponse: AddEnvironmentReply) {
+        res.json({ 
+          success:GoLangResponse.getSuccess(),
+          message : GoLangResponse.getMessage(), 
+          environmentID: GoLangResponse.getEnvironmentid(),
+        });
         res.status(200).end();
       })
     }

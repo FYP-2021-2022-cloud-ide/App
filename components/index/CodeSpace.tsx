@@ -6,17 +6,17 @@ interface CodeSpaceItemProps{
 }
 
 interface Item{
-    containerId: String
-    courseTitle: String
-    asmName: String
-    existedTime: String
+    courseTitle: string
+    assignmentName: string
+    existedTime: string
+    containerID: string
 }
 
 function CodeSpace({item}:CodeSpaceItemProps){
     // const { removeContainer} = useCnails();
     return(
         <div>
-        <a href={"https://codespace.ust.dev/user/container/"+item.containerId+"/"}  
+        <a href={"https://codespace.ust.dev/user/container/"+item.containerID+"/"}  
         target="_blank"
         className="flex flex-col justify-between border
         rounded-xl border-gray-200 border shadow-sm hover:shadow-lg min-w-max mr-4 transition-all ease-in-out duration-300 p-4" 
@@ -29,7 +29,7 @@ function CodeSpace({item}:CodeSpaceItemProps){
                     </span>
                 </div>
                 <div className="w-9/12 my-3">
-                    <div className="font-semibold text-sm text-gray-800">{item.asmName}</div>
+                    <div className="font-semibold text-sm text-gray-800">{item.assignmentName}</div>
                     <div className="font-medium text-xs text-gray-600">{item.courseTitle}</div>
                 </div>
                 <div className="w-2/12">

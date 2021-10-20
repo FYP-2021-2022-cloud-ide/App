@@ -2,12 +2,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 type Data = {
+  success:boolean
   message: string
-  //cutMes: string[]
 }
 import * as grpc from 'grpc';
 
-import {  StringReply,  RemoveEnvironmentRequest } from '../../proto/dockerGet/dockerGet_pb';
+import {  SuccessStringReply,  RemoveEnvironmentRequest } from '../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../proto/dockerGet/dockerGet_grpc_pb';
 
 export default function handler(
@@ -23,10 +23,13 @@ export default function handler(
     var docReq = new RemoveEnvironmentRequest();
     docReq.setEnvironmentid(body.envId);
     try{
-      client.removeEnvironment(docReq, function(err, GoLangResponse: StringReply) {
+      client.removeEnvironment(docReq, function(err, GoLangResponse: SuccessStringReply) {
         var mes= GoLangResponse.getMessage();
         console.log(mes)
-        res.json({ message : mes });
+        res.json({ 
+          success:GoLangResponse.getSuccess(),
+          message : GoLangResponse.getMessage(), 
+        });
         res.status(200).end();
       })
     }

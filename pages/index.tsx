@@ -17,26 +17,23 @@ export default function Home({sub}:props) {
     // data fetching from API
     useEffect(()=>{
         const fetchCourses = async ()=>{
-            const response = await courseList(sub)
-            const courses = JSON.parse(response.message)
+            const courses = await courseList(sub)
             setCourses(courses)
         }
         const fetchContainers = async ()=>{
-            const response = await containerList(sub)
-            const containers = JSON.parse(response.message)
+            const containers = await containerList(sub)
             setContainers(containers)
         }
         fetchCourses()
         fetchContainers()
     }, [])
-    
-    
+        
     return (
         <div>
             {courses&&containers ? (
                 <div className = "flex flex-col mx-6">
                     {/* @ts-ignore */}
-                    <ContainersList containers = {containers!.containers} containerInfo={containers!.containerInfo} ></ContainersList>
+                    <ContainersList containers = {containers!.containers} containerInfo={containers!.containersInfo} ></ContainersList>
                     {/* @ts-ignore */}
                     <CoursesList courses= {courses!.courses} ></CoursesList>
                 </div>
