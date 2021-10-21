@@ -36,7 +36,9 @@ export default function handler(
     docReq.setSub(body.sub);
     try{
       client.listCourses(docReq, function(err, GoLangResponse: ListCoursesReply) {
-        //console.log(mes)
+        if(!GoLangResponse.getSuccess()){
+          console.log(GoLangResponse.getMessage())
+        }
         var courses = GoLangResponse.getCoursesList();
         res.json({
           success: GoLangResponse.getSuccess(),

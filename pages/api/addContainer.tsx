@@ -30,6 +30,9 @@ export default function handler(
     docReq.setDbstored(body.dbStored);
     try{
       client.addContainer(docReq, function(err, GoLangResponse: AddContainerReply) {
+        if(!GoLangResponse.getSuccess()){
+          console.log(GoLangResponse.getMessage())
+        }
         res.json({ 
           success:GoLangResponse.getSuccess(),
           message : GoLangResponse.getMessage(), 

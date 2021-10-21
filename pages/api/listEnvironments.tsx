@@ -4,6 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 type Data = {
   success: boolean
+  userSectionID: string
   message:string
   environments: Environment []
   //cutMes: string[]
@@ -12,13 +13,14 @@ type Data = {
 type Environment = {
   id: string
   imageId: string
-  imageName: string
+  libraries:string
+  environmentName: string
   description: string
 }
 
 import * as grpc from 'grpc';
 
-import {  ListEnvironmentsReply,  SectionRequest } from '../../proto/dockerGet/dockerGet_pb';
+import {  ListEnvironmentsReply,  SectionAndSubRequest } from '../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../proto/dockerGet/dockerGet_grpc_pb';
 
 export default  function handler(
@@ -32,20 +34,26 @@ export default  function handler(
        grpc.credentials.createInsecure());
 
     var body = JSON.parse(req.body);
-    var docReq = new SectionRequest();
+    var docReq = new SectionAndSubRequest();
     docReq.setSectionid(body.sectionid);
+    docReq.setSub(body.sub);
+
     try{
       client.listEnvironments(docReq, function(err, GoLangResponse: ListEnvironmentsReply) {
         var envs= GoLangResponse.getEnvironmentsList();
-       // console.log(envs)
+        if(!GoLangResponse.getSuccess()){
+          console.log(GoLangResponse.getMessage())
+        }
         res.json({
           success : GoLangResponse.getSuccess(),
+          userSectionID: GoLangResponse.getUsersectionid(),
           message: GoLangResponse.getMessage(),
           environments:envs.map(env=>{
             return ({
               id: env.getId(),
               imageId: env.getImageid(),
-              imageName: env.getImagename(),
+              environmentName: env.getEnvironmentname(),
+              libraries: env.getLibraries(),
               description: env.getDescription(),
             })
           })

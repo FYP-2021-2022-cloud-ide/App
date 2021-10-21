@@ -202,6 +202,8 @@ export namespace ListCoursesReply {
 export class ListEnvironmentsReply extends jspb.Message { 
     getSuccess(): boolean;
     setSuccess(value: boolean): ListEnvironmentsReply;
+    getUsersectionid(): string;
+    setUsersectionid(value: string): ListEnvironmentsReply;
     getMessage(): string;
     setMessage(value: string): ListEnvironmentsReply;
     clearEnvironmentsList(): void;
@@ -222,6 +224,7 @@ export class ListEnvironmentsReply extends jspb.Message {
 export namespace ListEnvironmentsReply {
     export type AsObject = {
         success: boolean,
+        usersectionid: string,
         message: string,
         environmentsList: Array<ListEnvironmentsReply.Environment.AsObject>,
     }
@@ -232,8 +235,10 @@ export namespace ListEnvironmentsReply {
         setId(value: string): Environment;
         getImageid(): string;
         setImageid(value: string): Environment;
-        getImagename(): string;
-        setImagename(value: string): Environment;
+        getEnvironmentname(): string;
+        setEnvironmentname(value: string): Environment;
+        getLibraries(): string;
+        setLibraries(value: string): Environment;
         getDescription(): string;
         setDescription(value: string): Environment;
 
@@ -251,7 +256,8 @@ export namespace ListEnvironmentsReply {
         export type AsObject = {
             id: string,
             imageid: string,
-            imagename: string,
+            environmentname: string,
+            libraries: string,
             description: string,
         }
     }
@@ -296,12 +302,20 @@ export namespace ListTemplatesReply {
         setId(value: string): Template;
         getName(): string;
         setName(value: string): Template;
+        getDescription(): string;
+        setDescription(value: string): Template;
         getImageid(): string;
         setImageid(value: string): Template;
         getAssignmentConfigId(): string;
         setAssignmentConfigId(value: string): Template;
         getStorage(): string;
         setStorage(value: string): Template;
+        getActive(): boolean;
+        setActive(value: boolean): Template;
+        clearContaineridList(): void;
+        getContaineridList(): Array<string>;
+        setContaineridList(value: Array<string>): Template;
+        addContainerid(value: string, index?: number): string;
 
         serializeBinary(): Uint8Array;
         toObject(includeInstance?: boolean): Template.AsObject;
@@ -317,9 +331,12 @@ export namespace ListTemplatesReply {
         export type AsObject = {
             id: string,
             name: string,
+            description: string,
             imageid: string,
             assignmentConfigId: string,
             storage: string,
+            active: boolean,
+            containeridList: Array<string>,
         }
     }
 
@@ -407,14 +424,18 @@ export namespace RemoveContainerRequest {
 }
 
 export class AddTemplateRequest extends jspb.Message { 
-    getEnvironmentid(): string;
-    setEnvironmentid(value: string): AddTemplateRequest;
+    getImageid(): string;
+    setImageid(value: string): AddTemplateRequest;
     getName(): string;
     setName(value: string): AddTemplateRequest;
+    getDescription(): string;
+    setDescription(value: string): AddTemplateRequest;
     getAssignmentConfigId(): string;
     setAssignmentConfigId(value: string): AddTemplateRequest;
     getSectionUserId(): string;
     setSectionUserId(value: string): AddTemplateRequest;
+    getActive(): boolean;
+    setActive(value: boolean): AddTemplateRequest;
     getContainerid(): string;
     setContainerid(value: string): AddTemplateRequest;
 
@@ -430,10 +451,12 @@ export class AddTemplateRequest extends jspb.Message {
 
 export namespace AddTemplateRequest {
     export type AsObject = {
-        environmentid: string,
+        imageid: string,
         name: string,
+        description: string,
         assignmentConfigId: string,
         sectionUserId: string,
+        active: boolean,
         containerid: string,
     }
 }
@@ -493,6 +516,8 @@ export class AddEnvironmentRequest extends jspb.Message {
     setSectionUserId(value: string): AddEnvironmentRequest;
     getName(): string;
     setName(value: string): AddEnvironmentRequest;
+    getDescription(): string;
+    setDescription(value: string): AddEnvironmentRequest;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): AddEnvironmentRequest.AsObject;
@@ -509,6 +534,7 @@ export namespace AddEnvironmentRequest {
         librariesList: Array<string>,
         sectionUserId: string,
         name: string,
+        description: string,
     }
 }
 
@@ -538,6 +564,35 @@ export namespace AddEnvironmentReply {
     }
 }
 
+export class BuildEnvironmentRequest extends jspb.Message { 
+    getName(): string;
+    setName(value: string): BuildEnvironmentRequest;
+    getDescription(): string;
+    setDescription(value: string): BuildEnvironmentRequest;
+    getSectionUserId(): string;
+    setSectionUserId(value: string): BuildEnvironmentRequest;
+    getContainerid(): string;
+    setContainerid(value: string): BuildEnvironmentRequest;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): BuildEnvironmentRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: BuildEnvironmentRequest): BuildEnvironmentRequest.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: BuildEnvironmentRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): BuildEnvironmentRequest;
+    static deserializeBinaryFromReader(message: BuildEnvironmentRequest, reader: jspb.BinaryReader): BuildEnvironmentRequest;
+}
+
+export namespace BuildEnvironmentRequest {
+    export type AsObject = {
+        name: string,
+        description: string,
+        sectionUserId: string,
+        containerid: string,
+    }
+}
+
 export class RemoveEnvironmentRequest extends jspb.Message { 
     getEnvironmentid(): string;
     setEnvironmentid(value: string): RemoveEnvironmentRequest;
@@ -558,9 +613,32 @@ export namespace RemoveEnvironmentRequest {
     }
 }
 
-export class CheckHaveContainerRequest extends jspb.Message { 
+export class SectionAndSubRequest extends jspb.Message { 
+    getSectionid(): string;
+    setSectionid(value: string): SectionAndSubRequest;
     getSub(): string;
-    setSub(value: string): CheckHaveContainerRequest;
+    setSub(value: string): SectionAndSubRequest;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): SectionAndSubRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: SectionAndSubRequest): SectionAndSubRequest.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: SectionAndSubRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): SectionAndSubRequest;
+    static deserializeBinaryFromReader(message: SectionAndSubRequest, reader: jspb.BinaryReader): SectionAndSubRequest;
+}
+
+export namespace SectionAndSubRequest {
+    export type AsObject = {
+        sectionid: string,
+        sub: string,
+    }
+}
+
+export class CheckHaveContainerRequest extends jspb.Message { 
+    getSectionUserId(): string;
+    setSectionUserId(value: string): CheckHaveContainerRequest;
     getContainerid(): string;
     setContainerid(value: string): CheckHaveContainerRequest;
 
@@ -576,7 +654,7 @@ export class CheckHaveContainerRequest extends jspb.Message {
 
 export namespace CheckHaveContainerRequest {
     export type AsObject = {
-        sub: string,
+        sectionUserId: string,
         containerid: string,
     }
 }

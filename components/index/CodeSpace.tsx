@@ -1,5 +1,5 @@
 import React from 'react'
-import {LogoutIcon} from "@heroicons/react/outline"
+import {LogoutIcon, ClockIcon} from "@heroicons/react/outline"
 import { useCnails } from "../../contexts/cnails";
 interface CodeSpaceItemProps{
     item: Item
@@ -36,11 +36,11 @@ function CodeSpace({item}:CodeSpaceItemProps){
                     <LogoutIcon className="text-gray-500 w-6 h-6"></LogoutIcon>
                 </div>
             </div>
-            <div className="w-11/12 flex flex-row justify-end mb-1">
-                <img src="/clocktime.svg"  className="mr-2"></img>
+            <div className="w-12/12 flex flex-row justify-end items-center space-x-1 mb-1">
+                <ClockIcon className="h-4 w-4 text-gray-600"></ClockIcon>
                 <div className="font-medium text-xs text-gray-600">{item.existedTime.slice(0,item.existedTime.indexOf('m')+1)}</div>
             </div>     
-            </a> 
+        </a> 
         {/* <button className="border broder-gray-200 "           
                 onClick ={async () => {
                     const response = await removeContainer(item.containerId as string)

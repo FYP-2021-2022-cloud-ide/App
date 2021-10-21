@@ -31,7 +31,7 @@ function Modal({children, isOpen, setOpen}:ModalProps){
                 <Dialog
                 as="div"
                 className="fixed inset-0 z-10 overflow-y-auto"
-                onClose={()=>{setOpen(false)}}
+                onClose={()=>{}}
                 >
                     <div className="min-h-screen px-4 text-center">
                         <Transition.Child

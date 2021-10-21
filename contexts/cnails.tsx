@@ -3,13 +3,14 @@ import React, { useContext } from "react";
 interface CnailsContextState {
     containerList: (sub: string) => Promise<any>,
     courseList: (sub:string) => Promise<any>,
-    environmentList: (sectionid:string) => Promise<any>,
-    templateList: (sectionid:string) => Promise<any>,
+    environmentList: (sectionid:string, sub:string) => Promise<any>,
+    templateList: (sectionid:string, sub:string) => Promise<any>,
     addContainer: (imageName :string,memLimit :Number,numCPU:Number,section_user_id :string,template_id :string,dbStored:boolean) => Promise<any>,
     removeContainer: (containerId:string) => Promise<any>,
-    addTemplate: (templateName :string,envId :string,section_user_id:string,assignment_config_id :string,containerId :string) => Promise<any>,
+    addTemplate: (templateName :string, description:string, imageId :string,section_user_id:string,assignment_config_id :string,containerId :string,active:boolean) => Promise<any>,
     removeTemplate: (templateId:string) => Promise<any>,
-    addEnvironment: (libraries :string[],name :string, section_user_id:string)=> Promise<any>,
+    addEnvironment: (libraries :string[],name :string, description:string,section_user_id:string)=> Promise<any>,
+    buildEnvironment: (name :string,description:string, section_user_id:string,containerId:string)=> Promise<any>,
     removeEnvironment: (envId :string)=>  Promise<any>,
 }
 
@@ -44,20 +45,22 @@ export const CnailsProvider = (props: CnailsProviderProps) => {
         return res.json()
     }
 
-    const environmentList = async (sectionid:string)=>{
+    const environmentList = async (sectionid:string, sub:string)=>{
         var res =  await fetch('/api/listEnvironments',{
             method: 'POST', 
             body:JSON.stringify({ 
                 "sectionid": sectionid,
+                "sub": sub
             }),
         })
         return res.json()
     }
-    const templateList = async (sectionid:string)=>{
+    const templateList = async (sectionid:string,sub:string)=>{
         var res =  await fetch('/api/listTemplates',{
             method: 'POST', 
             body:JSON.stringify({ 
                 "sectionid": sectionid,
+                "sub":sub,
             }),
         })
         return res.json()
@@ -93,18 +96,23 @@ export const CnailsProvider = (props: CnailsProviderProps) => {
     }
     const addTemplate = async (
         templateName :string,
-        envId :string,
+        description:string,
+        imageId :string,
         section_user_id:string,
         assignment_config_id :string,
-        containerId :string)=>{
+        containerId :string,
+        active:boolean
+        )=>{
         var res =  await fetch('/api/addTemplate',{
             method: 'POST', 
             body:JSON.stringify({ 
                 "templateName":templateName,
-                "envId" : envId ,
+                "description":description,
+                "imageId" : imageId ,
                 "section_user_id":section_user_id,
                 "assignment_config_id" :assignment_config_id ,
                 "containerId" :containerId,
+                "active":active,
             }),
         })
         return res.json()
@@ -122,6 +130,7 @@ export const CnailsProvider = (props: CnailsProviderProps) => {
     const addEnvironment = async (
         libraries :string[],
         name :string,
+        description:string,
         section_user_id:string)=>{
         var res =  await fetch('/api/addEnvironment',{
             method: 'POST', 
@@ -129,6 +138,23 @@ export const CnailsProvider = (props: CnailsProviderProps) => {
                 "libraries":libraries,
                 "name" : name ,
                 "section_user_id":section_user_id,
+                "description":description,
+            }),
+        })
+        return res.json()
+    }
+    const buildEnvironment = async (
+        name :string,
+        description:string,
+        section_user_id:string,
+        containerId :string)=>{
+        var res =  await fetch('/api/buildEnvironment',{
+            method: 'POST', 
+            body:JSON.stringify({ 
+                "name" : name ,
+                "section_user_id":section_user_id,
+                "containerId":containerId,
+                "description":description,
             }),
         })
         return res.json()
@@ -154,6 +180,7 @@ export const CnailsProvider = (props: CnailsProviderProps) => {
                 addTemplate,
                 removeTemplate,
                 addEnvironment,
+                buildEnvironment,
                 removeEnvironment,
             }}
         >

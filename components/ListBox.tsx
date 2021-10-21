@@ -4,6 +4,8 @@ import { CheckIcon, SelectorIcon } from '@heroicons/react/solid'
 
 interface ListBoxProps{
   environments: Environment[]
+  selected: Environment
+  setSelected: React.Dispatch<React.SetStateAction<Environment>>
 }
 
 interface Environment{
@@ -11,8 +13,8 @@ interface Environment{
   id: string
 }
 
-export default function ListBox({environments}:ListBoxProps) {
-  const [selected, setSelected] = useState(environments[0])
+export default function ListBox({environments, selected, setSelected}:ListBoxProps) {
+  // const [selected, setSelected] = useState(environments[0])
 
   return (
     <div className="w-full top-16">

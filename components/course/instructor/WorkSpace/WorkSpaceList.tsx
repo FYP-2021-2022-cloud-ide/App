@@ -4,24 +4,38 @@ import { useState } from "react"
 import WorkSpace from "./WorkSpace"
 
 interface container{
-    name:string
-    link:string
-    description: string
-    existContainer: boolean
+    // name:string
+    // link:string
+    // description: string
+    // existContainer: boolean
+    // existedTime: string
+    courseTitle: string
+    assignmentName: string
     existedTime: string
+    containerID: string
 }
 
 interface props{
     containers: container[]
+    courseName:string
+    sectionUserID:string
 }
 
 
-const WorkSpaceList = ({containers}:props)=>{//
-    var containers =[{name:'dsfas', 
-    link:'https://www.google.com',
-    description: 'dsf32423423423423423423as',
-    existContainer: false,
-    existedTime: '32423534'}]
+const WorkSpaceList = ({containers,courseName,sectionUserID}:props)=>{//
+    // var containers =[{name:'dsfas', 
+    // link:'https://www.google.com',
+    // description: 'dsf32423423423423423423as',
+    // existContainer: false,
+    // existedTime: '32423534'}]
+    // containers = [{
+    //     courseTitle:"COMP1021 (L02)",
+    //     assignmentName:"PA1",
+    //     existedTime:"adasd",
+    //     containerID:"asdasda"
+    // }]
+    containers = []
+
     let [isOpen, setIsOpen] = useState(false)
 
     function openModal() {
@@ -44,11 +58,16 @@ const WorkSpaceList = ({containers}:props)=>{//
             <div className="flex flex-col space-y-5">
                 {containers!=null && containers.map((container)=>{
                     return(
-                        <WorkSpace container={container}></WorkSpace>
+                        <div>
+                            {container.courseTitle==courseName &&
+                            <WorkSpace container={container}></WorkSpace>
+                            }
+                        </div>
+                        
                     );
                     })
                 }
-                {containers== null &&
+                {containers.length == 0 &&
                 <button className="border broder-gray-200 shadow-sm rounded-lg bg-white
                 p-4 hover:shadow-lg transition-all ease-in-out duration-300 h-24"
                 onClick ={(e) =>{

@@ -27,7 +27,7 @@ export default function Home({sub}:props) {
         fetchCourses()
         fetchContainers()
     }, [])
-        
+    console.log(courses)
     return (
         <div>
             {courses&&containers ? (
@@ -56,4 +56,3 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
     }
 }
-

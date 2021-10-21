@@ -11,11 +11,11 @@ package dockerGet;
 
 service Docker {
   rpc login(LoginRequest)returns ( ListReply) {}
-  rpc checkHaveContainer(CheckHaveContainerRequest)returns( StringReply ){}
+  rpc checkHaveContainer(CheckHaveContainerRequest)returns( SuccessStringReply ){}
   rpc listContainers(SubRequest)returns( ListContainerReply ){}
   rpc listCourses(SubRequest)returns( ListCoursesReply ){}
-  rpc listEnvironments(SectionRequest)returns(ListEnvironmentsReply){}
-  rpc listTemplates(SectionRequest)returns(ListTemplatesReply){}
+  rpc listEnvironments(SectionAndSubRequest)returns(ListEnvironmentsReply){}
+  rpc listTemplates(SectionAndSubRequest)returns(ListTemplatesReply){}
 
   rpc addContainer(AddContainerRequest)returns(AddContainerReply){}
   rpc removeContainer(RemoveContainerRequest)returns(SuccessStringReply){}
@@ -24,6 +24,7 @@ service Docker {
   rpc removeTemplate(RemoveTemplateRequest)returns(SuccessStringReply){}
 
   rpc addEnvironment(AddEnvironmentRequest)returns(AddEnvironmentReply){}
+  rpc buildEnvironment(BuildEnvironmentRequest)returns(AddEnvironmentReply){}
   rpc removeEnvironment(RemoveEnvironmentRequest)returns(SuccessStringReply){}
 }
 
@@ -69,12 +70,14 @@ message ListCoursesReply {
 
 message ListEnvironmentsReply{
   bool success=1;
+  string userSectionID=2;
   string message = 4;
 
   message Environment {
     string id =1;
     string imageId   =2;
-    string imageName  =3; 
+    string environmentName  =3; 
+    string libraries = 5;
     string description   =4;
   }
 	repeated Environment environments=3;
@@ -87,9 +90,12 @@ message ListTemplatesReply{
   message Template {
     string id =1;
     string name   =2;
+    string description=7;
     string imageId  =3; 
     string assignment_config_id   =4;
     string storage=5;
+    bool active=8;
+    repeated string ContainerId=6; 
   }
 	repeated Template templates=3;
 }
@@ -115,13 +121,13 @@ message RemoveContainerRequest {
 
 
 
-
-
 message AddTemplateRequest{
-  string environmentID =1;
+  string imageID =1;
   string name = 2;
+  string description=6;
   string assignment_config_id = 3;
   string section_user_id = 4;
+  bool active=7;
   string containerID =5;
 }
 
@@ -143,6 +149,7 @@ message AddEnvironmentRequest{
   repeated string libraries =1;
   string section_user_id = 2;
   string name = 3;
+  string description=4;
 }
 message AddEnvironmentReply {
 	bool success=1;
@@ -150,15 +157,24 @@ message AddEnvironmentReply {
 	string environmentID=3;
 }
 
+message BuildEnvironmentRequest{
+  string name = 2;
+  string description=1;
+  string section_user_id = 4;
+  string containerID =5;
+}
+
 message RemoveEnvironmentRequest {
   string environmentID=1;
 }
 
-
-
+message SectionAndSubRequest{
+  string sectionID = 1;
+  string sub = 2;
+}
 
 message CheckHaveContainerRequest {
-  string sub = 1; 
+  string section_user_id = 1; 
   string containerID = 3;
 }
 

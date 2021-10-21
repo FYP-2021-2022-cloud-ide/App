@@ -24,8 +24,9 @@ export default function handler(
     docReq.setContainerid(body.containerId);
     try{
       client.removeContainer(docReq, function(err, GoLangResponse: SuccessStringReply) {
-        var mes= GoLangResponse.getMessage();
-        console.log(mes)
+        if(!GoLangResponse.getSuccess()){
+          console.log(GoLangResponse.getMessage())
+        }
         res.json({ 
           success:GoLangResponse.getSuccess(),
           message : GoLangResponse.getMessage(), 

@@ -19,13 +19,14 @@ export default function handler(
        target,
        grpc.credentials.createInsecure());
     
-    var body = JSON.parse(req.body);console.log(body)
+    var body = JSON.parse(req.body);//console.log(body)
     var docReq = new RemoveEnvironmentRequest();
     docReq.setEnvironmentid(body.envId);
     try{
       client.removeEnvironment(docReq, function(err, GoLangResponse: SuccessStringReply) {
-        var mes= GoLangResponse.getMessage();
-        console.log(mes)
+        if(!GoLangResponse.getSuccess()){
+          console.log(GoLangResponse.getMessage())
+        }
         res.json({ 
           success:GoLangResponse.getSuccess(),
           message : GoLangResponse.getMessage(), 

@@ -23,14 +23,18 @@ export default function handler(
     var body = JSON.parse(req.body);console.log(body)
     var docReq = new AddTemplateRequest();
     docReq.setName(body.templateName);
-    docReq.setEnvironmentid(body.envId);
+    docReq.setImageid(body.imageId);
     docReq.setSectionUserId(body.section_user_id);
     docReq.setAssignmentConfigId(body.assignment_config_id);
     docReq.setContainerid(body.containerId);
+    docReq.setDescription(body.description);
+    docReq.setActive(body.active)
     try{
       client.addTemplate(docReq, function(err, GoLangResponse: AddTemplateReply) {
-        var mes= GoLangResponse.getMessage();
-        console.log(mes)
+        if(!GoLangResponse.getSuccess()){
+          console.log(GoLangResponse.getMessage())
+        }
+        //console.log(GoLangResponse.getTemplateid())
         res.json({ 
           success:GoLangResponse.getSuccess(),
           message : GoLangResponse.getMessage(), 

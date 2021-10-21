@@ -1,11 +1,11 @@
-import {useCnails} from "../../../contexts/cnails";
+import {useCnails} from "../../../../contexts/cnails";
 import React, { useEffect, useRef, useState } from 'react';
 import Template from "./Template"
 import {DocumentTextIcon} from "@heroicons/react/outline"
 import {PlusCircleIcon} from "@heroicons/react/solid"
 import { Dialog, Transition } from "@headlessui/react";
-import Modal from "../../Modal";
-import ListBox from "../../ListBox";
+import Modal from "../../../Modal";
+import ListBox from "../../../ListBox";
 import TemplateCreate from "./TemplateCreate";
 
 interface template{
@@ -14,22 +14,25 @@ interface template{
     imageId: string
     assignment_config_id: string
     storage: string
+    containerID: string
+    active: boolean
 }
 
 interface props{
     templates: template[]
-    images: image[]
+    environments: environment[]
     sectionUserID:string
 }
 
-interface image{
+interface environment{
+    id:string
     imageId:string
-    imageName: string
+    environmentName: string
     description: string
 }
 
 
-const TemplateList = ({templates,sectionUserID, images}:props)=>{//{
+const TemplateList = ({templates,sectionUserID, environments}:props)=>{//{
     // var templates=[
     //     { name: "fdgsdd",
     //     imageId: 'asdasdasd',
@@ -45,7 +48,6 @@ const TemplateList = ({templates,sectionUserID, images}:props)=>{//{
     //     },
     // ]
     // var templates = []
-    
     const [memLimit ,setmemLimit]= useState(100);
     const [numCPU ,setnumCPU]= useState(1);
     const { addContainer} = useCnails();
@@ -59,11 +61,11 @@ const TemplateList = ({templates,sectionUserID, images}:props)=>{//{
         setIsOpen(false)
     }
     
-    var environments=[]
-    for (let i =0; i< images.length; i++){
-        environments.push({
-            name: images[i].imageName + " ("+ images[i].imageId +")",
-            id: images[i].imageId
+    var environmentsList=[]
+    for (let i =0; i< environments.length; i++){
+        environmentsList.push({
+            name: environments[i].environmentName + " ("+ environments[i].imageId +")",
+            id: environments[i].imageId
         })
     }
 
@@ -79,7 +81,7 @@ const TemplateList = ({templates,sectionUserID, images}:props)=>{//{
                 </button>
             </div>
             {templates?.length? 
-            <div className="flex flex-col space-y-5">
+            <div className="grid grid-cols-2 gap-8">
                 {templates.map((template: template)=>{
                     return(
                         <Template template={template} memLimit={memLimit} numCPU={numCPU} sectionUserID={sectionUserID}></Template>
@@ -97,7 +99,7 @@ const TemplateList = ({templates,sectionUserID, images}:props)=>{//{
                     </div>
                 </button>}
                 <Modal isOpen={isOpen} setOpen={setIsOpen}>
-                    <TemplateCreate closeModal={closeModal} environments={environments} ref={ref} sectionUserID={sectionUserID}></TemplateCreate>
+                    <TemplateCreate closeModal={closeModal} environments={environmentsList} ref={ref} sectionUserID={sectionUserID}></TemplateCreate>
                 </Modal>
         </div>
     )

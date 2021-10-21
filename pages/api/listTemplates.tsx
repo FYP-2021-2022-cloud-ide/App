@@ -13,15 +13,17 @@ type Data = {
 type Template = {
   id: string
   name: string
+  description:string
   imageId: string
   assignment_config_id: string
+  active:boolean
   storage:string
 }
 
 
 import * as grpc from 'grpc';
 
-import {    ListTemplatesReply,  SectionRequest } from '../../proto/dockerGet/dockerGet_pb';
+import {    ListTemplatesReply,  SectionAndSubRequest } from '../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../proto/dockerGet/dockerGet_grpc_pb';
 
 export default  function handler(
@@ -35,23 +37,32 @@ export default  function handler(
        grpc.credentials.createInsecure());
 
     var body = JSON.parse(req.body);
-    var docReq = new SectionRequest();
+    var docReq = new SectionAndSubRequest();
+    docReq.setSub(body.sub);
     docReq.setSectionid(body.sectionid);
     try{
       client.listTemplates(docReq, function(err, GoLangResponse: ListTemplatesReply) {
         var templates= GoLangResponse.getTemplatesList();
-        //console.log(templates)
+        if(!GoLangResponse.getSuccess()){
+          console.log(GoLangResponse.getMessage())
+        }
+        
         res.json({
           success : GoLangResponse.getSuccess(),
           message: GoLangResponse.getMessage(),
           sectionInfo:GoLangResponse.getSectioninfoList(),
           templates:templates.map(t=>{
+            // console.log(t.getContaineridList())
+            // console.log(t.getActive())
             return ({
               id: t.getId(),
               name:t.getName(),
+              description:t.getDescription(),
               imageId: t.getImageid(),
               assignment_config_id: t.getAssignmentConfigId(),
               storage: t.getStorage(),
+              active: t.getActive(),
+              containerID:t.getContaineridList()[0],
             })
           })
         })

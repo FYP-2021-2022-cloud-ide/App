@@ -8,7 +8,7 @@ type Data = {
 }
 import * as grpc from 'grpc';
 
-import {  AddEnvironmentReply,  AddEnvironmentRequest } from '../../proto/dockerGet/dockerGet_pb';
+import {  AddEnvironmentReply,  BuildEnvironmentRequest } from '../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../proto/dockerGet/dockerGet_grpc_pb';
 
 export default function handler(
@@ -21,13 +21,13 @@ export default function handler(
        grpc.credentials.createInsecure());
     
     var body = JSON.parse(req.body);console.log(body)
-    var docReq = new AddEnvironmentRequest();
-    docReq.setLibrariesList(body.libraries);
+    var docReq = new BuildEnvironmentRequest();
     docReq.setName(body.name);
     docReq.setSectionUserId(body.section_user_id);
+    docReq.setContainerid(body.containerId);
     docReq.setDescription(body.description)
     try{
-      client.addEnvironment(docReq, function(err, GoLangResponse: AddEnvironmentReply) {
+      client.buildEnvironment(docReq, function(err, GoLangResponse: AddEnvironmentReply) {
         if(!GoLangResponse.getSuccess()){
           console.log(GoLangResponse.getMessage())
         }

@@ -40,7 +40,9 @@ export default function handler(
     docReq.setSub(body.sub);
     try{
       client.listContainers(docReq, function(err, GoLangResponse: ListContainerReply) {
-        //console.log(GoLangResponse.getContainersList()[0])
+        if(!GoLangResponse.getSuccess()){
+          console.log(GoLangResponse.getMessage())
+        }
         var containersInfo =GoLangResponse.getContainerinfo();
         var containers = GoLangResponse.getContainersList();
         res.json({ 

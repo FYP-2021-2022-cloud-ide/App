@@ -1,52 +1,65 @@
 import { useRouter } from "next/router";
 import CourseBar from "../../../../components/course/CourseBar";
-import ImageList from "../../../../components/course/instructor/ImageList";
-import TemplateList from "../../../../components/course/instructor/TemplateList";
+import EnvironmentList from "../../../../components/course/instructor/Environment/EnvironmentList";
+import TemplateList from "../../../../components/course/instructor/Template/TemplateList";
 import React, { useEffect, useState } from 'react';
 import { useCnails } from "../../../../contexts/cnails";
 import { GetServerSideProps } from 'next';
-import WorkSpaceList from "../../../../components/course/instructor/WorkSpaceList";
+import WorkSpaceList from "../../../../components/course/instructor/WorkSpace/WorkSpaceList";
 
-const Home = ()=>{
+interface ICourseProps{
+  sub: string
+}
+
+const Home = ({sub}:ICourseProps)=>{
     const router = useRouter();
     const courseId = router.query.sessionId as string
     const [courseName,setCourseName]= useState("")
     const [sectionUserID,setSUID]= useState("")
-    const [imageList,setImageList]= useState(null)
+    const [thisEnvironmentList,setEnvironmentList]= useState(null)
     const [thisTemplateList,setTemplateList]= useState(null)
-    const { environmentList,templateList} = useCnails();
+    const [workSpaceList,setWorkspaceList]= useState(null)
+    const { environmentList,templateList,containerList} = useCnails();
     // data fetching from API
     useEffect(()=>{
         const fetchEnvironments = async ()=>{
-          const response = await environmentList(courseId)//
+          const response = await environmentList(courseId, sub)//
           if(response.success){
-            setImageList(response.environments)
+            console.log(response)
+            setSUID(response.userSectionID)
+            setEnvironmentList(response.environments)
           }
         }
         const fetchTemplates = async ()=>{
-          const response = await templateList(courseId)//
+          const response = await templateList(courseId,sub)//
           if(response.success){
             setCourseName(response.sectionInfo[0])
-            setSUID(response.sectionInfo[1])
             setTemplateList(response.templates)
+          }
+        }
+        const fetchWorkspace = async ()=>{
+          const response = await containerList(sub)//
+          if(response.success){
+            setWorkspaceList(response.containers)
           }
         }
         fetchEnvironments()
         fetchTemplates()
-    }, [])    
+        fetchWorkspace()
+    }, [])
     //console.log(imageList)
 
     return (
       <div className="w-full">
-          {imageList&&thisTemplateList ? (
+          {thisEnvironmentList&&thisTemplateList ? (
               <div className="flex flex-col font-bold px-8 w-full pt-10 min-h-screen">
                   {/* pathBar */}
                   <CourseBar role={ "Instructor"}  courseName={courseName!}></CourseBar>
           
-                  <div className="grid grid-cols-3 gap-8">
-                      <ImageList images={imageList!} sectionUserID={sectionUserID}></ImageList>
-                      <TemplateList images={imageList!} templates={thisTemplateList!} sectionUserID={sectionUserID}></TemplateList>
-                      <WorkSpaceList containers={null}></WorkSpaceList>
+                  <div className="grid grid-cols-2 gap-8">
+                      <EnvironmentList environments={thisEnvironmentList!} sectionUserID={sectionUserID}></EnvironmentList>
+                      <TemplateList environments={thisEnvironmentList!} templates={thisTemplateList!} sectionUserID={sectionUserID}></TemplateList>
+                      {/* <WorkSpaceList containers={workSpaceList!}  courseName={courseName!} sectionUserID={sectionUserID}></WorkSpaceList> */}
                   </div>
               </div>
           ):(
