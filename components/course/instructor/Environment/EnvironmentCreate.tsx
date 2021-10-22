@@ -2,6 +2,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import React, { MouseEventHandler, useEffect } from "react";
 import { Fragment, useState}from "react";
 import Select from 'react-select';
+import { finished } from "stream";
 import { useCnails } from "../../../../contexts/cnails";
 
 interface EnvironmentCreateProps{
@@ -18,10 +19,11 @@ const EnvironmentCreate = React.forwardRef(({sectionUserID, closeModal}:Environm
         { value: 'python', label: 'python' },
         { value: 'python3', label: 'python3' },
     ]
+    const [finishLoading, setFinishLoading] = useState(true)
     const {buildEnvironment,addContainer} = useCnails();
     const [containerID,setContainerID]=useState("")
     const [libaries, setLibaries] = useState([""])
-    const {addEnvironment} = useCnails();
+    const {addEnvironment, removeContainer} = useCnails();
     const [step, setStep] = useState(1);
     const nextStep = () => {
         setStep(step + 1);
@@ -60,26 +62,23 @@ const EnvironmentCreate = React.forwardRef(({sectionUserID, closeModal}:Environm
                             >
                                 Create Environment
                             </Dialog.Title>
-                            <div className="py-2">
-                            A new container is opened in a new browser, please initialize the environment and press the finish button to save the environment
+                            <div className="py-2 m-auto ">
+                            A new container is prepared, please click the following link and set up the environment. After finished the setting, please press the finish button to save the environment
                             </div>
+                            <a className="flex text-blue-500 underline justify-center" href={"https://codespace.ust.dev/user/container/"+containerID+"/"} target="_blank"> 
+                            Click Here
+                            </a>
                             <div className="py-3 sm:flex sm:flex-row-reverse">
                                 <span className="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
                                     <button
                                     type="button"
                                     onClick={async()=>{
+                                        setFinishLoading(false)
+                                        nextStep()
                                         const response = await buildEnvironment(environmentName,"",sectionUserID,containerID)//expect description
                                         console.log(response)
-                                        // response.then(
-                                        //     value => {
-                                        //         //@ts-ignore
-                                        //         closeModal()
-                                        //     }
-                                        // )
                                         if(response.success){
-                                            //@ts-ignore
-                                            closeModal()
-                                            window.location.reload();
+                                            setFinishLoading(true);
                                         }
                                     }}
                                     className="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-[#65A9E0] text-base leading-6 font-medium text-white shadow-sm hover:text-gray-900 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
@@ -87,10 +86,34 @@ const EnvironmentCreate = React.forwardRef(({sectionUserID, closeModal}:Environm
                                     </button>
                                 </span>
                                 <span className="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
-                                    <button onClick={closeModal} type="button" className="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-500 shadow-sm hover:text-gray-900 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
+                                    <button onClick={ async()=>{
+                                        setFinishLoading(false)
+                                        nextStep();
+                                        const response = await removeContainer(containerID)
+                                        if(response.success){
+                                            setFinishLoading(true)
+                                        }
+                                    }} type="button" className="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-500 shadow-sm hover:text-gray-900 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
                                     Cancel
                                     </button>
                                 </span>
+                            </div>
+                        </div>
+                    )
+                case 4:
+                    if(finishLoading){
+                        window.location.reload();
+                    }
+                    return(
+                        <div className="inline-block overflow-visible w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl text-[#415A6E]">
+                            <Dialog.Title
+                                as="h3"
+                                className="text-xl font-medium leading-6"
+                            >
+                                Create Environment
+                            </Dialog.Title>
+                            <div className="flex flex-row justify-center my-8">
+                                <img src='/circle.svg'/> 
                             </div>
                         </div>
                     )
@@ -127,7 +150,7 @@ const EnvironmentCreate = React.forwardRef(({sectionUserID, closeModal}:Environm
                                     if(response.success){
                                         // const fakeWindow= window.open("",'_blank')
                                         setContainerID(response.containerID)
-                                        window.open("https://codespace.ust.dev/user/container/"+response.containerID+"/",'_blank')
+                                        // window.open("https://codespace.ust.dev/user/container/"+response.containerID+"/",'_blank')
                                         // fakeWindow?.location.replace("https://codespace.ust.dev/user/container/"+response.containerID+"/")
                                     }
                                     // open the container link from the API response
@@ -198,13 +221,12 @@ const EnvironmentCreate = React.forwardRef(({sectionUserID, closeModal}:Environm
                                     <button
                                     type="button"
                                     onClick={async()=>{
-                                        const response = addEnvironment(libaries, environmentName,"",sectionUserID)//expecting description
-                                        response.then(
-                                            value => {
-                                                //@ts-ignore
-                                                closeModal()
-                                            }
-                                        )
+                                        const response = await addEnvironment(libaries, environmentName,"",sectionUserID)//expecting description
+                                        if(response.success){
+                                            //@ts-ignore
+                                            closeModal()
+                                            window.location.reload();
+                                        }
                                         nextStep()
                                     }}
                                     className="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-[#65A9E0] text-base leading-6 font-medium text-white shadow-sm hover:text-gray-900 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">

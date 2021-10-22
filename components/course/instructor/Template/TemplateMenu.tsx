@@ -14,7 +14,7 @@ interface TemplateMenuProps{
 }
 
 export default function TemplateMenu({templateID, imageID, memLimit, numCPU, sectionUserID, containerID, templateActive}:TemplateMenuProps) {
-    const {removeTemplate, addContainer, removeContainer} = useCnails();
+    const {removeTemplate, addContainer, removeContainer,activateTemplate,deactivateTemplate} = useCnails();
     let [isOpen, setIsOpen] = useState(false)
 
     function openModal() {
@@ -24,7 +24,12 @@ export default function TemplateMenu({templateID, imageID, memLimit, numCPU, sec
     function closeModal(){
         setIsOpen(false)
     }
-    console.log(templateActive)
+    console.log(templateID)
+
+    var flag = true
+    if (containerID == undefined){
+        flag = false
+    }
     return (
         <div>
             <Menu as="div" className="relative inline-block text-left">
@@ -51,13 +56,15 @@ export default function TemplateMenu({templateID, imageID, memLimit, numCPU, sec
                                 onClick ={async () => {
                                     const response = await removeTemplate(templateID)
                                     console.log(response)
+                                    window.location.reload()
                                 }}
                             >
                                 delete
                             </button>
                             )}
                         </Menu.Item>
-                        <Menu.Item>
+                        {flag?(
+                            <Menu.Item>
                             {({ active }) => (
                             <button
                                 className={`${
@@ -72,32 +79,27 @@ export default function TemplateMenu({templateID, imageID, memLimit, numCPU, sec
                                 rmInstance
                             </button>
                             )}
-                        </Menu.Item>
-                        <Menu.Item>
+                            </Menu.Item>
+                        ):(
+                            <Menu.Item>
                             {({ active }) => (
-                            <button
-                                className={`${
-                                active ? 'bg-gray-200 font-semibold' : ''
-                                } text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-sm`}
-                                onClick ={async () => {
-                                    openModal();
-                                    if (containerID == undefined){
+                                <button
+                                    className={`${
+                                    active ? 'bg-gray-200 font-semibold' : ''
+                                    } text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-sm`}
+                                    onClick ={async () => {
+                                        openModal();
                                         const response = await addContainer(imageID,memLimit,numCPU,sectionUserID,templateID,true)
-                                        if(response.success){
-                                            window.open("https://codespace.ust.dev/user/container/"+response.containerID+"/",'_blank')
-                                        }
-                                    }else{
-                                        window.open("https://codespace.ust.dev/user/container/"+containerID+"/",'_blank')
-                                        // fakeWindow?.location.replace("https://codespace.ust.dev/user/container/"+containerID+"/")
-                                    }
-                                    closeModal();
-                                    window.location.reload();
-                                }}
-                            >
-                                instance
-                            </button>
-                            )}
-                        </Menu.Item>
+                                        window.location.reload();
+                                    }}
+                                >
+                                    instance
+                                </button>
+                                )}
+                            </Menu.Item>
+                        )}
+                        
+                        
                         {templateActive ? (
                             <Menu.Item>
                                 {({ active }) => (
@@ -106,9 +108,10 @@ export default function TemplateMenu({templateID, imageID, memLimit, numCPU, sec
                                     active ? 'bg-gray-200 font-semibold' : ''
                                     } text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-sm`}
                                     onClick ={async () => {
-                                        // const response = await removeEnvironment(imageID)
-                                        // console.log(response)
-                                        // const remove = JSON.parse(response.message)
+                                        
+                                        const response = await deactivateTemplate(templateID)
+                                        console.log(response)
+                                        window.location.reload();
                                     }}
                                 >
                                     deactivate
@@ -123,9 +126,9 @@ export default function TemplateMenu({templateID, imageID, memLimit, numCPU, sec
                                     active ? 'bg-gray-200 font-semibold' : ''
                                     } text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-sm`}
                                     onClick ={async () => {
-                                        // const response = await removeEnvironment(imageID)
-                                        // console.log(response)
-                                        // const remove = JSON.parse(response.message)
+                                        const response = await activateTemplate(templateID)
+                                        console.log(response)
+                                        window.location.reload();
                                     }}
                                 >
                                     activate

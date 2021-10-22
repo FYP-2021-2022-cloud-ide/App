@@ -2,32 +2,25 @@ import {CubeTransparentIcon} from "@heroicons/react/outline"
 import {PlusCircleIcon} from "@heroicons/react/solid"
 import Workspace from "./Workspace"
 
-interface container{
+interface Template{
+    imageId: string
     id: string
     name: string
-    imageId: string
+    description:string
     assignment_config_id: string
     storage: string
-    existContainer: boolean
-    existedTime: string
+    containerID: string
+    active: boolean
 }
 
 interface props{
-    containers: container[]
+    templates: Template[]
+    sectionUserId: string
 }
 
-const WorkspacesList = ({containers}:props)=>{//
-    // var containers =[{name:'dsfas', 
-    // link:'https://www.google.com',
-    // description: 'dsf32423423423423423423as',
-    // existContainer: false,
-    // existedTime: '32423534'},{name:'dsfas', 
-    // link:'https://www.google.com',
-    // description: 'dsf32423423423423423423as',
-    // existContainer: false,
-    // existedTime: '32423534'}]
+const WorkspacesList = ({templates, sectionUserId}:props)=>{//
     return(
-        <div className="flex flex-col justify-start">
+        <div className="flex flex-col justify-start w-full">
             <div className="text-gray-600 flex flex-row justify-start gap-x-4 pb-4">
                 {/* <img src="/coursePage/workspacesLogo.svg"  className="" /> */}
                 <CubeTransparentIcon className="w-7 h-7"></CubeTransparentIcon>
@@ -37,13 +30,11 @@ const WorkspacesList = ({containers}:props)=>{//
                     <PlusCircleIcon className="w-7 h-7"></PlusCircleIcon>
                 </button>
             </div>
-            {(containers?.length )? (containers.map((container)=>{
+            {(templates?.length )? <div className="space-x-4 flex flex-wrap"> {templates.map((template)=>{
                 return(
-                    <div className="grid grid-cols-3 gap-6 place-items-stretch">
-                    <Workspace container={container}></Workspace>
-                    </div>
+                    <Workspace template={template} sectionUserId={sectionUserId}></Workspace>
                 );
-                }))
+                })}</div>
                 :
                 <button className="border broder-gray-200 shadow-sm rounded-lg bg-white
                 hover:shadow-lg transition-all ease-in-out duration-300 h-20"

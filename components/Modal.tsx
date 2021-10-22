@@ -33,7 +33,7 @@ function Modal({children, isOpen, setOpen}:ModalProps){
                 className="fixed inset-0 z-10 overflow-y-auto"
                 onClose={()=>{}}
                 >
-                    <div className="min-h-screen px-4 text-center">
+                    <div className="min-h-screen w-full px-4 text-center">
                         <Transition.Child
                         as={Fragment}
                         enter="ease-out duration-300"

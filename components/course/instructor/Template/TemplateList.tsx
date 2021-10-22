@@ -11,6 +11,7 @@ import TemplateCreate from "./TemplateCreate";
 interface template{
     id: string
     name: string
+    description:string
     imageId: string
     assignment_config_id: string
     storage: string
@@ -69,14 +70,19 @@ const TemplateList = ({templates,sectionUserID, environments}:props)=>{//{
         })
     }
 
-    
+    console.log(environments.length)
     let ref = useRef();
     return(
         <div className="flex flex-col justify-start text-gray-600 ">
             <div className="flex flex-row justify-start gap-x-4 pb-4">
                 <DocumentTextIcon className="w-7 h-7"></DocumentTextIcon>
                 <div className="text-lg">Templates</div>
-                <button onClick={openModal}>
+                <button onClick={()=>{
+                    
+                    if(environments.length>0){
+                        openModal()
+                    }
+                    }}>
                     <PlusCircleIcon className="w-7 h-7 hover:scale-110 transition transition-all ease-in-out duration-300"></PlusCircleIcon>
                 </button>
             </div>

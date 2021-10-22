@@ -29,7 +29,6 @@ function Template({template, memLimit, numCPU, sectionUserID}: TemplateProps){
     const activeClass = "bg-white"
     const inactiveClass = "bg-gray-100"
     console.log(template.containerID)
-    //template.containerID=""
     var instanceFlag = true
     if (template.containerID == undefined){
         instanceFlag = false
@@ -46,7 +45,11 @@ function Template({template, memLimit, numCPU, sectionUserID}: TemplateProps){
                         <span className={`${instanceBaseClass} ${instanceFlag?instanceActiveClass:instanceInactiveClass}`}></span>
                     </span>
                 </div>
-                <div className="text-left w-10/12">
+                <button onClick={()=>{
+                    if (instanceFlag){
+                        window.open("https://codespace.ust.dev/user/container/"+template.containerID+"/")
+                    }
+                }}  className="text-left w-10/12">
                     <div className="font-semibold text-sm text-[#578CB5] text-left ">{template.name}</div>
                     <div className="font-medium text-xs text-gray-600  underline">
                         {/* <a href={template.imageId}  target="_blank" 
@@ -56,7 +59,7 @@ function Template({template, memLimit, numCPU, sectionUserID}: TemplateProps){
                     <div className="font-medium text-xs text-gray-400 mt-4">
                         {template.description}
                     </div>
-                </div>
+                </button>
                 
                 <div className="w-1/12">
                     <TemplateMenu templateID={template.id} imageID={template.imageId} memLimit={memLimit} numCPU={numCPU} sectionUserID={sectionUserID} containerID={template.containerID} templateActive={template.active}></TemplateMenu>

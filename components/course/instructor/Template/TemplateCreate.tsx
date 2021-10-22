@@ -12,7 +12,7 @@ interface TemplateCreateProps{
 interface Environment{
     name: string
     id: string
-  }
+}
 
 const TemplateCreate = React.forwardRef(({sectionUserID,environments, closeModal}:TemplateCreateProps, ref)=>{
 
@@ -25,10 +25,11 @@ const TemplateCreate = React.forwardRef(({sectionUserID,environments, closeModal
     const nextStep = () => {
         setStep(step + 1);
     }
+    const [finishLoading, setFinishLoading] = useState(true)
     const [description, setDescription] = useState("")
     const [selectedEnv, setSelectedEnv]= useState(environments[0])
     const [templateName, setTemplateName]= useState("")
-    const { addTemplate,addContainer} = useCnails();
+    const { addTemplate,addContainer, removeContainer} = useCnails();
     const [containerID,setContainerID]=useState("")
     // console.log(selectedEnv)
     switch(step){
@@ -46,7 +47,7 @@ const TemplateCreate = React.forwardRef(({sectionUserID,environments, closeModal
                         Create Template
                     </Dialog.Title>
                     <div className="py-2">
-                    Preparing the base IDE Teplate with base environment, please wait
+                    Preparing the base IDE Template with base environment, please wait
                     </div>
                     <div className="flex flex-row justify-center my-8">
                         <img src='/circle.svg'/> 
@@ -64,28 +65,56 @@ const TemplateCreate = React.forwardRef(({sectionUserID,environments, closeModal
                         Create Assignment Template
                     </Dialog.Title>
                     <div className="py-2">
-                    A new container is opened in a new browser, please initialize the template and press the finish button to save the template
+                    A new container is prepared, please click the following link and set up the template. After finished the setting, please press the finish button to save the template
                     </div>
+                    <a className="flex text-blue-500 underline justify-center" href={"https://codespace.ust.dev/user/container/"+containerID+"/"} target="_blank"> 
+                        Click Here
+                    </a>
                     <div className="py-3 sm:flex sm:flex-row-reverse">
                         <span className="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
                             <button
                             type="button"
                             onClick={async()=>{
-                                const response = await addTemplate(templateName,description, selectedEnv.id,sectionUserID, "Dummy string", containerID, false)
-                                console.log(response)
-                                //@ts-ignore
-                                closeModal()
-                                window.location.reload();
+                                setFinishLoading(false)
+                                nextStep()
+                                const response = await addTemplate(templateName,description, sectionUserID, "Dummy string", containerID, false)
+                                if(response.success){
+                                    setFinishLoading(true)
+                                }
                             }}
                             className="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-[#65A9E0] text-base leading-6 font-medium text-white shadow-sm hover:text-gray-900 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
                             Finish
                             </button>
                         </span>
                         <span className="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
-                            <button onClick={closeModal} type="button" className="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-500 shadow-sm hover:text-gray-900 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
+                            <button onClick={ async()=>{
+                                setFinishLoading(false)
+                                nextStep();
+                                const response = await removeContainer(containerID)
+                                if(response.success){
+                                    setFinishLoading(true)
+                                }
+                            }}  type="button" className="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-500 shadow-sm hover:text-gray-900 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
                             Cancel
                             </button>
                         </span>
+                    </div>
+                </div>
+            )
+        case 4:
+            if(finishLoading){
+                window.location.reload();
+            }
+            return(
+                <div className="inline-block overflow-visible w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl text-[#415A6E]">
+                    <Dialog.Title
+                        as="h3"
+                        className="text-xl font-medium leading-6"
+                    >
+                        Create Template
+                    </Dialog.Title>
+                    <div className="flex flex-row justify-center my-8">
+                        <img src='/circle.svg'/> 
                     </div>
                 </div>
             )
@@ -152,10 +181,9 @@ const TemplateCreate = React.forwardRef(({sectionUserID,environments, closeModal
                             type="button"
                             onClick={async()=>{
                                 nextStep()
-                                const response = await addContainer("06979193acbf",100,0.5,sectionUserID,"",false)//non-existent template id
+                                const response = await addContainer(selectedEnv.id,100,0.5,sectionUserID,"",false)//non-existent template id
                                 if(response.success){
                                     setContainerID(response.containerID)
-                                    window.open("https://codespace.ust.dev/user/container/"+response.containerID+"/",'_blank')
                                 }
                                 // open the container link from the API response
                                 //window.open('https://codespace.ust.dev', '_blank')

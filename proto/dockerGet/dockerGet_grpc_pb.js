@@ -92,6 +92,17 @@ function deserialize_dockerGet_CheckHaveContainerRequest(buffer_arg) {
   return dockerGet_pb.CheckHaveContainerRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_dockerGet_GetSectionInfoReply(arg) {
+  if (!(arg instanceof dockerGet_pb.GetSectionInfoReply)) {
+    throw new Error('Expected argument of type dockerGet.GetSectionInfoReply');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_GetSectionInfoReply(buffer_arg) {
+  return dockerGet_pb.GetSectionInfoReply.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_dockerGet_ListContainerReply(arg) {
   if (!(arg instanceof dockerGet_pb.ListContainerReply)) {
     throw new Error('Expected argument of type dockerGet.ListContainerReply');
@@ -224,6 +235,17 @@ function deserialize_dockerGet_SuccessStringReply(buffer_arg) {
   return dockerGet_pb.SuccessStringReply.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_dockerGet_TemplateIdRequest(arg) {
+  if (!(arg instanceof dockerGet_pb.TemplateIdRequest)) {
+    throw new Error('Expected argument of type dockerGet.TemplateIdRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_TemplateIdRequest(buffer_arg) {
+  return dockerGet_pb.TemplateIdRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 
 var DockerService = exports.DockerService = {
   login: {
@@ -269,6 +291,17 @@ var DockerService = exports.DockerService = {
     requestDeserialize: deserialize_dockerGet_SubRequest,
     responseSerialize: serialize_dockerGet_ListCoursesReply,
     responseDeserialize: deserialize_dockerGet_ListCoursesReply,
+  },
+  getSectionInfo: {
+    path: '/dockerGet.Docker/getSectionInfo',
+    requestStream: false,
+    responseStream: false,
+    requestType: dockerGet_pb.SectionAndSubRequest,
+    responseType: dockerGet_pb.GetSectionInfoReply,
+    requestSerialize: serialize_dockerGet_SectionAndSubRequest,
+    requestDeserialize: deserialize_dockerGet_SectionAndSubRequest,
+    responseSerialize: serialize_dockerGet_GetSectionInfoReply,
+    responseDeserialize: deserialize_dockerGet_GetSectionInfoReply,
   },
   listEnvironments: {
     path: '/dockerGet.Docker/listEnvironments',
@@ -324,6 +357,28 @@ var DockerService = exports.DockerService = {
     requestDeserialize: deserialize_dockerGet_AddTemplateRequest,
     responseSerialize: serialize_dockerGet_AddTemplateReply,
     responseDeserialize: deserialize_dockerGet_AddTemplateReply,
+  },
+  activateTemplate: {
+    path: '/dockerGet.Docker/activateTemplate',
+    requestStream: false,
+    responseStream: false,
+    requestType: dockerGet_pb.TemplateIdRequest,
+    responseType: dockerGet_pb.SuccessStringReply,
+    requestSerialize: serialize_dockerGet_TemplateIdRequest,
+    requestDeserialize: deserialize_dockerGet_TemplateIdRequest,
+    responseSerialize: serialize_dockerGet_SuccessStringReply,
+    responseDeserialize: deserialize_dockerGet_SuccessStringReply,
+  },
+  deactivateTemplate: {
+    path: '/dockerGet.Docker/deactivateTemplate',
+    requestStream: false,
+    responseStream: false,
+    requestType: dockerGet_pb.TemplateIdRequest,
+    responseType: dockerGet_pb.SuccessStringReply,
+    requestSerialize: serialize_dockerGet_TemplateIdRequest,
+    requestDeserialize: deserialize_dockerGet_TemplateIdRequest,
+    responseSerialize: serialize_dockerGet_SuccessStringReply,
+    responseDeserialize: deserialize_dockerGet_SuccessStringReply,
   },
   removeTemplate: {
     path: '/dockerGet.Docker/removeTemplate',

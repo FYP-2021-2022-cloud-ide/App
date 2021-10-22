@@ -14,6 +14,9 @@ service Docker {
   rpc checkHaveContainer(CheckHaveContainerRequest)returns( SuccessStringReply ){}
   rpc listContainers(SubRequest)returns( ListContainerReply ){}
   rpc listCourses(SubRequest)returns( ListCoursesReply ){}
+
+  rpc getSectionInfo(SectionAndSubRequest)returns(GetSectionInfoReply){}
+
   rpc listEnvironments(SectionAndSubRequest)returns(ListEnvironmentsReply){}
   rpc listTemplates(SectionAndSubRequest)returns(ListTemplatesReply){}
 
@@ -21,6 +24,8 @@ service Docker {
   rpc removeContainer(RemoveContainerRequest)returns(SuccessStringReply){}
 
   rpc addTemplate(AddTemplateRequest)returns(AddTemplateReply){}
+  rpc activateTemplate(TemplateIdRequest)returns(SuccessStringReply){}
+  rpc deactivateTemplate(TemplateIdRequest)returns(SuccessStringReply){}
   rpc removeTemplate(RemoveTemplateRequest)returns(SuccessStringReply){}
 
   rpc addEnvironment(AddEnvironmentRequest)returns(AddEnvironmentReply){}
@@ -68,11 +73,16 @@ message ListCoursesReply {
 	repeated Course courses =3;
 }
 
+message GetSectionInfoReply{
+  bool success = 1;
+  string message = 2;
+  string sectionUserID=3;
+  string courseName=4;
+}
+
 message ListEnvironmentsReply{
   bool success=1;
-  string userSectionID=2;
   string message = 4;
-
   message Environment {
     string id =1;
     string imageId   =2;
@@ -86,7 +96,6 @@ message ListEnvironmentsReply{
 message ListTemplatesReply{
   bool success=1;
   string message = 4;
-  repeated string sectionInfo=2;
   message Template {
     string id =1;
     string name   =2;
@@ -122,13 +131,17 @@ message RemoveContainerRequest {
 
 
 message AddTemplateRequest{
-  string imageID =1;
+ // string imageID =1;
   string name = 2;
   string description=6;
   string assignment_config_id = 3;
   string section_user_id = 4;
   bool active=7;
   string containerID =5;
+}
+
+message TemplateIdRequest{
+  string templateID=1;
 }
 
 message AddTemplateReply {
@@ -141,8 +154,6 @@ message AddTemplateReply {
 message RemoveTemplateRequest {
   string templateID=1;
 }
-
-
 
 
 message AddEnvironmentRequest{

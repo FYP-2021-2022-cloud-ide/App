@@ -199,11 +199,38 @@ export namespace ListCoursesReply {
 
 }
 
+export class GetSectionInfoReply extends jspb.Message { 
+    getSuccess(): boolean;
+    setSuccess(value: boolean): GetSectionInfoReply;
+    getMessage(): string;
+    setMessage(value: string): GetSectionInfoReply;
+    getSectionuserid(): string;
+    setSectionuserid(value: string): GetSectionInfoReply;
+    getCoursename(): string;
+    setCoursename(value: string): GetSectionInfoReply;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): GetSectionInfoReply.AsObject;
+    static toObject(includeInstance: boolean, msg: GetSectionInfoReply): GetSectionInfoReply.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: GetSectionInfoReply, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): GetSectionInfoReply;
+    static deserializeBinaryFromReader(message: GetSectionInfoReply, reader: jspb.BinaryReader): GetSectionInfoReply;
+}
+
+export namespace GetSectionInfoReply {
+    export type AsObject = {
+        success: boolean,
+        message: string,
+        sectionuserid: string,
+        coursename: string,
+    }
+}
+
 export class ListEnvironmentsReply extends jspb.Message { 
     getSuccess(): boolean;
     setSuccess(value: boolean): ListEnvironmentsReply;
-    getUsersectionid(): string;
-    setUsersectionid(value: string): ListEnvironmentsReply;
     getMessage(): string;
     setMessage(value: string): ListEnvironmentsReply;
     clearEnvironmentsList(): void;
@@ -224,7 +251,6 @@ export class ListEnvironmentsReply extends jspb.Message {
 export namespace ListEnvironmentsReply {
     export type AsObject = {
         success: boolean,
-        usersectionid: string,
         message: string,
         environmentsList: Array<ListEnvironmentsReply.Environment.AsObject>,
     }
@@ -269,10 +295,6 @@ export class ListTemplatesReply extends jspb.Message {
     setSuccess(value: boolean): ListTemplatesReply;
     getMessage(): string;
     setMessage(value: string): ListTemplatesReply;
-    clearSectioninfoList(): void;
-    getSectioninfoList(): Array<string>;
-    setSectioninfoList(value: Array<string>): ListTemplatesReply;
-    addSectioninfo(value: string, index?: number): string;
     clearTemplatesList(): void;
     getTemplatesList(): Array<ListTemplatesReply.Template>;
     setTemplatesList(value: Array<ListTemplatesReply.Template>): ListTemplatesReply;
@@ -292,7 +314,6 @@ export namespace ListTemplatesReply {
     export type AsObject = {
         success: boolean,
         message: string,
-        sectioninfoList: Array<string>,
         templatesList: Array<ListTemplatesReply.Template.AsObject>,
     }
 
@@ -424,8 +445,6 @@ export namespace RemoveContainerRequest {
 }
 
 export class AddTemplateRequest extends jspb.Message { 
-    getImageid(): string;
-    setImageid(value: string): AddTemplateRequest;
     getName(): string;
     setName(value: string): AddTemplateRequest;
     getDescription(): string;
@@ -451,13 +470,32 @@ export class AddTemplateRequest extends jspb.Message {
 
 export namespace AddTemplateRequest {
     export type AsObject = {
-        imageid: string,
         name: string,
         description: string,
         assignmentConfigId: string,
         sectionUserId: string,
         active: boolean,
         containerid: string,
+    }
+}
+
+export class TemplateIdRequest extends jspb.Message { 
+    getTemplateid(): string;
+    setTemplateid(value: string): TemplateIdRequest;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): TemplateIdRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: TemplateIdRequest): TemplateIdRequest.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: TemplateIdRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): TemplateIdRequest;
+    static deserializeBinaryFromReader(message: TemplateIdRequest, reader: jspb.BinaryReader): TemplateIdRequest;
+}
+
+export namespace TemplateIdRequest {
+    export type AsObject = {
+        templateid: string,
     }
 }
 

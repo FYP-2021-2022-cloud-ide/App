@@ -35,7 +35,7 @@ export default function EnvironmentMenu({environmentID}:EnvironmentMenuProps) {
                             onClick ={async () => {
                                 const response = await removeEnvironment(environmentID)
                                 console.log(response)
-                                const remove = JSON.parse(response.message)
+                                window.location.reload()
                             }}
                         >
                             delete
