@@ -7,7 +7,7 @@ type Data = {
 }
 import * as grpc from 'grpc';
 
-import {  SuccessStringReply,TemplateIdRequest  } from '../../../proto/dockerGet/dockerGet_pb';
+import {  SuccessStringReply,UpdateEnvironmentRequest  } from '../../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
 
 export default function handler(
@@ -20,10 +20,14 @@ export default function handler(
        grpc.credentials.createInsecure());
     
     var body = JSON.parse(req.body);console.log(body)
-    var docReq = new TemplateIdRequest();
-    docReq.setTemplateid(body.templateId);
+    var docReq = new UpdateEnvironmentRequest();
+    docReq.setEnvironmentid(body.envId);
+    docReq.setName(body.name);
+    docReq.setSectionUserId(body.section_user_id);
+    docReq.setContainerid(body.containerId);
+    docReq.setDescription(body.description)
     try{
-      client.removeTemplate(docReq, function(err, GoLangResponse: SuccessStringReply) {
+      client.updateEnvironment(docReq, function(err, GoLangResponse: SuccessStringReply) {
         if(!GoLangResponse.getSuccess()){
           console.log(GoLangResponse.getMessage())
         }

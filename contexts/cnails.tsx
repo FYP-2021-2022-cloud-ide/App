@@ -12,11 +12,13 @@ interface CnailsContextState {
     removeContainer: (containerId:string) => Promise<any>,
     
     addTemplate: (templateName :string, description:string,section_user_id:string,assignment_config_id :string,containerId :string,active:boolean) => Promise<any>,
+    updateTemplate:(templateId:string,templateName :string, description:string,section_user_id:string,containerId :string) => Promise<any>,
     activateTemplate:(templateId:string) => Promise<any>,
     deactivateTemplate:(templateId:string) => Promise<any>,
     removeTemplate: (templateId:string) => Promise<any>,
     
     addEnvironment: (libraries :string[],name :string, description:string,section_user_id:string)=> Promise<any>,
+    updateEnvironment:(envId:string,name :string,description:string, section_user_id:string,containerId:string)=> Promise<any>,
     buildEnvironment: (name :string,description:string, section_user_id:string,containerId:string)=> Promise<any>,
     removeEnvironment: (envId :string)=>  Promise<any>,
 }
@@ -132,7 +134,25 @@ export const CnailsProvider = (props: CnailsProviderProps) => {
         })
         return res.json()
     }
-
+    const updateTemplate = async (
+        templateId:string,
+        templateName :string,
+        description:string,
+        section_user_id:string,
+        containerId :string
+        )=>{
+        var res =  await fetch('/api/coursePage/updateTemplate',{
+            method: 'POST', 
+            body:JSON.stringify({ 
+                "templateId":templateId,
+                "templateName":templateName,
+                "description":description,
+                "section_user_id":section_user_id,
+                "containerId" :containerId
+            }),
+        })
+        return res.json()
+    }
     const activateTemplate = async (templateId :string)=>{
         var res =  await fetch('/api/coursePage/activateTemplate',{
             method: 'POST', 
@@ -173,6 +193,24 @@ export const CnailsProvider = (props: CnailsProviderProps) => {
                 "libraries":libraries,
                 "name" : name ,
                 "section_user_id":section_user_id,
+                "description":description,
+            }),
+        })
+        return res.json()
+    }
+    const updateEnvironment = async (
+        envId:string,
+        name :string,
+        description:string,
+        section_user_id:string,
+        containerId :string)=>{
+        var res =  await fetch('/api/coursePage/updateEnvironment',{
+            method: 'POST', 
+            body:JSON.stringify({ 
+                "envId":envId,
+                "name" : name ,
+                "section_user_id":section_user_id,
+                "containerId":containerId,
                 "description":description,
             }),
         })
@@ -219,11 +257,13 @@ export const CnailsProvider = (props: CnailsProviderProps) => {
                 removeContainer,
 
                 addTemplate,
+                updateTemplate,
                 activateTemplate,
                 deactivateTemplate,
                 removeTemplate,
 
                 addEnvironment,
+                updateEnvironment,
                 buildEnvironment,
                 removeEnvironment,
             }}

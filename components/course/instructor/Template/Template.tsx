@@ -51,10 +51,10 @@ function Template({template, memLimit, numCPU, sectionUserID}: TemplateProps){
                     }
                 }}  className="text-left w-10/12">
                     <div className="font-semibold text-sm text-[#578CB5] text-left ">{template.name}</div>
-                    <div className="font-medium text-xs text-gray-600  underline">
+                    <div className="font-medium text-xs text-gray-400  ">
                         {/* <a href={template.imageId}  target="_blank" 
                             >{template.imageId}</a> */}
-                        from {template.imageId}
+                        Image id: {template.imageId}
                     </div>
                     <div className="font-medium text-xs text-gray-400 mt-4">
                         {template.description}
@@ -62,7 +62,7 @@ function Template({template, memLimit, numCPU, sectionUserID}: TemplateProps){
                 </button>
                 
                 <div className="w-1/12">
-                    <TemplateMenu templateID={template.id} imageID={template.imageId} memLimit={memLimit} numCPU={numCPU} sectionUserID={sectionUserID} containerID={template.containerID} templateActive={template.active}></TemplateMenu>
+                    <TemplateMenu template={template} memLimit={memLimit} numCPU={numCPU} sectionUserID={sectionUserID}></TemplateMenu>
                 </div>
             </div>
             

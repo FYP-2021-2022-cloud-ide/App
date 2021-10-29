@@ -7,7 +7,7 @@ type Data = {
 }
 import * as grpc from 'grpc';
 
-import {  SuccessStringReply,  RemoveEnvironmentRequest } from '../../../proto/dockerGet/dockerGet_pb';
+import {  SuccessStringReply,  EnvironmentIdRequest } from '../../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
 
 export default function handler(
@@ -20,7 +20,7 @@ export default function handler(
        grpc.credentials.createInsecure());
     
     var body = JSON.parse(req.body);//console.log(body)
-    var docReq = new RemoveEnvironmentRequest();
+    var docReq = new EnvironmentIdRequest();
     docReq.setEnvironmentid(body.envId);
     try{
       client.removeEnvironment(docReq, function(err, GoLangResponse: SuccessStringReply) {

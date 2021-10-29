@@ -18,10 +18,12 @@ interface IDockerService extends grpc.ServiceDefinition<grpc.UntypedServiceImple
     addContainer: IDockerService_IaddContainer;
     removeContainer: IDockerService_IremoveContainer;
     addTemplate: IDockerService_IaddTemplate;
+    updateTemplate: IDockerService_IupdateTemplate;
     activateTemplate: IDockerService_IactivateTemplate;
     deactivateTemplate: IDockerService_IdeactivateTemplate;
     removeTemplate: IDockerService_IremoveTemplate;
     addEnvironment: IDockerService_IaddEnvironment;
+    updateEnvironment: IDockerService_IupdateEnvironment;
     buildEnvironment: IDockerService_IbuildEnvironment;
     removeEnvironment: IDockerService_IremoveEnvironment;
 }
@@ -116,6 +118,15 @@ interface IDockerService_IaddTemplate extends grpc.MethodDefinition<dockerGet_pb
     responseSerialize: grpc.serialize<dockerGet_pb.AddTemplateReply>;
     responseDeserialize: grpc.deserialize<dockerGet_pb.AddTemplateReply>;
 }
+interface IDockerService_IupdateTemplate extends grpc.MethodDefinition<dockerGet_pb.UpdateTemplateRequest, dockerGet_pb.SuccessStringReply> {
+    path: "/dockerGet.Docker/updateTemplate";
+    requestStream: false;
+    responseStream: false;
+    requestSerialize: grpc.serialize<dockerGet_pb.UpdateTemplateRequest>;
+    requestDeserialize: grpc.deserialize<dockerGet_pb.UpdateTemplateRequest>;
+    responseSerialize: grpc.serialize<dockerGet_pb.SuccessStringReply>;
+    responseDeserialize: grpc.deserialize<dockerGet_pb.SuccessStringReply>;
+}
 interface IDockerService_IactivateTemplate extends grpc.MethodDefinition<dockerGet_pb.TemplateIdRequest, dockerGet_pb.SuccessStringReply> {
     path: "/dockerGet.Docker/activateTemplate";
     requestStream: false;
@@ -134,12 +145,12 @@ interface IDockerService_IdeactivateTemplate extends grpc.MethodDefinition<docke
     responseSerialize: grpc.serialize<dockerGet_pb.SuccessStringReply>;
     responseDeserialize: grpc.deserialize<dockerGet_pb.SuccessStringReply>;
 }
-interface IDockerService_IremoveTemplate extends grpc.MethodDefinition<dockerGet_pb.RemoveTemplateRequest, dockerGet_pb.SuccessStringReply> {
+interface IDockerService_IremoveTemplate extends grpc.MethodDefinition<dockerGet_pb.TemplateIdRequest, dockerGet_pb.SuccessStringReply> {
     path: "/dockerGet.Docker/removeTemplate";
     requestStream: false;
     responseStream: false;
-    requestSerialize: grpc.serialize<dockerGet_pb.RemoveTemplateRequest>;
-    requestDeserialize: grpc.deserialize<dockerGet_pb.RemoveTemplateRequest>;
+    requestSerialize: grpc.serialize<dockerGet_pb.TemplateIdRequest>;
+    requestDeserialize: grpc.deserialize<dockerGet_pb.TemplateIdRequest>;
     responseSerialize: grpc.serialize<dockerGet_pb.SuccessStringReply>;
     responseDeserialize: grpc.deserialize<dockerGet_pb.SuccessStringReply>;
 }
@@ -152,6 +163,15 @@ interface IDockerService_IaddEnvironment extends grpc.MethodDefinition<dockerGet
     responseSerialize: grpc.serialize<dockerGet_pb.AddEnvironmentReply>;
     responseDeserialize: grpc.deserialize<dockerGet_pb.AddEnvironmentReply>;
 }
+interface IDockerService_IupdateEnvironment extends grpc.MethodDefinition<dockerGet_pb.UpdateEnvironmentRequest, dockerGet_pb.SuccessStringReply> {
+    path: "/dockerGet.Docker/updateEnvironment";
+    requestStream: false;
+    responseStream: false;
+    requestSerialize: grpc.serialize<dockerGet_pb.UpdateEnvironmentRequest>;
+    requestDeserialize: grpc.deserialize<dockerGet_pb.UpdateEnvironmentRequest>;
+    responseSerialize: grpc.serialize<dockerGet_pb.SuccessStringReply>;
+    responseDeserialize: grpc.deserialize<dockerGet_pb.SuccessStringReply>;
+}
 interface IDockerService_IbuildEnvironment extends grpc.MethodDefinition<dockerGet_pb.BuildEnvironmentRequest, dockerGet_pb.AddEnvironmentReply> {
     path: "/dockerGet.Docker/buildEnvironment";
     requestStream: false;
@@ -161,12 +181,12 @@ interface IDockerService_IbuildEnvironment extends grpc.MethodDefinition<dockerG
     responseSerialize: grpc.serialize<dockerGet_pb.AddEnvironmentReply>;
     responseDeserialize: grpc.deserialize<dockerGet_pb.AddEnvironmentReply>;
 }
-interface IDockerService_IremoveEnvironment extends grpc.MethodDefinition<dockerGet_pb.RemoveEnvironmentRequest, dockerGet_pb.SuccessStringReply> {
+interface IDockerService_IremoveEnvironment extends grpc.MethodDefinition<dockerGet_pb.EnvironmentIdRequest, dockerGet_pb.SuccessStringReply> {
     path: "/dockerGet.Docker/removeEnvironment";
     requestStream: false;
     responseStream: false;
-    requestSerialize: grpc.serialize<dockerGet_pb.RemoveEnvironmentRequest>;
-    requestDeserialize: grpc.deserialize<dockerGet_pb.RemoveEnvironmentRequest>;
+    requestSerialize: grpc.serialize<dockerGet_pb.EnvironmentIdRequest>;
+    requestDeserialize: grpc.deserialize<dockerGet_pb.EnvironmentIdRequest>;
     responseSerialize: grpc.serialize<dockerGet_pb.SuccessStringReply>;
     responseDeserialize: grpc.deserialize<dockerGet_pb.SuccessStringReply>;
 }
@@ -184,12 +204,14 @@ export interface IDockerServer {
     addContainer: grpc.handleUnaryCall<dockerGet_pb.AddContainerRequest, dockerGet_pb.AddContainerReply>;
     removeContainer: grpc.handleUnaryCall<dockerGet_pb.RemoveContainerRequest, dockerGet_pb.SuccessStringReply>;
     addTemplate: grpc.handleUnaryCall<dockerGet_pb.AddTemplateRequest, dockerGet_pb.AddTemplateReply>;
+    updateTemplate: grpc.handleUnaryCall<dockerGet_pb.UpdateTemplateRequest, dockerGet_pb.SuccessStringReply>;
     activateTemplate: grpc.handleUnaryCall<dockerGet_pb.TemplateIdRequest, dockerGet_pb.SuccessStringReply>;
     deactivateTemplate: grpc.handleUnaryCall<dockerGet_pb.TemplateIdRequest, dockerGet_pb.SuccessStringReply>;
-    removeTemplate: grpc.handleUnaryCall<dockerGet_pb.RemoveTemplateRequest, dockerGet_pb.SuccessStringReply>;
+    removeTemplate: grpc.handleUnaryCall<dockerGet_pb.TemplateIdRequest, dockerGet_pb.SuccessStringReply>;
     addEnvironment: grpc.handleUnaryCall<dockerGet_pb.AddEnvironmentRequest, dockerGet_pb.AddEnvironmentReply>;
+    updateEnvironment: grpc.handleUnaryCall<dockerGet_pb.UpdateEnvironmentRequest, dockerGet_pb.SuccessStringReply>;
     buildEnvironment: grpc.handleUnaryCall<dockerGet_pb.BuildEnvironmentRequest, dockerGet_pb.AddEnvironmentReply>;
-    removeEnvironment: grpc.handleUnaryCall<dockerGet_pb.RemoveEnvironmentRequest, dockerGet_pb.SuccessStringReply>;
+    removeEnvironment: grpc.handleUnaryCall<dockerGet_pb.EnvironmentIdRequest, dockerGet_pb.SuccessStringReply>;
 }
 
 export interface IDockerClient {
@@ -223,24 +245,30 @@ export interface IDockerClient {
     addTemplate(request: dockerGet_pb.AddTemplateRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.AddTemplateReply) => void): grpc.ClientUnaryCall;
     addTemplate(request: dockerGet_pb.AddTemplateRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.AddTemplateReply) => void): grpc.ClientUnaryCall;
     addTemplate(request: dockerGet_pb.AddTemplateRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.AddTemplateReply) => void): grpc.ClientUnaryCall;
+    updateTemplate(request: dockerGet_pb.UpdateTemplateRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    updateTemplate(request: dockerGet_pb.UpdateTemplateRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    updateTemplate(request: dockerGet_pb.UpdateTemplateRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
     activateTemplate(request: dockerGet_pb.TemplateIdRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
     activateTemplate(request: dockerGet_pb.TemplateIdRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
     activateTemplate(request: dockerGet_pb.TemplateIdRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
     deactivateTemplate(request: dockerGet_pb.TemplateIdRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
     deactivateTemplate(request: dockerGet_pb.TemplateIdRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
     deactivateTemplate(request: dockerGet_pb.TemplateIdRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
-    removeTemplate(request: dockerGet_pb.RemoveTemplateRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
-    removeTemplate(request: dockerGet_pb.RemoveTemplateRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
-    removeTemplate(request: dockerGet_pb.RemoveTemplateRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    removeTemplate(request: dockerGet_pb.TemplateIdRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    removeTemplate(request: dockerGet_pb.TemplateIdRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    removeTemplate(request: dockerGet_pb.TemplateIdRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
     addEnvironment(request: dockerGet_pb.AddEnvironmentRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.AddEnvironmentReply) => void): grpc.ClientUnaryCall;
     addEnvironment(request: dockerGet_pb.AddEnvironmentRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.AddEnvironmentReply) => void): grpc.ClientUnaryCall;
     addEnvironment(request: dockerGet_pb.AddEnvironmentRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.AddEnvironmentReply) => void): grpc.ClientUnaryCall;
+    updateEnvironment(request: dockerGet_pb.UpdateEnvironmentRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    updateEnvironment(request: dockerGet_pb.UpdateEnvironmentRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    updateEnvironment(request: dockerGet_pb.UpdateEnvironmentRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
     buildEnvironment(request: dockerGet_pb.BuildEnvironmentRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.AddEnvironmentReply) => void): grpc.ClientUnaryCall;
     buildEnvironment(request: dockerGet_pb.BuildEnvironmentRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.AddEnvironmentReply) => void): grpc.ClientUnaryCall;
     buildEnvironment(request: dockerGet_pb.BuildEnvironmentRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.AddEnvironmentReply) => void): grpc.ClientUnaryCall;
-    removeEnvironment(request: dockerGet_pb.RemoveEnvironmentRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
-    removeEnvironment(request: dockerGet_pb.RemoveEnvironmentRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
-    removeEnvironment(request: dockerGet_pb.RemoveEnvironmentRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    removeEnvironment(request: dockerGet_pb.EnvironmentIdRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    removeEnvironment(request: dockerGet_pb.EnvironmentIdRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    removeEnvironment(request: dockerGet_pb.EnvironmentIdRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
 }
 
 export class DockerClient extends grpc.Client implements IDockerClient {
@@ -275,22 +303,28 @@ export class DockerClient extends grpc.Client implements IDockerClient {
     public addTemplate(request: dockerGet_pb.AddTemplateRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.AddTemplateReply) => void): grpc.ClientUnaryCall;
     public addTemplate(request: dockerGet_pb.AddTemplateRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.AddTemplateReply) => void): grpc.ClientUnaryCall;
     public addTemplate(request: dockerGet_pb.AddTemplateRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.AddTemplateReply) => void): grpc.ClientUnaryCall;
+    public updateTemplate(request: dockerGet_pb.UpdateTemplateRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    public updateTemplate(request: dockerGet_pb.UpdateTemplateRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    public updateTemplate(request: dockerGet_pb.UpdateTemplateRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
     public activateTemplate(request: dockerGet_pb.TemplateIdRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
     public activateTemplate(request: dockerGet_pb.TemplateIdRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
     public activateTemplate(request: dockerGet_pb.TemplateIdRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
     public deactivateTemplate(request: dockerGet_pb.TemplateIdRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
     public deactivateTemplate(request: dockerGet_pb.TemplateIdRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
     public deactivateTemplate(request: dockerGet_pb.TemplateIdRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
-    public removeTemplate(request: dockerGet_pb.RemoveTemplateRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
-    public removeTemplate(request: dockerGet_pb.RemoveTemplateRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
-    public removeTemplate(request: dockerGet_pb.RemoveTemplateRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    public removeTemplate(request: dockerGet_pb.TemplateIdRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    public removeTemplate(request: dockerGet_pb.TemplateIdRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    public removeTemplate(request: dockerGet_pb.TemplateIdRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
     public addEnvironment(request: dockerGet_pb.AddEnvironmentRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.AddEnvironmentReply) => void): grpc.ClientUnaryCall;
     public addEnvironment(request: dockerGet_pb.AddEnvironmentRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.AddEnvironmentReply) => void): grpc.ClientUnaryCall;
     public addEnvironment(request: dockerGet_pb.AddEnvironmentRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.AddEnvironmentReply) => void): grpc.ClientUnaryCall;
+    public updateEnvironment(request: dockerGet_pb.UpdateEnvironmentRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    public updateEnvironment(request: dockerGet_pb.UpdateEnvironmentRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    public updateEnvironment(request: dockerGet_pb.UpdateEnvironmentRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
     public buildEnvironment(request: dockerGet_pb.BuildEnvironmentRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.AddEnvironmentReply) => void): grpc.ClientUnaryCall;
     public buildEnvironment(request: dockerGet_pb.BuildEnvironmentRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.AddEnvironmentReply) => void): grpc.ClientUnaryCall;
     public buildEnvironment(request: dockerGet_pb.BuildEnvironmentRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.AddEnvironmentReply) => void): grpc.ClientUnaryCall;
-    public removeEnvironment(request: dockerGet_pb.RemoveEnvironmentRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
-    public removeEnvironment(request: dockerGet_pb.RemoveEnvironmentRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
-    public removeEnvironment(request: dockerGet_pb.RemoveEnvironmentRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    public removeEnvironment(request: dockerGet_pb.EnvironmentIdRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    public removeEnvironment(request: dockerGet_pb.EnvironmentIdRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    public removeEnvironment(request: dockerGet_pb.EnvironmentIdRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
 }

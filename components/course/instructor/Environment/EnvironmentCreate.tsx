@@ -13,6 +13,7 @@ interface EnvironmentCreateProps{
 const EnvironmentCreate = React.forwardRef(({sectionUserID, closeModal}:EnvironmentCreateProps, ref)=>{
     const [mode, setMode] = useState("")
     const [environmentName, setEnvironmentName] = useState("")
+    const [description, setDescription] = useState("")
     const options = [
         { value: 'g++', label: 'g++' },
         { value: 'gcc', label: 'gcc' },
@@ -75,7 +76,7 @@ const EnvironmentCreate = React.forwardRef(({sectionUserID, closeModal}:Environm
                                     onClick={async()=>{
                                         setFinishLoading(false)
                                         nextStep()
-                                        const response = await buildEnvironment(environmentName,"",sectionUserID,containerID)//expect description
+                                        const response = await buildEnvironment(environmentName,description,sectionUserID,containerID)//expect description
                                         console.log(response)
                                         if(response.success){
                                             setFinishLoading(true);
@@ -137,6 +138,17 @@ const EnvironmentCreate = React.forwardRef(({sectionUserID, closeModal}:Environm
                             placeholder="e.g. Environment 1"
                             value={environmentName}
                             onChange={(e) => setEnvironmentName(e.target.value)}></input>
+                        </div>
+
+                        <div className="mt-2 font-medium mt-4">
+                            Description(Optional)
+                        </div>
+                        
+                        <div className="p-1 border w-full flex text-gray-500 flex-row space-x-2 focus:border-black-600 text-left rounded-xl shadow-lg">
+                            <textarea className="focus:outline-none w-full h-32" 
+                            placeholder="e.g. Environment 1 is about ..."
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}></textarea>
                         </div>
 
                         <div className="py-3 sm:flex sm:flex-row-reverse">
@@ -212,16 +224,27 @@ const EnvironmentCreate = React.forwardRef(({sectionUserID, closeModal}:Environm
                             
                             <div className="p-1 border w-full flex text-gray-500 flex-row space-x-2 focus:border-black-600 text-left rounded-xl shadow-lg">
                                 <input  className="focus:outline-none" 
-                                placeholder="e.g. COMP2012"
+                                placeholder="e.g. Environment 1"
                                 value={environmentName}
                                 onChange={(e) => setEnvironmentName(e.target.value)}></input>
                             </div>
+                            <div className="mt-2 font-medium mt-4">
+                                Description(Optional)
+                            </div>
+                            
+                            <div className="p-1 border w-full flex text-gray-500 flex-row space-x-2 focus:border-black-600 text-left rounded-xl shadow-lg">
+                                <textarea className="focus:outline-none w-full h-32" 
+                                placeholder="e.g. Environment 1 is about ..."
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}></textarea>
+                            </div>
+
                             <div className="py-3 sm:flex sm:flex-row-reverse">
                                 <span className="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
                                     <button
                                     type="button"
                                     onClick={async()=>{
-                                        const response = await addEnvironment(libaries, environmentName,"",sectionUserID)//expecting description
+                                        const response = await addEnvironment(libaries, environmentName,description,sectionUserID)//expecting description
                                         if(response.success){
                                             //@ts-ignore
                                             closeModal()

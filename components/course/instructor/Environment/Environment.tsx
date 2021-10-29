@@ -4,6 +4,7 @@ import {MenuIcon} from "@heroicons/react/outline"
 import { useCnails } from "../../../../contexts/cnails";
 import EnvironmentMenu from "./EnvironmentMenu";
 interface EnvironmentProps{
+    sectionUserID: string
     environment: Environment
 }
 
@@ -15,7 +16,7 @@ interface Environment{
     imageId: string
 }
 
-function Environment({environment}:EnvironmentProps){
+function Environment({environment,sectionUserID}:EnvironmentProps){
     console.log(environment)
     return(
         <div className="border broder-gray-200 shadow-sm rounded-lg bg-white px-7 py-4">
@@ -23,14 +24,17 @@ function Environment({environment}:EnvironmentProps){
                 <div className="w-11/12">
                     <div className="font-semibold text-sm text-[#578CB5] text-left">{environment.environmentName}</div>
                     <div className="font-medium text-xs text-gray-600 text-[#775FBD] text-left">{environment.libraries}</div>
-                    <div className="flex flex-row justify-start gap-x-6 mt-4">
+                    {/* <div className="flex flex-col justify-start gap-x-6 mt-4"> */}
                         <div className="font-medium text-xs text-gray-400">
-                            {environment.imageId}
+                            Image id: {environment.imageId}
                         </div>
-                    </div>
+                        <div className="font-medium text-xs text-gray-400 mt-4">
+                            {environment.description}
+                        </div>
+                    {/* </div> */}
                 </div>
                 <div className="w-1/12">
-                    <EnvironmentMenu environmentID={environment.id}></EnvironmentMenu>
+                    <EnvironmentMenu sectionUserID={sectionUserID} environment={environment}></EnvironmentMenu>
                 </div>
             </div>
         </div>  

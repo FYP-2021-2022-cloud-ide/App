@@ -479,6 +479,44 @@ export namespace AddTemplateRequest {
     }
 }
 
+export class UpdateTemplateRequest extends jspb.Message { 
+    getTemplateid(): string;
+    setTemplateid(value: string): UpdateTemplateRequest;
+    getName(): string;
+    setName(value: string): UpdateTemplateRequest;
+    getDescription(): string;
+    setDescription(value: string): UpdateTemplateRequest;
+    getAssignmentConfigId(): string;
+    setAssignmentConfigId(value: string): UpdateTemplateRequest;
+    getSectionUserId(): string;
+    setSectionUserId(value: string): UpdateTemplateRequest;
+    getActive(): boolean;
+    setActive(value: boolean): UpdateTemplateRequest;
+    getContainerid(): string;
+    setContainerid(value: string): UpdateTemplateRequest;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): UpdateTemplateRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: UpdateTemplateRequest): UpdateTemplateRequest.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: UpdateTemplateRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): UpdateTemplateRequest;
+    static deserializeBinaryFromReader(message: UpdateTemplateRequest, reader: jspb.BinaryReader): UpdateTemplateRequest;
+}
+
+export namespace UpdateTemplateRequest {
+    export type AsObject = {
+        templateid: string,
+        name: string,
+        description: string,
+        assignmentConfigId: string,
+        sectionUserId: string,
+        active: boolean,
+        containerid: string,
+    }
+}
+
 export class TemplateIdRequest extends jspb.Message { 
     getTemplateid(): string;
     setTemplateid(value: string): TemplateIdRequest;
@@ -521,26 +559,6 @@ export namespace AddTemplateReply {
     export type AsObject = {
         success: boolean,
         message: string,
-        templateid: string,
-    }
-}
-
-export class RemoveTemplateRequest extends jspb.Message { 
-    getTemplateid(): string;
-    setTemplateid(value: string): RemoveTemplateRequest;
-
-    serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): RemoveTemplateRequest.AsObject;
-    static toObject(includeInstance: boolean, msg: RemoveTemplateRequest): RemoveTemplateRequest.AsObject;
-    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: RemoveTemplateRequest, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): RemoveTemplateRequest;
-    static deserializeBinaryFromReader(message: RemoveTemplateRequest, reader: jspb.BinaryReader): RemoveTemplateRequest;
-}
-
-export namespace RemoveTemplateRequest {
-    export type AsObject = {
         templateid: string,
     }
 }
@@ -631,21 +649,53 @@ export namespace BuildEnvironmentRequest {
     }
 }
 
-export class RemoveEnvironmentRequest extends jspb.Message { 
+export class UpdateEnvironmentRequest extends jspb.Message { 
     getEnvironmentid(): string;
-    setEnvironmentid(value: string): RemoveEnvironmentRequest;
+    setEnvironmentid(value: string): UpdateEnvironmentRequest;
+    getName(): string;
+    setName(value: string): UpdateEnvironmentRequest;
+    getDescription(): string;
+    setDescription(value: string): UpdateEnvironmentRequest;
+    getSectionUserId(): string;
+    setSectionUserId(value: string): UpdateEnvironmentRequest;
+    getContainerid(): string;
+    setContainerid(value: string): UpdateEnvironmentRequest;
 
     serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): RemoveEnvironmentRequest.AsObject;
-    static toObject(includeInstance: boolean, msg: RemoveEnvironmentRequest): RemoveEnvironmentRequest.AsObject;
+    toObject(includeInstance?: boolean): UpdateEnvironmentRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: UpdateEnvironmentRequest): UpdateEnvironmentRequest.AsObject;
     static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
     static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: RemoveEnvironmentRequest, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): RemoveEnvironmentRequest;
-    static deserializeBinaryFromReader(message: RemoveEnvironmentRequest, reader: jspb.BinaryReader): RemoveEnvironmentRequest;
+    static serializeBinaryToWriter(message: UpdateEnvironmentRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): UpdateEnvironmentRequest;
+    static deserializeBinaryFromReader(message: UpdateEnvironmentRequest, reader: jspb.BinaryReader): UpdateEnvironmentRequest;
 }
 
-export namespace RemoveEnvironmentRequest {
+export namespace UpdateEnvironmentRequest {
+    export type AsObject = {
+        environmentid: string,
+        name: string,
+        description: string,
+        sectionUserId: string,
+        containerid: string,
+    }
+}
+
+export class EnvironmentIdRequest extends jspb.Message { 
+    getEnvironmentid(): string;
+    setEnvironmentid(value: string): EnvironmentIdRequest;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): EnvironmentIdRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: EnvironmentIdRequest): EnvironmentIdRequest.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: EnvironmentIdRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): EnvironmentIdRequest;
+    static deserializeBinaryFromReader(message: EnvironmentIdRequest, reader: jspb.BinaryReader): EnvironmentIdRequest;
+}
+
+export namespace EnvironmentIdRequest {
     export type AsObject = {
         environmentid: string,
     }

@@ -24,7 +24,7 @@ const Navbar = () => {
             {pages.map((page)=>{
                 const isActive = router.pathname === page.link;
                 return (
-                <Link href={page.link}>
+                <Link key={page.link} href={page.link}>
                   <a className={`${baseClass} ${isActive?activeClass:""}`}>
                     {/* <Image className="transform scale-100 hover:scale-105 hover:shadow-xl" 
                       src={page.image} width="50" height="50" /> */}

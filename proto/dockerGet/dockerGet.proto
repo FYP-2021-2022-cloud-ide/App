@@ -24,13 +24,15 @@ service Docker {
   rpc removeContainer(RemoveContainerRequest)returns(SuccessStringReply){}
 
   rpc addTemplate(AddTemplateRequest)returns(AddTemplateReply){}
+  rpc updateTemplate(UpdateTemplateRequest)returns(SuccessStringReply){}
   rpc activateTemplate(TemplateIdRequest)returns(SuccessStringReply){}
   rpc deactivateTemplate(TemplateIdRequest)returns(SuccessStringReply){}
-  rpc removeTemplate(RemoveTemplateRequest)returns(SuccessStringReply){}
+  rpc removeTemplate(TemplateIdRequest)returns(SuccessStringReply){}
 
   rpc addEnvironment(AddEnvironmentRequest)returns(AddEnvironmentReply){}
+  rpc updateEnvironment(UpdateEnvironmentRequest)returns(SuccessStringReply){}
   rpc buildEnvironment(BuildEnvironmentRequest)returns(AddEnvironmentReply){}
-  rpc removeEnvironment(RemoveEnvironmentRequest)returns(SuccessStringReply){}
+  rpc removeEnvironment(EnvironmentIdRequest)returns(SuccessStringReply){}
 }
 
 message LoginRequest {
@@ -139,7 +141,15 @@ message AddTemplateRequest{
   bool active=7;
   string containerID =5;
 }
-
+message UpdateTemplateRequest{
+   string templateID =1;
+   string name = 2;
+   string description=6;
+   string assignment_config_id = 3;
+   string section_user_id = 4;
+   bool active=7;
+   string containerID =5;
+ }
 message TemplateIdRequest{
   string templateID=1;
 }
@@ -151,9 +161,6 @@ message AddTemplateReply {
 }
 
 
-message RemoveTemplateRequest {
-  string templateID=1;
-}
 
 
 message AddEnvironmentRequest{
@@ -175,7 +182,15 @@ message BuildEnvironmentRequest{
   string containerID =5;
 }
 
-message RemoveEnvironmentRequest {
+message UpdateEnvironmentRequest{
+  string environmentID =1;
+  string name = 2;
+  string description=3;
+  string section_user_id = 4;
+  string containerID =5;
+}
+
+message EnvironmentIdRequest {
   string environmentID=1;
 }
 
