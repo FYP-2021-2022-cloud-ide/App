@@ -21,7 +21,9 @@ service Docker {
   rpc listTemplates(SectionAndSubRequest)returns(ListTemplatesReply){}
 
   rpc addContainer(AddContainerRequest)returns(AddContainerReply){}
-  rpc removeContainer(RemoveContainerRequest)returns(SuccessStringReply){}
+  rpc instantAddContainer(InstantAddContainerRequest)returns(AddContainerReply){}
+  rpc removeContainer(RemoveContainerRequest)returns(SuccessStringReply){} 
+  
 
   rpc addTemplate(AddTemplateRequest)returns(AddTemplateReply){}
   rpc updateTemplate(UpdateTemplateRequest)returns(SuccessStringReply){}
@@ -33,6 +35,8 @@ service Docker {
   rpc updateEnvironment(UpdateEnvironmentRequest)returns(SuccessStringReply){}
   rpc buildEnvironment(BuildEnvironmentRequest)returns(AddEnvironmentReply){}
   rpc removeEnvironment(EnvironmentIdRequest)returns(SuccessStringReply){}
+
+ 
 }
 
 message LoginRequest {
@@ -59,6 +63,7 @@ message ListContainerReply{
     string containerID   =4;
   }
 	repeated Container containers=3;
+  repeated Container tempContainers=5;
 }
 
 message ListCoursesReply {
@@ -118,6 +123,12 @@ message AddContainerRequest{
   string section_user_id=4;  
   string template_id=5;
   bool dbStored =6;
+  string accessRight= 7;
+}
+
+message InstantAddContainerRequest {
+  string sub=1;  
+  string template_id=2;
 }
 
 message AddContainerReply {
@@ -125,7 +136,6 @@ message AddContainerReply {
 	string message=2;
 	string containerID=3;
 }
-
 message RemoveContainerRequest {
   string containerID=1;
 }

@@ -27,7 +27,7 @@ export default function Home({sub}:props) {
         fetchCourses()
         fetchContainers()
     }, [])
-    console.log(courses)
+    console.log(containers)
     return (
         <div>
             {courses&&containers ? (

@@ -72,7 +72,7 @@ export default function WorkspaceMenu({templateID, sectionUserID, containerID, m
                                     } text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-sm`}
                                     onClick ={async () => {
                                         openModal();
-                                        const response = await addContainer(imageID,memLimit,numCPU,sectionUserID,templateID,true)
+                                        const response = await addContainer(imageID,memLimit,numCPU,sectionUserID,templateID,true,"student")
                                         window.location.reload();
                                     }}
                                 >

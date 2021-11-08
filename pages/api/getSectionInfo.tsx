@@ -13,8 +13,8 @@ type Data = {
 
 import * as grpc from 'grpc';
 
-import {    GetSectionInfoReply,  SectionAndSubRequest } from '../../../proto/dockerGet/dockerGet_pb';
-import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
+import {    GetSectionInfoReply,  SectionAndSubRequest } from '../../proto/dockerGet/dockerGet_pb';
+import { DockerClient } from '../../proto/dockerGet/dockerGet_grpc_pb';
 
 export default  function handler(
   req: NextApiRequest,

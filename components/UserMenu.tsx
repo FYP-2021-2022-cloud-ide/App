@@ -1,6 +1,7 @@
 import { Menu, Transition } from '@headlessui/react'
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { ChevronDownIcon } from '@heroicons/react/solid'
+import Link from 'next/link'
 
 interface UserMenuProps{
     sub: string
@@ -56,13 +57,15 @@ export default function UserMenu({sub,name,email}: UserMenuProps) {
               </Menu.Item>
               <Menu.Item>
                 {({ active }) => (
-                  <button
-                    className={`${
-                        active ? 'bg-gray-200 font-semibold' : ''
-                    } text-[#775FBD] group flex rounded-md items-center w-full px-2 py-2 text-sm`}
-                  >
-                    Sign Out
-                  </button>
+                  <div className={`${
+                    active ? 'bg-gray-200 font-semibold' : ''
+                } text-[#775FBD] group flex rounded-md items-center w-full px-2 py-2 text-sm`}>
+                  <Link href="/logout">
+                    <a className='w-full'>
+                      Sign Out
+                    </a>
+                  </Link>
+                </div>
                 )}
               </Menu.Item>
             </div>

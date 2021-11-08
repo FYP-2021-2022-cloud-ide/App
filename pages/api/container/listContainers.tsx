@@ -6,7 +6,7 @@ type Data = {
   message:string
   containersInfo: ContainerInfo
   containers: Container []
-  //cutMes: string[]
+  tempContainers:Container []
 }
 
 type ContainerInfo = {
@@ -23,8 +23,8 @@ type Container = {
 
 import * as grpc from 'grpc';
 
-import {  ListContainerReply,  SubRequest } from '../../proto/dockerGet/dockerGet_pb';
-import { DockerClient } from '../../proto/dockerGet/dockerGet_grpc_pb';
+import {  ListContainerReply,  SubRequest } from '../../../proto/dockerGet/dockerGet_pb';
+import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
 
 export default function handler(
   req: NextApiRequest,
@@ -45,6 +45,7 @@ export default function handler(
         }
         var containersInfo =GoLangResponse.getContainerinfo();
         var containers = GoLangResponse.getContainersList();
+        var tempContainers = GoLangResponse.getTempcontainersList();
         res.json({ 
           success : GoLangResponse.getSuccess(),
           message: GoLangResponse.getMessage(),
@@ -53,6 +54,14 @@ export default function handler(
               containersTotal: containersInfo?.getContainerstotal(),
           },
           containers: containers.map( containers =>{
+            return ({
+              courseTitle: containers.getCoursetitle(),
+              assignmentName: containers.getAssignmentname(),
+              existedTime: containers.getExistedtime(),
+              containerID: containers.getContainerid(),
+            })
+          }),
+          tempContainers: tempContainers.map( containers =>{
             return ({
               courseTitle: containers.getCoursetitle(),
               assignmentName: containers.getAssignmentname(),

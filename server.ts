@@ -5,7 +5,7 @@ type Data = {
   message: string[]
 }
 import * as grpc from 'grpc';
-import { LoginRequest , ListReply, CheckHaveContainerRequest , StringReply} from './proto/dockerGet/dockerGet_pb';
+import { SubRequest, ListContainerReply, InstantAddContainerRequest, AddContainerReply } from './proto/dockerGet/dockerGet_pb';
 import { DockerClient } from './proto/dockerGet/dockerGet_grpc_pb';
 import express from 'express';
 import { Request, Response, NextFunction } from 'express';
@@ -25,17 +25,11 @@ var http = require('http')
 const cookieParser = require('cookie-parser');
 const app = next({ dev })
 const handle = app.getRequestHandler()
-import { auth, claimEquals, OpenidRequest, requiresAuth } from 'express-openid-connect';
-import jwt_decode, { JwtPayload } from 'jwt-decode';
-import { parse } from 'url';
+import { auth, requiresAuth } from 'express-openid-connect';
 //import fetch from "node-fetch";
 
 const SESSION_VALID_FOR = 8 * 60 * 60 * 1000;
-
-type CASJwtPayload = JwtPayload & { 
-  sub:string;
-  name:string;
- };
+const ID_LENGTH = 12;
 
 app.prepare().then(() => {
   var server = express()
@@ -43,13 +37,12 @@ app.prepare().then(() => {
 
   httpServer.on('upgrade', function(req: Request, socket: Socket, head: Header){
     // req.url = req.url.replace('/user/container/'+ req.params.id, '');
-    var sample = "/user/container/b00aa1064a69"
-    var sample2 = '/user/container/'
-    var userPosition = req.url.search("/user/container/")
+    var baseURL = '/user/container/'
+    var userPosition = req.url.search(baseURL)
     var id = req.url.slice(
-      userPosition+ sample2.length,
-      userPosition+ sample.length);
-    req.url = req.url.slice(userPosition+sample.length,);
+      userPosition+ baseURL.length,
+      userPosition+ baseURL.length + ID_LENGTH);
+    req.url = req.url.slice(userPosition + baseURL.length + ID_LENGTH);
     console.log(id)
     proxy.ws(req, socket, head, {target: 'http://'+id+':8080/'} );
   })
@@ -58,78 +51,111 @@ app.prepare().then(() => {
   server.enable('trust proxy')
   server.use(
    auth({
-      issuerBaseURL: 'https://cas.ust.hk/cas/oidc',
-      baseURL: 'https://codespace.ust.dev',
-      clientID: '20008',
-      clientSecret: 'YatwZXDyx52gz644DFn8ZsheigCaz5GPRuT48I7n',
-      secret: 'thisisasddfvsdavsadfgvdsvdsgdfstest',
-      authorizationParams:{
-        response_type: 'code',
-        scope: 'openid profile email'
-      },
-      afterCallback: async (req, res, session, decodedState) => {
-        try {
-          const additionalUserClaims = await axios('https://cas.ust.hk/cas/oidc'+'/profile', {
-            headers:{
-              Authorization: 'Bearer ' + session.access_token
-            }
-          });
-          // @ts-ignore
-          req.appSession!.openidTokens = session.access_token;
-          // @ts-ignore
-          req.appSession!.userIdentity = additionalUserClaims.data;
-          const { sub, name, email } = additionalUserClaims.data;
-          // const { userId, semesterId } = await getUserData(sub, name!);
-          // const userId = '20605387'
-          // const semesterId = 'testing2213'
-          // res.cookie('semester', semesterId, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `.${process.env.HOSTNAME}` });
-          res.cookie('sub', sub);
-          res.cookie('name', name);
-          res.cookie('email', email);
-        } catch (error) {
-          throw error
-        }
-        return {
-          ...session,
-        };
-
-
-        // console.log(session)
-        // var decodedJWT = jwt_decode<CASJwtPayload>(session.id_token);
-        // var target= 'api:50051';
-        // var client = new DockerClient(
-        //   target,
-        //   grpc.credentials.createInsecure());
-        // var body = decodedJWT;
-        // // set cookie
-        // console.log(req.cookies) 
-
-        // var docReq = new LoginRequest();
-        // docReq.setSub(body.sub);
-        // docReq.setName(body.name);
-        // res.cookie('sub', body.sub)
-        // res.cookie('name', body.name)
-        // try{
-        //   client.login(docReq, function(err, GoLangResponse:ListReply) {
-        //     var mes = GoLangResponse.getMessageList();
-        //     console.log(mes, err);
-        //   })
-        // }
-        // catch(error) {
-        //   console.log('error');
-        // }
-        // return session;
+    issuerBaseURL: 'https://cas.ust.hk/cas/oidc',
+    baseURL: 'https://codespace.ust.dev',
+    clientID: '20008',
+    clientSecret: 'YatwZXDyx52gz644DFn8ZsheigCaz5GPRuT48I7n',
+    secret: 'thisisasddfvsdavsadfgvdsvdsgdfstest',
+    authorizationParams:{
+      response_type: 'code',
+      scope: 'openid profile email'
+    },
+    afterCallback: async (req, res, session, decodedState) => {
+      try {
+        const additionalUserClaims = await axios('https://cas.ust.hk/cas/oidc'+'/profile', {
+          headers:{
+            Authorization: 'Bearer ' + session.access_token
+          }
+        });
+        // @ts-ignore
+        req.appSession!.openidTokens = session.access_token;
+        // @ts-ignore
+        req.appSession!.userIdentity = additionalUserClaims.data;
+        const { sub, name, email } = additionalUserClaims.data;
+        res.cookie('sub', sub, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `.${process.env.HOSTNAME}` });
+        res.cookie('name', name, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `.${process.env.HOSTNAME}` });
+        res.cookie('email', email, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `.${process.env.HOSTNAME}` });
+      } catch (error) {
+        throw error
       }
+      return {
+        ...session,
+      };
+    }
    })
   )
 
-  server.all('/user/container/:id/*', async function(req: Request, res: Response){    
+  server.all('/logout', async function(req: Request, res: Response){
+    console.log('logout inside')
+    res.oidc!.logout({returnTo: '/' });
+    // @ts-ignore
+    req.appSession!.destroy((err) => {
+      if(err) {
+        console.error(err);
+      }
+      res.oidc!.logout({returnTo: '/' });
+    });
+  });
+
+  server.all('/quickAssignmentInit/:templateID', async function(req: Request, res: Response){
     try{
-      req.url = req.url.replace('/user/container/'+ req.params.id+'/', '');
-      proxy.web(req, res, {target: 'http://'+req.params.id+':8080/'})
+      var target= 'api:50051';
+      var client = new DockerClient(
+        target,
+        grpc.credentials.createInsecure()
+      );
+      var docReq = new InstantAddContainerRequest();
+      docReq.setSub(req.oidc.user!.sub)
+      docReq.setTemplateId(req.params.templateID)
+      client.instantAddContainer(docReq, function(err, GoLangResponse: AddContainerReply){
+        if(!GoLangResponse.getSuccess()){
+          console.log(GoLangResponse.getMessage())
+          res.redirect('/')
+        }
+        res.redirect(`/user/container/${GoLangResponse.getContainerid()}/`)
+      })
     }
     catch(error){
       console.log(error)
+      res.redirect('/')
+    }
+  })
+  
+  server.all('/user/container/:id/*', async function(req: Request, res: Response){    
+    try{
+      var target= 'api:50051';
+      var client = new DockerClient(
+        target,
+        grpc.credentials.createInsecure()
+      );
+      var docReq = new SubRequest();
+      docReq.setSub(req.oidc.user!.sub);
+      client.listContainers(docReq, function(err, GoLangResponse: ListContainerReply) {
+        if(!GoLangResponse.getSuccess()){
+          console.log(GoLangResponse.getMessage())
+          res.redirect('/')
+        }
+        var containers = GoLangResponse.getContainersList();
+        var tempContainers = GoLangResponse.getTempcontainersList();
+        const list = containers.map( containers =>{
+          return (containers.getContainerid())
+        })
+        const tempList = tempContainers.map( containers =>{
+          return (containers.getContainerid())
+        })
+        if(list.includes(req.params.id) || tempList.includes(req.params.id)){
+          console.log('authenticated')
+          req.url = req.url.replace('/user/container/'+ req.params.id+'/', '');
+          proxy.web(req, res, {target: 'http://'+req.params.id+':8080/'})
+        }else{
+          console.log('unauthenticated')
+          res.redirect('/')
+        }
+      })
+    }
+    catch(error){
+      console.log(error)
+      res.redirect('/')
     }
   });
 

@@ -157,7 +157,7 @@ const EnvironmentCreate = React.forwardRef(({sectionUserID, closeModal}:Environm
                                 type="button"
                                 onClick={async()=>{
                                     nextStep()
-                                    const response = await addContainer("06979193acbf",100,0.5,sectionUserID,"",false)//non-existent template id
+                                    const response = await addContainer("8612625399ae",100,0.5,sectionUserID,"",false,"root")//non-existent template id
                                     console.log(response)
                                     if(response.success){
                                         // const fakeWindow= window.open("",'_blank')
@@ -244,6 +244,7 @@ const EnvironmentCreate = React.forwardRef(({sectionUserID, closeModal}:Environm
                                     <button
                                     type="button"
                                     onClick={async()=>{
+                                        
                                         const response = await addEnvironment(libaries, environmentName,description,sectionUserID)//expecting description
                                         if(response.success){
                                             //@ts-ignore

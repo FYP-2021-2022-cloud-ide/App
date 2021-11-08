@@ -17,8 +17,8 @@ interface EnvironmentContent{
 }
 const EnvironmentUpdate = React.forwardRef(({sectionUserID,environment, closeModal}:EnvironmentUpdateProps, ref)=>{
 
-    const [environmentName, setEnvironmentName] = useState("")
-    const [description, setDescription] = useState("")
+    const [environmentName, setEnvironmentName] = useState(environment.environmentName)
+    const [description, setDescription] = useState(environment.description)
     const [finishLoading, setFinishLoading] = useState(true)
     const [containerID,setContainerID]=useState("")
     const {updateEnvironment, removeContainer,addContainer} = useCnails();
@@ -107,7 +107,7 @@ const EnvironmentUpdate = React.forwardRef(({sectionUserID,environment, closeMod
                         as="h3"
                         className="text-xl font-medium leading-6"
                     >
-                        Create Environment
+                        Update Environment
                     </Dialog.Title>
                     <div className="flex flex-row justify-center my-8">
                         <img src='/circle.svg'/> 
@@ -126,7 +126,7 @@ const EnvironmentUpdate = React.forwardRef(({sectionUserID,environment, closeMod
                 </Dialog.Title>
 
                 <div className="mt-2 font-medium mt-4">
-                    Environment name (Leave empty for unchanged)
+                    Environment name 
                 </div>
                 
                 <div className="p-1 border w-full flex text-gray-500 flex-row space-x-2 focus:border-black-600 text-left rounded-xl shadow-lg">
@@ -137,7 +137,7 @@ const EnvironmentUpdate = React.forwardRef(({sectionUserID,environment, closeMod
                 </div>
 
                 <div className="mt-2 font-medium mt-4">
-                    Description (Leave empty for unchanged)
+                    Description 
                 </div>
                 
                 <div className="p-1 border w-full flex text-gray-500 flex-row space-x-2 focus:border-black-600 text-left rounded-xl shadow-lg">
@@ -153,7 +153,7 @@ const EnvironmentUpdate = React.forwardRef(({sectionUserID,environment, closeMod
                         type="button"
                         onClick={async()=>{
                             nextStep()
-                            const response = await addContainer(environment.imageId,100,0.5,sectionUserID,"",false)//non-existent template id
+                            const response = await addContainer(environment.imageId,100,0.5,sectionUserID,"",false,"root")//non-existent template id
                             console.log(response)
                             if(response.success){
                                 setContainerID(response.containerID)
@@ -161,7 +161,19 @@ const EnvironmentUpdate = React.forwardRef(({sectionUserID,environment, closeMod
                             
                         }}
                         className="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-[#65A9E0] text-base leading-6 font-medium text-white shadow-sm hover:text-gray-900 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                        Next
+                        Edit the IDE
+                        </button>
+                    </span>
+                    <span className="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
+                        <button onClick={async()=>{
+                            const response = await updateEnvironment(environment.id,environmentName,description,sectionUserID,"")//non-existent template id
+                            console.log(response)
+                            if(response.success){
+                                window.location.reload();
+                            }
+                            
+                        }} type="button" className="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-[#65A9E0] text-base leading-6 font-medium text-white shadow-sm hover:text-gray-900 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
+                        Finish
                         </button>
                     </span>
                     <span className="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">

@@ -21,21 +21,21 @@ interface Template{
 }
 
 function Template({template, memLimit, numCPU, sectionUserID}: TemplateProps){
-    const { addContainer,removeTemplate} = useCnails();
+    //const { addContainer,removeTemplate} = useCnails();
     const instanceBaseClass = "relative inline-flex rounded-full h-3 w-3"
     const instanceActiveClass = "bg-green-400"
     const instanceInactiveClass = "bg-gray-400"
     const baseClass = 'w-full border broder-gray-200 shadow-sm rounded-lg hover:shadow-lg transition-all ease-in-out duration-300 px-5 py-4'
     const activeClass = "bg-white"
     const inactiveClass = "bg-gray-100"
-    console.log(template.containerID)
+    console.log(template.id)
     var instanceFlag = true
     if (template.containerID == undefined){
         instanceFlag = false
     }
-    if (template.description == ""){
-        template.description = "blank"
-    }
+    // if (template.description = undefined){
+    //     template.description = ""
+    // }
     return(  
         <div className={`${baseClass} ${template.active?activeClass:inactiveClass}`}>
             <div className="flex flex-row items-center space-x-3">
@@ -59,6 +59,7 @@ function Template({template, memLimit, numCPU, sectionUserID}: TemplateProps){
                     <div className="font-medium text-xs text-gray-400 mt-4">
                         {template.description}
                     </div>
+                    
                 </button>
                 
                 <div className="w-1/12">

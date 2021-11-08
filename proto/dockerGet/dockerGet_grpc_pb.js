@@ -114,6 +114,17 @@ function deserialize_dockerGet_GetSectionInfoReply(buffer_arg) {
   return dockerGet_pb.GetSectionInfoReply.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_dockerGet_InstantAddContainerRequest(arg) {
+  if (!(arg instanceof dockerGet_pb.InstantAddContainerRequest)) {
+    throw new Error('Expected argument of type dockerGet.InstantAddContainerRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_InstantAddContainerRequest(buffer_arg) {
+  return dockerGet_pb.InstantAddContainerRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_dockerGet_ListContainerReply(arg) {
   if (!(arg instanceof dockerGet_pb.ListContainerReply)) {
     throw new Error('Expected argument of type dockerGet.ListContainerReply');
@@ -344,6 +355,17 @@ var DockerService = exports.DockerService = {
     responseType: dockerGet_pb.AddContainerReply,
     requestSerialize: serialize_dockerGet_AddContainerRequest,
     requestDeserialize: deserialize_dockerGet_AddContainerRequest,
+    responseSerialize: serialize_dockerGet_AddContainerReply,
+    responseDeserialize: deserialize_dockerGet_AddContainerReply,
+  },
+  instantAddContainer: {
+    path: '/dockerGet.Docker/instantAddContainer',
+    requestStream: false,
+    responseStream: false,
+    requestType: dockerGet_pb.InstantAddContainerRequest,
+    responseType: dockerGet_pb.AddContainerReply,
+    requestSerialize: serialize_dockerGet_InstantAddContainerRequest,
+    requestDeserialize: deserialize_dockerGet_InstantAddContainerRequest,
     responseSerialize: serialize_dockerGet_AddContainerReply,
     responseDeserialize: deserialize_dockerGet_AddContainerReply,
   },

@@ -60,6 +60,10 @@ export class ListContainerReply extends jspb.Message {
     getContainersList(): Array<ListContainerReply.Container>;
     setContainersList(value: Array<ListContainerReply.Container>): ListContainerReply;
     addContainers(value?: ListContainerReply.Container, index?: number): ListContainerReply.Container;
+    clearTempcontainersList(): void;
+    getTempcontainersList(): Array<ListContainerReply.Container>;
+    setTempcontainersList(value: Array<ListContainerReply.Container>): ListContainerReply;
+    addTempcontainers(value?: ListContainerReply.Container, index?: number): ListContainerReply.Container;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): ListContainerReply.AsObject;
@@ -77,6 +81,7 @@ export namespace ListContainerReply {
         message: string,
         containerinfo?: ListContainerReply.ContainersInfo.AsObject,
         containersList: Array<ListContainerReply.Container.AsObject>,
+        tempcontainersList: Array<ListContainerReply.Container.AsObject>,
     }
 
 
@@ -376,6 +381,8 @@ export class AddContainerRequest extends jspb.Message {
     setTemplateId(value: string): AddContainerRequest;
     getDbstored(): boolean;
     setDbstored(value: boolean): AddContainerRequest;
+    getAccessright(): string;
+    setAccessright(value: string): AddContainerRequest;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): AddContainerRequest.AsObject;
@@ -395,6 +402,30 @@ export namespace AddContainerRequest {
         sectionUserId: string,
         templateId: string,
         dbstored: boolean,
+        accessright: string,
+    }
+}
+
+export class InstantAddContainerRequest extends jspb.Message { 
+    getSub(): string;
+    setSub(value: string): InstantAddContainerRequest;
+    getTemplateId(): string;
+    setTemplateId(value: string): InstantAddContainerRequest;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): InstantAddContainerRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: InstantAddContainerRequest): InstantAddContainerRequest.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: InstantAddContainerRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): InstantAddContainerRequest;
+    static deserializeBinaryFromReader(message: InstantAddContainerRequest, reader: jspb.BinaryReader): InstantAddContainerRequest;
+}
+
+export namespace InstantAddContainerRequest {
+    export type AsObject = {
+        sub: string,
+        templateId: string,
     }
 }
 
