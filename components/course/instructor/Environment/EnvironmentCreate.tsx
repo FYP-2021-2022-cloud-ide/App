@@ -3,6 +3,7 @@ import React, { MouseEventHandler, useEffect } from "react";
 import { Fragment, useState}from "react";
 import Select from 'react-select';
 import { finished } from "stream";
+import ListBox from "./ListBox";
 import { useCnails } from "../../../../contexts/cnails";
 
 interface EnvironmentCreateProps{
@@ -15,15 +16,17 @@ const EnvironmentCreate = React.forwardRef(({sectionUserID, closeModal}:Environm
     const [environmentName, setEnvironmentName] = useState("")
     const [description, setDescription] = useState("")
     const options = [
-        { value: 'g++', label: 'g++' },
-        { value: 'gcc', label: 'gcc' },
-        { value: 'python', label: 'python' },
+        { value: 'C++/C', label: 'C++/C' },
         { value: 'python3', label: 'python3' },
+        { value: 'java', label: 'java' },
     ]
+    const rootImage ="4d5f53676d8f"
+    const CPU = 0.5
+    const memory = 400
     const [finishLoading, setFinishLoading] = useState(true)
     const {buildEnvironment,addContainer} = useCnails();
     const [containerID,setContainerID]=useState("")
-    const [libaries, setLibaries] = useState([""])
+    const [selectedEnv, setSelectedEnv] = useState(options[0])
     const {addEnvironment, removeContainer} = useCnails();
     const [step, setStep] = useState(1);
     const nextStep = () => {
@@ -157,7 +160,7 @@ const EnvironmentCreate = React.forwardRef(({sectionUserID, closeModal}:Environm
                                 type="button"
                                 onClick={async()=>{
                                     nextStep()
-                                    const response = await addContainer("8612625399ae",100,0.5,sectionUserID,"",false,"root")//non-existent template id
+                                    const response = await addContainer(rootImage,memory,CPU,sectionUserID,"",false,"root")//non-existent template id
                                     console.log(response)
                                     if(response.success){
                                         // const fakeWindow= window.open("",'_blank')
@@ -210,13 +213,15 @@ const EnvironmentCreate = React.forwardRef(({sectionUserID, closeModal}:Environm
                                 Add Environment
                             </Dialog.Title>
                             <div className="mt-2 font-medium mt-4">
-                                Pick Libray needed
+                                Pick the Programming Language
                             </div>
-                            <Select options={options} isMulti onChange={(value)=>{
+                            {/* <Select options={options} isMulti onChange={(value)=>{
                                 setLibaries(value.map((libary)=>{
                                     return (libary.value)
                                 }))
-                            }}/>
+                            }}/> */}
+                            <ListBox selected={selectedEnv} setSelected={setSelectedEnv} environments={options}/>
+
                 
                             <div className="mt-2 font-medium mt-4">
                                 Environment name
@@ -245,7 +250,7 @@ const EnvironmentCreate = React.forwardRef(({sectionUserID, closeModal}:Environm
                                     type="button"
                                     onClick={async()=>{
                                         
-                                        const response = await addEnvironment(libaries, environmentName,description,sectionUserID)//expecting description
+                                        const response = await addEnvironment([selectedEnv.value], environmentName,description,sectionUserID)//expecting description
                                         if(response.success){
                                             //@ts-ignore
                                             closeModal()

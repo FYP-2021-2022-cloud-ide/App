@@ -5,7 +5,7 @@ type Data = {
   message: string[]
 }
 import * as grpc from 'grpc';
-import { SubRequest, ListContainerReply, InstantAddContainerRequest, AddContainerReply } from './proto/dockerGet/dockerGet_pb';
+import { SubRequest, ListContainerReply, InstantAddContainerRequest, AddContainerReply, SectionAndSubRequest, GetSectionInfoReply } from './proto/dockerGet/dockerGet_pb';
 import { DockerClient } from './proto/dockerGet/dockerGet_grpc_pb';
 import express from 'express';
 import { Request, Response, NextFunction } from 'express';
@@ -97,6 +97,37 @@ app.prepare().then(() => {
     });
   });
 
+  server.all('/course/:sectionId/:role', async function(req: Request, res: Response){
+    try{
+      console.log('inside role checking')
+      var target= 'api:50051';
+      var client = new DockerClient(
+        target,
+        grpc.credentials.createInsecure()
+      );
+      var docReq = new SectionAndSubRequest();
+      docReq.setSub(req.oidc.user!.sub)
+      docReq.setSectionid(req.params.sectionId)
+      client.getSectionInfo(docReq, function(err, GolangResponse: GetSectionInfoReply){
+        if(!GolangResponse.getSuccess()){
+          console.log(GolangResponse.getMessage())
+          res.redirect('/')
+        }else{
+          if(GolangResponse.getRole() != req.params.role){
+            console.log(GolangResponse.getRole())
+            console.log(req.params.role)
+            res.redirect('/')
+          }else{
+            return handle(req, res);
+          }
+        }
+      })
+    }catch(error){
+      console.log(error)
+      res.redirect('/')
+    }
+  })
+
   server.all('/quickAssignmentInit/:templateID', async function(req: Request, res: Response){
     try{
       var target= 'api:50051';
@@ -111,8 +142,9 @@ app.prepare().then(() => {
         if(!GoLangResponse.getSuccess()){
           console.log(GoLangResponse.getMessage())
           res.redirect('/')
+        }else{
+          res.redirect(`/user/container/${GoLangResponse.getContainerid()}/`)
         }
-        res.redirect(`/user/container/${GoLangResponse.getContainerid()}/`)
       })
     }
     catch(error){

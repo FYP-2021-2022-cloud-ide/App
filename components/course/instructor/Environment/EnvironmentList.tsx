@@ -5,7 +5,7 @@ import {PlusCircleIcon} from "@heroicons/react/solid"
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
 import Modal from "../../../Modal"
-import ListBox from "../../../ListBox"
+import ListBox from "../Template/ListBox"
 import Select from 'react-select'
 
 import { useCnails } from "../../../../contexts/cnails";

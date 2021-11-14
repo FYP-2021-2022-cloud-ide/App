@@ -5,7 +5,7 @@ import {DocumentTextIcon} from "@heroicons/react/outline"
 import {PlusCircleIcon} from "@heroicons/react/solid"
 import { Dialog, Transition } from "@headlessui/react";
 import Modal from "../../../Modal";
-import ListBox from "../../../ListBox";
+import ListBox from "./ListBox"
 import TemplateCreate from "./TemplateCreate";
 
 interface template{
@@ -49,8 +49,8 @@ const TemplateList = ({templates,sectionUserID, environments}:props)=>{//{
     //     },
     // ]
     // var templates = []
-    const [memLimit ,setmemLimit]= useState(100);
-    const [numCPU ,setnumCPU]= useState(1);
+    const [memLimit ,setmemLimit]= useState(400);
+    const [numCPU ,setnumCPU]= useState(0.5);
     const { addContainer} = useCnails();
     let [isOpen, setIsOpen] = useState(false)
 
@@ -105,7 +105,7 @@ const TemplateList = ({templates,sectionUserID, environments}:props)=>{//{
                     </div>
                 </button>}
                 <Modal isOpen={isOpen} setOpen={setIsOpen}>
-                    <TemplateCreate closeModal={closeModal} environments={environmentsList} ref={ref} sectionUserID={sectionUserID}></TemplateCreate>
+                    <TemplateCreate closeModal={closeModal} memLimit={memLimit} numCPU={numCPU} environments={environmentsList} ref={ref} sectionUserID={sectionUserID}></TemplateCreate>
                 </Modal>
         </div>
     )

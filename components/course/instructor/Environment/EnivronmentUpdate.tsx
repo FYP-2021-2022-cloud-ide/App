@@ -17,6 +17,8 @@ interface EnvironmentContent{
 }
 const EnvironmentUpdate = React.forwardRef(({sectionUserID,environment, closeModal}:EnvironmentUpdateProps, ref)=>{
 
+    const CPU = 0.5
+    const memory = 400
     const [environmentName, setEnvironmentName] = useState(environment.environmentName)
     const [description, setDescription] = useState(environment.description)
     const [finishLoading, setFinishLoading] = useState(true)
@@ -74,7 +76,7 @@ const EnvironmentUpdate = React.forwardRef(({sectionUserID,environment, closeMod
                                 nextStep()
                                 const response = await updateEnvironment(environment.id,environmentName,description,sectionUserID,containerID)//expect description
                                 console.log(response)
-                                if(response.success){
+                                if(response.success==true||response.success==false){
                                     setFinishLoading(true);
                                 }
                             }}
@@ -87,7 +89,7 @@ const EnvironmentUpdate = React.forwardRef(({sectionUserID,environment, closeMod
                                 setFinishLoading(false)
                                 nextStep();
                                 const response = await removeContainer(containerID)
-                                if(response.success){
+                                if(response.success==true||response.success==false){
                                     setFinishLoading(true)
                                 }
                             }} type="button" className="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-500 shadow-sm hover:text-gray-900 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
@@ -153,7 +155,7 @@ const EnvironmentUpdate = React.forwardRef(({sectionUserID,environment, closeMod
                         type="button"
                         onClick={async()=>{
                             nextStep()
-                            const response = await addContainer(environment.imageId,100,0.5,sectionUserID,"",false,"root")//non-existent template id
+                            const response = await addContainer(environment.imageId,memory,CPU,sectionUserID,"",false,"root")//non-existent template id
                             console.log(response)
                             if(response.success){
                                 setContainerID(response.containerID)
@@ -168,7 +170,7 @@ const EnvironmentUpdate = React.forwardRef(({sectionUserID,environment, closeMod
                         <button onClick={async()=>{
                             const response = await updateEnvironment(environment.id,environmentName,description,sectionUserID,"")//non-existent template id
                             console.log(response)
-                            if(response.success){
+                            if(response.success==true||response.success==false){
                                 window.location.reload();
                             }
                             

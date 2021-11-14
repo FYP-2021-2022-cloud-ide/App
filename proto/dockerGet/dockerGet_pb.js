@@ -2219,7 +2219,8 @@ proto.dockerGet.GetSectionInfoReply.toObject = function(includeInstance, msg) {
     success: jspb.Message.getBooleanFieldWithDefault(msg, 1, false),
     message: jspb.Message.getFieldWithDefault(msg, 2, ""),
     sectionuserid: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    coursename: jspb.Message.getFieldWithDefault(msg, 4, "")
+    coursename: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    role: jspb.Message.getFieldWithDefault(msg, 5, "")
   };
 
   if (includeInstance) {
@@ -2271,6 +2272,10 @@ proto.dockerGet.GetSectionInfoReply.deserializeBinaryFromReader = function(msg, 
     case 4:
       var value = /** @type {string} */ (reader.readString());
       msg.setCoursename(value);
+      break;
+    case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setRole(value);
       break;
     default:
       reader.skipField();
@@ -2326,6 +2331,13 @@ proto.dockerGet.GetSectionInfoReply.serializeBinaryToWriter = function(message, 
   if (f.length > 0) {
     writer.writeString(
       4,
+      f
+    );
+  }
+  f = message.getRole();
+  if (f.length > 0) {
+    writer.writeString(
+      5,
       f
     );
   }
@@ -2401,6 +2413,24 @@ proto.dockerGet.GetSectionInfoReply.prototype.getCoursename = function() {
  */
 proto.dockerGet.GetSectionInfoReply.prototype.setCoursename = function(value) {
   return jspb.Message.setProto3StringField(this, 4, value);
+};
+
+
+/**
+ * optional string role = 5;
+ * @return {string}
+ */
+proto.dockerGet.GetSectionInfoReply.prototype.getRole = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.dockerGet.GetSectionInfoReply} returns this
+ */
+proto.dockerGet.GetSectionInfoReply.prototype.setRole = function(value) {
+  return jspb.Message.setProto3StringField(this, 5, value);
 };
 
 

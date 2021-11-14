@@ -1,10 +1,12 @@
 import React, { MouseEventHandler, useRef, useState } from "react"
 import { Dialog, Transition, Switch } from "@headlessui/react";
-import ListBox from "../../../ListBox"
+import ListBox from "./ListBox"
 import { useCnails } from "../../../../contexts/cnails";
 
 interface TemplateCreateProps{
     sectionUserID:string
+    memLimit: number
+    numCPU: number
     environments: Environment[]
     closeModal: MouseEventHandler<HTMLButtonElement> | undefined
 }
@@ -14,7 +16,7 @@ interface Environment{
     id: string
 }
 
-const TemplateCreate = React.forwardRef(({sectionUserID,environments, closeModal}:TemplateCreateProps, ref)=>{
+const TemplateCreate = React.forwardRef(({memLimit,numCPU,sectionUserID,environments, closeModal}:TemplateCreateProps, ref)=>{
 
     const [step, setStep] = useState(1);
     const [active, setActive] = useState(false)
@@ -164,7 +166,7 @@ const TemplateCreate = React.forwardRef(({sectionUserID,environments, closeModal
                             type="button"
                             onClick={async()=>{
                                 nextStep()
-                                const response = await addContainer(selectedEnv.id,100,0.5,sectionUserID,"",false,"student")//non-existent template id
+                                const response = await addContainer(selectedEnv.id,memLimit ,numCPU,sectionUserID,"",false,"student")//non-existent template id
                                 if(response.success){
                                     setContainerID(response.containerID)
                                 }

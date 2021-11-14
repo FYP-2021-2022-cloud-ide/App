@@ -7,6 +7,7 @@ type Data = {
   message:string
   sectionUserID:string
   courseName:string
+  role:string
 }
 
 
@@ -41,6 +42,7 @@ export default  function handler(
             message: GoLangResponse.getMessage(),
             sectionUserID : GoLangResponse.getSectionuserid(),
             courseName: GoLangResponse.getCoursename(),
+            role:GoLangResponse.getRole(),
         })
         res.status(200).end();
         })

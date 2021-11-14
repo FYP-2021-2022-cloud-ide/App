@@ -32,6 +32,7 @@ const TemplateUpdate = React.forwardRef(({sectionUserID, memLimit, numCPU, templ
     const nextStep = () => {
         setStep(step + 1);
     }
+
     const [finishLoading, setFinishLoading] = useState(true)
     const [description, setDescription] = useState(template.description)
     const [templateName, setTemplateName]= useState(template.name)

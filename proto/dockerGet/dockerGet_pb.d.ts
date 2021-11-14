@@ -213,6 +213,8 @@ export class GetSectionInfoReply extends jspb.Message {
     setSectionuserid(value: string): GetSectionInfoReply;
     getCoursename(): string;
     setCoursename(value: string): GetSectionInfoReply;
+    getRole(): string;
+    setRole(value: string): GetSectionInfoReply;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): GetSectionInfoReply.AsObject;
@@ -230,6 +232,7 @@ export namespace GetSectionInfoReply {
         message: string,
         sectionuserid: string,
         coursename: string,
+        role: string,
     }
 }
 

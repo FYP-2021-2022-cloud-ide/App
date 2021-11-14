@@ -85,6 +85,7 @@ message GetSectionInfoReply{
   string message = 2;
   string sectionUserID=3;
   string courseName=4;
+  string role=5;
 }
 
 message ListEnvironmentsReply{
