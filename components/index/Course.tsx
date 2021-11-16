@@ -2,7 +2,7 @@ import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-interface CourseProps{
+export interface CourseProps{
     link: string
     course: Course
 }

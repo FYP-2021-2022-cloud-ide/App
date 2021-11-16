@@ -3,6 +3,11 @@ import { useCnails } from '../contexts/cnails';
 import CoursesList from '../components/index/CoursesList';
 import ContainersList from '../components/index/ContainersList';
 import { GetServerSideProps } from 'next';
+//testing 
+import containerData from "../data/testing/container" ; 
+import courseData from "../data/testing/course" ; 
+import {props as CourseListProps} from "../components/index/CoursesList"
+import {props as ContainerListProps} from "../components/index/ContainersList"
 
 
 interface props{
@@ -11,31 +16,36 @@ interface props{
 
 export default function Home({sub}:props) {
     // load once when page is rendered
-    const [courses, setCourses] = useState(null)
-    const [containers, setContainers] = useState(null)
+    const [courses, setCourses] = useState<CourseListProps>(courseData)
+    const [containers, setContainers] = useState<ContainerListProps>(containerData)
     const { containerList, courseList} = useCnails();
     // data fetching from API
-    useEffect(()=>{
-        const fetchCourses = async ()=>{
-            const courses = await courseList(sub)
-            setCourses(courses)
-        }
-        const fetchContainers = async ()=>{
-            const containers = await containerList(sub)
-            setContainers(containers)
-        }
-        fetchCourses()
-        fetchContainers()
-    }, [])
-    console.log(containers)
+    // useEffect(()=>{
+    //     const fetchCourses = async ()=>{
+    //         const courses = await courseList(sub) 
+    //         // testing 
+    //         // const courses = courseData; 
+    //         setCourses(courses)
+    //     }
+    //     const fetchContainers = async ()=>{
+    //         const containers = await containerList(sub)
+    //         //testing 
+    //         // const containers = containerData ; 
+    //         setContainers(containers)
+    //     }
+    //     fetchCourses()
+    //     fetchContainers()
+    // }, [])
+    // console.log(containers)
+    console.log(containers.containerInfo)
     return (
         <div>
             {courses&&containers ? (
                 <div className = "flex flex-col mx-6">
                     {/* @ts-ignore */}
-                    <ContainersList containers = {containers!.containers} containerInfo={containers!.containersInfo} ></ContainersList>
+                    <ContainersList containers = {containerData!.containers} containerInfo={containerData!.containersInfo} ></ContainersList>
                     {/* @ts-ignore */}
-                    <CoursesList courses= {courses!.courses} ></CoursesList>
+                    <CoursesList courses= {courseData!.courses} ></CoursesList>
                 </div>
             ):(
                 <div className="flex h-screen w-screen">

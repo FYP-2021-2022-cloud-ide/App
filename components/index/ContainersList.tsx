@@ -1,18 +1,19 @@
 import CodeSpace from "./CodeSpace";
+import data from "../../data/testing/container"
 
-interface container{
+export interface container{
     courseTitle: string
     assignmentName: string
     existedTime: string
     containerID: string
 }
-interface containerInfo  {
+export interface containerInfo  {
 	containersAlive :number
 	containersTotal :number
 }
 
 
-interface props{
+export interface props{
     containerInfo: containerInfo
     containers: container[]
     
@@ -20,6 +21,8 @@ interface props{
 
 const ContainersList = ({containers,containerInfo}:props  )=>{
     console.log(containerInfo)
+    containers = data.containers 
+    containerInfo = data.containerInfo
     var percentage = containerInfo.containersAlive/containerInfo.containersTotal;
     return(
         <div className="flex flex-col justiy-start w-full font-bold">

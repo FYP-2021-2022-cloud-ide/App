@@ -49,53 +49,53 @@ app.prepare().then(() => {
   
   server.use(cookieParser())
   server.enable('trust proxy')
-  server.use(
-   auth({
-    issuerBaseURL: 'https://cas.ust.hk/cas/oidc',
-    baseURL: 'https://codespace.ust.dev',
-    clientID: '20008',
-    clientSecret: 'YatwZXDyx52gz644DFn8ZsheigCaz5GPRuT48I7n',
-    secret: 'thisisasddfvsdavsadfgvdsvdsgdfstest',
-    authorizationParams:{
-      response_type: 'code',
-      scope: 'openid profile email'
-    },
-    afterCallback: async (req, res, session, decodedState) => {
-      try {
-        const additionalUserClaims = await axios('https://cas.ust.hk/cas/oidc'+'/profile', {
-          headers:{
-            Authorization: 'Bearer ' + session.access_token
-          }
-        });
-        // @ts-ignore
-        req.appSession!.openidTokens = session.access_token;
-        // @ts-ignore
-        req.appSession!.userIdentity = additionalUserClaims.data;
-        const { sub, name, email } = additionalUserClaims.data;
-        res.cookie('sub', sub, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `.${process.env.HOSTNAME}` });
-        res.cookie('name', name, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `.${process.env.HOSTNAME}` });
-        res.cookie('email', email, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `.${process.env.HOSTNAME}` });
-      } catch (error) {
-        throw error
-      }
-      return {
-        ...session,
-      };
-    }
-   })
-  )
+  // server.use(
+  //  auth({
+  //   issuerBaseURL: 'https://cas.ust.hk/cas/oidc',
+  //   baseURL: 'https://codespace.ust.dev',
+  //   clientID: '20008',
+  //   clientSecret: 'YatwZXDyx52gz644DFn8ZsheigCaz5GPRuT48I7n',
+  //   secret: 'thisisasddfvsdavsadfgvdsvdsgdfstest',
+  //   authorizationParams:{
+  //     response_type: 'code',
+  //     scope: 'openid profile email'
+  //   },
+  //   afterCallback: async (req, res, session, decodedState) => {
+  //     try {
+  //       const additionalUserClaims = await axios('https://cas.ust.hk/cas/oidc'+'/profile', {
+  //         headers:{
+  //           Authorization: 'Bearer ' + session.access_token
+  //         }
+  //       });
+  //       // @ts-ignore
+  //       req.appSession!.openidTokens = session.access_token;
+  //       // @ts-ignore
+  //       req.appSession!.userIdentity = additionalUserClaims.data;
+  //       const { sub, name, email } = additionalUserClaims.data;
+  //       res.cookie('sub', sub, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `.${process.env.HOSTNAME}` });
+  //       res.cookie('name', name, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `.${process.env.HOSTNAME}` });
+  //       res.cookie('email', email, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `.${process.env.HOSTNAME}` });
+  //     } catch (error) {
+  //       throw error
+  //     }
+  //     return {
+  //       ...session,
+  //     };
+  //   }
+  //  })
+  // )
 
-  server.all('/logout', async function(req: Request, res: Response){
-    console.log('logout inside')
-    res.oidc!.logout({returnTo: '/' });
-    // @ts-ignore
-    req.appSession!.destroy((err) => {
-      if(err) {
-        console.error(err);
-      }
-      res.oidc!.logout({returnTo: '/' });
-    });
-  });
+  // server.all('/logout', async function(req: Request, res: Response){
+  //   console.log('logout inside')
+  //   res.oidc!.logout({returnTo: '/' });
+  //   // @ts-ignore
+  //   req.appSession!.destroy((err) => {
+  //     if(err) {
+  //       console.error(err);
+  //     }
+  //     res.oidc!.logout({returnTo: '/' });
+  //   });
+  // });
 
   server.all('/course/:sectionId/:role', async function(req: Request, res: Response){
     try{
@@ -191,7 +191,14 @@ app.prepare().then(() => {
     }
   });
 
-  server.all('*',requiresAuth(), (req, res) => {
+  // server.all('*',requiresAuth(), (req, res) => {
+  //   return handle(req, res);
+  // })
+
+  server.all('*' ,  (req, res) => {
+    res.cookie('sub', "mlkyeung");
+    res.cookie('name', "Yeung Man Lung Ken ");
+    res.cookie('email', "mlkyeung@connect.ust.hk");
     return handle(req, res);
   })
 

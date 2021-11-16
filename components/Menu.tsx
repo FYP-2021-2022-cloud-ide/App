@@ -1,6 +1,7 @@
 import Image from 'next/image'
-import {BellIcon, QuestionMarkCircleIcon, MoonIcon, SearchIcon} from '@heroicons/react/solid'
+import {BellIcon, QuestionMarkCircleIcon, MoonIcon, SearchIcon , SunIcon} from '@heroicons/react/solid'
 import UserMenu from './UserMenu'
+import {useTheme} from "../contexts/theme"
 
 interface props{
     sub: string
@@ -9,6 +10,8 @@ interface props{
 }
 
 const Menu = ({sub, name, email}:props) => {
+    const { isDark , setDark } = useTheme() ; 
+
     return (
         <div className="grid grid-cols-3 gap-8 w-full">
             <div></div>
@@ -21,7 +24,9 @@ const Menu = ({sub, name, email}:props) => {
                     <UserMenu sub={sub} name={name} email={email}></UserMenu>
                     <BellIcon className='w-6 h-6 hover:scale-110 transition transition-all ease-in-out duration-300'></BellIcon>
                     <QuestionMarkCircleIcon className='w-6 h-6 hover:scale-110 transition transition-all ease-in-out duration-300'></QuestionMarkCircleIcon>
-                    <MoonIcon className='w-6 h-6 hover:scale-110 transition transition-all ease-in-out duration-300'></MoonIcon>
+                    {
+                        isDark? <SunIcon className="w-6 h-6" onClick={()=>setDark(!isDark)}></SunIcon> : <MoonIcon className='w-6 h-6 hover:scale-110 transition transition-all ease-in-out duration-300' onClick={() => setDark(!isDark)}></MoonIcon>
+                    }         
                 </div>
             </div>  
         </div>
