@@ -14,7 +14,7 @@ const Navbar = () => {
     const baseClass='flex flex-row items-center text-gray-500 hover:text-gray-900'
     const activeClass='text-gray-900'
     return (
-        <div className="w-[240px] min-h-screen bg-gray-50 flex flex-col border-r px-5 py-5">
+        <div className="w-[240px] min-h-screen bg-gray-50 dark:bg-gray-700 dark:border-gray-800 flex flex-col border-r px-5 py-5">
           <div className="pb-10">
             <Link href="/">
               <Image  src="/logo.svg"  width="100" height="50" /> 
@@ -28,8 +28,8 @@ const Navbar = () => {
                   <a className={`${baseClass} ${isActive?activeClass:""}`}>
                     {/* <Image className="transform scale-100 hover:scale-105 hover:shadow-xl" 
                       src={page.image} width="50" height="50" /> */}
-                      <page.icon className="w-6 h-6"/>
-                    <div className="text-xs uppercase tracking-widest font-medium ml-2">{page.name}</div>
+                      <page.icon className="w-6 h-6 dark:text-gray-200"/>
+                    <div className="text-xs uppercase tracking-widest font-medium ml-2 dark:text-gray-200">{page.name}</div>
                   </a>
                  
                 </Link>

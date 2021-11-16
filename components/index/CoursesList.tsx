@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import Course from './Course'
-import data from "../../data/testing/course"
+import data from "../../data/testing/courseList"
 
 
 interface course{
@@ -21,10 +21,10 @@ export interface props{
 
 const CoursesList = ({courses}:props)=>{
     console.log(courses)
-    courses = data.courses
+    // courses = data.courses
     return(
         <div className = "flex flex-col my-4">
-            <div className = "my-4 text-gray-600 font-bold text-xl">Courses</div>
+            <div className = "my-4 text-gray-600 font-bold text-xl dark:text-white">Courses</div>
             <div className = "space-x-4 flex flex-wrap">
                 {courses.map((course:course)=>{
                     var link = "https://codespace.ust.dev/course/"+course.sectionID+"/"+course.sectionRole.toLowerCase()

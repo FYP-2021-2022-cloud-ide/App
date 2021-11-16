@@ -14,7 +14,7 @@ export default function UserMenu({sub,name,email}: UserMenuProps) {
     <div className="w-14 text-right top-16">
       <Menu as="div" className="relative text-left">
         <div>
-          <Menu.Button className="justify-center text-sm font-medium rounded-md hover:scale-110 transition transition-all ease-in-out duration-300">
+          <Menu.Button className="justify-center text-sm font-medium rounded-md hover:scale-110 transition transition-all ease-in-out duration-300 dark:text-gray-200">
             {sub}
           </Menu.Button>
         </div>

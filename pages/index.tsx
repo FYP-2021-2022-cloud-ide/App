@@ -4,8 +4,8 @@ import CoursesList from '../components/index/CoursesList';
 import ContainersList from '../components/index/ContainersList';
 import { GetServerSideProps } from 'next';
 //testing 
-import containerData from "../data/testing/container" ; 
-import courseData from "../data/testing/course" ; 
+import containerData from "../data/testing/containerList" ; 
+import courseData from "../data/testing/courseList" ; 
 import {props as CourseListProps} from "../components/index/CoursesList"
 import {props as ContainerListProps} from "../components/index/ContainersList"
 
@@ -20,24 +20,19 @@ export default function Home({sub}:props) {
     const [containers, setContainers] = useState<ContainerListProps>(containerData)
     const { containerList, courseList} = useCnails();
     // data fetching from API
-    // useEffect(()=>{
-    //     const fetchCourses = async ()=>{
-    //         const courses = await courseList(sub) 
-    //         // testing 
-    //         // const courses = courseData; 
-    //         setCourses(courses)
-    //     }
-    //     const fetchContainers = async ()=>{
-    //         const containers = await containerList(sub)
-    //         //testing 
-    //         // const containers = containerData ; 
-    //         setContainers(containers)
-    //     }
-    //     fetchCourses()
-    //     fetchContainers()
-    // }, [])
-    // console.log(containers)
-    console.log(containers.containerInfo)
+    useEffect(()=>{
+        const fetchCourses = async ()=>{
+            const courses = await courseList(sub) 
+            setCourses(courses)
+        }
+        const fetchContainers = async ()=>{
+            const containers = await containerList(sub)
+            setContainers(containers)
+        }
+        fetchCourses()
+        fetchContainers()
+    }, [])
+    console.log(containers)
     return (
         <div>
             {courses&&containers ? (
