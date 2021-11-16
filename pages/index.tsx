@@ -16,8 +16,8 @@ interface props{
 
 export default function Home({sub}:props) {
     // load once when page is rendered
-    const [courses, setCourses] = useState<CourseListProps>(courseData)
-    const [containers, setContainers] = useState<ContainerListProps>(containerData)
+    const [courses, setCourses] = useState<CourseListProps>()
+    const [containers, setContainers] = useState<ContainerListProps>()
     const { containerList, courseList} = useCnails();
     // data fetching from API
     useEffect(()=>{
@@ -33,14 +33,15 @@ export default function Home({sub}:props) {
         fetchContainers()
     }, [])
     console.log(containers)
+    console.log(courses)
     return (
         <div>
             {courses&&containers ? (
                 <div className = "flex flex-col mx-6">
                     {/* @ts-ignore */}
-                    <ContainersList containers = {containerData!.containers} containerInfo={containerData!.containersInfo} ></ContainersList>
+                    <ContainersList containers = {containers!.containers} containerInfo={containers!.containersInfo} ></ContainersList>
                     {/* @ts-ignore */}
-                    <CoursesList courses= {courseData!.courses} ></CoursesList>
+                    <CoursesList courses= {courses!.courses} ></CoursesList>
                 </div>
             ):(
                 <div className="flex h-screen w-screen">

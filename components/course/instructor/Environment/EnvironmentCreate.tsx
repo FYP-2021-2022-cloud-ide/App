@@ -17,8 +17,8 @@ const EnvironmentCreate = React.forwardRef(({sectionUserID, closeModal}:Environm
     const [description, setDescription] = useState("")
     const options = [
         { value: 'C++/C', label: 'C++/C' },
-        { value: 'python3', label: 'python3' },
-        { value: 'java', label: 'java' },
+        { value: 'Python3', label: 'Python3' },
+        { value: 'Java', label: 'Java' },
     ]
     const rootImage ="4d5f53676d8f"
     const CPU = 0.5
