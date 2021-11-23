@@ -3,7 +3,7 @@ import Link from 'next/link'
 import {HomeIcon, UserGroupIcon, CubeTransparentIcon, CogIcon} from '@heroicons/react/outline'
 import { useRouter } from "next/router";
 
-const Navbar = () => {
+const SideBar = () => {
     var pages= [
       {name:"Dashboard", link:"/", icon:HomeIcon},
       {name:"Teams",link:"/Teams", icon:UserGroupIcon},
@@ -26,8 +26,6 @@ const Navbar = () => {
                 return (
                 <Link key={page.link} href={page.link}>
                   <a className={`${baseClass} ${isActive?activeClass:""}`}>
-                    {/* <Image className="transform scale-100 hover:scale-105 hover:shadow-xl" 
-                      src={page.image} width="50" height="50" /> */}
                       <page.icon className="w-6 h-6 dark:text-gray-200"/>
                     <div className="text-xs uppercase tracking-widest font-medium ml-2 dark:text-gray-200">{page.name}</div>
                   </a>
@@ -42,4 +40,4 @@ const Navbar = () => {
     )
 }
 
-export default Navbar
+export default SideBar

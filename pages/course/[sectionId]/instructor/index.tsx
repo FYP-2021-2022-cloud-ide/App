@@ -18,10 +18,10 @@ interface ICourseProps {
 const Home = ({ sub }: ICourseProps) => {
   const router = useRouter();
   const sectionId = router.query.sectionId as string
-  const [courseName, setCourseName] = useState("COMP1021")
+  const [courseName, setCourseName] = useState("")
   const [sectionUserID, setSectionUserID] = useState("")
-  const [thisEnvironmentList, setEnvironmentList] = useState(EnvironmentListData.environments)
-  const [thisTemplateList, setTemplateList] = useState(TemplateListData.templates)
+  const [thisEnvironmentList, setEnvironmentList] = useState()
+  const [thisTemplateList, setTemplateList] = useState()
   const { environmentList, templateList, getSectionInfo } = useCnails();
   // data fetching from API
   useEffect(() => {
@@ -45,9 +45,9 @@ const Home = ({ sub }: ICourseProps) => {
         setCourseName(response.courseName)
       }
     }
-    // fetchEnvironments()
-    // fetchTemplates()
-    // fetchSectionInfo()
+    fetchEnvironments()
+    fetchTemplates()
+    fetchSectionInfo()
   }, [])
 
   
@@ -58,7 +58,7 @@ const Home = ({ sub }: ICourseProps) => {
       <Breadcrumbs elements={["Dashboard" , courseName]}/>
       <CourseBar role={"Instructor"} courseName={courseName!}></CourseBar>
 
-      <div className="flex flex-row space-x-4">
+      <div className="flex flex-row space-x-4 w-full">
         <EnvironmentList environments={thisEnvironmentList!} sectionUserID={sectionUserID}></EnvironmentList>
         <TemplateList environments={thisEnvironmentList!} templates={thisTemplateList!} sectionUserID={sectionUserID}></TemplateList>
       </div>

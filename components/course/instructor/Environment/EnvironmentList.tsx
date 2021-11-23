@@ -39,7 +39,7 @@ const EnvironmentList = ({ sectionUserID, environments }: props) => {
 
 
     return (
-        <div className="flex flex-col">
+        <div className="flex flex-col w-full">
             <div className="flex flex-row text-gray-700 dark:text-gray-300 justify-start gap-x-4 pb-4">
                 <CubeIcon className="w-7 h-7"></CubeIcon>
                 <div className="text-lg">Environments</div>

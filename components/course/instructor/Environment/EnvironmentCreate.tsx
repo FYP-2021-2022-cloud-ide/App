@@ -41,7 +41,7 @@ const EnvironmentCreate = React.forwardRef(({sectionUserID, closeModal}:Environm
                     }
                     return(
                         //@ts-ignore
-                        <div ref={ref} className="inline-block overflow-visible w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl text-[#415A6E]">
+                        <div ref={ref} className="inline-block overflow-visible w-full max-w-md p-6 my-8 text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl text-[#415A6E]">
                             <Dialog.Title
                                 as="h3"
                                 className="text-xl font-medium leading-6"

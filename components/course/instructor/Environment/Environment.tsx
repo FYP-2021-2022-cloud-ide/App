@@ -17,7 +17,7 @@ function Environment({ environment, sectionUserID }: EnvironmentProps) {
     console.log(environment)
     return (
         <div className="border broder-gray-200 dark:border-gray-700 shadow-sm rounded-lg bg-white dark:bg-gray-600 px-4 py-4 min-h-36 h-36">
-            <div className="flex flex-row items-start h-full">
+            <div className="flex flex-row items-start h-full justify-between">
                 <div className="flex flex-col h-full justify-between">
                     <div>
                         <div className="font-semibold text-sm text-gray-600 dark:text-gray-300 text-left">{environment.environmentName}</div>

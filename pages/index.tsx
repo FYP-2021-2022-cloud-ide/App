@@ -16,8 +16,8 @@ interface props {
 
 export default function Home({ sub }: props) {
     // load once when page is rendered
-    const [courses, setCourses] = useState<CourseListProps>(courseData)
-    const [containers, setContainers] = useState<ContainerListProps>(containerData)
+    const [courses, setCourses] = useState<CourseListProps>()
+    const [containers, setContainers] = useState<ContainerListProps>()
     const { containerList, courseList } = useCnails();
     // data fetching from API
     useEffect(() => {
@@ -29,13 +29,13 @@ export default function Home({ sub }: props) {
             const containers = await containerList(sub)
             setContainers(containers)
         }
-        // fetchCourses()
-        // fetchContainers()
+        fetchCourses()
+        fetchContainers()
     }, [])
     return (
-        <div className="flex flex-col mx-6 space-y-5">
-            <ContainersList containers={containers.containers} containerInfo={containers.containerInfo} ></ContainersList>
-            <CoursesList courses={courses.courses} ></CoursesList>
+        <div className="flex flex-col px-6 space-y-5 w-full">
+            <ContainersList containers={containers!.containers} containerInfo={containers!.containerInfo} ></ContainersList>
+            <CoursesList courses={courses!.courses} ></CoursesList>
         </div>
     )
 }

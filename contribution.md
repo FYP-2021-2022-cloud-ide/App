@@ -107,7 +107,7 @@ Actually there should be a better way of development which is to separate the te
 
 # practice 
 
-1. You should create a new branch when developing a new feature, never merging directly to the main branch. 
+1. You should create a new branch when developing a new feature, never merging directly to the main branch. You can do this by running command `git push origin manlung`.
 
 
 # roadmap

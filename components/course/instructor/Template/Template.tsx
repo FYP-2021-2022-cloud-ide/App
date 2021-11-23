@@ -33,29 +33,28 @@ function Template({ template, memLimit, numCPU, sectionUserID }: TemplateProps) 
     }
 
     return (
-        <div onClick={OpenContainer} className={`min-h-36 h-36 border cursor-pointer border-gray-200 dark:border-gray-700 shadow-sm rounded-lg hover:shadow-lg px-5 py-4 ${template.active? "bg-white dark:bg-gray-600" : "bg-gray-200 dark:bg-gray-900"}`}>
-            <div className="flex flex-row items-start space-x-3 h-full ">
-                <div className="w-1/12 mt-4">
-                    <span className="relative flex h-3 w-3">
-                        {instanceFlag && <span className="absolute animate-ping inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>}
-                        <span className={`relative inline-flex rounded-full h-3 w-3 ${instanceFlag ? "bg-green-400" : "bg-gray-400"}`}></span>
-                    </span>
-                </div>
-                <div className="flex flex-col h-full justify-between">
-                    <div>
-                        <div className="font-semibold text-sm text-gray-600 dark:text-gray-300  text-left ">{template.name}</div>
-                        <div className="font-medium text-xs text-gray-400  ">{template.imageId}</div>
+        <div onClick={OpenContainer} className={`min-h-36 h-36 border cursor-pointer border-gray-200 dark:border-gray-700 shadow-sm rounded-lg hover:shadow-lg px-5 py-4 ${template.active ? "bg-white dark:bg-gray-600" : "bg-gray-200 dark:bg-gray-900"}`}>
+            <div className="flex flex-row  justify-between h-full">
+                <div className=" flex flex-row  space-x-3 ">
+                    <div className="w-1/12 mt-4">
+                        <span className="relative flex h-3 w-3">
+                            {instanceFlag && <span className="absolute animate-ping inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>}
+                            <span className={`relative inline-flex rounded-full h-3 w-3 ${instanceFlag ? "bg-green-400" : "bg-gray-400"}`}></span>
+                        </span>
                     </div>
-                    <div className="font-medium text-xs text-gray-400 justify-self-end">{template.description}</div>
+                    <div className="flex flex-col h-full justify-between w-full">
+                        <div>
+                            <div className="font-semibold text-sm text-gray-600 dark:text-gray-300  text-left ">{template.name}</div>
+                            <div className="font-medium text-xs text-gray-400  ">{template.imageId}</div>
+                        </div>
+                        <div className="font-medium text-xs text-gray-400 justify-self-end">{template.description}</div>
+                    </div>
                 </div>
 
                 <div className="w-1/12">
                     <TemplateMenu template={template} memLimit={memLimit} numCPU={numCPU} sectionUserID={sectionUserID}></TemplateMenu>
                 </div>
             </div>
-
-
-
         </div>
     )
 }
