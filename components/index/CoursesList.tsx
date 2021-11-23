@@ -24,8 +24,8 @@ const CoursesList = ({courses}:props)=>{
     // courses = data.courses
     return(
         <div className = "flex flex-col my-4">
-            <div className = "my-4 text-gray-600 font-bold text-xl dark:text-white">Courses</div>
-            <div className = "space-x-4 flex flex-wrap">
+            <div className = "my-4 text-gray-600 dark:text-gray-300 font-bold text-xl ">Courses</div>
+            <div className = "grid grid-cols-2 md:grid-cols-3 gap-8 ">
                 {courses.map((course:course)=>{
                     var link = "https://codespace.ust.dev/course/"+course.sectionID+"/"+course.sectionRole.toLowerCase()
                     return(

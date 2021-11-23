@@ -1,5 +1,5 @@
 import { Menu, Transition } from '@headlessui/react'
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { Fragment, useRef, useState } from 'react'
 import { MenuIcon } from '@heroicons/react/outline'
 import {useCnails} from '../../../../contexts/cnails'
 import Modal from '../../../Modal'
@@ -31,7 +31,7 @@ export default function EnvironmentMenu({sectionUserID,environment}:EnvironmentM
         <div>
             <Menu as="div" className="relative inline-block text-left">
                 <Menu.Button className="inline-flex justify-end w-full py-2 text-sm font-medium rounded-md ">
-                    <MenuIcon className="w-5 h-5 hover:scale-110 transition transition-all ease-in-out duration-300"></MenuIcon>
+                    <MenuIcon className="w-5 h-5 hover:scale-110 transition text-gray-600 dark:text-gray-300 ease-in-out duration-300"></MenuIcon>
                 </Menu.Button>
                 <Transition
                 as={Fragment}

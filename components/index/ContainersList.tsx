@@ -20,25 +20,29 @@ export interface props{
 }
 
 const ContainersList = ({containers,containerInfo}:props  )=>{
-    console.log(containerInfo)
-    // containers = data.containers 
-    // containerInfo = data.containerInfo
-    var percentage = containerInfo.containersAlive/containerInfo.containersTotal;
-    return(
-        <div className="flex flex-col justiy-start w-full font-bold  " >
-          <div className="flex flex-row text-gray-600 max-w-xs justify-between mb-6">
-            <div className="text-xl dark:text-white">Current Run</div>
-            <div className="flex flex-col justify-between w-3/5">
-              <div className="h-1 text-xs  text-gray-400 text-right"> {containerInfo.containersAlive}/{containerInfo.containersTotal}</div>
-              <div className='h-2 rounded-full w-full bg-gray-300'>
-                <div
-                    style={{ width: `${percentage}%`}}
-                    className={`h-2 rounded-full ${
-                        percentage === 100 ? 'bg-red-400' : 'bg-red-300'}`}>
-                </div>
-              </div>
+    var percentage = containerInfo.containersAlive/containerInfo.containersTotal * 100 ;
+
+    const Header = () => { 
+      return (
+        <div className="flex flex-row  max-w-xs justify-between mb-6">
+        <div className="text-xl text-gray-600 dark:text-gray-300">Current Run</div>
+        <div className="flex flex-col justify-between w-3/5">
+          <div className="h-1 text-xs  text-gray-400 text-right"> {containerInfo.containersAlive}/{containerInfo.containersTotal}</div>
+          <div className='h-2 rounded-full w-full bg-gray-300 '>
+            <div
+                style={{ width: `${percentage}%`}}
+                className={`h-2 rounded-full ${
+                    percentage === 100 ? 'bg-red-400' : 'bg-green-300'}`}>
             </div>
           </div>
+        </div>
+      </div>
+      )
+    }
+    
+    return(
+        <div className="flex flex-col justiy-start w-full font-bold mt-10" >
+          <Header />
           <div className="flex flex-wrap justify-start">
             {containers.map((container, i)=>{
               return(

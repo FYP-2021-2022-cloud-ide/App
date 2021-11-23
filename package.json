@@ -16,6 +16,7 @@
     "axios": "^0.21.4",
     "cookie": "^0.4.1",
     "cookie-parser": "^1.4.5",
+    "daisyui": "^1.16.2",
     "express": "^4.17.1",
     "express-openid-connect": "^2.5.0",
     "grpc": "^1.24.11",

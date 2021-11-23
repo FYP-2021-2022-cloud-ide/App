@@ -52,7 +52,7 @@ export default function TemplateMenu({template, memLimit, numCPU, sectionUserID}
         <div>
             <Menu as="div" className="relative inline-block text-left">
                 <Menu.Button className="inline-flex justify-end w-full py-2 text-sm font-medium rounded-md ">
-                    <MenuIcon className="w-5 h-5 hover:scale-110 transition transition-all ease-in-out duration-300"></MenuIcon>
+                    <MenuIcon className="w-5 h-5 hover:scale-110 transition dark:text-gray-300 ease-in-out duration-300"></MenuIcon>
                 </Menu.Button>
                 <Transition
                 as={Fragment}

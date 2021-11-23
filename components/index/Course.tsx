@@ -19,19 +19,13 @@ interface Course{
 function Course({link, course}:CourseProps){
     return(
         <Link href= {link}>
-            <a className="border broder-gray-200 shadow-sm rounded-lg bg-white p-4 dark:bg-white dark:border-gray-600 hover:shadow-lg transition-all ease-in-out duration-300">
+            <a className="border broder-gray-200 shadow-sm rounded-lg bg-white p-4 dark:bg-gray-600 dark:border-gray-700 hover:shadow-lg transition-all ease-in-out duration-300">
                 <div className="flex flex-row">
                     <div className="flex flex-col space-y-1">
-                        <b className="font-semibold text-sm text-gray-800">{course.courseCode + " (" +course.section+")"}</b>
-                        <div className="font-medium text-xs text-gray-600">{course.name}</div>
-                        {/* {course.role == "INSTRUCTOR" ?(
-                        <div className = "rounded-lg bg-purple-700 w-24 py-1.5 font-bold text-center text-white text-sm">
-                            Instructor
-                        </div>):(
-                        <div className = "rounded-lg bg-blue-500 w-24 py-1.5 font-bold text-center text-white text-sm">
-                            Student
-                        </div>) } */}
-                        <div className="text-xs text-gray-400">
+                        <b className="font-semibold text-sm text-gray-800 dark:text-gray-300">{course.courseCode + " (" +course.section+")"}</b>
+                        <div className="font-medium text-xs text-gray-600 dark:text-gray-400">{course.name}</div>
+                        {course.sectionRole == "INSTRUCTOR" ?<div className="badge bg-purple-500 border-purple-500">Instructor</div>:<div className="badge bg-blue-500 border-blue-500">Student</div>}
+                        <div className="text-xs text-gray-400 ">
                             Last update: {course.lastUpdateTime}
                         </div>
                     </div>

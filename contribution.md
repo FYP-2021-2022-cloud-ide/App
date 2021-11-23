@@ -14,6 +14,20 @@ npm install
 
 Then you should run `npm run dev` to start the project. But before you start the project, you should check the following:  
 
+## disable authentication and api routing 
+
+In the `server.ts`, express handle some authentication and api routing, you need to disable them as well. You need to enable the following block to mimic authentication. 
+
+```tsx
+//testing 
+  server.all('*' ,  (req, res) => {
+    res.cookie('sub', "mlkyeung");
+    res.cookie('name', "Yeung Man Lung Ken ");
+    res.cookie('email', "mlkyeung@connect.ust.hk");
+    return handle(req, res);
+  })
+```
+
 ## disable all external api 
 
 For example in `index.tsx`,
@@ -36,9 +50,56 @@ For example in `index.tsx`,
 ```
 The `fetchCourses()` and `fetchContainers()` need to be disabled. Then use your test data. 
 
-## disable authentication and api routing 
+### how to create fake testing data? 
 
-In the `server.ts`, express handle some authentication and api routing, you need to disable them as well. 
+The fake testing data should be correspond to the data structure of components props. 
+
+#### the props type must be public 
+
+```tsx 
+interface course{
+    sectionID: string
+    courseCode: string
+    section: string
+    name: string
+    sectionRole: string
+    lastUpdateTime: string
+}
+
+export interface props{
+    courses: course[]
+}
+
+const CoursesList = ({courses}:props)=>{
+```
+
+The code is in `CourseList.tsx`. The props is the type of the component and it should be published. 
+
+
+```tsx
+const data : props = { 
+    courses : [
+        {
+            section : "12312321asda" , 
+            sectionID : "123123" , 
+            sectionRole : "student" , 
+            name : "sdfosodfks" , 
+            courseCode : "COMP1234" , 
+            lastUpdateTime : "15 mins ago"
+        },
+        {
+            section : "12312321asda" , 
+            sectionID : "123123" , 
+            sectionRole : "student" , 
+            name : "sdfosodfks" , 
+            courseCode : "COMP1234" , 
+            lastUpdateTime : "15 mins ago"
+        },{
+  //...
+```
+
+Then you need to compose the data just like the struct you define for the component. For naming convention, the testing data file can be the same as the component name. 
+
 
 ## Note !
 

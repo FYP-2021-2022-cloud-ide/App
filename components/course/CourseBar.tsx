@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ChevronRightIcon, ChevronLeftIcon, MenuIcon, CogIcon } from '@heroicons/react/solid'
+import { ChevronRightIcon, ChevronLeftIcon, MenuIcon, CogIcon ,TerminalIcon } from '@heroicons/react/solid'
 
 
 interface props{
@@ -30,53 +30,21 @@ function RoleBlock({role}:propsR){
 const CourseBar = ({courseName, role}:props) => {
 
     return (
-        <div className='text-[#578CB5]'>
-            <div className="flex flex-row space-x-2 ">
-                <Link href={'/'}>
-                    <a className= "flex flex-row gap-x-2" >
-                        {/* <div className= "text-5xl scale-y-125 scale-x-150" >
-                            <img src="/coursePage/arrow.svg"  className="" />
-                        </div> */}
-                        <ChevronLeftIcon className="w-7 h-7"></ChevronLeftIcon>
-                        <div className= "text-lg font-light hover:underline" >
-                            Back
-                        </div>
-                    </a>
-                </Link>
-                <div className= "text-lg mx-4" >|</div>
-                {/* <img src="/coursePage/vline.svg"  className="mx-5" /> */}
-                <div className= "text-lg font-light" >
-                    Course
-                </div>
-                {/* <div className= "text-5xl scale-y-125  scale-x-150" >
-                <img src="/coursePage/arrow.svg"  className="rotate-180" />
-                </div> */}
-                <ChevronRightIcon className="w-7 h-7"></ChevronRightIcon>
-                <div className= "text-lg font-light" >
-                    {courseName}
-                </div>
-            </div>
-            {/* title and settings */}
-            <div className="grid grid-cols-3 gap-8 py-8">
+        
+            <div className="flex flex-row justify-between text-gray-700 dark:text-gray-300">
                 <div className="flex flex-row justify-start gap-x-4">
-                    <img src="/coursePage/manageDocRole.svg"  className="" />
-                    <div className="text-lg mt-1 ">{courseName}</div>
-                    {/* <RoleBlock role={role}></RoleBlock> */}
+                    <TerminalIcon className="w-7 h-7"> </TerminalIcon> 
+                    <p className="text-lg">{courseName}</p>
+                    <div className="badge dark:bg-gray-300 dark:text-gray-700"> {role}</div>
                 </div>
-                <div></div>
                 <div className="flex flex-row gap-x-4 justify-end">
-                    <button className="hover:scale-110 transition transition-all ease-in-out duration-300">
-                        {/* <img src="/coursePage/barWithDots.svg"  className="" /> */}
-                        <MenuIcon className="w-7 h-7"></MenuIcon>
-                    </button>
-                    <button className="hover:scale-110 transition transition-all ease-in-out duration-300">
-                        {/* <img src="/coursePage/repairing.svg"  className="" /> */}
+                    <button className="hover:scale-110 transition ease-in-out duration-300">
                         <CogIcon className="w-7 h-7"></CogIcon>
                     </button>
                 </div>
                 
             </div>
-        </div>
+       
     )
 }
 

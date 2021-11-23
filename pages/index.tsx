@@ -4,50 +4,38 @@ import CoursesList from '../components/index/CoursesList';
 import ContainersList from '../components/index/ContainersList';
 import { GetServerSideProps } from 'next';
 //testing 
-import containerData from "../data/testing/containerList" ; 
-import courseData from "../data/testing/courseList" ; 
-import {props as CourseListProps} from "../components/index/CoursesList"
-import {props as ContainerListProps} from "../components/index/ContainersList"
+import containerData from "../data/testing/containerList";
+import courseData from "../data/testing/courseList";
+import { props as CourseListProps } from "../components/index/CoursesList"
+import { props as ContainerListProps } from "../components/index/ContainersList"
 
 
-interface props{
+interface props {
     sub: string
 }
 
-export default function Home({sub}:props) {
+export default function Home({ sub }: props) {
     // load once when page is rendered
-    const [courses, setCourses] = useState<CourseListProps>()
-    const [containers, setContainers] = useState<ContainerListProps>()
-    const { containerList, courseList} = useCnails();
+    const [courses, setCourses] = useState<CourseListProps>(courseData)
+    const [containers, setContainers] = useState<ContainerListProps>(containerData)
+    const { containerList, courseList } = useCnails();
     // data fetching from API
-    useEffect(()=>{
-        const fetchCourses = async ()=>{
-            const courses = await courseList(sub) 
+    useEffect(() => {
+        const fetchCourses = async () => {
+            const courses = await courseList(sub)
             setCourses(courses)
         }
-        const fetchContainers = async ()=>{
+        const fetchContainers = async () => {
             const containers = await containerList(sub)
             setContainers(containers)
         }
-        fetchCourses()
-        fetchContainers()
+        // fetchCourses()
+        // fetchContainers()
     }, [])
     return (
-        <div>
-            {courses&&containers ? (
-                <div className = "flex flex-col mx-6">
-                    {/* @ts-ignore */}
-                    <ContainersList containers = {containers!.containers} containerInfo={containers!.containersInfo} ></ContainersList>
-                    {/* @ts-ignore */}
-                    <CoursesList courses= {courses!.courses} ></CoursesList>
-                </div>
-            ):(
-                <div className="flex h-screen w-screen">
-                    <div className="m-auto">
-                        <img src='/circle.svg'/> 
-                    </div>
-                </div>
-            )}
+        <div className="flex flex-col mx-6 space-y-5">
+            <ContainersList containers={containers.containers} containerInfo={containers.containerInfo} ></ContainersList>
+            <CoursesList courses={courses.courses} ></CoursesList>
         </div>
     )
 }
@@ -55,7 +43,7 @@ export default function Home({sub}:props) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
     var cookies = context.req.cookies
     return {
-        props:{
+        props: {
             sub: cookies.sub,
         }
     }
