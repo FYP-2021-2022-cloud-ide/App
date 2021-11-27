@@ -1,26 +1,14 @@
 import React, { MouseEventHandler, useRef, useState } from "react"
 import { Dialog, Transition, Switch } from "@headlessui/react";
 import { useCnails } from "../../../../contexts/cnails";
-
+import {template } from "./TemplateList"
 interface TemplateUpdateProps{
     sectionUserID:string
-    template: Template
+    template: template
     memLimit: number
     numCPU: number
     closeModal: MouseEventHandler<HTMLButtonElement> | undefined
 }
-
-interface Template{
-    imageId: string
-    id: string
-    name: string
-    description:string
-    assignment_config_id: string
-    storage: string
-    containerID: string
-    active: boolean
-}
-
 
 const TemplateUpdate = React.forwardRef(({sectionUserID, memLimit, numCPU, template, closeModal}:TemplateUpdateProps, ref)=>{
 
@@ -36,6 +24,8 @@ const TemplateUpdate = React.forwardRef(({sectionUserID, memLimit, numCPU, templ
     const [finishLoading, setFinishLoading] = useState(true)
     const [description, setDescription] = useState(template.description)
     const [templateName, setTemplateName]= useState(template.name)
+    const [isExam, setIsExam]= useState(template.isExam)
+    const [timeLimit, setTimeLimit]= useState(template.timeLimit)
     const { updateTemplate,addContainer, removeContainer} = useCnails();
     const [containerID,setContainerID]=useState("")
     // console.log(selectedEnv)
@@ -84,7 +74,7 @@ const TemplateUpdate = React.forwardRef(({sectionUserID, memLimit, numCPU, templ
                             onClick={async()=>{
                                 setFinishLoading(false)
                                 nextStep()
-                                const response = await updateTemplate(template.id,templateName,description, sectionUserID, containerID)
+                                const response = await updateTemplate(template.id,templateName,description, sectionUserID, containerID,isExam, timeLimit)
                                 if(response.success){
                                     setFinishLoading(true)
                                 }else{
@@ -161,6 +151,31 @@ const TemplateUpdate = React.forwardRef(({sectionUserID, memLimit, numCPU, templ
                         onChange={(e) => setDescription(e.target.value)}></textarea>
                     </div>
 
+                    <div className="mt-2 font-medium mt-4">
+                        Is it an Exam?(Optional)
+                    </div>
+                    <div className="p-1 border  flex text-gray-500 flex-row space-x-2 focus:border-black-600 text-left rounded-xl shadow-lg">
+                        <input className="focus:outline-none" type="checkbox"
+                        checked={isExam}
+                        onChange={(e) => setIsExam(!isExam)}></input>
+                    </div>
+
+                    {isExam?
+                    <div> 
+                        <div className="mt-2 font-medium mt-4">
+                        Time Limit(in minutes)
+                        </div>
+                        <div className="p-1 border w-full flex text-gray-500 flex-row space-x-2 focus:border-black-600 text-left rounded-xl shadow-lg">
+                            <input className="focus:outline-none w-full" 
+                            placeholder="e.g. 120"
+                            value={timeLimit.toString()}
+                            onChange={(e) => setTimeLimit(parseInt(e.target.value))}></input>
+                        </div>
+                    </div>
+                        :
+                       <div></div>
+                    }
+                    
                     <div className="py-3 sm:flex sm:flex-row-reverse">
                         <span className="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
                             <button
@@ -181,7 +196,7 @@ const TemplateUpdate = React.forwardRef(({sectionUserID, memLimit, numCPU, templ
                             <button
                             type="button"
                             onClick={async()=>{
-                                const response = await updateTemplate(template.id,templateName,description, sectionUserID, "")
+                                const response = await updateTemplate(template.id,templateName,description, sectionUserID, "",isExam,timeLimit)
                                 if(response.success){
                                     window.location.reload();
                                 }

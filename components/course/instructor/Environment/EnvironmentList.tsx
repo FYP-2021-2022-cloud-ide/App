@@ -14,7 +14,7 @@ import environmentListData from "../../../../data/testing/environmentList"
 import { useCnails } from "../../../../contexts/cnails";
 import EmptyDiv from "../../../EmptyDiv";
 
-interface EnvironmentContent {
+export interface EnvironmentContent {
     id: string
     imageId: string
     environmentName: string

@@ -8,7 +8,7 @@ const SideBar = () => {
       {name:"Dashboard", link:"/", icon:HomeIcon},
       {name:"Teams",link:"/Teams", icon:UserGroupIcon},
       {name:"Workspace",link:"/Workspace", icon:CubeTransparentIcon},
-      {name:"Setting",link:"/Setting", icon:CogIcon}
+      {name:"Setting",link:"/settings", icon:CogIcon}
     ]
     const router = useRouter();
     const baseClass='flex flex-row items-center text-gray-500 hover:text-gray-900'

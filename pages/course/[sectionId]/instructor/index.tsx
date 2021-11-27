@@ -50,21 +50,29 @@ const Home = ({ sub }: ICourseProps) => {
     fetchSectionInfo()
   }, [])
 
-  
+
 
   return (
 
-    <div className="flex flex-col font-bold px-8 w-full pt-10 min-h-screen text-gray-600 space-y-4">
-      <Breadcrumbs elements={["Dashboard" , courseName]}/>
-      <CourseBar role={"Instructor"} courseName={courseName!}></CourseBar>
+    <div className="w-full">
+      {thisEnvironmentList && thisTemplateList ? (
+        <div className="flex flex-col font-bold px-8 w-full pt-10 min-h-screen text-gray-600 space-y-4">
+          <Breadcrumbs elements={["Dashboard", courseName]} />
+          <CourseBar role={"Instructor"} courseName={courseName!}></CourseBar>
 
-      <div className="flex flex-row space-x-4 w-full">
-        <EnvironmentList environments={thisEnvironmentList!} sectionUserID={sectionUserID}></EnvironmentList>
-        <TemplateList environments={thisEnvironmentList!} templates={thisTemplateList!} sectionUserID={sectionUserID}></TemplateList>
-      </div>
+          <div className="flex flex-row space-x-4 w-full">
+            <EnvironmentList environments={thisEnvironmentList!} sectionUserID={sectionUserID}></EnvironmentList>
+            <TemplateList environments={thisEnvironmentList!} templates={thisTemplateList!} sectionUserID={sectionUserID}></TemplateList>
+          </div>
+        </div>
+      ) : (
+        <div className="flex h-screen w-screen">
+          <div className="m-auto">
+            <img src='/circle.svg' />
+          </div>
+        </div>
+      )}
     </div>
-
-
   )
 }
 

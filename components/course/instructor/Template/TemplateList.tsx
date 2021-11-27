@@ -11,8 +11,10 @@ import TemplateCreate from "./TemplateCreate";
 //testing
 import templateData from "../../../../data/testing/templateList"
 import EmptyDiv from "../../../EmptyDiv";
+import {EnvironmentContent as environment} from "../Environment/EnvironmentList"
 
-interface template {
+
+export interface template {
     id: string
     name: string
     description: string
@@ -21,15 +23,10 @@ interface template {
     storage: string
     containerID: string
     active: boolean
+    isExam:boolean
+    timeLimit:Number
 }
 
-
-interface environment {
-    id: string
-    imageId: string
-    environmentName: string
-    description: string
-}
 
 export interface props {
     templates: template[]

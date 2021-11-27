@@ -28,6 +28,8 @@ export default function handler(
     docReq.setContainerid(body.containerId);
     docReq.setDescription(body.description);
     docReq.setActive(body.active)
+    docReq.setIsExam(body.isExam)
+    docReq.setTimeLimit(body.timeLimit)
     try{
       client.addTemplate(docReq, function(err, GoLangResponse: AddTemplateReply) {
         if(!GoLangResponse.getSuccess()){

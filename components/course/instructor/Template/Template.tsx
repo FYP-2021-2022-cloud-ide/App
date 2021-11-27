@@ -1,24 +1,15 @@
 import React from "react"
 import { useCnails } from "../../../../contexts/cnails";
 import TemplateMenu from "./TemplateMenu"
-
+import {template } from "./TemplateList"
 interface TemplateProps {
-    template: Template
+    template: template
     memLimit: number
     numCPU: number
     sectionUserID: string
 }
 
-interface Template {
-    imageId: string
-    id: string
-    name: string
-    description: string
-    assignment_config_id: string
-    storage: string
-    containerID: string
-    active: boolean
-}
+
 
 function Template({ template, memLimit, numCPU, sectionUserID }: TemplateProps) {
     var instanceFlag = true
@@ -48,6 +39,15 @@ function Template({ template, memLimit, numCPU, sectionUserID }: TemplateProps) 
                             <div className="font-medium text-xs text-gray-400  ">{template.imageId}</div>
                         </div>
                         <div className="font-medium text-xs text-gray-400 justify-self-end">{template.description}</div>
+                       
+                       {template.isExam?
+                       <div className="font-medium text-xs text-gray-400 justify-self-end">
+                           is exam. time:{template.timeLimit}
+                       </div>:
+                       <div className="font-medium text-xs text-gray-400 justify-self-end">
+                           is not exam. time:{template.timeLimit}
+                        </div>
+                       } 
                     </div>
                 </div>
 

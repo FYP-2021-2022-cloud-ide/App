@@ -3,23 +3,13 @@ import {LogoutIcon} from "@heroicons/react/outline"
 import {useCnails} from '../../../contexts/cnails'
 import { useState } from 'react'
 import WorkspaceMenu from "./WorkspaceMenu"
-
+import {template}from "../instructor/Template/TemplateList"
 
 interface WorkspaceProps{
-    template: Template
+    template: template
     sectionUserId: string
 }
 
-interface Template{
-    imageId: string
-    id: string
-    name: string
-    description:string
-    assignment_config_id: string
-    storage: string
-    containerID: string
-    active: boolean
-  }
 
 function Workspace({template, sectionUserId}:WorkspaceProps){
     const baseClass = "relative inline-flex rounded-full h-3 w-3"
@@ -62,7 +52,7 @@ function Workspace({template, sectionUserId}:WorkspaceProps){
                     </div>
                 </button>
                 <div className="w-2/12">
-                    <WorkspaceMenu templateID={template.id} containerID={template.containerID} sectionUserID={sectionUserId} imageID={template.imageId} memLimit={memLimit} numCPU={numCPU}></WorkspaceMenu>
+                    <WorkspaceMenu template={template} containerID={template.containerID} sectionUserID={sectionUserId} memLimit={memLimit} numCPU={numCPU}></WorkspaceMenu>
                 </div>
             </div>
         </div>

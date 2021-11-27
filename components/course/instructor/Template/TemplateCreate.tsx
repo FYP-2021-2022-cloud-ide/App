@@ -31,6 +31,8 @@ const TemplateCreate = React.forwardRef(({memLimit,numCPU,sectionUserID,environm
     const [description, setDescription] = useState("")
     const [selectedEnv, setSelectedEnv]= useState(environments[0])
     const [templateName, setTemplateName]= useState("")
+    const [isExam, setIsExam]= useState(false)
+    const [timeLimit, setTimeLimit]= useState(60)
     const { addTemplate,addContainer, removeContainer} = useCnails();
     const [containerID,setContainerID]=useState("")
     // console.log(selectedEnv)
@@ -79,7 +81,7 @@ const TemplateCreate = React.forwardRef(({memLimit,numCPU,sectionUserID,environm
                             onClick={async()=>{
                                 setFinishLoading(false)
                                 nextStep()
-                                const response = await addTemplate(templateName,description, sectionUserID, "Dummy string", containerID, false)
+                                const response = await addTemplate(templateName,description, sectionUserID, "Dummy string", containerID, false,isExam, timeLimit)
                                 if(response.success){
                                     setFinishLoading(true)
                                 }else{
@@ -160,6 +162,30 @@ const TemplateCreate = React.forwardRef(({memLimit,numCPU,sectionUserID,environm
                         onChange={(e) => setDescription(e.target.value)}></textarea>
                     </div>
 
+                    <div className="mt-2 font-medium mt-4">
+                        Is it an Exam?(Optional)
+                    </div>
+                    <div className="p-1 border  flex text-gray-500 flex-row space-x-2 focus:border-black-600 text-left rounded-xl shadow-lg">
+                        <input className="focus:outline-none" type="checkbox"
+                        checked={isExam}
+                        onChange={(e) => setIsExam(!isExam)}></input>
+                    </div>
+
+                    {isExam?
+                    <div> 
+                        <div className="mt-2 font-medium mt-4">
+                        Time Limit(in minutes)
+                        </div>
+                        <div className="p-1 border w-full flex text-gray-500 flex-row space-x-2 focus:border-black-600 text-left rounded-xl shadow-lg">
+                            <input className="focus:outline-none w-full" 
+                            placeholder="e.g. 120"
+                            value={timeLimit.toString()}
+                            onChange={(e) => setTimeLimit(parseInt(e.target.value))}></input>
+                        </div>
+                    </div>
+                        :
+                       <div></div>
+                    }
                     <div className="py-3 sm:flex sm:flex-row-reverse">
                         <span className="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
                             <button

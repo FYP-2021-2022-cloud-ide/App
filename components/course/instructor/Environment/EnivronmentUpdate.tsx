@@ -2,19 +2,13 @@ import { Dialog, } from "@headlessui/react";
 import React, { MouseEventHandler } from "react";
 import {  useState}from "react";
 import { useCnails } from "../../../../contexts/cnails";
-
+import {EnvironmentContent as Environment}  from "./EnvironmentList"
 interface EnvironmentUpdateProps{
     sectionUserID: string
-    environment:EnvironmentContent
+    environment:Environment
     closeModal: MouseEventHandler<HTMLButtonElement> | undefined
 }
-interface EnvironmentContent{
-    id:string
-    imageId:string
-    environmentName: string
-    libraries:string
-    description: string
-}
+
 const EnvironmentUpdate = React.forwardRef(({sectionUserID,environment, closeModal}:EnvironmentUpdateProps, ref)=>{
 
     const CPU = 0.5

@@ -224,6 +224,17 @@ function deserialize_dockerGet_SubRequest(buffer_arg) {
   return dockerGet_pb.SubRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_dockerGet_SubmitFilesRequest(arg) {
+  if (!(arg instanceof dockerGet_pb.SubmitFilesRequest)) {
+    throw new Error('Expected argument of type dockerGet.SubmitFilesRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_SubmitFilesRequest(buffer_arg) {
+  return dockerGet_pb.SubmitFilesRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_dockerGet_SuccessStringReply(arg) {
   if (!(arg instanceof dockerGet_pb.SuccessStringReply)) {
     throw new Error('Expected argument of type dockerGet.SuccessStringReply');
@@ -377,6 +388,17 @@ var DockerService = exports.DockerService = {
     responseType: dockerGet_pb.SuccessStringReply,
     requestSerialize: serialize_dockerGet_RemoveContainerRequest,
     requestDeserialize: deserialize_dockerGet_RemoveContainerRequest,
+    responseSerialize: serialize_dockerGet_SuccessStringReply,
+    responseDeserialize: deserialize_dockerGet_SuccessStringReply,
+  },
+  submitFiles: {
+    path: '/dockerGet.Docker/submitFiles',
+    requestStream: false,
+    responseStream: false,
+    requestType: dockerGet_pb.SubmitFilesRequest,
+    responseType: dockerGet_pb.SuccessStringReply,
+    requestSerialize: serialize_dockerGet_SubmitFilesRequest,
+    requestDeserialize: deserialize_dockerGet_SubmitFilesRequest,
     responseSerialize: serialize_dockerGet_SuccessStringReply,
     responseDeserialize: deserialize_dockerGet_SuccessStringReply,
   },

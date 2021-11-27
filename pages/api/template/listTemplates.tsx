@@ -60,6 +60,8 @@ export default  function handler(
               assignment_config_id: t.getAssignmentConfigId(),
               storage: t.getStorage(),
               active: t.getActive(),
+              isExam:t.getIsExam(),
+              timeLimit:t.getTimeLimit(),
               containerID:t.getContaineridList()[0],
             })
           })

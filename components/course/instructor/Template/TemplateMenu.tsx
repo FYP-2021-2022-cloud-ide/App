@@ -4,22 +4,14 @@ import { MenuIcon } from '@heroicons/react/outline'
 import {useCnails} from '../../../../contexts/cnails'
 import Modal from '../../../Modal'
 import TemplateUpdate from './TemplateUpdate'
+import {template } from "./TemplateList"
 interface TemplateMenuProps{
-    template: Template
+    template: template
     memLimit: number
     numCPU: number
     sectionUserID: string
 }
-interface Template{
-    imageId: string
-    id: string
-    name: string
-    description:string
-    assignment_config_id: string
-    storage: string
-    containerID: string
-    active: boolean
-}
+
 export default function TemplateMenu({template, memLimit, numCPU, sectionUserID}:TemplateMenuProps) {
     const {removeTemplate, addContainer, removeContainer,activateTemplate,deactivateTemplate} = useCnails();
     let [isOpen, setIsOpen] = useState(false)
@@ -51,7 +43,7 @@ export default function TemplateMenu({template, memLimit, numCPU, sectionUserID}
     return (
         <div>
             <Menu as="div" className="relative inline-block text-left">
-                <Menu.Button className="inline-flex justify-end w-full py-2 text-sm font-medium rounded-md ">
+                <Menu.Button className="inline-flex justify-end w-full py-2 text-sm font-medium rounded-md z-0 ">
                     <MenuIcon className="w-5 h-5 hover:scale-110 transition dark:text-gray-300 ease-in-out duration-300"></MenuIcon>
                 </Menu.Button>
                 <Transition
@@ -63,7 +55,7 @@ export default function TemplateMenu({template, memLimit, numCPU, sectionUserID}
                 leaveFrom="transform opacity-100 scale-100"
                 leaveTo="transform opacity-0 scale-95"
                 >
-                    <Menu.Items className="absolute mt-1 right-0 w-24 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none ">
+                    <Menu.Items className="z-1 absolute mt-1 right-0 w-24 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none ">
                         <div className="px-1 py-1">
                         <Menu.Item>
                             {({ active }) => (

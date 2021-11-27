@@ -27,7 +27,8 @@ export default function handler(
   //  docReq.setAssignmentConfigId(body.assignment_config_id);
     docReq.setContainerid(body.containerId);
     docReq.setDescription(body.description);
-   // docReq.setActive(body.active)
+    docReq.setIsExam(body.isExam)
+    docReq.setTimeLimit(body.timeLimit)
     try{
       client.updateTemplate(docReq, function(err, GoLangResponse: SuccessStringReply) {
         if(!GoLangResponse.getSuccess()){

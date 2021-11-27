@@ -26,16 +26,32 @@ export default function Home({ sub }: props) {
             setCourses(courses)
         }
         const fetchContainers = async () => {
+            // console.log('part A')
             const containers = await containerList(sub)
+            // console.log(containers)
             setContainers(containers)
         }
         fetchCourses()
         fetchContainers()
     }, [])
+    // console.log('testing')
+    console.log(containers) 
     return (
-        <div className="flex flex-col px-6 space-y-5 w-full">
-            <ContainersList containers={containers!.containers} containerInfo={containers!.containerInfo} ></ContainersList>
-            <CoursesList courses={courses!.courses} ></CoursesList>
+        <div>
+            {courses&&containers ? (
+                <div className = "flex flex-col mx-6">
+                    {/* @ts-ignore */}
+                    <ContainersList containers = {containers!.containers} containerInfo={containers!.containersInfo} ></ContainersList>
+                    {/* @ts-ignore */}
+                    <CoursesList courses= {courses!.courses} ></CoursesList>
+                </div>
+            ):(
+                <div className="flex h-screen w-screen">
+                    <div className="m-auto">
+                        <img src='/circle.svg'/> 
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

@@ -4,18 +4,12 @@ import { MenuIcon } from '@heroicons/react/outline'
 import {useCnails} from '../../../../contexts/cnails'
 import Modal from '../../../Modal'
 import EnvironmentUpdate from './EnivronmentUpdate'
-
+import {EnvironmentContent as Environment}  from "./EnvironmentList"
 interface EnvironmentMenuProps{
     sectionUserID: string
-    environment: EnvironmentContent
+    environment: Environment
 }
-interface EnvironmentContent{
-    id:string
-    imageId:string
-    environmentName: string
-    libraries:string
-    description: string
-}
+
 export default function EnvironmentMenu({sectionUserID,environment}:EnvironmentMenuProps) {
     const { removeEnvironment} = useCnails();
     let [updateIsOpen, setUpdateIsOpen] = useState(false)

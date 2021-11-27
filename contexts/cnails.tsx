@@ -12,12 +12,14 @@ interface CnailsContextState {
     
     addContainer: (imageName :string,memLimit :Number,numCPU:Number,section_user_id :string,template_id :string,dbStored:boolean,accessRight:string) => Promise<any>,
     removeContainer: (containerId:string) => Promise<any>,
-    
-    addTemplate: (templateName :string, description:string,section_user_id:string,assignment_config_id :string,containerId :string,active:boolean) => Promise<any>,
-    updateTemplate:(templateId:string,templateName :string, description:string,section_user_id:string,containerId :string) => Promise<any>,
+    submitFiles:(containerId:string) => Promise<any>,
+
+    addTemplate: (templateName :string, description:string,section_user_id:string,assignment_config_id :string,containerId :string,active:boolean,isExam:boolean,timeLimit:Number) => Promise<any>,
+    updateTemplate:(templateId:string,templateName :string, description:string,section_user_id:string,containerId :string,isExam:boolean,timeLimit:Number) => Promise<any>,
     activateTemplate:(templateId:string) => Promise<any>,
     deactivateTemplate:(templateId:string) => Promise<any>,
     removeTemplate: (templateId:string) => Promise<any>,
+    
     
     addEnvironment: (libraries :string[],name :string, description:string,section_user_id:string)=> Promise<any>,
     updateEnvironment:(envId:string,name :string,description:string, section_user_id:string,containerId:string)=> Promise<any>,
@@ -117,13 +119,25 @@ export const CnailsProvider = (props: CnailsProviderProps) => {
         })
         return res.json()
     }
+    const submitFiles = async (containerId :string)=>{
+        var res =  await fetch('/api/container/submitFiles',{
+            method: 'POST', 
+            body:JSON.stringify({ 
+                "containerId":containerId,
+            }),
+        })
+        return res.json()
+    }
+
     const addTemplate = async (
         templateName :string,
         description:string,
         section_user_id:string,
         assignment_config_id :string,
         containerId :string,
-        active:boolean
+        active:boolean,
+        isExam:boolean,
+        timeLimit:Number
         )=>{
         var res =  await fetch('/api/template/addTemplate',{
             method: 'POST', 
@@ -134,6 +148,8 @@ export const CnailsProvider = (props: CnailsProviderProps) => {
                 "assignment_config_id" :assignment_config_id ,
                 "containerId" :containerId,
                 "active":active,
+                "isExam":isExam,
+                "timeLimit":timeLimit,
             }),
         })
         return res.json()
@@ -143,7 +159,9 @@ export const CnailsProvider = (props: CnailsProviderProps) => {
         templateName :string,
         description:string,
         section_user_id:string,
-        containerId :string
+        containerId :string,
+        isExam:boolean,
+        timeLimit:Number
         )=>{
         var res =  await fetch('/api/template/updateTemplate',{
             method: 'POST', 
@@ -152,7 +170,9 @@ export const CnailsProvider = (props: CnailsProviderProps) => {
                 "templateName":templateName,
                 "description":description,
                 "section_user_id":section_user_id,
-                "containerId" :containerId
+                "containerId" :containerId,
+                "isExam":isExam,
+                "timeLimit":timeLimit,
             }),
         })
         return res.json()
@@ -259,6 +279,7 @@ export const CnailsProvider = (props: CnailsProviderProps) => {
 
                 addContainer,
                 removeContainer,
+                submitFiles,
 
                 addTemplate,
                 updateTemplate,

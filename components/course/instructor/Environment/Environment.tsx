@@ -1,16 +1,10 @@
 import React from "react"
 import EnvironmentMenu from "./EnvironmentMenu";
+import {EnvironmentContent}  from "./EnvironmentList"
+
 interface EnvironmentProps {
     sectionUserID: string
-    environment: Environment
-}
-
-interface Environment {
-    id: string
-    environmentName: string
-    libraries: string
-    description: string
-    imageId: string
+    environment: EnvironmentContent
 }
 
 function Environment({ environment, sectionUserID }: EnvironmentProps) {
