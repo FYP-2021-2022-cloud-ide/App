@@ -1,34 +1,35 @@
 import Menu from './Menu'
-import Navbar from './Navbar'
+import Navbar from './SideBar'
 import Head from 'next/head'
-import { GetServerSideProps } from 'next'
-import {useTheme} from "../contexts/theme"
+import { useTheme } from "../contexts/theme"
 
 interface LayoutProps {
-    children: React.ReactNode;
-    sub: string
-    name: string
-    email: string
- }
+  children: React.ReactNode;
+  sub: string
+  name: string
+  email: string
+}
 
-const Layout = ({children, sub, name, email}:LayoutProps) => {
-    const {isDark} = useTheme() ; 
+const Layout = ({ children, sub, name, email }: LayoutProps) => {
+  const { isDark } = useTheme();
 
-    return (
+  return (
     <div className={`flex flex-row items-start justify-start min-h-screen ${isDark && "dark"}`}>
       <Head>
-          <title>Cnails</title>
-          <link rel="icon" href="/favicon.ico" />
-          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"></link>
+        <title>Cnails</title>
+        <link rel="icon" href="/favicon.ico" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"></link>
       </Head>
       <Navbar></Navbar>
-      <div className="flex flex-col items-start justify-start min-h-screen py-2 bg-white dark:bg-gray-800 w-full">
+      <div className="flex flex-col items-end justify-start min-h-screen bg-white dark:bg-gray-800 w-full">
         <Menu sub={sub} name={name} email={email}></Menu>
-        {children}
+        <div className="w-full">
+          {children}
+        </div>
       </div>
     </div>
-        
-    )
+
+  )
 }
 
 export default Layout

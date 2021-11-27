@@ -10,7 +10,7 @@ interface ListBoxProps{
 
 interface Environment{
     value: string
-    label : string
+    image : string
 }
 
 export default function ListBox({environments, selected, setSelected}:ListBoxProps) {

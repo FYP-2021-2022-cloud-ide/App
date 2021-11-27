@@ -1,0 +1,43 @@
+import Image from 'next/image'
+import Link from 'next/link'
+import {HomeIcon, UserGroupIcon, CubeTransparentIcon, CogIcon} from '@heroicons/react/outline'
+import { useRouter } from "next/router";
+
+const SideBar = () => {
+    var pages= [
+      {name:"Dashboard", link:"/", icon:HomeIcon},
+      {name:"Teams",link:"/Teams", icon:UserGroupIcon},
+      {name:"Workspace",link:"/Workspace", icon:CubeTransparentIcon},
+      {name:"Setting",link:"/settings", icon:CogIcon}
+    ]
+    const router = useRouter();
+    const baseClass='flex flex-row items-center text-gray-500 hover:text-gray-900'
+    const activeClass='text-gray-900'
+    return (
+        <div className="w-[240px] min-h-screen bg-gray-50 dark:bg-gray-700 dark:border-gray-800 flex flex-col border-r px-5 py-5">
+          <div className="pb-10">
+            <Link href="/">
+              <Image  src="/logo.svg"  width="100" height="50" /> 
+            </Link>
+          </div>
+          <div className="flex flex-col items-left space-y-6">
+            {pages.map((page)=>{
+                const isActive = router.pathname === page.link;
+                return (
+                <Link key={page.link} href={page.link}>
+                  <a className={`${baseClass} ${isActive?activeClass:""}`}>
+                      <page.icon className="w-6 h-6 dark:text-gray-200"/>
+                    <div className="text-xs uppercase tracking-widest font-medium ml-2 dark:text-gray-200">{page.name}</div>
+                  </a>
+                 
+                </Link>
+                )
+              }
+              )
+            }
+          </div> 
+        </div>
+    )
+}
+
+export default SideBar

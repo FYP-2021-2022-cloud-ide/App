@@ -341,6 +341,10 @@ export namespace ListTemplatesReply {
         setStorage(value: string): Template;
         getActive(): boolean;
         setActive(value: boolean): Template;
+        getIsExam(): boolean;
+        setIsExam(value: boolean): Template;
+        getTimeLimit(): number;
+        setTimeLimit(value: number): Template;
         clearContaineridList(): void;
         getContaineridList(): Array<string>;
         setContaineridList(value: Array<string>): Template;
@@ -365,6 +369,8 @@ export namespace ListTemplatesReply {
             assignmentConfigId: string,
             storage: string,
             active: boolean,
+            isExam: boolean,
+            timeLimit: number,
             containeridList: Array<string>,
         }
     }
@@ -478,19 +484,43 @@ export namespace RemoveContainerRequest {
     }
 }
 
+export class SubmitFilesRequest extends jspb.Message { 
+    getContainerid(): string;
+    setContainerid(value: string): SubmitFilesRequest;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): SubmitFilesRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: SubmitFilesRequest): SubmitFilesRequest.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: SubmitFilesRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): SubmitFilesRequest;
+    static deserializeBinaryFromReader(message: SubmitFilesRequest, reader: jspb.BinaryReader): SubmitFilesRequest;
+}
+
+export namespace SubmitFilesRequest {
+    export type AsObject = {
+        containerid: string,
+    }
+}
+
 export class AddTemplateRequest extends jspb.Message { 
     getName(): string;
     setName(value: string): AddTemplateRequest;
     getDescription(): string;
     setDescription(value: string): AddTemplateRequest;
+    getContainerid(): string;
+    setContainerid(value: string): AddTemplateRequest;
     getAssignmentConfigId(): string;
     setAssignmentConfigId(value: string): AddTemplateRequest;
     getSectionUserId(): string;
     setSectionUserId(value: string): AddTemplateRequest;
     getActive(): boolean;
     setActive(value: boolean): AddTemplateRequest;
-    getContainerid(): string;
-    setContainerid(value: string): AddTemplateRequest;
+    getIsExam(): boolean;
+    setIsExam(value: boolean): AddTemplateRequest;
+    getTimeLimit(): number;
+    setTimeLimit(value: number): AddTemplateRequest;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): AddTemplateRequest.AsObject;
@@ -506,10 +536,12 @@ export namespace AddTemplateRequest {
     export type AsObject = {
         name: string,
         description: string,
+        containerid: string,
         assignmentConfigId: string,
         sectionUserId: string,
         active: boolean,
-        containerid: string,
+        isExam: boolean,
+        timeLimit: number,
     }
 }
 
@@ -520,14 +552,18 @@ export class UpdateTemplateRequest extends jspb.Message {
     setName(value: string): UpdateTemplateRequest;
     getDescription(): string;
     setDescription(value: string): UpdateTemplateRequest;
+    getContainerid(): string;
+    setContainerid(value: string): UpdateTemplateRequest;
     getAssignmentConfigId(): string;
     setAssignmentConfigId(value: string): UpdateTemplateRequest;
     getSectionUserId(): string;
     setSectionUserId(value: string): UpdateTemplateRequest;
     getActive(): boolean;
     setActive(value: boolean): UpdateTemplateRequest;
-    getContainerid(): string;
-    setContainerid(value: string): UpdateTemplateRequest;
+    getIsExam(): boolean;
+    setIsExam(value: boolean): UpdateTemplateRequest;
+    getTimeLimit(): number;
+    setTimeLimit(value: number): UpdateTemplateRequest;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): UpdateTemplateRequest.AsObject;
@@ -544,10 +580,12 @@ export namespace UpdateTemplateRequest {
         templateid: string,
         name: string,
         description: string,
+        containerid: string,
         assignmentConfigId: string,
         sectionUserId: string,
         active: boolean,
-        containerid: string,
+        isExam: boolean,
+        timeLimit: number,
     }
 }
 

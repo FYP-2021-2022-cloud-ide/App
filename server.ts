@@ -49,6 +49,9 @@ app.prepare().then(() => {
   
   server.use(cookieParser())
   server.enable('trust proxy')
+
+
+  // authentication 
   server.use(
    auth({
     issuerBaseURL: 'https://cas.ust.hk/cas/oidc',
@@ -85,6 +88,8 @@ app.prepare().then(() => {
    })
   )
 
+
+  // authentication logout 
   server.all('/logout', async function(req: Request, res: Response){
     console.log('logout inside')
     res.oidc!.logout({returnTo: '/' });
@@ -97,6 +102,8 @@ app.prepare().then(() => {
     });
   });
 
+
+  // grpc api route 
   server.all('/course/:sectionId/:role', async function(req: Request, res: Response){
     try{
       console.log('inside role checking')
@@ -128,6 +135,7 @@ app.prepare().then(() => {
     }
   })
 
+  // grpc api route 
   server.all('/quickAssignmentInit/:templateID', async function(req: Request, res: Response){
     try{
       var target= 'api:50051';
@@ -153,6 +161,7 @@ app.prepare().then(() => {
     }
   })
   
+  // grpc api route 
   server.all('/user/container/:id/*', async function(req: Request, res: Response){    
     try{
       var target= 'api:50051';
@@ -199,7 +208,7 @@ app.prepare().then(() => {
   //testing 
   // server.all('*' ,  (req, res) => {
   //   res.cookie('sub', "mlkyeung");
-  //   res.cookie('name', "Yeung Man Lung Ken ");
+  //   res.cookie('name', "Yeung Man Lung Ken");
   //   res.cookie('email', "mlkyeung@connect.ust.hk");
   //   return handle(req, res);
   // })

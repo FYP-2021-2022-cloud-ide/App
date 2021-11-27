@@ -15,12 +15,13 @@ const EnvironmentCreate = React.forwardRef(({sectionUserID, closeModal}:Environm
     const [mode, setMode] = useState("")
     const [environmentName, setEnvironmentName] = useState("")
     const [description, setDescription] = useState("")
+    const rootImage ="1893b2d31f38"
     const options = [
-        { value: 'C++/C', label: 'C++/C' },
-        { value: 'Python3', label: 'Python3' },
-        { value: 'Java', label: 'Java' },
+        { value: 'C++/C', image: '1893b2d31f38' },
+        { value: 'Python3', image: '1893b2d31f38' },
+        { value: 'Java', image: '1893b2d31f38' },
     ]
-    const rootImage ="4d5f53676d8f"
+    
     const CPU = 0.5
     const memory = 400
     const [finishLoading, setFinishLoading] = useState(true)
@@ -41,7 +42,7 @@ const EnvironmentCreate = React.forwardRef(({sectionUserID, closeModal}:Environm
                     }
                     return(
                         //@ts-ignore
-                        <div ref={ref} className="inline-block overflow-visible w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl text-[#415A6E]">
+                        <div ref={ref} className="inline-block overflow-visible w-full max-w-md p-6 my-8 text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl text-[#415A6E]">
                             <Dialog.Title
                                 as="h3"
                                 className="text-xl font-medium leading-6"
@@ -250,7 +251,7 @@ const EnvironmentCreate = React.forwardRef(({sectionUserID, closeModal}:Environm
                                     type="button"
                                     onClick={async()=>{
                                         
-                                        const response = await addEnvironment([selectedEnv.value], environmentName,description,sectionUserID)//expecting description
+                                        const response = await addEnvironment([selectedEnv.value+":"+selectedEnv.image], environmentName,description,sectionUserID)//expecting description
                                         if(response.success){
                                             //@ts-ignore
                                             closeModal()

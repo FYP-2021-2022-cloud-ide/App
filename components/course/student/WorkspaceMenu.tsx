@@ -4,17 +4,17 @@ import { MenuIcon } from '@heroicons/react/outline'
 import {useCnails} from '../../../contexts/cnails'
 import Modal from '../../Modal'
 import { Dialog} from '@headlessui/react'
+import {template}from "../instructor/Template/TemplateList"
 
 interface WorkspaceMenuProps{
-    templateID: string
+    template: template
     containerID: string
     sectionUserID: string
-    imageID: string
     memLimit: number
     numCPU: number
 }
 
-export default function WorkspaceMenu({templateID, sectionUserID, containerID, memLimit, numCPU, imageID}:WorkspaceMenuProps) {
+export default function WorkspaceMenu({template, sectionUserID, containerID, memLimit, numCPU}:WorkspaceMenuProps) {
     const { addContainer ,removeContainer} = useCnails();
     let [isOpen, setIsOpen] = useState(false)
 
@@ -72,7 +72,7 @@ export default function WorkspaceMenu({templateID, sectionUserID, containerID, m
                                     } text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-sm`}
                                     onClick ={async () => {
                                         openModal();
-                                        const response = await addContainer(imageID,memLimit,numCPU,sectionUserID,templateID,true,"student")
+                                        const response = await addContainer(template.imageId,memLimit,numCPU,sectionUserID,template.id,true,"student")
                                         window.location.reload();
                                     }}
                                 >

@@ -1,20 +1,12 @@
 import {CubeTransparentIcon} from "@heroicons/react/outline"
 import {PlusCircleIcon} from "@heroicons/react/solid"
 import Workspace from "./Workspace"
+import {template}from "../instructor/Template/TemplateList"
 
-interface Template{
-    imageId: string
-    id: string
-    name: string
-    description:string
-    assignment_config_id: string
-    storage: string
-    containerID: string
-    active: boolean
-}
+
 
 interface props{
-    templates: Template[]
+    templates: template[]
     sectionUserId: string
 }
 
