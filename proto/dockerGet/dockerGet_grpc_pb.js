@@ -103,6 +103,17 @@ function deserialize_dockerGet_EnvironmentIdRequest(buffer_arg) {
   return dockerGet_pb.EnvironmentIdRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_dockerGet_GetNotificationReply(arg) {
+  if (!(arg instanceof dockerGet_pb.GetNotificationReply)) {
+    throw new Error('Expected argument of type dockerGet.GetNotificationReply');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_GetNotificationReply(buffer_arg) {
+  return dockerGet_pb.GetNotificationReply.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_dockerGet_GetSectionInfoReply(arg) {
   if (!(arg instanceof dockerGet_pb.GetSectionInfoReply)) {
     throw new Error('Expected argument of type dockerGet.GetSectionInfoReply');
@@ -112,6 +123,17 @@ function serialize_dockerGet_GetSectionInfoReply(arg) {
 
 function deserialize_dockerGet_GetSectionInfoReply(buffer_arg) {
   return dockerGet_pb.GetSectionInfoReply.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_dockerGet_GetUserDataReply(arg) {
+  if (!(arg instanceof dockerGet_pb.GetUserDataReply)) {
+    throw new Error('Expected argument of type dockerGet.GetUserDataReply');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_GetUserDataReply(buffer_arg) {
+  return dockerGet_pb.GetUserDataReply.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_dockerGet_InstantAddContainerRequest(arg) {
@@ -266,6 +288,28 @@ function serialize_dockerGet_UpdateEnvironmentRequest(arg) {
 
 function deserialize_dockerGet_UpdateEnvironmentRequest(buffer_arg) {
   return dockerGet_pb.UpdateEnvironmentRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_dockerGet_UpdateNotificationRequest(arg) {
+  if (!(arg instanceof dockerGet_pb.UpdateNotificationRequest)) {
+    throw new Error('Expected argument of type dockerGet.UpdateNotificationRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_UpdateNotificationRequest(buffer_arg) {
+  return dockerGet_pb.UpdateNotificationRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_dockerGet_UpdateSubscriptionRequest(arg) {
+  if (!(arg instanceof dockerGet_pb.UpdateSubscriptionRequest)) {
+    throw new Error('Expected argument of type dockerGet.UpdateSubscriptionRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_UpdateSubscriptionRequest(buffer_arg) {
+  return dockerGet_pb.UpdateSubscriptionRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_dockerGet_UpdateTemplateRequest(arg) {
@@ -498,6 +542,50 @@ var DockerService = exports.DockerService = {
     responseType: dockerGet_pb.SuccessStringReply,
     requestSerialize: serialize_dockerGet_EnvironmentIdRequest,
     requestDeserialize: deserialize_dockerGet_EnvironmentIdRequest,
+    responseSerialize: serialize_dockerGet_SuccessStringReply,
+    responseDeserialize: deserialize_dockerGet_SuccessStringReply,
+  },
+  getUserData: {
+    path: '/dockerGet.Docker/getUserData',
+    requestStream: false,
+    responseStream: false,
+    requestType: dockerGet_pb.SubRequest,
+    responseType: dockerGet_pb.GetUserDataReply,
+    requestSerialize: serialize_dockerGet_SubRequest,
+    requestDeserialize: deserialize_dockerGet_SubRequest,
+    responseSerialize: serialize_dockerGet_GetUserDataReply,
+    responseDeserialize: deserialize_dockerGet_GetUserDataReply,
+  },
+  getNotification: {
+    path: '/dockerGet.Docker/getNotification',
+    requestStream: false,
+    responseStream: false,
+    requestType: dockerGet_pb.SubRequest,
+    responseType: dockerGet_pb.GetNotificationReply,
+    requestSerialize: serialize_dockerGet_SubRequest,
+    requestDeserialize: deserialize_dockerGet_SubRequest,
+    responseSerialize: serialize_dockerGet_GetNotificationReply,
+    responseDeserialize: deserialize_dockerGet_GetNotificationReply,
+  },
+  updateNotification: {
+    path: '/dockerGet.Docker/updateNotification',
+    requestStream: false,
+    responseStream: false,
+    requestType: dockerGet_pb.UpdateNotificationRequest,
+    responseType: dockerGet_pb.SuccessStringReply,
+    requestSerialize: serialize_dockerGet_UpdateNotificationRequest,
+    requestDeserialize: deserialize_dockerGet_UpdateNotificationRequest,
+    responseSerialize: serialize_dockerGet_SuccessStringReply,
+    responseDeserialize: deserialize_dockerGet_SuccessStringReply,
+  },
+  updateSubscription: {
+    path: '/dockerGet.Docker/updateSubscription',
+    requestStream: false,
+    responseStream: false,
+    requestType: dockerGet_pb.UpdateSubscriptionRequest,
+    responseType: dockerGet_pb.SuccessStringReply,
+    requestSerialize: serialize_dockerGet_UpdateSubscriptionRequest,
+    requestDeserialize: deserialize_dockerGet_UpdateSubscriptionRequest,
     responseSerialize: serialize_dockerGet_SuccessStringReply,
     responseDeserialize: deserialize_dockerGet_SuccessStringReply,
   },

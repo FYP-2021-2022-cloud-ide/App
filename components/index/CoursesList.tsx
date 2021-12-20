@@ -27,9 +27,9 @@ const CoursesList = ({courses}:props)=>{
             <div className = "my-4 text-gray-600 dark:text-gray-300 font-bold text-xl ">Courses</div>
             <div className = "grid grid-cols-2 md:grid-cols-3 gap-8 ">
                 {courses.map((course:course)=>{
-                    var link = "https://codespace.ust.dev/course/"+course.sectionID+"/"+course.sectionRole.toLowerCase()
+                    var link = "/course/"+course.sectionID+"/"+course.sectionRole.toLowerCase()
                     return(
-                        <Course link={link} course={course}></Course>
+                        <Course key={course.sectionID} link={link} course={course}></Course>
                     )
                 })}
             </div>

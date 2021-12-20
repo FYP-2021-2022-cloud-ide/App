@@ -9,8 +9,16 @@ import * as grpc from 'grpc';
 
 import {  SuccessStringReply,RemoveContainerRequest  } from '../../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
+import { checkHaveContainer } from '../../../lib/authentication';
 
-export default function handler(
+function unauthorized(){
+  return({
+    success: false,
+    message: "unauthorized"
+  })
+}
+
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
   ) {
@@ -20,8 +28,15 @@ export default function handler(
        grpc.credentials.createInsecure());
     
     var body = JSON.parse(req.body);console.log(body)
+    // check empty containerId --> user have that container?
+    if (!(await checkHaveContainer(body.containerId, req.oidc.user.sub)) ){
+      res.json(unauthorized())
+      return
+    }
+
     var docReq = new RemoveContainerRequest();
     docReq.setContainerid(body.containerId);
+    // docReq.setSub(body.sub)
     try{
       client.removeContainer(docReq, function(err, GoLangResponse: SuccessStringReply) {
         if(!GoLangResponse.getSuccess()){

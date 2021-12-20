@@ -45,7 +45,7 @@ export default function EnvironmentMenu({sectionUserID,environment}:EnvironmentM
                                 active ? 'bg-gray-200 font-semibold' : ''
                                 } text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-sm`}
                                 onClick ={async () => {
-                                    const response = await removeEnvironment(environment.id)
+                                    const response = await removeEnvironment(environment.id,sectionUserID)
                                     console.log(response)
                                     window.location.reload()
                                 }}

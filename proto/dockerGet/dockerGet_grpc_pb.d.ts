@@ -28,6 +28,10 @@ interface IDockerService extends grpc.ServiceDefinition<grpc.UntypedServiceImple
     updateEnvironment: IDockerService_IupdateEnvironment;
     buildEnvironment: IDockerService_IbuildEnvironment;
     removeEnvironment: IDockerService_IremoveEnvironment;
+    getUserData: IDockerService_IgetUserData;
+    getNotification: IDockerService_IgetNotification;
+    updateNotification: IDockerService_IupdateNotification;
+    updateSubscription: IDockerService_IupdateSubscription;
 }
 
 interface IDockerService_Ilogin extends grpc.MethodDefinition<dockerGet_pb.LoginRequest, dockerGet_pb.ListReply> {
@@ -210,6 +214,42 @@ interface IDockerService_IremoveEnvironment extends grpc.MethodDefinition<docker
     responseSerialize: grpc.serialize<dockerGet_pb.SuccessStringReply>;
     responseDeserialize: grpc.deserialize<dockerGet_pb.SuccessStringReply>;
 }
+interface IDockerService_IgetUserData extends grpc.MethodDefinition<dockerGet_pb.SubRequest, dockerGet_pb.GetUserDataReply> {
+    path: "/dockerGet.Docker/getUserData";
+    requestStream: false;
+    responseStream: false;
+    requestSerialize: grpc.serialize<dockerGet_pb.SubRequest>;
+    requestDeserialize: grpc.deserialize<dockerGet_pb.SubRequest>;
+    responseSerialize: grpc.serialize<dockerGet_pb.GetUserDataReply>;
+    responseDeserialize: grpc.deserialize<dockerGet_pb.GetUserDataReply>;
+}
+interface IDockerService_IgetNotification extends grpc.MethodDefinition<dockerGet_pb.SubRequest, dockerGet_pb.GetNotificationReply> {
+    path: "/dockerGet.Docker/getNotification";
+    requestStream: false;
+    responseStream: false;
+    requestSerialize: grpc.serialize<dockerGet_pb.SubRequest>;
+    requestDeserialize: grpc.deserialize<dockerGet_pb.SubRequest>;
+    responseSerialize: grpc.serialize<dockerGet_pb.GetNotificationReply>;
+    responseDeserialize: grpc.deserialize<dockerGet_pb.GetNotificationReply>;
+}
+interface IDockerService_IupdateNotification extends grpc.MethodDefinition<dockerGet_pb.UpdateNotificationRequest, dockerGet_pb.SuccessStringReply> {
+    path: "/dockerGet.Docker/updateNotification";
+    requestStream: false;
+    responseStream: false;
+    requestSerialize: grpc.serialize<dockerGet_pb.UpdateNotificationRequest>;
+    requestDeserialize: grpc.deserialize<dockerGet_pb.UpdateNotificationRequest>;
+    responseSerialize: grpc.serialize<dockerGet_pb.SuccessStringReply>;
+    responseDeserialize: grpc.deserialize<dockerGet_pb.SuccessStringReply>;
+}
+interface IDockerService_IupdateSubscription extends grpc.MethodDefinition<dockerGet_pb.UpdateSubscriptionRequest, dockerGet_pb.SuccessStringReply> {
+    path: "/dockerGet.Docker/updateSubscription";
+    requestStream: false;
+    responseStream: false;
+    requestSerialize: grpc.serialize<dockerGet_pb.UpdateSubscriptionRequest>;
+    requestDeserialize: grpc.deserialize<dockerGet_pb.UpdateSubscriptionRequest>;
+    responseSerialize: grpc.serialize<dockerGet_pb.SuccessStringReply>;
+    responseDeserialize: grpc.deserialize<dockerGet_pb.SuccessStringReply>;
+}
 
 export const DockerService: IDockerService;
 
@@ -234,6 +274,10 @@ export interface IDockerServer {
     updateEnvironment: grpc.handleUnaryCall<dockerGet_pb.UpdateEnvironmentRequest, dockerGet_pb.SuccessStringReply>;
     buildEnvironment: grpc.handleUnaryCall<dockerGet_pb.BuildEnvironmentRequest, dockerGet_pb.AddEnvironmentReply>;
     removeEnvironment: grpc.handleUnaryCall<dockerGet_pb.EnvironmentIdRequest, dockerGet_pb.SuccessStringReply>;
+    getUserData: grpc.handleUnaryCall<dockerGet_pb.SubRequest, dockerGet_pb.GetUserDataReply>;
+    getNotification: grpc.handleUnaryCall<dockerGet_pb.SubRequest, dockerGet_pb.GetNotificationReply>;
+    updateNotification: grpc.handleUnaryCall<dockerGet_pb.UpdateNotificationRequest, dockerGet_pb.SuccessStringReply>;
+    updateSubscription: grpc.handleUnaryCall<dockerGet_pb.UpdateSubscriptionRequest, dockerGet_pb.SuccessStringReply>;
 }
 
 export interface IDockerClient {
@@ -297,6 +341,18 @@ export interface IDockerClient {
     removeEnvironment(request: dockerGet_pb.EnvironmentIdRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
     removeEnvironment(request: dockerGet_pb.EnvironmentIdRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
     removeEnvironment(request: dockerGet_pb.EnvironmentIdRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    getUserData(request: dockerGet_pb.SubRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.GetUserDataReply) => void): grpc.ClientUnaryCall;
+    getUserData(request: dockerGet_pb.SubRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.GetUserDataReply) => void): grpc.ClientUnaryCall;
+    getUserData(request: dockerGet_pb.SubRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.GetUserDataReply) => void): grpc.ClientUnaryCall;
+    getNotification(request: dockerGet_pb.SubRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.GetNotificationReply) => void): grpc.ClientUnaryCall;
+    getNotification(request: dockerGet_pb.SubRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.GetNotificationReply) => void): grpc.ClientUnaryCall;
+    getNotification(request: dockerGet_pb.SubRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.GetNotificationReply) => void): grpc.ClientUnaryCall;
+    updateNotification(request: dockerGet_pb.UpdateNotificationRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    updateNotification(request: dockerGet_pb.UpdateNotificationRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    updateNotification(request: dockerGet_pb.UpdateNotificationRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    updateSubscription(request: dockerGet_pb.UpdateSubscriptionRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    updateSubscription(request: dockerGet_pb.UpdateSubscriptionRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    updateSubscription(request: dockerGet_pb.UpdateSubscriptionRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
 }
 
 export class DockerClient extends grpc.Client implements IDockerClient {
@@ -361,4 +417,16 @@ export class DockerClient extends grpc.Client implements IDockerClient {
     public removeEnvironment(request: dockerGet_pb.EnvironmentIdRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
     public removeEnvironment(request: dockerGet_pb.EnvironmentIdRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
     public removeEnvironment(request: dockerGet_pb.EnvironmentIdRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    public getUserData(request: dockerGet_pb.SubRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.GetUserDataReply) => void): grpc.ClientUnaryCall;
+    public getUserData(request: dockerGet_pb.SubRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.GetUserDataReply) => void): grpc.ClientUnaryCall;
+    public getUserData(request: dockerGet_pb.SubRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.GetUserDataReply) => void): grpc.ClientUnaryCall;
+    public getNotification(request: dockerGet_pb.SubRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.GetNotificationReply) => void): grpc.ClientUnaryCall;
+    public getNotification(request: dockerGet_pb.SubRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.GetNotificationReply) => void): grpc.ClientUnaryCall;
+    public getNotification(request: dockerGet_pb.SubRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.GetNotificationReply) => void): grpc.ClientUnaryCall;
+    public updateNotification(request: dockerGet_pb.UpdateNotificationRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    public updateNotification(request: dockerGet_pb.UpdateNotificationRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    public updateNotification(request: dockerGet_pb.UpdateNotificationRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    public updateSubscription(request: dockerGet_pb.UpdateSubscriptionRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    public updateSubscription(request: dockerGet_pb.UpdateSubscriptionRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    public updateSubscription(request: dockerGet_pb.UpdateSubscriptionRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
 }

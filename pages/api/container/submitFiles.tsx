@@ -23,7 +23,7 @@ export default function handler(
     var docReq = new SubmitFilesRequest();
     docReq.setContainerid(body.containerId);
     try{
-      client.removeContainer(docReq, function(err, GoLangResponse: SuccessStringReply) {
+      client.submitFiles(docReq, function(err, GoLangResponse: SuccessStringReply) {
         if(!GoLangResponse.getSuccess()){
           console.log(GoLangResponse.getMessage())
         }

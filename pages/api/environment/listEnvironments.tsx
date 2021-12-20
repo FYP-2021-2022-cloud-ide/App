@@ -5,7 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 type Data = {
   success: boolean
   message:string
-  environments: Environment []
+  environments: Environment [] | null
 }
 
 type Environment = {
@@ -20,8 +20,17 @@ import * as grpc from 'grpc';
 
 import {  ListEnvironmentsReply,  SectionAndSubRequest } from '../../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
+import { checkInSectionBySectionId, checkRoleBySectionId } from '../../../lib/authentication';
 
-export default  function handler(
+function unauthorized(){
+  return({
+    success: false,
+    message: "unauthorized",
+    environments: null
+  })
+}
+
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
   ) {
@@ -31,10 +40,18 @@ export default  function handler(
        target,
        grpc.credentials.createInsecure());
 
-    var body = JSON.parse(req.body);
+    // var body = JSON.parse(req.body);
+    const{sectionid, sub} = req.query
+    if (sectionid != undefined){
+      if(!(await checkInSectionBySectionId(req.oidc.user.sub, sectionid)) || !(await checkRoleBySectionId(req.oidc.user.sub, sectionid, "instructor")))
+      {res.json(unauthorized());return;}
+    }else{
+      res.json(unauthorized())
+      return
+    }
     var docReq = new SectionAndSubRequest();
-    docReq.setSectionid(body.sectionid);
-    docReq.setSub(body.sub);
+    docReq.setSectionid(sectionid);
+    docReq.setSub(sub);
 
     try{
       client.listEnvironments(docReq, function(err, GoLangResponse: ListEnvironmentsReply) {

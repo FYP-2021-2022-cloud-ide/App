@@ -33,7 +33,7 @@ const TemplateCreate = React.forwardRef(({memLimit,numCPU,sectionUserID,environm
     const [templateName, setTemplateName]= useState("")
     const [isExam, setIsExam]= useState(false)
     const [timeLimit, setTimeLimit]= useState(60)
-    const { addTemplate,addContainer, removeContainer} = useCnails();
+    const { addTemplate,addContainer, removeContainer, sub} = useCnails();
     const [containerID,setContainerID]=useState("")
     // console.log(selectedEnv)
     switch(step){
@@ -97,7 +97,7 @@ const TemplateCreate = React.forwardRef(({memLimit,numCPU,sectionUserID,environm
                             <button onClick={ async()=>{
                                 setFinishLoading(false)
                                 nextStep();
-                                const response = await removeContainer(containerID)
+                                const response = await removeContainer(containerID, sub)
                                 if(response.success){
                                     setFinishLoading(true)
                                 }

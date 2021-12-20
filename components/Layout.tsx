@@ -2,16 +2,15 @@ import Menu from './Menu'
 import Navbar from './SideBar'
 import Head from 'next/head'
 import { useTheme } from "../contexts/theme"
+import { useCnails } from '../contexts/cnails'
 
 interface LayoutProps {
   children: React.ReactNode;
-  sub: string
-  name: string
-  email: string
 }
 
-const Layout = ({ children, sub, name, email }: LayoutProps) => {
+const Layout = ({ children }: LayoutProps) => {
   const { isDark } = useTheme();
+  const {sub, name, email} = useCnails();
 
   return (
     <div className={`flex flex-row items-start justify-start min-h-screen ${isDark && "dark"}`}>

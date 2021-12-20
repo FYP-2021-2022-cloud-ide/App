@@ -10,8 +10,17 @@ import * as grpc from 'grpc';
 
 import {  AddEnvironmentReply,  AddEnvironmentRequest } from '../../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
+import { checkInSectionBySectionUserId, checkRoleBySectionUserId } from '../../../lib/authentication';
 
-export default function handler(
+function unauthorized(){
+  return({
+    success: false,
+    message: "unauthorized",
+    environmentID: ""
+  })
+}
+
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
   ) {
@@ -20,12 +29,21 @@ export default function handler(
        target,
        grpc.credentials.createInsecure());
     
-    var body = JSON.parse(req.body);console.log(body)
+    const {libraries, name, section_user_id, description} = JSON.parse(req.body);
+    if (section_user_id != undefined){
+      if(!(await checkInSectionBySectionUserId(req.oidc.user.sub, section_user_id)) || !(await checkRoleBySectionUserId(req.oidc.user.sub, section_user_id, "instructor"))){
+        res.json(unauthorized()); return;
+      }
+    }else{
+      res.json(unauthorized())
+      return
+    }
+
     var docReq = new AddEnvironmentRequest();
-    docReq.setLibrariesList(body.libraries);
-    docReq.setName(body.name);
-    docReq.setSectionUserId(body.section_user_id);
-    docReq.setDescription(body.description)
+    docReq.setLibrariesList(libraries);
+    docReq.setName(name);
+    docReq.setSectionUserId(section_user_id);
+    docReq.setDescription(description)
     try{
       client.addEnvironment(docReq, function(err, GoLangResponse: AddEnvironmentReply) {
         if(!GoLangResponse.getSuccess()){

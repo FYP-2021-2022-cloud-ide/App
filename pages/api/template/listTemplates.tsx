@@ -5,7 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 type Data = {
   success: boolean
   message:string
-  templates: Template []
+  templates: Template [] | null
   //cutMes: string[]
 }
 
@@ -24,21 +24,34 @@ import * as grpc from 'grpc';
 
 import {    ListTemplatesReply,  SectionAndSubRequest } from '../../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
+import { checkInSectionBySectionId } from '../../../lib/authentication';
 
-export default  function handler(
+
+function unauthorized(){
+  return({
+    success: false,
+    message: "unauthorized",
+    templates: null
+  })
+}
+
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
   ) {
-   // console.log("cunw")
+   console.log("listTemplate")
     var target= 'api:50051';
     var client = new DockerClient(
        target,
        grpc.credentials.createInsecure());
 
-    var body = JSON.parse(req.body);
+    // var body = JSON.parse(req.body);
     var docReq = new SectionAndSubRequest();
-    docReq.setSub(body.sub);
-    docReq.setSectionid(body.sectionid);
+    const {sub, sectionid} = req.query;
+    if(!(await checkInSectionBySectionId(sub, sectionid, req.oidc.user.sub)))
+    {res.json(unauthorized());return}
+    docReq.setSub(sub);
+    docReq.setSectionid(sectionid);
     try{
       client.listTemplates(docReq, function(err, GoLangResponse: ListTemplatesReply) {
         var templates= GoLangResponse.getTemplatesList();

@@ -25,33 +25,32 @@ function Workspace({template, sectionUserId}:WorkspaceProps){
         flag = false
     }
     return(
-        <div className="border broder-gray-200 shadow-sm rounded-lg bg-white
-        p-4 hover:shadow-lg transition-all ease-in-out duration-300 ">
-            <div className="flex space-x-4 items-center">
-                <div className="w-1/12">
+        <div onClick={async (e) =>{
+            if(flag){
+                window.open("https://codespace.ust.dev/user/container/"+template.containerID+"/")
+            }
+        }} className="min-h-36 h-36 border cursor-pointer border-gray-200 dark:border-gray-700 shadow-sm rounded-lg px-5 py-4 bg-white dark:bg-gray-600">
+            <div className="flex flex-row space-x-4 items-start">
+                <div className="w-1/12 mt-4">
                     <span className="relative flex h-3 w-3">
                         {flag && <span className="absolute animate-ping inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>}
                         <span className={`${baseClass} ${flag?activeClass:inactiveClass}`}></span>
                     </span>
                 </div>
-                <button onClick ={async (e) =>{
-                    if(flag){
-                        window.open("https://codespace.ust.dev/user/container/"+template.containerID+"/")
-                    }
-                }} className="w-9/12 text-left">
+                <div className="w-full">
                     <div className="text-[#578CB5] font-semibold text-sm">{template.name}</div>
                     <div>
                         <a href={template.imageId} target="_blank" 
-                        className="font-medium text-xs text-gray-600 underline">{template.imageId}</a>
+                        className="font-medium text-xs text-gray-600 underline dark:text-gray-300">{template.imageId}</a>
                     </div>
                     
                     <div className="flex flex-row justify-start mt-2">
-                        <div className="font-medium text-xs text-gray-600">
+                        <div className="font-medium text-xs text-gray-600 dark:text-gray-300">
                             {template.description}
                         </div>
                     </div>
-                </button>
-                <div className="w-2/12">
+                </div>
+                <div className="w-1/12">
                     <WorkspaceMenu template={template} containerID={template.containerID} sectionUserID={sectionUserId} memLimit={memLimit} numCPU={numCPU}></WorkspaceMenu>
                 </div>
             </div>

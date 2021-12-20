@@ -10,8 +10,17 @@ import * as grpc from 'grpc';
 
 import {  AddTemplateReply,  AddTemplateRequest } from '../../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
+import { checkHaveContainer, checkInSectionBySectionUserId, checkRoleBySectionUserId } from '../../../lib/authentication';
 
-export default function handler(
+function unauthorized(){
+  return({
+    success: false,
+    message: "unauthorized",
+    templateID: ""
+  })
+}
+
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
   ) {
@@ -20,16 +29,23 @@ export default function handler(
        target,
        grpc.credentials.createInsecure());
     
-    var body = JSON.parse(req.body);console.log(body)
+    const {templateName, section_user_id, assignment_config_id, containerId, description, active, isExam, timeLimit} = JSON.parse(req.body);
+    if (section_user_id != undefined && containerId != undefined){
+      if(!(await checkInSectionBySectionUserId(req.oidc.user.sub, section_user_id)) || !(await checkHaveContainer(containerId, req.oidc.user.sub))  || !(await checkRoleBySectionUserId(req.oidc.user.sub, section_user_id, "instructor")))
+      {res.json(unauthorized());return}
+    }else{
+      res.json(unauthorized())
+      return
+    }
     var docReq = new AddTemplateRequest();
-    docReq.setName(body.templateName);
-    docReq.setSectionUserId(body.section_user_id);
-    docReq.setAssignmentConfigId(body.assignment_config_id);
-    docReq.setContainerid(body.containerId);
-    docReq.setDescription(body.description);
-    docReq.setActive(body.active)
-    docReq.setIsExam(body.isExam)
-    docReq.setTimeLimit(body.timeLimit)
+    docReq.setName(templateName);
+    docReq.setSectionUserId(section_user_id);
+    docReq.setAssignmentConfigId(assignment_config_id);
+    docReq.setContainerid(containerId);
+    docReq.setDescription(description);
+    docReq.setActive(active)
+    docReq.setIsExam(isExam)
+    docReq.setTimeLimit(timeLimit)
     try{
       client.addTemplate(docReq, function(err, GoLangResponse: AddTemplateReply) {
         if(!GoLangResponse.getSuccess()){

@@ -26,7 +26,7 @@ const TemplateUpdate = React.forwardRef(({sectionUserID, memLimit, numCPU, templ
     const [templateName, setTemplateName]= useState(template.name)
     const [isExam, setIsExam]= useState(template.isExam)
     const [timeLimit, setTimeLimit]= useState(template.timeLimit)
-    const { updateTemplate,addContainer, removeContainer} = useCnails();
+    const { updateTemplate,addContainer, removeContainer, sub} = useCnails();
     const [containerID,setContainerID]=useState("")
     // console.log(selectedEnv)
     switch(step){
@@ -90,7 +90,7 @@ const TemplateUpdate = React.forwardRef(({sectionUserID, memLimit, numCPU, templ
                             <button onClick={ async()=>{
                                 setFinishLoading(false)
                                 nextStep();
-                                const response = await removeContainer(containerID)
+                                const response = await removeContainer(containerID, sub)
                                 if(response.success){
                                     setFinishLoading(true)
                                 }

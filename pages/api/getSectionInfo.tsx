@@ -16,8 +16,21 @@ import * as grpc from 'grpc';
 
 import {    GetSectionInfoReply,  SectionAndSubRequest } from '../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../proto/dockerGet/dockerGet_grpc_pb';
+import { checkInSectionBySectionId } from '../../lib/authentication';
 
-export default  function handler(
+  
+function unauthorized(){
+  return({
+      success: false,
+      message: "unauthorized",
+      sectionUserID: "",
+      courseName: "",
+      role: ""
+  })
+}
+
+
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
   ) 
@@ -26,11 +39,17 @@ export default  function handler(
     var client = new DockerClient(
         target,
         grpc.credentials.createInsecure());
-
-    var body = JSON.parse(req.body);
+    const {sectionid, sub} = req.query
+    if(sub == req.oidc.user.sub){
+      if(!(await checkInSectionBySectionId(req.oidc.user.sub, sectionid)) )
+      {res.json(unauthorized());return}
+    }else{
+      res.json(unauthorized())
+      return;
+    }
     var docReq = new SectionAndSubRequest();
-    docReq.setSub(body.sub);
-    docReq.setSectionid(body.sectionid);
+    docReq.setSub(sub);
+    docReq.setSectionid(sectionid);
     try{
         client.getSectionInfo(docReq, function(err, GoLangResponse: GetSectionInfoReply) {
         if(!GoLangResponse.getSuccess()){

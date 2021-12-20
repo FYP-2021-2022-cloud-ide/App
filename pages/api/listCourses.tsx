@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 type Data = {
   success: boolean
   message: string
-  courses: Course[]
+  courses: Course[] | null
   //cutMes: string[]
 }
 
@@ -22,6 +22,14 @@ import * as grpc from 'grpc';
 import {  ListCoursesReply,  SubRequest } from '../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../proto/dockerGet/dockerGet_grpc_pb';
 
+function unauthorized(){
+  return({
+    success: false,
+    message: "unauthorized",
+    courses: null
+  })
+}
+
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
@@ -31,9 +39,19 @@ export default function handler(
        target,
        grpc.credentials.createInsecure());
 
-    var body = JSON.parse(req.body);
+    // var body = JSON.parse(req.body);
+    const { sub } = req.query;
+    if(sub == undefined){
+      {res.json(unauthorized());return}
+    }else{
+      if(sub != req.oidc.user.sub){
+        res.json(unauthorized())
+        return;
+      }
+    }
+
     var docReq = new SubRequest();
-    docReq.setSub(body.sub);
+    docReq.setSub(sub);
     try{
       client.listCourses(docReq, function(err, GoLangResponse: ListCoursesReply) {
         if(!GoLangResponse.getSuccess()){

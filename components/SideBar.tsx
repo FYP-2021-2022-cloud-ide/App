@@ -11,13 +11,11 @@ const SideBar = () => {
       {name:"Setting",link:"/settings", icon:CogIcon}
     ]
     const router = useRouter();
-    const baseClass='flex flex-row items-center text-gray-500 hover:text-gray-900'
-    const activeClass='text-gray-900'
     return (
         <div className="w-[240px] min-h-screen bg-gray-50 dark:bg-gray-700 dark:border-gray-800 flex flex-col border-r px-5 py-5">
           <div className="pb-10">
             <Link href="/">
-              <Image  src="/logo.svg"  width="100" height="50" /> 
+              <img  src="/logo.svg"  width="100" height="50" /> 
             </Link>
           </div>
           <div className="flex flex-col items-left space-y-6">
@@ -25,9 +23,9 @@ const SideBar = () => {
                 const isActive = router.pathname === page.link;
                 return (
                 <Link key={page.link} href={page.link}>
-                  <a className={`${baseClass} ${isActive?activeClass:""}`}>
-                      <page.icon className="w-6 h-6 dark:text-gray-200"/>
-                    <div className="text-xs uppercase tracking-widest font-medium ml-2 dark:text-gray-200">{page.name}</div>
+                  <a className={`flex flex-row items-center hover:text-gray-900 ${isActive? "text-gray-900 dark:text-gray-200":"text-gray-500 dark:text-gray-400"}`}>
+                      <page.icon className="w-6 h-6"/>
+                    <div className="text-xs uppercase tracking-widest font-medium ml-2">{page.name}</div>
                   </a>
                  
                 </Link>

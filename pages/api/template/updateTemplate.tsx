@@ -9,8 +9,16 @@ import * as grpc from 'grpc';
 
 import {  SuccessStringReply,UpdateTemplateRequest  } from '../../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
+import { checkHaveContainer, checkInSectionBySectionUserId, checkRoleBySectionUserId } from '../../../lib/authentication';
 
-export default function handler(
+function unauthorized(){
+  return({
+    success: false,
+    message: "unauthorized"
+  })
+}
+
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
   ) {
@@ -19,16 +27,23 @@ export default function handler(
        target,
        grpc.credentials.createInsecure());
     
-    var body = JSON.parse(req.body);console.log(body)
+    const {templateId, templateName, section_user_id, containerId, description, isExam, timeLimit} = JSON.parse(req.body);
+    if (section_user_id != undefined && containerId != undefined){
+      if(!(await checkInSectionBySectionUserId(req.oidc.user.sub, section_user_id)) || !(await checkHaveContainer(containerId, req.oidc.user.sub))  || !(await checkRoleBySectionUserId(req.oidc.user.sub, section_user_id, "instructor")))
+      {res.json(unauthorized());return}
+    }else{
+      res.json(unauthorized())
+      return
+    }
     var docReq = new UpdateTemplateRequest();
-    docReq.setTemplateid(body.templateId);
-    docReq.setName(body.templateName);
-    docReq.setSectionUserId(body.section_user_id);
+    docReq.setTemplateid(templateId);
+    docReq.setName(templateName);
+    docReq.setSectionUserId(section_user_id);
   //  docReq.setAssignmentConfigId(body.assignment_config_id);
-    docReq.setContainerid(body.containerId);
-    docReq.setDescription(body.description);
-    docReq.setIsExam(body.isExam)
-    docReq.setTimeLimit(body.timeLimit)
+    docReq.setContainerid(containerId);
+    docReq.setDescription(description);
+    docReq.setIsExam(isExam)
+    docReq.setTimeLimit(timeLimit)
     try{
       client.updateTemplate(docReq, function(err, GoLangResponse: SuccessStringReply) {
         if(!GoLangResponse.getSuccess()){

@@ -15,7 +15,7 @@ interface WorkspaceMenuProps{
 }
 
 export default function WorkspaceMenu({template, sectionUserID, containerID, memLimit, numCPU}:WorkspaceMenuProps) {
-    const { addContainer ,removeContainer} = useCnails();
+    const { addContainer ,removeContainer, sub} = useCnails();
     let [isOpen, setIsOpen] = useState(false)
 
     function openModal() {
@@ -55,7 +55,7 @@ export default function WorkspaceMenu({template, sectionUserID, containerID, mem
                                     active ? 'bg-gray-200 font-semibold' : ''
                                     } text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-sm`}
                                     onClick ={async () => {
-                                        const response = await removeContainer(containerID)
+                                        const response = await removeContainer(containerID, sub)
                                         window.location.reload()
                                     }}
                                 >

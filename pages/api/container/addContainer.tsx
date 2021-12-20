@@ -10,25 +10,53 @@ import * as grpc from 'grpc';
 
 import {  AddContainerReply,  AddContainerRequest } from '../../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
+import { checkInSectionBySectionUserId } from '../../../lib/authentication';
 
-export default function handler(
+function unauthorized(){
+  return({
+    success: false,
+    message: "unauthorized",
+    containerID: ""
+  })
+}
+
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
   ) {
+    // if (req.body == "") {
+    //   res.json({
+    //     success: false,
+    //     message: "unauthorized",
+    //     containerID: ""
+    //   })
+    // }
+
     var target= 'api:50051';
     var client = new DockerClient(
        target,
        grpc.credentials.createInsecure());
     
-    var body = JSON.parse(req.body);//console.log(body)
+    const {imageName, memLimit, numCPU, section_user_id, template_id,dbStored, accessRight} = JSON.parse(req.body);//console.log(body)
+
+    if (section_user_id != undefined){
+      if(!(await checkInSectionBySectionUserId(req.oidc.user.sub, section_user_id))){
+        res.json(unauthorized())
+        return
+      }
+    }else{
+      res.json(unauthorized())
+      return
+    }
+
     var docReq = new AddContainerRequest();
-    docReq.setImagename(body.imageName);
-    docReq.setMemlimit(body.memLimit);
-    docReq.setNumcpu(body.numCPU);
-    docReq.setSectionUserId(body.section_user_id);
-    docReq.setTemplateId(body.template_id);
-    docReq.setDbstored(body.dbStored);
-    docReq.setAccessright(body.accessRight);
+    docReq.setImagename(imageName);
+    docReq.setMemlimit(memLimit);
+    docReq.setNumcpu(numCPU);
+    docReq.setSectionUserId(section_user_id);
+    docReq.setTemplateId(template_id);
+    docReq.setDbstored(dbStored);
+    docReq.setAccessright(accessRight);
     try{
       client.addContainer(docReq, function(err, GoLangResponse: AddContainerReply) {
         if(!GoLangResponse.getSuccess()){
@@ -43,6 +71,7 @@ export default function handler(
       })
     }
     catch(error) {
+        console.log(error)
         //@ts-ignore
         res.json(error);
         res.status(405).end();

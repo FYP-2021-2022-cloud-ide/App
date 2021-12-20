@@ -13,7 +13,7 @@ interface TemplateMenuProps{
 }
 
 export default function TemplateMenu({template, memLimit, numCPU, sectionUserID}:TemplateMenuProps) {
-    const {removeTemplate, addContainer, removeContainer,activateTemplate,deactivateTemplate} = useCnails();
+    const {removeTemplate, addContainer, removeContainer,activateTemplate,deactivateTemplate, sub} = useCnails();
     let [isOpen, setIsOpen] = useState(false)
     let [updateIsOpen, setUpdateIsOpen] = useState(false)
 
@@ -64,7 +64,7 @@ export default function TemplateMenu({template, memLimit, numCPU, sectionUserID}
                                 active ? 'bg-gray-200 font-semibold' : ''
                                 } text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-sm`}
                                 onClick ={async () => {
-                                    const response = await removeTemplate(template.id)
+                                    const response = await removeTemplate(template.id,sectionUserID)
                                     console.log(response)
                                     window.location.reload()
                                 }}
@@ -93,7 +93,7 @@ export default function TemplateMenu({template, memLimit, numCPU, sectionUserID}
                                 active ? 'bg-gray-200 font-semibold' : ''
                                 } text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-sm`}
                                 onClick ={async () => {
-                                    const response = await removeContainer(template.containerID)
+                                    const response = await removeContainer(template.containerID, sub)
                                     console.log(response)
                                     window.location.reload()
                                 }}
@@ -131,7 +131,7 @@ export default function TemplateMenu({template, memLimit, numCPU, sectionUserID}
                                     } text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-sm`}
                                     onClick ={async () => {
                                         
-                                        const response = await deactivateTemplate(template.id)
+                                        const response = await deactivateTemplate(template.id,sectionUserID)
                                         console.log(response)
                                         window.location.reload();
                                     }}
@@ -148,7 +148,7 @@ export default function TemplateMenu({template, memLimit, numCPU, sectionUserID}
                                     active ? 'bg-gray-200 font-semibold' : ''
                                     } text-gray-900 group flex rounded-md items-center w-full px-2 py-2 text-sm`}
                                     onClick ={async () => {
-                                        const response = await activateTemplate(template.id)
+                                        const response = await activateTemplate(template.id,sectionUserID)
                                         console.log(response)
                                         window.location.reload();
                                     }}

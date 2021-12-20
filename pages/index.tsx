@@ -14,11 +14,12 @@ interface props {
     sub: string
 }
 
-export default function Home({ sub }: props) {
+export default function Home() {
     // load once when page is rendered
     const [courses, setCourses] = useState<CourseListProps>()
     const [containers, setContainers] = useState<ContainerListProps>()
-    const { containerList, courseList } = useCnails();
+    const { containerList, courseList, sub } = useCnails();
+    console.log("sub is ",sub)
     // data fetching from API
     useEffect(() => {
         const fetchCourses = async () => {
@@ -31,6 +32,7 @@ export default function Home({ sub }: props) {
             // console.log(containers)
             setContainers(containers)
         }
+        // while(sub == "")
         fetchCourses()
         fetchContainers()
     }, [])
@@ -56,11 +58,11 @@ export default function Home({ sub }: props) {
     )
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-    var cookies = context.req.cookies
-    return {
-        props: {
-            sub: cookies.sub,
-        }
-    }
-}
+// export const getServerSideProps: GetServerSideProps = async (context) => {
+//     var cookies = context.req.cookies
+//     return {
+//         props: {
+//             sub: cookies.sub,
+//         }
+//     }
+// }

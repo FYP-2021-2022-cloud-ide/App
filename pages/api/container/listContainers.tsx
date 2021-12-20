@@ -4,9 +4,9 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 type Data = {
   success: boolean
   message:string
-  containersInfo: ContainerInfo
-  containers: Container []
-  tempContainers:Container []
+  containersInfo: ContainerInfo | null
+  containers: Container [] | null
+  tempContainers:Container [] | null
 }
 
 type ContainerInfo = {
@@ -26,6 +26,26 @@ import * as grpc from 'grpc';
 import {  ListContainerReply,  SubRequest } from '../../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
 
+function authentication(sub: string|string[], oidcSub: string){
+  if(sub == undefined){
+    return false
+  }else{
+    if(sub != oidcSub)
+      return false
+  }
+  return true
+}
+
+function unauthorized(){
+  return {
+    success:false,
+    message: "unauthorized",
+    containersInfo: null,
+    containers: null,
+    tempContainers: null
+  }
+}
+
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
@@ -34,10 +54,14 @@ export default function handler(
     var client = new DockerClient(
        target,
        grpc.credentials.createInsecure());
-
-    var body = JSON.parse(req.body);
+    const { sub } = req.query;
+    if(!authentication(sub, req.oidc.user.sub)){
+      res.json(unauthorized())
+      return
+    } 
     var docReq = new SubRequest();
-    docReq.setSub(body.sub);
+    docReq.setSub(sub);
+    
     try{
       client.listContainers(docReq, function(err, GoLangResponse: ListContainerReply) {
         if(!GoLangResponse.getSuccess()){

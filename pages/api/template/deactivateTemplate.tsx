@@ -11,8 +11,16 @@ import * as grpc from 'grpc';
 
 import {    SuccessStringReply,  TemplateIdRequest } from '../../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
+import { checkInSectionBySectionUserId, checkRoleBySectionUserId } from '../../../lib/authentication';
 
-export default  function handler(
+function unauthorized(){
+    return({
+        success: false,
+        message: "unauthorized"
+    })
+}
+
+export default async  function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
   ) 
@@ -23,9 +31,16 @@ export default  function handler(
         target,
         grpc.credentials.createInsecure());
 
-    var body = JSON.parse(req.body);
+    const {templateId, section_user_id} = JSON.parse(req.body);
+    if (section_user_id != undefined){
+    if(!(await checkInSectionBySectionUserId(req.oidc.user.sub, section_user_id))|| !(await checkRoleBySectionUserId(req.oidc.user.sub, section_user_id, "instructor")))
+    {res.json(unauthorized());return}
+    }else{
+        res.json(unauthorized())
+        return
+    }
     var docReq = new TemplateIdRequest();
-    docReq.setTemplateid(body.templateId);
+    docReq.setTemplateid(templateId);
     try{
         client.deactivateTemplate(docReq, function(err, GoLangResponse: SuccessStringReply) {
         if(!GoLangResponse.getSuccess()){

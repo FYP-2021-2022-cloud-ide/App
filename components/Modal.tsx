@@ -1,6 +1,7 @@
 import React, { useRef } from "react"
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment} from "react";
+import { useTheme } from "../contexts/theme";
 
 type CloseModal = (...args: Boolean[]) => void
 
@@ -11,6 +12,7 @@ interface ModalProps {
  }
 
 function Modal({children, isOpen, setOpen}:ModalProps){
+    const {isDark} = useTheme(); 
     return(
         //@ts-ignore
         <Transition show={isOpen!}>
@@ -30,8 +32,8 @@ function Modal({children, isOpen, setOpen}:ModalProps){
                 <span className="hidden sm:inline-block sm:align-middle sm:h-screen"></span>&#8203;
                 <Dialog
                 as="div"
-                className="fixed inset-0 z-10 overflow-y-auto"
-                onClose={()=>{}}
+                className={`fixed inset-0 z-10 overflow-y-auto ${isDark? "dark": ""}`}
+                onClose={()=>setOpen(false)}
                 >
                     <div className="min-h-screen w-full px-4 text-center">
                         <Transition.Child
@@ -43,7 +45,7 @@ function Modal({children, isOpen, setOpen}:ModalProps){
                         leaveFrom="opacity-100"
                         leaveTo="opacity-0"
                         >
-                        <Dialog.Overlay className="fixed inset-0" />
+                        <Dialog.Overlay className="fixed inset-0 dark:bg-black dark:opacity-70" />
                         </Transition.Child>
 
                         {/* This element is to trick the browser into centering the modal contents. */}

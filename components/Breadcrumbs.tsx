@@ -1,5 +1,10 @@
+import Link from "next/link"
+
 type Props = {
-    elements : string []
+    elements : {
+      name : string , 
+      path : string , 
+    }[]
 }
 
 const Breadcrumbs = ({elements} : Props ) => {
@@ -9,8 +14,8 @@ const Breadcrumbs = ({elements} : Props ) => {
           {
             elements.map(e => {
               return (
-                <li>
-                  <a>{e}</a>
+                <li key={e.name} className="text-gray-600 dark:text-gray-300">
+                  <Link href={e.path}>{e.name}</Link>
                 </li>
               )
             })

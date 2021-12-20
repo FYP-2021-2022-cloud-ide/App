@@ -36,7 +36,10 @@ service Docker {
   rpc buildEnvironment(BuildEnvironmentRequest)returns(AddEnvironmentReply){}
   rpc removeEnvironment(EnvironmentIdRequest)returns(SuccessStringReply){}
 
- 
+  rpc getUserData(SubRequest)returns(GetUserDataReply){}
+  rpc getNotification(SubRequest)returns(GetNotificationReply){}
+  rpc updateNotification(UpdateNotificationRequest)returns(SuccessStringReply){}
+  rpc updateSubscription(UpdateSubscriptionRequest)returns(SuccessStringReply){}
 }
 
 message LoginRequest {
@@ -144,6 +147,7 @@ message RemoveContainerRequest {
 }
 message SubmitFilesRequest{
   string containerID=2;
+  string section_user_id = 4;
 }
 
 
@@ -171,6 +175,7 @@ message UpdateTemplateRequest{
  }
 message TemplateIdRequest{
   string templateID=1;
+  string section_user_id = 4;
 }
 
 message AddTemplateReply {
@@ -211,6 +216,7 @@ message UpdateEnvironmentRequest{
 
 message EnvironmentIdRequest {
   string environmentID=1;
+  string section_user_id = 4;
 }
 
 message SectionAndSubRequest{
@@ -244,3 +250,26 @@ message ListReply {
   repeated string message = 1;
 }
 
+message GetUserDataReply{
+  bool success = 1;
+  string message = 2;
+  string userId = 3;
+  string semesterId = 4;
+}
+
+message GetNotificationReply{
+  bool success = 1;
+  string message = 2;
+  string notification = 3;
+}
+
+message UpdateNotificationRequest{
+  string sub = 1;
+  string token = 2;
+}
+
+message UpdateSubscriptionRequest{
+  string userId = 1;
+  string token = 2;
+  string semesterId = 3;
+}

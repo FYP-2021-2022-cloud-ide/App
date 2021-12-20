@@ -17,7 +17,7 @@ const EnvironmentUpdate = React.forwardRef(({sectionUserID,environment, closeMod
     const [description, setDescription] = useState(environment.description)
     const [finishLoading, setFinishLoading] = useState(true)
     const [containerID,setContainerID]=useState("")
-    const {updateEnvironment, removeContainer,addContainer} = useCnails();
+    const {updateEnvironment, removeContainer,addContainer, sub} = useCnails();
     const [step, setStep] = useState(1);
     const nextStep = () => {
         setStep(step + 1);
@@ -82,7 +82,7 @@ const EnvironmentUpdate = React.forwardRef(({sectionUserID,environment, closeMod
                             <button onClick={ async()=>{
                                 setFinishLoading(false)
                                 nextStep();
-                                const response = await removeContainer(containerID)
+                                const response = await removeContainer(containerID, sub)
                                 if(response.success==true||response.success==false){
                                     setFinishLoading(true)
                                 }

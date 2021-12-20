@@ -32,7 +32,7 @@ const CourseBar = ({courseName, role}:props) => {
     return (
         
             <div className="flex flex-row justify-between text-gray-700 dark:text-gray-300">
-                <div className="flex flex-row justify-start gap-x-4">
+                <div className="flex flex-row justify-start gap-x-4 items-center">
                     <TerminalIcon className="w-7 h-7"> </TerminalIcon> 
                     <p className="text-lg">{courseName}</p>
                     <div className="badge dark:bg-gray-300 dark:text-gray-700"> {role}</div>

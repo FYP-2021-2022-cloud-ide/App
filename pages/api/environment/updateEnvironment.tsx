@@ -9,8 +9,16 @@ import * as grpc from 'grpc';
 
 import {  SuccessStringReply,UpdateEnvironmentRequest  } from '../../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
+import { checkHaveContainer, checkInSectionBySectionUserId } from '../../../lib/authentication';
 
-export default function handler(
+function unauthorized(){
+  return({
+    success: false,
+    message: "unauthorized"
+  })
+}
+
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
   ) {
@@ -19,13 +27,20 @@ export default function handler(
        target,
        grpc.credentials.createInsecure());
     
-    var body = JSON.parse(req.body);console.log(body)
+    const{envId, name, section_user_id, containerId, description} = JSON.parse(req.body);
+    if (section_user_id != undefined && containerId != undefined){
+      if(!(await checkInSectionBySectionUserId(req.oidc.user.sub, section_user_id)) || !(await checkHaveContainer(containerId, req.oidc.user.sub)) )
+      {res.json(unauthorized()); return;}
+    }else{
+      res.json(unauthorized())
+    }
+
     var docReq = new UpdateEnvironmentRequest();
-    docReq.setEnvironmentid(body.envId);
-    docReq.setName(body.name);
-    docReq.setSectionUserId(body.section_user_id);
-    docReq.setContainerid(body.containerId);
-    docReq.setDescription(body.description)
+    docReq.setEnvironmentid(envId);
+    docReq.setName(name);
+    docReq.setSectionUserId(section_user_id);
+    docReq.setContainerid(containerId);
+    docReq.setDescription(description)
     try{
       client.updateEnvironment(docReq, function(err, GoLangResponse: SuccessStringReply) {
         if(!GoLangResponse.getSuccess()){

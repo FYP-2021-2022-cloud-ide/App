@@ -19,7 +19,7 @@ interface Course{
 function Course({link, course}:CourseProps){
     return(
         <Link href= {link}>
-            <a className="border broder-gray-200 shadow-sm rounded-lg bg-white p-4 dark:bg-gray-600 dark:border-gray-700 hover:shadow-lg transition-all ease-in-out duration-300">
+            <a className="border broder-gray-200 shadow-sm rounded-lg bg-white p-4 dark:bg-gray-600 dark:border-gray-700">
                 <div className="flex flex-row">
                     <div className="flex flex-col space-y-1">
                         <b className="font-semibold text-sm text-gray-800 dark:text-gray-300">{course.courseCode + " (" +course.section+")"}</b>
