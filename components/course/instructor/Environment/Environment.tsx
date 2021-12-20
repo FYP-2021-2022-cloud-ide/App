@@ -1,6 +1,9 @@
-import React from "react"
+import React , {useState, useRef} from "react"
 import EnvironmentMenu from "./EnvironmentMenu";
 import {EnvironmentContent}  from "./EnvironmentList"
+import { useCnails } from "../../../../contexts/cnails";
+import Modal from "../../../Modal";
+import EnvironmentUpdate from "./EnivronmentUpdate";
 
 interface EnvironmentProps {
     sectionUserID: string
@@ -8,7 +11,17 @@ interface EnvironmentProps {
 }
 
 function Environment({ environment, sectionUserID }: EnvironmentProps) {
-    console.log(environment)
+    const { removeEnvironment} = useCnails();
+    let [updateIsOpen, setUpdateIsOpen] = useState(false)
+    function openUpdateModal() {
+        setUpdateIsOpen(true)
+    }
+
+    function closeUpdateModal(){
+        setUpdateIsOpen(false)
+    }
+    let ref = useRef();
+    
     return (
         <div className="border broder-gray-200 dark:border-gray-700 shadow-sm rounded-lg bg-white dark:bg-gray-600 px-4 py-4 min-h-36 h-36">
             <div className="flex flex-row items-start h-full justify-between">
@@ -20,8 +33,25 @@ function Environment({ environment, sectionUserID }: EnvironmentProps) {
                     </div>
                     <div className="font-medium text-xs text-gray-400">{environment.description}</div>
                 </div>
-                <EnvironmentMenu sectionUserID={sectionUserID} environment={environment}></EnvironmentMenu>
+                <EnvironmentMenu sectionUserID={sectionUserID} environment={environment} items={[
+                    {
+                        text: "delete" , 
+                        onClick : async () => {
+                            const response = await removeEnvironment(environment.id,sectionUserID)
+                            console.log(response)
+                            window.location.reload()
+                        }
+                    }, 
+                    {
+                        text : "update" , 
+                        onClick : ()=> openUpdateModal()
+                    }
+                ]}></EnvironmentMenu>
             </div>
+            <Modal isOpen={updateIsOpen} setOpen={setUpdateIsOpen}>
+                <EnvironmentUpdate closeModal={closeUpdateModal}
+                environment={environment}  ref={ref} sectionUserID={sectionUserID}/>
+            </Modal>
         </div>
     )
 }

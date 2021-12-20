@@ -5,7 +5,7 @@ import { DocumentTextIcon } from "@heroicons/react/outline"
 import { PlusCircleIcon } from "@heroicons/react/solid"
 import { Dialog, Transition } from "@headlessui/react";
 import Modal from "../../../Modal";
-import ListBox from "./ListBox"
+import ListBox, {Option} from "../ListBox"
 import TemplateCreate from "./TemplateCreate";
 
 //testing
@@ -49,12 +49,12 @@ const TemplateList = ({ templates, sectionUserID, environments }: props) => {
     }
 
     // building the environemnts list
-    var environmentsList = []
+    var environmentsList : Option[] = []
     for (let i = 0; i < environments.length; i++) {
         environmentsList.push({
-            name: environments[i].environmentName + " (" + environments[i].imageId + ")",
+            value: environments[i].environmentName + " (" + environments[i].imageId + ")",
             id: environments[i].imageId
-        })
+        } as Option )
     }
 
     console.log(environments.length)
