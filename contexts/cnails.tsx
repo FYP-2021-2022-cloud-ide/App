@@ -109,11 +109,11 @@ export const CnailsProvider = ({children}: CnailsProviderProps) => {
                 //         <NotificationBody title={"testing"} body={"testing"} success={false} id = {t.id}></NotificationBody>
                 //     </Notification>
                 //   ))
-                  onMessage(messaging, message => {
+                  onMessage(messaging, async message => {
                     console.log("message recevied")
-                    console.log(message.data!.title)
-                    console.log(message.data!.body)
+                    console.log(message.data)
                     const {title, body} = message.data!
+                    notificationStack.set(notificationStack.push((await notificationStack.get()),title, body))
                     toast.custom((t) =>(
                       <Notification trigger={t}>
                         <NotificationBody title={title} body={body} success={true} id = {t.id}></NotificationBody>

@@ -20,7 +20,7 @@ const EnvironmentCreate = React.forwardRef(({ sectionUserID, closeModal }: Envir
     const options : Option[] = [
         { value: 'C++/C', id: 'a2f570bc987f' },
         { value: 'Python3', id: '4610218071a3' },
-        { value: 'Java', id: '77b9bffedfa0' },
+        { value: 'Java', id: '70a334aadbd4' },
     ]
 
     const CPU = 0.5
@@ -54,7 +54,7 @@ const EnvironmentCreate = React.forwardRef(({ sectionUserID, closeModal }: Envir
                         <div ref={ref} className={dialogClass}>
 
                             <Dialog.Title as="h3" className={titleClass} >Create Environment </Dialog.Title>
-                            <p className="py-2 text-gray-600 dark:text-gray-300">
+                            <p className="text-gray-600 dark:text-gray-300">
                                 Preparing the base IDE environment, please wait...
                             </p>
                             <Loader />

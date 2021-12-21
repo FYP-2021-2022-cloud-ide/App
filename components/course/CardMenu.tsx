@@ -1,14 +1,12 @@
 import { Menu, Transition } from '@headlessui/react'
 import { Fragment, MouseEventHandler} from 'react'
 import { MenuIcon } from '@heroicons/react/outline'
-import { EnvironmentContent as Environment } from "./EnvironmentList"
-interface EnvironmentMenuProps {
-    sectionUserID: string
-    environment: Environment
+import { EnvironmentContent as Environment } from "./instructor/Environment/EnvironmentList"
+interface MenuProps {
     items: { text: string, onClick: MouseEventHandler<HTMLButtonElement> | undefined }[]
 }
 
-export default function EnvironmentMenu({ items }: EnvironmentMenuProps) {
+export default function CardMenu({ items }: MenuProps) {
     return (
         <div>
             <Menu as="div" className="relative inline-block text-left">

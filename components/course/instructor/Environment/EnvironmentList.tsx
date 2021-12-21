@@ -2,16 +2,8 @@ import Environment from "./Environment"
 import EnvironmentCreate from "./EnvironmentCreate"
 import { CubeIcon } from "@heroicons/react/outline"
 import { PlusCircleIcon } from "@heroicons/react/solid"
-import { Dialog, Transition } from "@headlessui/react";
-import React, { Fragment, useState } from "react";
+import React, {  useState } from "react";
 import Modal from "../../../Modal"
-import ListBox from "../Template/ListBox"
-import Select from 'react-select'
-
-//testing 
-import environmentListData from "../../../../data/testing/environmentList"
-
-import { useCnails } from "../../../../contexts/cnails";
 import EmptyDiv from "../../../EmptyDiv";
 
 export interface EnvironmentContent {
@@ -50,7 +42,7 @@ const EnvironmentList = ({ sectionUserID, environments }: props) => {
             {
                 // generate the environment cards
                 environments?.length == 0 ? <EmptyDiv message="There is no environment for this course yet." /> :
-                    <div className="grid grid-cols-2 gap-8">
+                    <div className="grid grid-cols-2 gap-4">
                         {
                             environments.map(environment => {
                                 return <Environment sectionUserID={sectionUserID} environment={environment}></Environment>

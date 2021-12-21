@@ -4,12 +4,8 @@ import EnvironmentList from "../../../../components/course/instructor/Environmen
 import TemplateList from "../../../../components/course/instructor/Template/TemplateList";
 import React, { useEffect, useState } from 'react';
 import { useCnails } from "../../../../contexts/cnails";
-import { GetServerSideProps } from 'next';
+import Loader from "../../../../components/Loader";
 import Breadcrumbs from "../../../../components/Breadcrumbs";
-
-//testing 
-import TemplateListData from "../../../../data/testing/templateList"
-import EnvironmentListData from "../../../../data/testing/environmentList"
 
 const Home = () => {
   const router = useRouter();
@@ -60,15 +56,15 @@ const Home = () => {
           }]} />
           <CourseBar role={"Instructor"} courseName={courseName!}></CourseBar>
 
-          <div className="flex flex-row space-x-4 w-full">
+          <div className="flex flex-row space-x-10 w-full">
             <EnvironmentList environments={thisEnvironmentList!} sectionUserID={sectionUserID}></EnvironmentList>
             <TemplateList environments={thisEnvironmentList!} templates={thisTemplateList!} sectionUserID={sectionUserID}></TemplateList>
           </div>
         </div>
       ) : (
-        <div className="flex h-screen w-screen">
+        <div className="flex h-screen w-full">
           <div className="m-auto">
-            <img src='/circle.svg' />
+            <Loader></Loader>
           </div>
         </div>
       )}

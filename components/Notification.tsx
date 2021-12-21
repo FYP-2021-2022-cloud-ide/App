@@ -1,7 +1,9 @@
 import { Transition } from "@headlessui/react";
 import { Toast } from "react-hot-toast/dist/core/types"; 
 import toast from "react-hot-toast";
+
 import {CheckIcon,XIcon} from "@heroicons/react/solid"
+import { useTheme } from "../contexts/theme";
 
 
 interface NotificationProps {
@@ -17,9 +19,8 @@ interface NotificationBodyProps{
 }
 
 export function Notification({ children, trigger }: NotificationProps) {
-  // const { showNotification } = useLayoutState()
+  const {isDark } =  useTheme() 
   return (
-    // <div className="max-w-md w-full bg-white shadow-lg rounded-xl pointer-events-auto sm:items-start sm:justify-end">
       <Transition
         show={trigger.visible}
         enter="transform ease-out duration-300 transition"
@@ -28,9 +29,9 @@ export function Notification({ children, trigger }: NotificationProps) {
         leave="transition ease-in duration-100"
         leaveFrom="opacity-100"
         leaveTo="opacity-0"
-        className="max-w-md w-full bg-white shadow-lg rounded-xl pointer-events-auto"
+        className={`max-w-md w-full bg-white shadow-lg rounded-xl pointer-events-auto ${isDark && "dark"}`}
       >
-        <div className="rounded-xl shadow-xs overflow-hidden">
+        <div className={`rounded-xl shadow-xs overflow-hidden  ${isDark && "dark"} bg-white dark:bg-gray-700`}>
           <div className="p-4 w-full">
             { children }
           </div>
@@ -44,26 +45,20 @@ export function NotificationBody({id, title, body, success}:NotificationBodyProp
   // const dispatch = useLayoutDispatch();
   // const { notification } = useLayoutState();
   return (
-    <div className="flex items-start">
-      <div className="flex-shrink-0">
+    <div className="flex flex-row items-start">
         {
-          success?(
-            <CheckIcon className="text-green-400 w-7 h-7" />
-            // <FontAwesomeIcon className="text-green-400" icon={['far', 'check']}/>
-          ):(
-            <XIcon className="text-red-400 w-7 h-7" />
-          )
+          success?<CheckIcon className="text-green-400 w-4 h-4" />: <XIcon className="text-red-400 w-4 h-4" />
         }
-      </div>
+      
       <div className="ml-3 w-0 flex-1 pt-0.5">
-        <p className="text-sm leading-5 font-medium text-gray-900">
+        <p className="text-sm leading-5 font-medium text-gray-900 dark:text-gray-200">
           {title}
         </p>
-        <p className="mt-1 text-sm leading-5 text-gray-500">
+        <p className="mt-1 text-sm leading-5 text-gray-500 dark:text-gray-300">
           {body}
         </p>
       </div>
-      <div className="ml-4 flex-shrink-0 flex">
+      <div className="ml-4 flex">
         <button
           onClick={() => toast.dismiss(id)}
           className="inline-flex text-gray-400 focus:outline-none focus:text-gray-500 transition ease-in-out duration-150">

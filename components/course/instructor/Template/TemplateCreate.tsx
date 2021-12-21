@@ -28,6 +28,7 @@ const TemplateCreate = React.forwardRef(({ memLimit, numCPU, sectionUserID, envi
     const [selectedEnv, setSelectedEnv] = useState(environments[0])
     const [templateName, setTemplateName] = useState("")
     const [isExam, setIsExam] = useState(false)
+    const [canNotify, setCanNotify]  =useState(true)
     const [timeLimit, setTimeLimit] = useState(60)
     const { addTemplate, addContainer, removeContainer, sub } = useCnails();
     const [containerID, setContainerID] = useState("")
@@ -54,7 +55,7 @@ const TemplateCreate = React.forwardRef(({ memLimit, numCPU, sectionUserID, envi
                     >
                         Create Template
                     </Dialog.Title>
-                    <div className="py-2 dark:text-gray-300">
+                    <div className="py-2 text-gray-600 dark:text-gray-300">
                         Preparing the base IDE Template with base environment, please wait...
                     </div>
                     <Loader></Loader>
@@ -70,7 +71,7 @@ const TemplateCreate = React.forwardRef(({ memLimit, numCPU, sectionUserID, envi
                     >
                         Create Assignment Template
                     </Dialog.Title>
-                    <div className="py-2 dark:text-gray-300">
+                    <div className="py-2 text-gray-600 dark:text-gray-300">
                         A new container is prepared, please click the following link and set up the template. After finished the setting, please press the finish button to save the template
                     </div>
                     <a className="flex text-blue-500 underline justify-center" href={"https://codespace.ust.dev/user/container/" + containerID + "/"} target="_blank">
@@ -163,11 +164,9 @@ const TemplateCreate = React.forwardRef(({ memLimit, numCPU, sectionUserID, envi
                     <div className="font-medium mt-4 dark:text-gray-300">
                         Is it an Exam?(Optional)
                     </div>
-                    <input className="focus:outline-none" type="checkbox"
+                    <input className="focus:outline-none dark:bg-gray-600 dark:text-gray-600" type="checkbox"
                         checked={isExam}
                         onChange={(e) => setIsExam(!isExam)}></input>
-
-
                     {isExam ?
                         <div>
                             <div className="font-medium mt-4 dark:text-gray-300">
@@ -181,6 +180,12 @@ const TemplateCreate = React.forwardRef(({ memLimit, numCPU, sectionUserID, envi
                         :
                         <div></div>
                     }
+                    <div className="font-medium mt-4 dark:text-gray-300">
+                        Can students send question to tutors? 
+                    </div>
+                    <input className="focus:outline-none dark:bg-gray-600 dark:text-gray-600" type="checkbox"
+                        checked={canNotify}
+                        onChange={(e) => setCanNotify(!canNotify)}></input>
                     <div className={buttonsClass}>
                         <button
                             type="button"

@@ -1,9 +1,9 @@
 import React , {useState, useRef} from "react"
-import EnvironmentMenu from "./EnvironmentMenu";
+import Menu from "../../CardMenu";
 import {EnvironmentContent}  from "./EnvironmentList"
 import { useCnails } from "../../../../contexts/cnails";
 import Modal from "../../../Modal";
-import EnvironmentUpdate from "./EnivronmentUpdate";
+import EnvironmentUpdate from "./EnvironmentUpdate";
 
 interface EnvironmentProps {
     sectionUserID: string
@@ -33,7 +33,7 @@ function Environment({ environment, sectionUserID }: EnvironmentProps) {
                     </div>
                     <div className="font-medium text-xs text-gray-400">{environment.description}</div>
                 </div>
-                <EnvironmentMenu sectionUserID={sectionUserID} environment={environment} items={[
+                <Menu items={[
                     {
                         text: "delete" , 
                         onClick : async () => {
@@ -46,7 +46,7 @@ function Environment({ environment, sectionUserID }: EnvironmentProps) {
                         text : "update" , 
                         onClick : ()=> openUpdateModal()
                     }
-                ]}></EnvironmentMenu>
+                ]}></Menu>
             </div>
             <Modal isOpen={updateIsOpen} setOpen={setUpdateIsOpen}>
                 <EnvironmentUpdate closeModal={closeUpdateModal}

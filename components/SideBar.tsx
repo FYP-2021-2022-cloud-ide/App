@@ -1,14 +1,15 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import {HomeIcon, UserGroupIcon, CubeTransparentIcon, CogIcon} from '@heroicons/react/outline'
+import {HomeIcon, UserGroupIcon, CubeTransparentIcon, CogIcon, AnnotationIcon} from '@heroicons/react/outline'
 import { useRouter } from "next/router";
 
 const SideBar = () => {
     var pages= [
       {name:"Dashboard", link:"/", icon:HomeIcon},
-      {name:"Teams",link:"/Teams", icon:UserGroupIcon},
-      {name:"Workspace",link:"/Workspace", icon:CubeTransparentIcon},
-      {name:"Setting",link:"/settings", icon:CogIcon}
+      // {name:"Teams",link:"/Teams", icon:UserGroupIcon},
+      // {name:"Workspace",link:"/Workspace", icon:CubeTransparentIcon},
+      // {name:"Setting",link:"/settings", icon:CogIcon},
+      {name:"Notifications", link:"/notifications", icon:AnnotationIcon}
     ]
     const router = useRouter();
     return (

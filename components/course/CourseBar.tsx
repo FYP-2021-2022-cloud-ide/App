@@ -1,5 +1,4 @@
-import Link from 'next/link'
-import { ChevronRightIcon, ChevronLeftIcon, MenuIcon, CogIcon ,TerminalIcon } from '@heroicons/react/solid'
+import { TerminalIcon } from '@heroicons/react/solid'
 
 
 interface props{
@@ -37,11 +36,11 @@ const CourseBar = ({courseName, role}:props) => {
                     <p className="text-lg">{courseName}</p>
                     <div className="badge dark:bg-gray-300 dark:text-gray-700"> {role}</div>
                 </div>
-                <div className="flex flex-row gap-x-4 justify-end">
+                {/* <div className="flex flex-row gap-x-4 justify-end">
                     <button className="hover:scale-110 transition ease-in-out duration-300">
                         <CogIcon className="w-7 h-7"></CogIcon>
                     </button>
-                </div>
+                </div> */}
                 
             </div>
        

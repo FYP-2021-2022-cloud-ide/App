@@ -15,6 +15,7 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
   ) {
+    //console.log(req.headers.cookie!)
     const {sub, name, email, userId, semesterId} = parse(req.headers.cookie!)
     res.json({
         sub,

@@ -32,13 +32,18 @@ const notificationStack = {
       return stack
   },
   remove: (stack:stack, id:number) => {
+      var temp: stack = {
+          notifications: []
+      }
       for (let i = 0; i<stack.notifications.length; i++){
-        if (stack.notifications[i].id > id){
-            stack.notifications[i-1] = stack.notifications[i]
-            stack.notifications[i-1].id-- 
+        var notification = stack.notifications[i]
+        if (notification.id != id){
+            if (notification.id > id)
+                notification.id--
+            temp.notifications.push(notification)
         }
       }
-      return stack
+      return temp
   }
 }
 

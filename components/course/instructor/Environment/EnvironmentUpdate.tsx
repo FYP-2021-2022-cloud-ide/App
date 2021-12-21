@@ -1,35 +1,30 @@
-import React, { MouseEventHandler, useRef, useState } from "react"
-import { Dialog, Transition, Switch } from "@headlessui/react";
+import { Dialog, } from "@headlessui/react";
+import React, { MouseEventHandler } from "react";
+import { useState } from "react";
 import { useCnails } from "../../../../contexts/cnails";
-import { template } from "./TemplateList"
-import Loader from "../../../Loader"
-interface TemplateUpdateProps {
+import Loader from "../../../Loader";
+import { EnvironmentContent as Environment } from "./EnvironmentList"
+interface EnvironmentUpdateProps {
     sectionUserID: string
-    template: template
-    memLimit: number
-    numCPU: number
+    environment: Environment
     closeModal: MouseEventHandler<HTMLButtonElement> | undefined
 }
 
-const TemplateUpdate = React.forwardRef(({ sectionUserID, memLimit, numCPU, template, closeModal }: TemplateUpdateProps, ref) => {
+const EnvironmentUpdate = React.forwardRef(({ sectionUserID, environment, closeModal }: EnvironmentUpdateProps, ref) => {
 
+    const CPU = 0.5
+    const memory = 400
+    const [environmentName, setEnvironmentName] = useState(environment.environmentName)
+    const [description, setDescription] = useState(environment.description)
+    const [finishLoading, setFinishLoading] = useState(true)
+    const [containerID, setContainerID] = useState("")
+    const { updateEnvironment, removeContainer, addContainer, sub } = useCnails();
     const [step, setStep] = useState(1);
-
-    const prevStep = () => {
-        setStep(step - 1);
-    }
     const nextStep = () => {
         setStep(step + 1);
     }
 
-    const [finishLoading, setFinishLoading] = useState(true)
-    const [description, setDescription] = useState(template.description)
-    const [templateName, setTemplateName] = useState(template.name)
-    const [isExam, setIsExam] = useState(template.isExam)
-    const [timeLimit, setTimeLimit] = useState(template.timeLimit)
-    const { updateTemplate, addContainer, removeContainer, sub } = useCnails();
-    const [containerID, setContainerID] = useState("")
-
+    // styles 
     const dialogClass = "inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl text-[#415A6E]"
     const titleClass = "text-xl font-medium leading-6 dark:text-gray-300 mb-5"
     const buttonsClass = "sm:flex sm:flex-row-reverse mt-4"
@@ -48,12 +43,12 @@ const TemplateUpdate = React.forwardRef(({ sectionUserID, memLimit, numCPU, temp
                         as="h3"
                         className={titleClass}
                     >
-                        Update Template
+                        Update Environment
                     </Dialog.Title>
-                    <div className="text-gray-600 dark:text-gray-300">
-                        Preparing the base IDE Template with base environment, please wait
+                    <div className="dark:text-gray-300">
+                        Preparing the IDE environment, please wait
                     </div>
-                    <Loader />
+                    <Loader></Loader>
                 </div>
             )
         case 3:
@@ -64,10 +59,10 @@ const TemplateUpdate = React.forwardRef(({ sectionUserID, memLimit, numCPU, temp
                         as="h3"
                         className={titleClass}
                     >
-                        Update Assignment Template
+                        Update Environment
                     </Dialog.Title>
-                    <div className="py-2">
-                        A new container is prepared, please click the following link and set up the template. After finished the setting, please press the finish button to save the template
+                    <div className="py-2 m-auto ">
+                        A new container is prepared, please click the following link and set up the environment. After finished the setting, please press the finish button to save the environment
                     </div>
                     <a className="flex text-blue-500 underline justify-center" href={"https://codespace.ust.dev/user/container/" + containerID + "/"} target="_blank">
                         Click Here
@@ -77,28 +72,28 @@ const TemplateUpdate = React.forwardRef(({ sectionUserID, memLimit, numCPU, temp
                             onClick={async () => {
                                 setFinishLoading(false)
                                 nextStep()
-                                const response = await updateTemplate(template.id, templateName, description, sectionUserID, containerID, isExam, timeLimit)
-                                if (response.success) {
-                                    setFinishLoading(true)
-                                } else {
-                                    setFinishLoading(true)
-                                    alert(response.message)
+                                const response = await updateEnvironment(environment.id, environmentName, description, sectionUserID, containerID)//expect description
+                                console.log(response)
+                                if (response.success == true || response.success == false) {
+                                    setFinishLoading(true);
                                 }
                             }}
                             className={okButtonClass}>
                             Finish
                         </button>
 
+
                         <button onClick={async () => {
                             setFinishLoading(false)
                             nextStep();
                             const response = await removeContainer(containerID, sub)
-                            if (response.success) {
+                            if (response.success == true || response.success == false) {
                                 setFinishLoading(true)
                             }
                         }} className={okButtonClass + ""}>
                             Cancel
                         </button>
+
                     </div>
                 </div>
             )
@@ -112,7 +107,7 @@ const TemplateUpdate = React.forwardRef(({ sectionUserID, memLimit, numCPU, temp
                         as="h3"
                         className={titleClass}
                     >
-                        Update Template
+                        Update Environment
                     </Dialog.Title>
                     <Loader></Loader>
                 </div>
@@ -125,76 +120,61 @@ const TemplateUpdate = React.forwardRef(({ sectionUserID, memLimit, numCPU, temp
                         as="h3"
                         className={titleClass}
                     >
-                        Update Assignment Template
+                        Update Environment
                     </Dialog.Title>
 
                     <div className="font-medium mt-4">
-                        Template name (Leave empty for unchanged)
+                        Environment name
                     </div>
+
 
                     <input className={inputClass}
-                        placeholder="e.g. Assignment 1"
-                        value={templateName}
-                        onChange={(e) => setTemplateName(e.target.value)}></input>
+                        placeholder="e.g. Environment 1"
+                        value={environmentName}
+                        onChange={(e) => setEnvironmentName(e.target.value)}></input>
 
                     <div className="font-medium mt-4">
-                        Description (Leave empty for unchanged)
+                        Description
                     </div>
 
+
                     <textarea className={inputClass}
-                        placeholder="e.g. Assignment 1 is about ..."
+                        placeholder="e.g. Environment 1 is about ..."
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}></textarea>
 
-
-                    <div className="font-medium mt-4">Is it an Exam?(Optional)</div>
-
-                    <input className="focus:outline-none" type="checkbox"
-                        checked={isExam}
-                        onChange={(e) => setIsExam(!isExam)}></input>
-
-
-                    {isExam &&
-                        <div>
-                            <div className="font-medium mt-4">
-                                Time Limit(in minutes)
-                            </div>
-                            <input className={inputClass}
-                                placeholder="e.g. 120"
-                                value={timeLimit.toString()}
-                                onChange={(e) => setTimeLimit(parseInt(e.target.value))}></input>
-                        </div>
-                    }
 
                     <div className={buttonsClass}>
                         <button
                             onClick={async () => {
                                 nextStep()
-                                const response = await addContainer(template.imageId, memLimit, numCPU, sectionUserID, template.id, false, "student")
+                                const response = await addContainer(environment.imageId, memory, CPU, sectionUserID, "", false, "root")//non-existent template id
+                                console.log(response)
                                 if (response.success) {
                                     setContainerID(response.containerID)
                                 }
 
                             }}
-                            className={okButtonClass + ""}>
+                            className={okButtonClass}>
                             Edit the IDE
                         </button>
-                        <button
-                            onClick={async () => {
-                                const response = await updateTemplate(template.id, templateName, description, sectionUserID, "", isExam, timeLimit)
-                                if (response.success) {
-                                    window.location.reload();
-                                }
 
-                            }}
-                            className={okButtonClass}>
+
+                        <button onClick={async () => {
+                            const response = await updateEnvironment(environment.id, environmentName, description, sectionUserID, "")//non-existent template id
+                            console.log(response)
+                            if (response.success == true || response.success == false) {
+                                window.location.reload();
+                            }
+
+                        }} className={okButtonClass + ""}>
                             Finish
                         </button>
                     </div>
                 </div>
             )
-
     }
+
 })
 
-export default TemplateUpdate
+export default EnvironmentUpdate

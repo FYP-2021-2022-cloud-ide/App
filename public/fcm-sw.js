@@ -1,6 +1,6 @@
-
 importScripts('https://www.gstatic.com/firebasejs/7.24.0/firebase-app.js')
 importScripts('https://www.gstatic.com/firebasejs/7.24.0/firebase-messaging.js')
+var notificationStack = require('../lib/notificationStack').notificationStack
 
 if (!firebase.apps.length) {
   firebase.initializeApp({
@@ -14,9 +14,11 @@ if (!firebase.apps.length) {
   firebase.messaging().onBackgroundMessage(function (payload) {
     console.log('[firebase-messaging-sw.js] Received background message ', payload);
     // Customize notification here
-    const notificationTitle = payload.data.title;
+    const {title, body} = payload.data
+    notificationStack.set(notificationStack.push((await notificationStack.get()),title, body))
+    const notificationTitle = title;
     const notificationOptions = {
-      body: payload.data.body,
+      body,
     };
 
     self.registration.showNotification(notificationTitle,

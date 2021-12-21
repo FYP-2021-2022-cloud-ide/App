@@ -3,7 +3,7 @@ import CourseBar from "../../../../components/course/CourseBar";
 import WorkspacesList from "../../../../components/course/student/WorkspaceList";
 import React, { useEffect, useState } from 'react';
 import { useCnails } from "../../../../contexts/cnails";
-import { GetServerSideProps } from 'next';
+import Loader from "../../../../components/Loader"; 
 import Breadcrumbs from "../../../../components/Breadcrumbs";
 
 interface Template {
@@ -63,9 +63,9 @@ const Home = () => {
           <WorkspacesList templates={thisTemplateList!} sectionUserId={sectionUserID}></WorkspacesList>
         </div>
       ) : (
-        <div className="flex h-screen w-screen">
+        <div className="flex h-screen w-full">
           <div className="m-auto">
-            <img src='/circle.svg' />
+            <Loader></Loader>
           </div>
         </div>
       )}

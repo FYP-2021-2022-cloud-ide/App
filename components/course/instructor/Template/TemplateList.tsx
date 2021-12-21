@@ -75,7 +75,7 @@ const TemplateList = ({ templates, sectionUserID, environments }: props) => {
             {
                 // generate the templates
                 templates?.length == 0 ? <EmptyDiv message="There is no template for this course yet." /> :
-                    <div className="grid grid-cols-2 gap-8">
+                    <div className="grid grid-cols-2 gap-4">
                         {
                             templates.map((template: template) => {
                                 return (

@@ -69,6 +69,9 @@ app.prepare().then(() => {
         response_type: 'code',
         scope: 'openid profile email'
       },
+      session:{
+        absoluteDuration:SESSION_VALID_FOR,
+      },
       afterCallback: async (req, res, session, decodedState) => {
         try {
           const additionalUserClaims = await axios('https://cas.ust.hk/cas/oidc' + '/profile', {
@@ -78,6 +81,7 @@ app.prepare().then(() => {
           });
           // @ts-ignore
           req.appSession!.openidTokens = session.access_token;
+          session.expired_at
           // @ts-ignore
           req.appSession!.userIdentity = additionalUserClaims.data;
           const { sub, name, email } = additionalUserClaims.data;
@@ -239,9 +243,9 @@ app.prepare().then(() => {
     return handle(req, res);
   })
 
-  server.all(/^\/_next\/webpack-hmr(\/.*)?/, async (req: Request, res: Response) => {
-    void handle(req, res)
-  })
+  // server.all(/^\/_next\/webpack-hmr(\/.*)?/, async (req: Request, res: Response) => {
+  //   void handle(req, res)
+  // })
 
 
   httpServer.listen(port, (err?: any) => {

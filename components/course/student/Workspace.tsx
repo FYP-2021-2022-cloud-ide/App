@@ -2,7 +2,11 @@ import React from "react"
 import {LogoutIcon} from "@heroicons/react/outline"
 import {useCnails} from '../../../contexts/cnails'
 import { useState } from 'react'
+import Menu from "../CardMenu";
+import Modal from "../../Modal"; 
+import { Dialog} from '@headlessui/react'
 import WorkspaceMenu from "./WorkspaceMenu"
+import Loader from "../../Loader"
 import {template}from "../instructor/Template/TemplateList"
 
 interface WorkspaceProps{
@@ -17,7 +21,16 @@ function Workspace({template, sectionUserId}:WorkspaceProps){
     const inactiveClass = "bg-gray-400"
     const [memLimit ,setmemLimit]= useState(100);
     const [numCPU ,setnumCPU]= useState(1);
-    const {addContainer} = useCnails();
+    const { addContainer ,removeContainer, sub} = useCnails();
+    const [isOpen, setIsOpen] = useState(false)
+
+    // styles 
+    const dialogClass = "inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl text-[#415A6E]"
+    const titleClass = "text-xl font-medium leading-6 dark:text-gray-300 mb-5"
+    const buttonsClass = "sm:flex sm:flex-row-reverse mt-4"
+    const okButtonClass = "inline-flex justify-center w-full md:w-32 rounded-md px-4 py-2 bg-green-500 hover:bg-green-600 text-base leading-6 font-medium text-white shadow-sm focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5"
+    const inputClass = "border dark:border-0 focus:outline-none dark:bg-gray-700 p-1 px-3 w-full text-gray-500 dark:text-gray-300 flex-row space-x-2  text-left rounded-md shadow-lg"
+
 
 
     var flag = true
@@ -51,9 +64,35 @@ function Workspace({template, sectionUserId}:WorkspaceProps){
                     </div>
                 </div>
                 <div className="w-1/12">
-                    <WorkspaceMenu template={template} containerID={template.containerID} sectionUserID={sectionUserId} memLimit={memLimit} numCPU={numCPU}></WorkspaceMenu>
+                    <Menu items={[
+                        {
+                            text: template.containerID ? "close" : "open" , 
+                            onClick : template.containerID ?  async () => {
+                                const response = await removeContainer(template.containerID, sub)
+                                window.location.reload()
+                            } : async () => {
+                                setIsOpen(true)
+                                const response = await addContainer(template.imageId,memLimit,numCPU,sectionUserId,template.id,true,"student")
+                                window.location.reload();
+                            }
+                        }
+                    ]}></Menu>
                 </div>
             </div>
+            <Modal isOpen={isOpen} setOpen={setIsOpen}>
+                <div className={dialogClass}>
+                    <Dialog.Title
+                        as="h3"
+                        className={titleClass}
+                    >
+                        Create Worksapce 
+                    </Dialog.Title>
+                    <div className="dark:text-gray-300">
+                    Preparing the workspace, please wait...
+                    </div>
+                    <Loader/>
+                </div>
+            </Modal>
         </div>
     )
 }
