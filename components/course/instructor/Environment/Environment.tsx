@@ -6,6 +6,7 @@ import Modal from "../../../Modal";
 import EnvironmentUpdate from "./EnvironmentUpdate";
 
 interface EnvironmentProps {
+    key: string
     sectionUserID: string
     environment: EnvironmentContent
 }
@@ -48,7 +49,7 @@ function Environment({ environment, sectionUserID }: EnvironmentProps) {
                     }
                 ]}></Menu>
             </div>
-            <Modal isOpen={updateIsOpen} setOpen={setUpdateIsOpen}>
+            <Modal isOpen={updateIsOpen} setOpen={setUpdateIsOpen} >
                 <EnvironmentUpdate closeModal={closeUpdateModal}
                 environment={environment}  ref={ref} sectionUserID={sectionUserID}/>
             </Modal>

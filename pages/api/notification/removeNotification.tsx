@@ -5,12 +5,11 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 type Data = {
   success: boolean
   message:string
-  notification: string
 }
 
 import * as grpc from 'grpc';
 
-import {    GetNotificationTokenReply,  SubRequest } from '../../../proto/dockerGet/dockerGet_pb';
+import {    SuccessStringReply,  RemoveNotificationRequest } from '../../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
 
 export default function handler(
@@ -24,19 +23,16 @@ export default function handler(
         target,
         grpc.credentials.createInsecure());
 
-    var body = JSON.parse(req.body);
-    var docReq = new SubRequest();
-    docReq.setSub(body.sub);
+    const {userId, notificationId} = JSON.parse(req.body);
+    var docReq = new RemoveNotificationRequest();
+    docReq.setUserid(userId);
+    docReq.setNotificationid(notificationId);
     try{
-        client.getNotificationToken(docReq, function(err, GoLangResponse: GetNotificationTokenReply) {
+        client.removeNotification(docReq, function(err, GoLangResponse: SuccessStringReply) {
             console.log(GoLangResponse)
-            if(!GoLangResponse.getSuccess()){
-                console.log(GoLangResponse.getMessage())
-            }
             res.json({
                 success : GoLangResponse.getSuccess(),
                 message: GoLangResponse.getMessage(),
-                notification: GoLangResponse.getNotificationToken()
             })
             res.status(200).end();
             }

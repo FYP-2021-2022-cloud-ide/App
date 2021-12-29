@@ -55,7 +55,7 @@ function Template({ template, memLimit, numCPU, sectionUserID }: TemplateProps) 
                         </div>
                         <div className="font-medium text-xs text-gray-400 justify-self-end">{template.description}</div>
 
-                        {!template.isExam && <div className="badge border-0 dark:bg-gray-300 dark:text-gray-600">Exam</div>}
+                        {template.isExam && <div className="badge border-0 dark:bg-gray-300 dark:text-gray-600">Exam</div>}
                     </div>
                 </div>
 
@@ -74,16 +74,12 @@ function Template({ template, memLimit, numCPU, sectionUserID }: TemplateProps) 
                             onClick : ()=> setUpdateIsOpen(true)
                         }, 
                         {
-                            text : "close" , 
-                            onClick:  async () => {
+                            text :instanceFlag? "close" :  "open", 
+                            onClick :instanceFlag?   async () => {
                                 const response = await removeContainer(template.containerID, sub)
                                 console.log(response)
                                 window.location.reload()
-                            }
-                        },
-                        {
-                            text : "open" , 
-                            onClick : async () => {
+                            }:async () => {
                                 setIsOpen(true) ; 
                                 const response = await addContainer(template.imageId,memLimit,numCPU,sectionUserID,template.id,true,"student")
                                 window.location.reload();

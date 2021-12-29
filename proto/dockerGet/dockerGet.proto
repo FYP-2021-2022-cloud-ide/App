@@ -37,9 +37,42 @@ service Docker {
   rpc removeEnvironment(EnvironmentIdRequest)returns(SuccessStringReply){}
 
   rpc getUserData(SubRequest)returns(GetUserDataReply){}
-  rpc getNotification(SubRequest)returns(GetNotificationReply){}
-  rpc updateNotification(UpdateNotificationRequest)returns(SuccessStringReply){}
+  rpc updateUserData(UpdateUserDataRequest)returns(SuccessStringReply){}
+
+  rpc getNotificationToken(SubRequest)returns(GetNotificationTokenReply){}
+  rpc sendNotification(SendNotificationRequest)returns(SendNotificationReply){}
+  rpc listNotifications(UserIdRequest)returns(ListNotificationsReply){}
+  rpc removeNotification(RemoveNotificationRequest)returns(SuccessStringReply){}
+  rpc updateNotificationToken(UpdateNotificationTokenRequest)returns(SuccessStringReply){}
   rpc updateSubscription(UpdateSubscriptionRequest)returns(SuccessStringReply){}
+
+  rpc listFolders(UserIdRequest)returns(ListFolderReply){}
+  rpc downloadFile(DownloadReuqest)returns(stream DownloadReply){}
+}
+
+
+
+message UserIdRequest {
+  string userId = 1;
+}
+
+message ListNotificationsReply {
+  bool success = 1;
+  string message = 2;
+  message Notification{
+    string id = 1;
+    string title = 2;
+    string body = 3;
+    message Sender{
+      string id = 1;
+      string sub = 2;
+      string name = 3;
+    }
+    Sender sender = 4;
+    bool allow_reply=6;
+    string updated_at = 5;
+  }
+  repeated Notification notifications = 3;
 }
 
 message LoginRequest {
@@ -117,6 +150,7 @@ message ListTemplatesReply{
     bool active=8;
     bool is_exam=10;
     int64 time_limit=9;
+    bool allow_notification=11;
     repeated string ContainerId=6; 
   }
 	repeated Template templates=3;
@@ -161,6 +195,7 @@ message AddTemplateRequest{
   bool active=7;
   bool is_exam=8;
   int64 time_limit=9;
+  bool allow_notification=10;
 }
 message UpdateTemplateRequest{
    string templateID =1;
@@ -172,6 +207,7 @@ message UpdateTemplateRequest{
    bool active=7;
    bool is_exam=8;
    int64 time_limit=9;
+   bool allow_notification=10;
  }
 message TemplateIdRequest{
   string templateID=1;
@@ -255,21 +291,79 @@ message GetUserDataReply{
   string message = 2;
   string userId = 3;
   string semesterId = 4;
+  bool darkMode =5;
+  string bio =6;
+}
+message UpdateUserDataRequest{
+  string sub=1;
+  bool darkMode =5;
+  string bio=6;
 }
 
-message GetNotificationReply{
+message GetNotificationTokenReply{
   bool success = 1;
   string message = 2;
-  string notification = 3;
+  string notification_token = 3;
 }
 
-message UpdateNotificationRequest{
+message SendNotificationRequest{
+  string title=1;
+  string body=2;
+  string sender=3;
+  string receiver=5;
+  bool allow_reply=4;
+}
+message SendNotificationReply{
+  bool success=1;
+  string message =2;
+  string notification_Id=3;
+}
+
+message UpdateNotificationTokenRequest{
   string sub = 1;
   string token = 2;
+}
+
+message RemoveNotificationRequest{
+  string userId = 1;
+  string notificationId = 2;
 }
 
 message UpdateSubscriptionRequest{
   string userId = 1;
   string token = 2;
   string semesterId = 3;
+}
+
+message ListFolderReply{
+  bool success=1;
+  string message=2;
+  Folder root =3;
+}
+message Folder{
+  string name=1;
+  repeated Folder children=2;
+  message Files {
+    string name=1;
+    string path =2;
+  }
+  repeated Files files =3;
+
+}
+
+message FileChunk{
+  bytes content=1;
+  string totalSize = 2;
+  string transferred = 3;
+}
+
+message DownloadReuqest {
+  string filePath = 1;
+  string userId = 2;
+}
+
+message DownloadReply {
+  bool success=1;
+  string message=2;
+  FileChunk fileChunk = 3;
 }

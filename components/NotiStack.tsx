@@ -1,24 +1,49 @@
 import { Popover, Transition } from '@headlessui/react'
-import { BellIcon } from '@heroicons/react/solid'
+import { BellIcon , MailIcon } from '@heroicons/react/solid'
 import React, { useEffect, useState } from 'react';
 import { Fragment } from 'react'
-import { notificationStack } from '../lib/notificationStack'
+// import { notificationStack } from '../lib/notificationStack'
+import { useCnails } from '../contexts/cnails'
+import Link from "next/link";
 
 interface notification {
-    id: number,
-    title: string,
+    id: string
+    sender: {
+        id: string
+        name: string
+        sub: string
+    },
+    title: string
     body: string
+    updatedAt: string
+    allow_reply: boolean
 }
+
 
 export default function NotiStack() {
     // load once when page is rendered
+    const test = [
+        {
+            id: "soemthe",
+            sender: {
+                id: "osdkf",
+                name: "sender name ",
+                sub: "send sub",
+            },
+            title: "noti title htieitoewjroewhtieitoewjroewhtieitoewjroewhtieitoewjroewhtieitoewjroewhtieitoewjroewhtieitoewjroew",
+            body: "noti body htieitoewjroewhtieitoewjroewhtieitoewjroewhtie itoewjroewhtieitoewjr oewhtieitoewjroewhtieitoewjroewhtieitoewjroewh tieitoewjroewhtieitoewjroewhtieitoewjroewhtieitoewjroewhtieitoewjroew",
+            updatedAt: "sdkfoskdf",
+            allow_reply: false
+        }
+    ] as notification[]
     const [notifications, setNotifications] = useState<notification[]>([])
+    const { listNotifications, userId } = useCnails()
 
     // data fetching from API
     useEffect(() => {
         const fetchNotifications = async () => {
-            const noti = await notificationStack.get()
-            setNotifications(noti.notifications)
+            const response = await listNotifications(userId)
+            setNotifications(response.notifications)
         }
         // while(sub == "")
         fetchNotifications()
@@ -47,38 +72,26 @@ export default function NotiStack() {
                         leaveTo="opacity-0 translate-y-1"
                     >
                         <Popover.Panel className="absolute z-10 min-w-fit px-4 mt-3 transform -translate-x-full left-1/2 sm:px-0">
-                            <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                            <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 bg-white dark:bg-gray-700 p-2">
                                 {
                                     notifications?.length == 0 ? <div className="text-gray-400 bg-white dark:text-gray-300 dark:bg-gray-700 w-96 flex flex-col items-center p-5">You have no notifications</div> :
-                                        <div className="flex bg-white dark:bg-gray-700 p-4 flex-col space-y-2">
-                                            {notifications!.map((item: notification) => (
-                                                <div key={item.id} className="cursor-pointer flex items-center p-2 transition duration-150 ease-in-out rounded-lg hover:bg-gray-50 dark:hover:bg-gray-500 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50">
-                                                    <div >
-                                                        <p className="text-sm font-medium text-gray-900 dark:text-gray-200 ">
+                                        <div className="flex  flex-col space-y-2">
+                                            {notifications!.slice(0, 6).map((item: notification) => (
+                                                <div key={item.id} className="cursor-pointer flex items-center p-2 transition duration-150 ease-in-out rounded-lg hover:bg-gray-200 dark:hover:bg-gray-500 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50">
+                                                    <div>
+                                                        <p className="w-96 whitespace-nowrap truncate text-sm font-medium text-gray-900 dark:text-gray-200 ">
                                                             {item.title}
                                                         </p>
-                                                        <p className="text-sm text-gray-500 dark:text-gray-300">
+                                                        <p className="w-96 text-sm text-gray-500 dark:text-gray-300 text-ellipsis overflow-hidden">
                                                             {item.body}
                                                         </p>
-                                                    </div>
-                                                    <div className="ml-4 flex-shrink-0 flex">
-                                                        <button
-                                                            onClick={async () => {
-                                                                const temp = notificationStack.remove((await notificationStack.get()), item.id)
-                                                                await notificationStack.set(temp)
-                                                                setNotifications(temp.notifications)
-                                                            }
-                                                            }
-                                                            className="inline-flex text-gray-400 focus:outline-none focus:text-gray-500 transition ease-in-out duration-150">
-                                                            <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                                                            </svg>
-                                                        </button>
+
                                                     </div>
                                                 </div>
-
                                             ))}
-                                        </div>}
+                                            <Link href="/messages"><div className="text-sm flex  justify-center cursor-pointer py-3 rounded-lg  text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-500 ring-opacity-5">more messages<span><MailIcon className="text-gray-600 dark:text-gray-300 w-4 h-4 ml-2"></MailIcon></span></div></Link>
+                                        </div>
+                                }
                             </div>
                         </Popover.Panel>
                     </Transition>

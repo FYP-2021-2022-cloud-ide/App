@@ -41,6 +41,7 @@ export default async  function handler(
     }
     var docReq = new TemplateIdRequest();
     docReq.setTemplateid(templateId);
+    docReq.setSectionUserId(section_user_id)
     try{
         client.deactivateTemplate(docReq, function(err, GoLangResponse: SuccessStringReply) {
         if(!GoLangResponse.getSuccess()){

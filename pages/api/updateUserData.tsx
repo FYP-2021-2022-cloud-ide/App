@@ -7,46 +7,56 @@ type Data = {
   message:string
 }
 
+
+
 import * as grpc from 'grpc';
 
-import {    SuccessStringReply,  TemplateIdRequest } from '../../../proto/dockerGet/dockerGet_pb';
-import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
-import { checkInSectionBySectionUserId, checkRoleBySectionUserId } from '../../../lib/authentication';
+import { SuccessStringReply   ,UpdateUserDataRequest } from '../../proto/dockerGet/dockerGet_pb';
+import { DockerClient } from '../../proto/dockerGet/dockerGet_grpc_pb';
 
+  
 function unauthorized(){
-    return({
+  return({
       success: false,
       message: "unauthorized",
-    })
+  })
 }
+function authentication(sub: string|string[], oidcSub: string){
+    if(sub == undefined){
+      return false
+    }else{
+      if(sub != oidcSub)
+        return false
+    }
+    return true
+  }
   
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
   ) 
 {
-    // console.log("cunw")
     var target= 'api:50051';
     var client = new DockerClient(
         target,
         grpc.credentials.createInsecure());
-
-    const {templateId, section_user_id} = JSON.parse(req.body);
-    if (section_user_id != undefined){
-        if(!(await checkInSectionBySectionUserId(req.oidc.user.sub, section_user_id)) || !(await checkRoleBySectionUserId(req.oidc.user.sub, section_user_id, "instructor")))
-        {res.json(unauthorized()); return;}
-      }else{
+    const{sub}=req.query;
+    const { darkMode, bio} = JSON.parse(req.body);//console.log(body)
+    if(!authentication(sub, req.oidc.user.sub)){
         res.json(unauthorized())
         return
-      }
-    var docReq = new TemplateIdRequest();
-    docReq.setTemplateid(templateId);
-    docReq.setSectionUserId(section_user_id);
+    } 
+    var docReq = new UpdateUserDataRequest();
+    docReq.setSub(sub);
+    docReq.setDarkmode(darkMode);
+    docReq.setBio(bio);
     try{
-        client.activateTemplate(docReq, function(err, GoLangResponse: SuccessStringReply) {
+        client.updateUserData(docReq, function(err, GoLangResponse: SuccessStringReply) {
         if(!GoLangResponse.getSuccess()){
             console.log(GoLangResponse.getMessage())
         }
+        
         res.json({
             success : GoLangResponse.getSuccess(),
             message: GoLangResponse.getMessage(),

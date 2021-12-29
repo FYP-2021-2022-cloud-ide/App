@@ -75,6 +75,7 @@ export default async function handler(
               active: t.getActive(),
               isExam:t.getIsExam(),
               timeLimit:t.getTimeLimit(),
+              allow_notification:t.getAllowNotification(),
               containerID:t.getContaineridList()[0],
             })
           })

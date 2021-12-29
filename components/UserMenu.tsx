@@ -35,7 +35,7 @@ export default function UserMenu({sub,name,email}: UserMenuProps) {
                 <div className="text-xs text-gray-500 dark:text-gray-400">{email}</div>
             </div>
             <div className="px-1 py-1">
-              <Menu.Item>
+              {/* <Menu.Item>
                 {({ active }) => (
                   <button
                     className={`${
@@ -45,16 +45,18 @@ export default function UserMenu({sub,name,email}: UserMenuProps) {
                     Profile
                   </button>
                 )}
-              </Menu.Item>
+              </Menu.Item> */}
               <Menu.Item>
                 {({ active }) => (
+                  <Link href="/settings">
                   <button
                     className={`${
                         active ? 'bg-gray-200 dark:bg-gray-500 dark:font-semibold' : ''
                     } text-[#775FBD] dark:text-gray-300 group flex rounded-md items-center w-full px-2 py-2 text-sm`}
                   >
-                    Setting
+                    Settings
                   </button>
+                  </Link>
                 )}
               </Menu.Item>
               <Menu.Item>

@@ -27,7 +27,7 @@ export default async function handler(
        target,
        grpc.credentials.createInsecure());
     
-    const {templateId, templateName, section_user_id, containerId, description, isExam, timeLimit} = JSON.parse(req.body);
+    const {templateId, templateName, section_user_id, containerId, description, isExam, timeLimit,allow_notification} = JSON.parse(req.body);
     if (section_user_id != undefined && containerId != undefined){
       if(!(await checkInSectionBySectionUserId(req.oidc.user.sub, section_user_id)) || !(await checkHaveContainer(containerId, req.oidc.user.sub))  || !(await checkRoleBySectionUserId(req.oidc.user.sub, section_user_id, "instructor")))
       {res.json(unauthorized());return}
@@ -44,6 +44,7 @@ export default async function handler(
     docReq.setDescription(description);
     docReq.setIsExam(isExam)
     docReq.setTimeLimit(timeLimit)
+    docReq.setAllowNotification(allow_notification)
     try{
       client.updateTemplate(docReq, function(err, GoLangResponse: SuccessStringReply) {
         if(!GoLangResponse.getSuccess()){

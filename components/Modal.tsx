@@ -8,10 +8,11 @@ type CloseModal = (...args: Boolean[]) => void
 interface ModalProps {
     children: React.ReactNode;
     isOpen: Boolean;
-    setOpen: React.Dispatch<React.SetStateAction<boolean>>
+    setOpen: React.Dispatch<React.SetStateAction<boolean>> , 
+    outsideToClose? : boolean
  }
 
-function Modal({children, isOpen, setOpen}:ModalProps){
+function Modal({children, isOpen, setOpen , outsideToClose = false}:ModalProps){
     const {isDark} = useTheme(); 
     return(
         //@ts-ignore
@@ -33,7 +34,10 @@ function Modal({children, isOpen, setOpen}:ModalProps){
                 <Dialog
                 as="div"
                 className={`fixed inset-0 z-10 overflow-y-auto ${isDark? "dark": ""}`}
-                onClose={()=>setOpen(false)}
+                onClose={()=>{
+                    if(outsideToClose)
+                        setOpen(false)
+                }}
                 >
                     <div className="min-h-screen w-full px-4 text-center">
                         <Transition.Child

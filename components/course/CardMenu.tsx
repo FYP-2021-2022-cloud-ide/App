@@ -27,7 +27,7 @@ export default function CardMenu({ items }: MenuProps) {
                             {
                                 items.map(item => {
                                     return (
-                                        <Menu.Item>
+                                        <Menu.Item key={item.text}>
                                             {({ active }) => (
                                                 <button
                                                     className={`${active ? 'bg-gray-200 dark:bg-gray-800 font-semibold' : ''

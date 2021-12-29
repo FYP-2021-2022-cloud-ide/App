@@ -5,12 +5,12 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 type Data = {
   success: boolean
   message:string
-  notification: string
+  notificationId: string
 }
 
 import * as grpc from 'grpc';
 
-import {    GetNotificationTokenReply,  SubRequest } from '../../../proto/dockerGet/dockerGet_pb';
+import {    SendNotificationReply,  SendNotificationRequest } from '../../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
 
 export default function handler(
@@ -24,19 +24,20 @@ export default function handler(
         target,
         grpc.credentials.createInsecure());
 
-    var body = JSON.parse(req.body);
-    var docReq = new SubRequest();
-    docReq.setSub(body.sub);
+    const {title, body, sender, receiver, allowReply} = JSON.parse(req.body);
+    var docReq = new SendNotificationRequest();
+    docReq.setTitle(title)
+    docReq.setBody(body)
+    docReq.setSender(sender)
+    docReq.setReceiver(receiver)
+    docReq.setAllowReply(allowReply)
     try{
-        client.getNotificationToken(docReq, function(err, GoLangResponse: GetNotificationTokenReply) {
+        client.sendNotification(docReq, function(err, GoLangResponse: SendNotificationReply) {
             console.log(GoLangResponse)
-            if(!GoLangResponse.getSuccess()){
-                console.log(GoLangResponse.getMessage())
-            }
             res.json({
                 success : GoLangResponse.getSuccess(),
                 message: GoLangResponse.getMessage(),
-                notification: GoLangResponse.getNotificationToken()
+                notificationId: GoLangResponse.getNotificationId(),
             })
             res.status(200).end();
             }

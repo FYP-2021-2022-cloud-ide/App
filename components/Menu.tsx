@@ -31,7 +31,8 @@ const Menu = ({ sub, name, email }: props) => {
                 <NotiStack/>
                 {/* <QuestionMarkCircleIcon className='w-6 h-6 hover:scale-110 transition  ease-in-out duration-300 dark:text-gray-300'></QuestionMarkCircleIcon> */}
                 {
-                    isDark ? <SunIcon className="w-6 h-6 text-yellow-400" onClick={() => setDark(!isDark)}></SunIcon> : <MoonIcon className='w-6 h-6 hover:scale-110 transition-all ease-in-out duration-300' onClick={() => setDark(!isDark)}></MoonIcon>
+                    isDark ? <SunIcon className="w-6 h-6 text-yellow-400" onClick={() => setDark(!isDark)}></SunIcon> :
+                     <MoonIcon className='w-6 h-6 hover:scale-110 transition-all ease-in-out duration-300' onClick={() => setDark(!isDark)}></MoonIcon>
                 }
             </div>
         </div>

@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import {HomeIcon, UserGroupIcon, CubeTransparentIcon, CogIcon, AnnotationIcon} from '@heroicons/react/outline'
+import {HomeIcon, UserGroupIcon, CubeTransparentIcon, CogIcon, AnnotationIcon, CloudIcon} from '@heroicons/react/outline'
 import { useRouter } from "next/router";
 
 const SideBar = () => {
@@ -9,7 +9,8 @@ const SideBar = () => {
       // {name:"Teams",link:"/Teams", icon:UserGroupIcon},
       // {name:"Workspace",link:"/Workspace", icon:CubeTransparentIcon},
       // {name:"Setting",link:"/settings", icon:CogIcon},
-      {name:"Notifications", link:"/notifications", icon:AnnotationIcon}
+      {name:"Messages", link:"/messages", icon:AnnotationIcon},
+      {name:"Cloud", link:"/cloud", icon:CloudIcon}
     ]
     const router = useRouter();
     return (

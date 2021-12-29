@@ -27,13 +27,15 @@ const TemplateUpdate = React.forwardRef(({ sectionUserID, memLimit, numCPU, temp
     const [templateName, setTemplateName] = useState(template.name)
     const [isExam, setIsExam] = useState(template.isExam)
     const [timeLimit, setTimeLimit] = useState(template.timeLimit)
+    const [canNotify, setCanNotify]  =useState(true)
     const { updateTemplate, addContainer, removeContainer, sub } = useCnails();
     const [containerID, setContainerID] = useState("")
 
     const dialogClass = "inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl text-[#415A6E]"
     const titleClass = "text-xl font-medium leading-6 dark:text-gray-300 mb-5"
-    const buttonsClass = "sm:flex sm:flex-row-reverse mt-4"
-    const okButtonClass = "inline-flex justify-center w-full md:w-32 rounded-md px-4 py-2 bg-green-500 hover:bg-green-600 text-base leading-6 font-medium text-white shadow-sm focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5"
+    const buttonsClass = "sm:flex sm:flex-row-reverse mt-4 "
+    const okButtonClass = "text-sm  mx-2 w-fit rounded-md px-4 py-2 bg-green-500 hover:bg-green-600 text-base leading-6 font-medium text-white shadow-sm focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5"
+    const cancelButtonClass  = "text-sm mx-2 w-fit rounded-md px-4 py-2 bg-gray-400 hover:bg-gray-500 text-base leading-6 font-medium text-white shadow-sm focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5"
     const inputClass = "border dark:border-0 focus:outline-none dark:bg-gray-700 p-1 px-3 w-full text-gray-500 dark:text-gray-300 flex-row space-x-2  text-left rounded-md shadow-lg"
 
     switch (step) {
@@ -77,7 +79,7 @@ const TemplateUpdate = React.forwardRef(({ sectionUserID, memLimit, numCPU, temp
                             onClick={async () => {
                                 setFinishLoading(false)
                                 nextStep()
-                                const response = await updateTemplate(template.id, templateName, description, sectionUserID, containerID, isExam, timeLimit)
+                                const response = await updateTemplate(template.id, templateName, description, sectionUserID, containerID, isExam, timeLimit,canNotify)
                                 if (response.success) {
                                     setFinishLoading(true)
                                 } else {
@@ -96,7 +98,7 @@ const TemplateUpdate = React.forwardRef(({ sectionUserID, memLimit, numCPU, temp
                             if (response.success) {
                                 setFinishLoading(true)
                             }
-                        }} className={okButtonClass + ""}>
+                        }} className={cancelButtonClass}>
                             Cancel
                         </button>
                     </div>
@@ -165,7 +167,14 @@ const TemplateUpdate = React.forwardRef(({ sectionUserID, memLimit, numCPU, temp
                                 onChange={(e) => setTimeLimit(parseInt(e.target.value))}></input>
                         </div>
                     }
-
+                    <div className="font-medium mt-4 dark:text-gray-300">
+                        Can students send question to tutors? 
+                    </div>
+                    <input className="focus:outline-none dark:bg-gray-600 dark:text-gray-600" type="checkbox"
+                        checked={canNotify}
+                        onChange={(e) => setCanNotify(!canNotify)}></input>
+                    <div className={buttonsClass}></div>
+                    
                     <div className={buttonsClass}>
                         <button
                             onClick={async () => {
@@ -181,11 +190,10 @@ const TemplateUpdate = React.forwardRef(({ sectionUserID, memLimit, numCPU, temp
                         </button>
                         <button
                             onClick={async () => {
-                                const response = await updateTemplate(template.id, templateName, description, sectionUserID, "", isExam, timeLimit)
+                                const response = await updateTemplate(template.id, templateName, description, sectionUserID, "", isExam, timeLimit,canNotify)
                                 if (response.success) {
                                     window.location.reload();
                                 }
-
                             }}
                             className={okButtonClass}>
                             Finish
