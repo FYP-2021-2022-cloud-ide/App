@@ -42,13 +42,9 @@ interface CnailsContextState {
     removeNotification:(userId:string, notificationId:string)=> Promise<any>,
 
     listFolders:(userId:string)=> Promise<any>,
-<<<<<<< HEAD
     downloadFile:(userId:string, filePath:string)=> Promise<any>,
     uploadFile:(userId:string, filePath:string,blob:Blob)=> Promise<any>,
     removeFile:(userId:string, filePath:string)=> Promise<any>,
-=======
-
->>>>>>> 00b64033b02359dfc4451d774a71a3763aacbf9b
     sub: string,
     name: string,
     email: string,
