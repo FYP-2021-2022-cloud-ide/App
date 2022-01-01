@@ -1,4 +1,4 @@
-export default ()=>{
+export default function table(){
     return(
         <div className="relative rounded-xl overflow-auto">
             <div className="shadow-sm overflow-hidden my-8">
