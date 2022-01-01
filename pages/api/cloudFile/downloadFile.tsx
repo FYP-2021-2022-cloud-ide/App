@@ -1,8 +1,11 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
+<<<<<<< HEAD
 import fs from 'fs';
 import path from 'path';
 
+=======
+>>>>>>> 00b64033b02359dfc4451d774a71a3763aacbf9b
 
 type Data = {
   success: boolean
@@ -19,7 +22,11 @@ type FileChunk= {
 
 import * as grpc from 'grpc';
 
+<<<<<<< HEAD
 import {  DownloadRequest,  DownloadReply } from '../../../proto/dockerGet/dockerGet_pb';
+=======
+import {  DownloadReuqest,  DownloadReply } from '../../../proto/dockerGet/dockerGet_pb';
+>>>>>>> 00b64033b02359dfc4451d774a71a3763aacbf9b
 import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
 
 
