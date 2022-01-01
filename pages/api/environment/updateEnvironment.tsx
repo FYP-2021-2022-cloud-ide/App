@@ -28,12 +28,13 @@ export default async function handler(
        grpc.credentials.createInsecure());
     
     const{envId, name, section_user_id, containerId, description} = JSON.parse(req.body);
-    if (section_user_id != undefined && containerId != undefined){
-      if(!(await checkInSectionBySectionUserId(req.oidc.user.sub, section_user_id)) || !(await checkHaveContainer(containerId, req.oidc.user.sub)) )
-      {res.json(unauthorized()); return;}
-    }else{
-      res.json(unauthorized())
-    }
+    // if (section_user_id != undefined && containerId != undefined){
+    //   {/* @ts-ignore */}
+    //   if(!(await checkInSectionBySectionUserId(req.oidc.user.sub, section_user_id)) || !(await checkHaveContainer(containerId, req.oidc.user.sub)) )
+    //   {res.json(unauthorized()); return;}
+    // }else{
+    //   res.json(unauthorized())
+    // }
 
     var docReq = new UpdateEnvironmentRequest();
     docReq.setEnvironmentid(envId);

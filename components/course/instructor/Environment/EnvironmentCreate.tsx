@@ -6,7 +6,7 @@ import { finished } from "stream";
 import Loader from "../../../../components/Loader"
 import ListBox , {Option}from "../ListBox";
 import { useCnails } from "../../../../contexts/cnails";
-
+import {toast} from "react-hot-toast"
 interface EnvironmentCreateProps {
     sectionUserID: string
     closeModal: MouseEventHandler<HTMLButtonElement> | undefined
@@ -16,11 +16,11 @@ const EnvironmentCreate = React.forwardRef(({ sectionUserID, closeModal }: Envir
     const [mode, setMode] = useState("")
     const [environmentName, setEnvironmentName] = useState("")
     const [description, setDescription] = useState("")
-    const rootImage = "78c40a8078d2"
+    const rootImage = "5cd49927fb40"
     const options : Option[] = [
         { value: 'C++/C', id: 'a2f570bc987f' },
         { value: 'Python3', id: '4610218071a3' },
-        { value: 'Java', id: '70a334aadbd4' },
+        { value: 'Java', id: '339c3a6ed6f3' },
     ]
 
     const CPU = 0.5
@@ -38,8 +38,9 @@ const EnvironmentCreate = React.forwardRef(({ sectionUserID, closeModal }: Envir
     // styles 
     const dialogClass = "inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl text-[#415A6E]"
     const titleClass = "text-xl font-medium leading-6 dark:text-gray-300 mb-5"
-    const buttonsClass = "sm:flex sm:flex-row-reverse mt-4"
-    const okButtonClass = "inline-flex justify-center w-full md:w-32 rounded-md px-4 py-2 bg-green-500 hover:bg-green-600 text-base leading-6 font-medium text-white shadow-sm focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5"
+    const buttonsClass = "sm:flex sm:flex-row-reverse mt-4 "
+    const okButtonClass = "text-sm  mx-2 w-fit rounded-md px-4 py-2 bg-green-500 hover:bg-green-600 text-base leading-6 font-medium text-white shadow-sm focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5"
+    const cancelButtonClass  = "text-sm mx-2 w-fit rounded-md px-4 py-2 bg-gray-400 hover:bg-gray-500 text-base leading-6 font-medium text-white shadow-sm focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5"
     const inputClass = "border dark:border-0 focus:outline-none dark:bg-gray-700 p-1 px-3 w-full text-gray-500 dark:text-gray-300 flex-row space-x-2  text-left rounded-md shadow-lg"
     
     switch (mode) {
@@ -73,10 +74,11 @@ const EnvironmentCreate = React.forwardRef(({ sectionUserID, closeModal }: Envir
                             <div className="py-2 m-auto text-gray-600 dark:text-gray-300">
                                 A new container is prepared, please click the following link and set up the environment. After finished the setting, please press the finish button to save the environment
                             </div>
-                            <a className="flex text-blue-500 underline justify-center" href={"https://codespace.ust.dev/user/container/" + containerID + "/"} target="_blank">
+                            <a className="flex text-blue-500 underline justify-center" href={"https://codespace.ust.dev/user/container/" + containerID + "/"} target="_blank" rel="noreferrer">
                                 Click Here
                             </a>
                             <div className={buttonsClass}>
+                                
                                 <button
                                     onClick={async () => {
                                         setFinishLoading(false)
@@ -90,6 +92,16 @@ const EnvironmentCreate = React.forwardRef(({ sectionUserID, closeModal }: Envir
                                     className={okButtonClass}>
                                     Finish
                                 </button>
+                                <button onClick={async()=>{
+                                        setFinishLoading(false)
+                                        nextStep();
+                                        const response = await removeContainer(containerID, sub)
+                                        if(response.success){
+                                            setFinishLoading(true)
+                                        }
+                                    }} className={cancelButtonClass}>
+                                    Cancel
+                                </button> 
                             </div>
                         </div>
                     )
@@ -135,6 +147,7 @@ const EnvironmentCreate = React.forwardRef(({ sectionUserID, closeModal }: Envir
 
 
                             <div className={buttonsClass}>
+                               
                                 <button
                                     onClick={async () => {
                                         nextStep()
@@ -155,7 +168,7 @@ const EnvironmentCreate = React.forwardRef(({ sectionUserID, closeModal }: Envir
                                     className={okButtonClass}>
                                     Next
                                 </button>
-
+                                 <button className={cancelButtonClass} onClick={closeModal}>Cancel</button>
                             </div>
                         </div>
                     )
@@ -208,6 +221,7 @@ const EnvironmentCreate = React.forwardRef(({ sectionUserID, closeModal }: Envir
                                 onChange={(e) => setDescription(e.target.value)}></textarea>
 
                             <div className={buttonsClass}>
+                                
                                     <button
                                         onClick={async () => {
 
@@ -222,6 +236,7 @@ const EnvironmentCreate = React.forwardRef(({ sectionUserID, closeModal }: Envir
                                         className={okButtonClass}>
                                         Next
                                     </button>
+                                    <button className={cancelButtonClass} onClick={closeModal }>Cancel</button>
                             </div>
                         </div>
                     )
@@ -237,8 +252,9 @@ const EnvironmentCreate = React.forwardRef(({ sectionUserID, closeModal }: Envir
                     <p className="text-gray-600 dark:text-gray-300 mb-5">Use predefined environment?</p>
 
                     <div className="flex flex-row-reverse">
-                        <button className="px-4 py-2 bg-green-400 text-white rounded-md mx-2" onClick={() => { setMode("preset") }}>Yes</button>
-                        <button className="px-4 py-2 bg-gray-400 text-white rounded-md mx-2" onClick={() => { setMode("custom") }}>Use Custom Environment</button>
+                        <button className={okButtonClass} onClick={() => { setMode("preset") }}>Yes</button>
+                        <button className={cancelButtonClass} onClick={() => { setMode("custom") }}>Use Custom Environment</button>
+                        <button className={cancelButtonClass} onClick={closeModal}>Cancel</button>
                     </div>
                 </div>
             )

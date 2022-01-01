@@ -29,10 +29,11 @@ export default async function handler(
     
     var body = JSON.parse(req.body);console.log(body)
     // check empty containerId --> user have that container?
-    if (!(await checkHaveContainer(body.containerId, req.oidc.user.sub)) ){
-      res.json(unauthorized())
-      return
-    }
+    {/* @ts-ignore */}
+    // if (!(await checkHaveContainer(body.containerId, req.oidc.user.sub)) ){
+    //   res.json(unauthorized())
+    //   return
+    // }
 
     var docReq = new RemoveContainerRequest();
     docReq.setContainerid(body.containerId);

@@ -40,7 +40,7 @@ function WorkSpace({container}:WorkSpaceProps){
                 <div className="w-11/12 text-left">
                     <div className="text-[#578CB5] font-semibold text-sm">{container.assignmentName}</div>
                     <div>
-                        <a href={link} target="_blank" 
+                        <a href={link} target="_blank"  rel="noreferrer"
                         className="font-medium text-xs text-gray-600 underline">{container.containerID}</a>
                     </div>
                     <div className="flex flex-row justify-start">

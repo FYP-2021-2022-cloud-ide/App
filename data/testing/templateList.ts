@@ -11,6 +11,9 @@ const data : props = {
             storage : "the url of the storage space" , 
             containerID :"some container id " , 
             active : true , 
+            isExam: true,
+            timeLimit:60,
+            allow_notification:true,
         },  
         {
             id : "some template id" , 
@@ -21,6 +24,9 @@ const data : props = {
             storage : "the url of the storage space" , 
             containerID :"some container id " , 
             active : true , 
+            isExam: true,
+            timeLimit:60,
+            allow_notification:true,
         },  
         {
             id : "some template id" , 
@@ -31,6 +37,9 @@ const data : props = {
             storage : "the url of the storage space" , 
             containerID :"some container id " , 
             active : true , 
+            isExam: true,
+            timeLimit:60,
+            allow_notification:true,
         },  
         {
             id : "some template id" , 
@@ -41,6 +50,9 @@ const data : props = {
             storage : "the url of the storage space" , 
             containerID :"some container id " , 
             active : true , 
+            isExam: true,
+            timeLimit:60,
+            allow_notification:true,
         },  
     ] , 
     environments : [
@@ -49,18 +61,21 @@ const data : props = {
             imageId : "some image id " , 
             environmentName : "some environemtn name" , 
             description : "soem description" , 
+            libraries:"",
         }, 
         {
             id: "some environment id " , 
             imageId : "some image id " , 
             environmentName : "some environemtn name" , 
             description : "soem description" , 
+            libraries:"",
         }, 
         {
             id: "some environment id " , 
             imageId : "some image id " , 
             environmentName : "some environemtn name" , 
             description : "soem description" , 
+            libraries:"",
         }, 
     ], 
     sectionUserID : "section user id "

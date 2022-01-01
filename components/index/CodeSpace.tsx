@@ -15,7 +15,7 @@ interface Item {
 function CodeSpace({ item }: CodeSpaceItemProps) {
     // const { removeContainer} = useCnails();
     return (
-        <a target="_blank" href={"https://codespace.ust.dev/user/container/" + item.containerID + "/"} className="my-3 flex flex-col h-full justify-between
+        <a target="_blank"  rel="noreferrer" href={"https://codespace.ust.dev/user/container/" + item.containerID + "/"} className="my-3 flex flex-col h-full justify-between
         rounded-xl border-gray-200 dark:border-gray-700 border shadow-sm hover:shadow-lg min-w-max mr-4 transition-all ease-in-out duration-300 p-4 bg-white dark:bg-gray-600">
 
             <div className="flex flex-row  space-x-4 items-start ">

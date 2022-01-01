@@ -58,7 +58,7 @@ const WorkSpaceList = ({containers,courseName,sectionUserID}:props)=>{//
             <div className="flex flex-col space-y-5">
                 {containers!=null && containers.map((container)=>{
                     return(
-                        <div>
+                        <div key={container.containerID}>
                             {container.courseTitle==courseName &&
                             <WorkSpace container={container}></WorkSpace>
                             }

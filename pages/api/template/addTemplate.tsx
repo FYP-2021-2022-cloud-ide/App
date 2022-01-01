@@ -29,14 +29,15 @@ export default async function handler(
        target,
        grpc.credentials.createInsecure());
     
-    const {templateName, section_user_id, assignment_config_id, containerId, description, active, isExam, timeLimit} = JSON.parse(req.body);
-    if (section_user_id != undefined && containerId != undefined){
-      if(!(await checkInSectionBySectionUserId(req.oidc.user.sub, section_user_id)) || !(await checkHaveContainer(containerId, req.oidc.user.sub))  || !(await checkRoleBySectionUserId(req.oidc.user.sub, section_user_id, "instructor")))
-      {res.json(unauthorized());return}
-    }else{
-      res.json(unauthorized())
-      return
-    }
+    const {templateName, section_user_id, assignment_config_id, containerId, description, active, isExam, timeLimit,allow_notification} = JSON.parse(req.body);
+    // if (section_user_id != undefined && containerId != undefined){
+    //   {/* @ts-ignore */}
+    //   if(!(await checkInSectionBySectionUserId(req.oidc.user.sub, section_user_id)) || !(await checkHaveContainer(containerId, req.oidc.user.sub))  || !(await checkRoleBySectionUserId(req.oidc.user.sub, section_user_id, "instructor")))
+    //   {res.json(unauthorized());return}
+    // }else{
+    //   res.json(unauthorized())
+    //   return
+    // }
     var docReq = new AddTemplateRequest();
     docReq.setName(templateName);
     docReq.setSectionUserId(section_user_id);
@@ -46,6 +47,7 @@ export default async function handler(
     docReq.setActive(active)
     docReq.setIsExam(isExam)
     docReq.setTimeLimit(timeLimit)
+    docReq.setAllowNotification(allow_notification)
     try{
       client.addTemplate(docReq, function(err, GoLangResponse: AddTemplateReply) {
         if(!GoLangResponse.getSuccess()){

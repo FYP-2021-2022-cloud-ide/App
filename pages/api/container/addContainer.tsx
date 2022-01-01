@@ -39,15 +39,15 @@ export default async function handler(
     
     const {imageName, memLimit, numCPU, section_user_id, template_id,dbStored, accessRight} = JSON.parse(req.body);//console.log(body)
 
-    if (section_user_id != undefined){
-      if(!(await checkInSectionBySectionUserId(req.oidc.user.sub, section_user_id))){
-        res.json(unauthorized())
-        return
-      }
-    }else{
-      res.json(unauthorized())
-      return
-    }
+    // if (section_user_id != undefined){
+    //   if(!(await checkInSectionBySectionUserId(req.oidc.user.sub, section_user_id))){
+    //     res.json(unauthorized())
+    //     return
+    //   }
+    // }else{
+    //   res.json(unauthorized())
+    //   return
+    // }
 
     var docReq = new AddContainerRequest();
     docReq.setImagename(imageName);

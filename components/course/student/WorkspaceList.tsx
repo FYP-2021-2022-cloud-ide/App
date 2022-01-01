@@ -23,7 +23,7 @@ const WorkspacesList = ({ templates, sectionUserId }: props) => {
             {(templates?.length == 0) ? <EmptyDiv message="There is no assignments yet."></EmptyDiv> :
                 <div className="grid grid-cols-2 gap-8">
                     {templates.map((template) => {
-                        return <Workspace template={template} sectionUserId={sectionUserId}></Workspace>
+                        return <Workspace key={template.id} template={template} sectionUserId={sectionUserId}></Workspace>
                     })}
                 </div>
             }

@@ -1,7 +1,7 @@
 import { NextPageContext } from "next";
 
 
-const Error = ({ statusCode }) => {
+const Error = ( statusCode:Number ) => {
   return (
     <p>
       {statusCode

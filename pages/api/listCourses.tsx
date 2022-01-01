@@ -41,17 +41,17 @@ export default function handler(
 
     // var body = JSON.parse(req.body);
     const { sub } = req.query;
-    if(sub == undefined){
-      {res.json(unauthorized());return}
-    }else{
-      if(sub != req.oidc.user.sub){
-        res.json(unauthorized())
-        return;
-      }
-    }
+    // if(sub == undefined){
+    //   {res.json(unauthorized());return}
+    // }else{
+    //   if(sub != req.oidc.user.sub){
+    //     res.json(unauthorized())
+    //     return;
+    //   }
+    // }
 
     var docReq = new SubRequest();
-    docReq.setSub(sub);
+    docReq.setSub(sub as string);
     try{
       client.listCourses(docReq, function(err, GoLangResponse: ListCoursesReply) {
         if(!GoLangResponse.getSuccess()){

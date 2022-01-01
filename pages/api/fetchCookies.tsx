@@ -8,7 +8,8 @@ type Data = {
   email: string
   userId: string
   semesterId: string
-  //cutMes: string[]
+  darkMode:string
+  bio:string
 }
 
 export default function handler(
@@ -16,12 +17,15 @@ export default function handler(
   res: NextApiResponse<Data>
   ) {
     //console.log(req.headers.cookie!)
-    const {sub, name, email, userId, semesterId} = parse(req.headers.cookie!)
+    const {sub, name, email, userId, semesterId , darkMode,bio} = parse(req.headers.cookie!)
     res.json({
         sub,
         name,
         email,
         userId,
-        semesterId
+        semesterId,
+        darkMode,
+        bio,
+      
     })
   }

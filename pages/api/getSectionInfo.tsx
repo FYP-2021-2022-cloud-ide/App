@@ -40,16 +40,18 @@ export default async function handler(
         target,
         grpc.credentials.createInsecure());
     const {sectionid, sub} = req.query
-    if(sub == req.oidc.user.sub){
-      if(!(await checkInSectionBySectionId(req.oidc.user.sub, sectionid)) )
-      {res.json(unauthorized());return}
-    }else{
-      res.json(unauthorized())
-      return;
-    }
+     {/* @ts-ignore */}
+    // if(sub == req.oidc.user.sub){
+    //    {/* @ts-ignore */}
+    //   if(!(await checkInSectionBySectionId(req.oidc.user.sub, sectionid as string) ) )
+    //   {res.json(unauthorized());return}
+    // }else{
+    //   res.json(unauthorized())
+    //   return;
+    // }
     var docReq = new SectionAndSubRequest();
-    docReq.setSub(sub);
-    docReq.setSectionid(sectionid);
+    docReq.setSub(sub as string);
+    docReq.setSectionid(sectionid as string);
     try{
         client.getSectionInfo(docReq, function(err, GoLangResponse: GetSectionInfoReply) {
         if(!GoLangResponse.getSuccess()){

@@ -25,6 +25,7 @@ export interface template {
     active: boolean
     isExam:boolean
     timeLimit:Number
+    allow_notification:boolean
 }
 
 
@@ -48,6 +49,9 @@ const TemplateList = ({ templates, sectionUserID, environments }: props) => {
         setIsOpen(false)
     }
 
+    const dialogClass = "inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl text-[#415A6E]"
+
+
     // building the environemnts list
     var environmentsList : Option[] = []
     for (let i = 0; i < environments.length; i++) {
@@ -64,11 +68,7 @@ const TemplateList = ({ templates, sectionUserID, environments }: props) => {
             <div className="flex flex-row text-gray-700 dark:text-gray-300 justify-start gap-x-4 pb-4">
                 <DocumentTextIcon className="w-7 h-7"></DocumentTextIcon>
                 <div className="text-lg">Templates</div>
-                <button onClick={() => {
-                    if (environments.length > 0) {
-                        openModal()
-                    }
-                }}>
+                <button onClick={openModal}>
                     <PlusCircleIcon className="w-7 h-7 hover:scale-110 transition ease-in-out duration-300"></PlusCircleIcon>
                 </button>
             </div>
@@ -79,15 +79,16 @@ const TemplateList = ({ templates, sectionUserID, environments }: props) => {
                         {
                             templates.map((template: template) => {
                                 return (
-                                    <Template template={template} memLimit={memLimit} numCPU={numCPU} sectionUserID={sectionUserID}></Template>
+                                    <Template key={template.id} template={template} memLimit={memLimit} numCPU={numCPU} sectionUserID={sectionUserID}></Template>
                                 );
                             })
                         }
                     </div>
             }
             <Modal isOpen={isOpen} setOpen={setIsOpen}>
-                <TemplateCreate closeModal={closeModal} memLimit={memLimit} numCPU={numCPU} environments={environmentsList} ref={ref} sectionUserID={sectionUserID}></TemplateCreate>
+                <TemplateCreate  closeModal={closeModal} memLimit={memLimit} numCPU={numCPU} environments={environmentsList} ref={ref} sectionUserID={sectionUserID}></TemplateCreate>
             </Modal>
+            
         </div>
     )
 }

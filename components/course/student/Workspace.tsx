@@ -5,7 +5,7 @@ import { useState } from 'react'
 import Menu from "../CardMenu";
 import Modal from "../../Modal"; 
 import { Dialog} from '@headlessui/react'
-import WorkspaceMenu from "./WorkspaceMenu"
+// import WorkspaceMenu from "./WorkspaceMenu"
 import Loader from "../../Loader"
 import {template}from "../instructor/Template/TemplateList"
 
@@ -53,7 +53,7 @@ function Workspace({template, sectionUserId}:WorkspaceProps){
                 <div className="w-full">
                     <div className="text-[#578CB5] font-semibold text-sm">{template.name}</div>
                     <div>
-                        <a href={template.imageId} target="_blank" 
+                        <a href={template.imageId} target="_blank"  rel="noreferrer"
                         className="font-medium text-xs text-gray-600 underline dark:text-gray-300">{template.imageId}</a>
                     </div>
                     

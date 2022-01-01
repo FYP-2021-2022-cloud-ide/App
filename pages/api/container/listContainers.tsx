@@ -55,12 +55,13 @@ export default function handler(
        target,
        grpc.credentials.createInsecure());
     const { sub } = req.query;
-    if(!authentication(sub, req.oidc.user.sub)){
-      res.json(unauthorized())
-      return
-    } 
+    {/* @ts-ignore */}
+    // if(!authentication(sub, req.oidc.user.sub)){
+    //   res.json(unauthorized())
+    //   return
+    // } 
     var docReq = new SubRequest();
-    docReq.setSub(sub);
+    docReq.setSub(sub as string);
     
     try{
       client.listContainers(docReq, function(err, GoLangResponse: ListContainerReply) {

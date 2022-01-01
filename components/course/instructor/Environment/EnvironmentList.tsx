@@ -45,7 +45,7 @@ const EnvironmentList = ({ sectionUserID, environments }: props) => {
                     <div className="grid grid-cols-2 gap-4">
                         {
                             environments.map(environment => {
-                                return <Environment sectionUserID={sectionUserID} environment={environment}></Environment>
+                                return <Environment key={environment.id} sectionUserID={sectionUserID} environment={environment}></Environment>
                             })
                         }
                     </div>

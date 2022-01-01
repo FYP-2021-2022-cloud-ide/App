@@ -30,13 +30,14 @@ export default async function handler(
        grpc.credentials.createInsecure());
     
     const {name, section_user_id, containerId, description} = JSON.parse(req.body);
-    if (section_user_id != undefined && containerId != undefined){
-      if(!(await checkInSectionBySectionUserId(req.oidc.user.sub, section_user_id)) || !(await checkHaveContainer(containerId, req.oidc.user.sub)) || !(await checkRoleBySectionUserId(req.oidc.user.sub, section_user_id, "instructor")))
-      {res.json(unauthorized()); return;}
-    }else{
-      res.json(unauthorized())
-      return
-    }
+    // if (section_user_id != undefined && containerId != undefined){
+    //   {/* @ts-ignore */}
+    //   if(!(await checkInSectionBySectionUserId(req.oidc.user.sub, section_user_id)) || !(await checkHaveContainer(containerId, req.oidc.user.sub)) || !(await checkRoleBySectionUserId(req.oidc.user.sub, section_user_id, "instructor")))
+    //   {res.json(unauthorized()); return;}
+    // }else{
+    //   res.json(unauthorized())
+    //   return
+    // }
     var docReq = new BuildEnvironmentRequest();
     docReq.setName(name);
     docReq.setSectionUserId(section_user_id);

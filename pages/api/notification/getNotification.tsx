@@ -10,7 +10,7 @@ type Data = {
 
 import * as grpc from 'grpc';
 
-import {    GetNotificationReply,  SubRequest } from '../../../proto/dockerGet/dockerGet_pb';
+import {    GetNotificationTokenReply,  SubRequest } from '../../../proto/dockerGet/dockerGet_pb';
 import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
 
 export default function handler(
@@ -28,7 +28,7 @@ export default function handler(
     var docReq = new SubRequest();
     docReq.setSub(body.sub);
     try{
-        client.getNotification(docReq, function(err, GoLangResponse: GetNotificationReply) {
+        client.getNotificationToken(docReq, function(err, GoLangResponse: GetNotificationTokenReply) {
             console.log(GoLangResponse)
             if(!GoLangResponse.getSuccess()){
                 console.log(GoLangResponse.getMessage())
@@ -36,7 +36,7 @@ export default function handler(
             res.json({
                 success : GoLangResponse.getSuccess(),
                 message: GoLangResponse.getMessage(),
-                notification: GoLangResponse.getNotification()
+                notification: GoLangResponse.getNotificationToken()
             })
             res.status(200).end();
             }

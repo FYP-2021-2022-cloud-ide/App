@@ -45,7 +45,7 @@ const Home = () => {
 
     <div className="w-full">
       {thisEnvironmentList && thisTemplateList ? (
-        <div className="flex flex-col font-bold px-8 w-full pt-10 min-h-screen text-gray-600 space-y-4">
+        <div className="flex flex-col font-bold px-8 w-full pt-10 text-gray-600 space-y-4">
           <Breadcrumbs elements={[{
             name : "Dashboard" , 
             path : "/"

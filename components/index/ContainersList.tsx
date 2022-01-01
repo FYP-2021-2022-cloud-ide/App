@@ -49,7 +49,7 @@ const ContainersList = ({ containers, containerInfo }: props) => {
         containers.length == 0 ? <EmptyDiv message="You have no active workspace."></EmptyDiv> :
           <div className="flex flex-wrap justify-start">
             {
-              containers.map((container, i) => <CodeSpace item={container}></CodeSpace>)
+              containers.map((container, i) => <CodeSpace key={container.containerID} item={container}></CodeSpace>)
             }
           </div>
       }

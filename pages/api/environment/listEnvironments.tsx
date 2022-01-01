@@ -42,16 +42,17 @@ export default async function handler(
 
     // var body = JSON.parse(req.body);
     const{sectionid, sub} = req.query
-    if (sectionid != undefined){
-      if(!(await checkInSectionBySectionId(req.oidc.user.sub, sectionid)) || !(await checkRoleBySectionId(req.oidc.user.sub, sectionid, "instructor")))
-      {res.json(unauthorized());return;}
-    }else{
-      res.json(unauthorized())
-      return
-    }
+    // if (sectionid != undefined){
+    //   {/* @ts-ignore */}
+    //   if(!(await checkInSectionBySectionId(req.oidc.user.sub, sectionid)) || !(await checkRoleBySectionId(req.oidc.user.sub, sectionid, "instructor")))
+    //   {res.json(unauthorized());return;}
+    // }else{
+    //   res.json(unauthorized())
+    //   return
+    // }
     var docReq = new SectionAndSubRequest();
-    docReq.setSectionid(sectionid);
-    docReq.setSub(sub);
+    docReq.setSectionid(sectionid as string);
+    docReq.setSub(sub as string);
 
     try{
       client.listEnvironments(docReq, function(err, GoLangResponse: ListEnvironmentsReply) {

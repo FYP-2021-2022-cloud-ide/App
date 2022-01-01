@@ -5,8 +5,8 @@ type Data = {
   message: string[]
 }
 import * as grpc from 'grpc';
-import { SubRequest, ListContainerReply, InstantAddContainerRequest, AddContainerReply, SectionAndSubRequest, GetSectionInfoReply, GetUserDataReply } from './proto/dockerGet/dockerGet_pb';
-import { DockerClient } from './proto/dockerGet/dockerGet_grpc_pb';
+import { SubRequest, ListContainerReply, InstantAddContainerRequest, AddContainerReply, SectionAndSubRequest, GetSectionInfoReply, GetUserDataReply } from '../proto/dockerGet/dockerGet_pb';
+import { DockerClient } from '../proto/dockerGet/dockerGet_grpc_pb';
 import express from 'express';
 import { Request, Response, NextFunction } from 'express';
 import { Socket } from 'node:dgram';
@@ -24,7 +24,7 @@ var http = require('http')
 const cookieParser = require('cookie-parser');
 const app = next({ dev })
 const handle = app.getRequestHandler()
-import { auth, requiresAuth } from 'express-openid-connect';
+import { auth, requiresAuth, OpenidRequest } from 'express-openid-connect';
 import { Header } from 'next/dist/lib/load-custom-routes';
 //import fetch from "node-fetch";
 
@@ -70,7 +70,8 @@ app.prepare().then(() => {
         scope: 'openid profile email'
       },
       session:{
-        absoluteDuration:SESSION_VALID_FOR,
+        rolling:false,
+        absoluteDuration:SESSION_VALID_FOR/1000,
       },
       afterCallback: async (req, res, session, decodedState) => {
         try {
@@ -98,18 +99,24 @@ app.prepare().then(() => {
             client.getUserData(docReq, function (err, GolangResponse: GetUserDataReply) {
               resolve({
                 userId: GolangResponse.getUserid(),
-                semesterId: GolangResponse.getSemesterid()
+                semesterId: GolangResponse.getSemesterid(),
+                darkMode:GolangResponse.getDarkmode(),
+                bio:GolangResponse.getBio(),
               })
             })
           }).then((value) => {
             //@ts-ignore
-            res.cookie('userId', value.userId, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `.${process.env.HOSTNAME}` });
+            res.cookie('userId', value.userId, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `${process.env.HOSTNAME}` });
             //@ts-ignore
-            res.cookie('semesterId', value.semesterId, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `.${process.env.HOSTNAME}` });
+            res.cookie('semesterId', value.semesterId, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `${process.env.HOSTNAME}` });
+            //@ts-ignore
+            res.cookie('darkMode', value.darkMode, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `${process.env.HOSTNAME}` });
+            //@ts-ignore
+            res.cookie('bio', value.bio, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `${process.env.HOSTNAME}` });
           })
-          res.cookie('sub', sub, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `.${process.env.HOSTNAME}` });
-          res.cookie('name', name, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `.${process.env.HOSTNAME}` });
-          res.cookie('email', email, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `.${process.env.HOSTNAME}` });
+          res.cookie('sub', sub, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `${process.env.HOSTNAME}` });
+          res.cookie('name', name, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `${process.env.HOSTNAME}` });
+          res.cookie('email', email, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `${process.env.HOSTNAME}` });
         } catch (error) {
           throw error
         }
@@ -139,6 +146,8 @@ app.prepare().then(() => {
       app.serveStatic(req, res, path)
     })
   });
+
+  
 
   // authentication logout 
   server.all('/logout', async function (req: Request, res: Response) {

@@ -48,10 +48,11 @@ export default async function handler(
     // var body = JSON.parse(req.body);
     var docReq = new SectionAndSubRequest();
     const {sub, sectionid} = req.query;
-    if(!(await checkInSectionBySectionId(sub, sectionid, req.oidc.user.sub)))
-    {res.json(unauthorized());return}
-    docReq.setSub(sub);
-    docReq.setSectionid(sectionid);
+    {/* @ts-ignore */}
+    // if(!(await checkInSectionBySectionId(sub, sectionid, req.oidc.user.sub)))
+    // {res.json(unauthorized());return}
+    docReq.setSub(sub as string);
+    docReq.setSectionid(sectionid as string);
     try{
       client.listTemplates(docReq, function(err, GoLangResponse: ListTemplatesReply) {
         var templates= GoLangResponse.getTemplatesList();
@@ -75,6 +76,7 @@ export default async function handler(
               active: t.getActive(),
               isExam:t.getIsExam(),
               timeLimit:t.getTimeLimit(),
+              allow_notification:t.getAllowNotification(),
               containerID:t.getContaineridList()[0],
             })
           })

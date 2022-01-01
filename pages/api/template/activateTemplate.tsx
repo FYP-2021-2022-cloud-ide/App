@@ -32,15 +32,17 @@ export default async function handler(
         grpc.credentials.createInsecure());
 
     const {templateId, section_user_id} = JSON.parse(req.body);
-    if (section_user_id != undefined){
-        if(!(await checkInSectionBySectionUserId(req.oidc.user.sub, section_user_id)) || !(await checkRoleBySectionUserId(req.oidc.user.sub, section_user_id, "instructor")))
-        {res.json(unauthorized()); return;}
-      }else{
-        res.json(unauthorized())
-        return
-      }
+    // if (section_user_id != undefined){
+    //   {/* @ts-ignore */}
+    //     if(!(await checkInSectionBySectionUserId(req.oidc.user.sub, section_user_id)) || !(await checkRoleBySectionUserId(req.oidc.user.sub, section_user_id, "instructor")))
+    //     {res.json(unauthorized()); return;}
+    //   }else{
+    //     res.json(unauthorized())
+    //     return
+    //   }
     var docReq = new TemplateIdRequest();
     docReq.setTemplateid(templateId);
+    docReq.setSectionUserId(section_user_id);
     try{
         client.activateTemplate(docReq, function(err, GoLangResponse: SuccessStringReply) {
         if(!GoLangResponse.getSuccess()){

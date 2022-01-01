@@ -16,13 +16,13 @@ interface CnailsProps extends AppProps {
 
 function CnailsApp({ Component, pageProps }: CnailsProps) {
   return (
-    <ThemeProvider>
       <CnailsProvider>
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
+        <ThemeProvider>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </ThemeProvider>
       </CnailsProvider>
-    </ThemeProvider>
 
   )
 }
