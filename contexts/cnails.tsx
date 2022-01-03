@@ -45,6 +45,7 @@ interface CnailsContextState {
     downloadFile:(userId:string, filePath:string)=> Promise<any>,
     uploadFile:(userId:string, filePath:string,blob:Blob)=> Promise<any>,
     removeFile:(userId:string, filePath:string)=> Promise<any>,
+    removeFileLocal:(userId:string,  filePath:string)=> Promise<any>,
     sub: string,
     name: string,
     email: string,
@@ -452,6 +453,15 @@ export const CnailsProvider = ({children}: CnailsProviderProps) => {
         })
         return res.json()
     }
+    const removeFileLocal = async (userId:string,filePath:string)=>{
+        var res =  await fetch('/api/cloudFile/removeFileLocal?userId='+userId,{
+            method: 'POST', 
+            body:JSON.stringify({ 
+                "filePath": filePath,
+            }),
+        })
+        return res.json()
+    }
     
     if (sub == "" || userId == "" ){
         return (
@@ -496,6 +506,7 @@ export const CnailsProvider = ({children}: CnailsProviderProps) => {
                     downloadFile,
                     uploadFile,
                     removeFile,
+                    removeFileLocal,
 
                     sub,
                     name,

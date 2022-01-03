@@ -51,31 +51,27 @@ export default  async function handler(
     })
 
 
-    // const data = await new Promise((resolve, reject) => {
-    //   const form = new IncomingForm();
-  
-    //   form.parse(req, (err, fields, files) => {
-    //     if (err) return reject(err);
-    //     resolve({ fields, files });
-    //   });
-    // });
-  
-    // const file = data?.files?.inputFile.path;
-    var form =new IncomingForm().parse(req, function(err, fields, files) {
-      console.log(files)
-      console.log(fields)
-    })
-
-    
-    const filePath_next = path.join(process.cwd(), `/public/uploadTest/data.txt`);
+    const data = await new Promise((resolve, reject) => {
+      const form = new IncomingForm();
+      form.parse(req, (err, fields, files) => {
+        if (err) return reject(err);
+        resolve({ fields, files });
+      });
+    });
+    //@ts-ignore
+    const file = data?.files?.file.filepath;
+    //@ts-ignore
+    const fileName = data?.files?.file.originalFilename
+    //@ts-ignore
+    const filePath = data?.fields?.filePath;
+    // const filePath_next = path.join(process.cwd(), `/public/uploadTest/data.txt`);
     // var readStream: fs.ReadStream = fs.createReadStream(data?.files?.nameOfTheInput.path);
-    var readStream:Duplex= bufferToStream(fs.readFileSync(filePath_next))
-    // console.log(readStream)
-   
+    var readStream:Duplex= bufferToStream(fs.readFileSync(file))
+
     var docReq=new UploadRequest()
     var metaData=new UploadRequest.UploadMetadata()
-    metaData.setFilepath("/volumes/7fac6d26-4f01-41c8-9b40-a9f372c7a691_project/_data/1/data.txt")
-      // filePath+"data.txt")
+    metaData.setFilepath(
+      filePath+fileName)
     metaData.setUserid(userId as string)
     docReq.setMetadata(metaData)
     call.write(docReq);

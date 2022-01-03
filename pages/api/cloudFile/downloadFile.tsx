@@ -5,16 +5,9 @@ import path from 'path';
 
 
 type Data = {
-  success: boolean
-  message:string
-  filechuck: FileChunk | null
+  filePath: string
 }
 
-type FileChunk= {
-  content: Uint8Array | string;
-  totalSize: string
-  transferred:string
-}
 
 
 import * as grpc from 'grpc';
@@ -32,25 +25,33 @@ export default function handler(
        target,
        grpc.credentials.createInsecure());
     const { userId } = req.query;
-    const {filePath} = JSON.parse(req.body);
+    var body = JSON.parse(req.body);
+    var filePath:string=body.filePath
+          
     var docReq = new DownloadRequest();
-    docReq.setFilepath(filePath as string)
+    docReq.setFilepath(filePath)
     docReq.setUserid(userId as string);
+    //get only the file name of the file
+    var fileName=filePath.split("/").slice(-1)[0]
+    // console.log(fileName)
+    var tmpPath=`/public/uploadTest/`+fileName
     
     try{
       var stream = client.downloadFile(docReq)
-      
-      stream.on('data', function(err:any, GoLangResponse: DownloadReply) {
-        // if(!GoLangResponse.getSuccess()){
-        console.log(GoLangResponse)
-        // }
-        const filePath_next = path.join(process.cwd(), `/public/uploadTest/download.txt`);
-        fs.writeFile(filePath_next, GoLangResponse.getContent_asU8(), (err) => {
-          if (err) throw err;
-          console.log('The file has been saved!');
-        })
+      const filePath_next = path.join(process.cwd(), tmpPath);
+      var outputFile = fs.createWriteStream(filePath_next)
+      stream.on('data', (GoLangResponse: DownloadReply,err:any) =>{
+        if(GoLangResponse!=undefined){
+          outputFile.write(GoLangResponse.getContent())
+        }else{
+          outputFile.write("fail to write chunk")
+        }
       })
+      
       stream.on('end',()=>{
+        outputFile.close()
+        // const imageBuffer = fs.readFileSync(filePath_next);\
+        res.json({filePath:filePath_next});
         res.status(200).end()
       })
     }

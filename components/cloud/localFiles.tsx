@@ -12,7 +12,7 @@ interface props{
 const LocalFiles = ({tree}:props)=>{
     return(
         <div className="border rounded-lg h-96">
-            {console.log('render')}
+            {/* {console.log('render')} */}
               local volume
               {(tree===undefined)?<div></div>:
                 <DisplayLocal tree={tree}></DisplayLocal>}     
@@ -39,8 +39,17 @@ files: {
 }[]
 }
 
+async function downloadFileURL(filePath:string){
+    // console.log(document.getElementById( "downloadToken" ))
+    var link=document.createElement('a');
+    var fileName=filePath.slice(filePath.lastIndexOf('/') + 1);
+    link.href = "/uploadTest/"+fileName;
+    link.download = fileName
+    link.click();
+}
+
 function FilesLocal({files}: filesLocalProps){
-const { userId,downloadFile,removeFile} = useCnails()
+const { userId,downloadFile,removeFile,removeFileLocal} = useCnails()
 
     return files.map((file) => {
     return(
@@ -51,10 +60,18 @@ const { userId,downloadFile,removeFile} = useCnails()
             <button className='bg-blue-500 hover:bg-blue-700 text-white   rounded '  
             onClick={async() => {
                 const res = await downloadFile(userId,file.path)
-                if (res.success){
-                    console.log(res)
-                }
-                }
+                    if (res!=undefined){
+                        console.log(res.filePath)
+                        await downloadFileURL(res.filePath)                       
+                    }
+                //remove the temp local file after the download
+                setTimeout(async()=>{
+                    const res2 =await removeFileLocal(userId,res.filePath)
+                    if (res.success){
+                        window.location.reload()
+                    }
+                },10000);
+            }
             } >download</button>
             <button className='bg-blue-500 hover:bg-blue-700 text-white rounded ' 
              onClick={async() => {
@@ -68,6 +85,7 @@ const { userId,downloadFile,removeFile} = useCnails()
     )
     })
 }
+
 
 function DisplayLocal({tree}:props){
     const childrenList = tree.children
