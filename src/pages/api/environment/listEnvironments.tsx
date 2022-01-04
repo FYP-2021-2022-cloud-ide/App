@@ -16,10 +16,8 @@ type Environment = {
   description: string
 }
 
-import * as grpc from 'grpc';
-
+import {grpcClient}from '../../../lib/grpcClient'
 import {  ListEnvironmentsReply,  SectionAndSubRequest } from '../../../proto/dockerGet/dockerGet_pb';
-import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
 import { checkInSectionBySectionId, checkRoleBySectionId } from '../../../lib/authentication';
 
 function unauthorized(){
@@ -34,12 +32,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
   ) {
-   // console.log("cunw")c
-    var target= 'api:50051';
-    var client = new DockerClient(
-       target,
-       grpc.credentials.createInsecure());
-
+    var client = grpcClient()
     // var body = JSON.parse(req.body);
     const{sectionid, sub} = req.query
     // if (sectionid != undefined){

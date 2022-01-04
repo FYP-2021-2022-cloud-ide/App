@@ -9,10 +9,8 @@ type Data = {
 
 
 
-import * as grpc from 'grpc';
-
+import {grpcClient}from '../../lib/grpcClient'
 import { SuccessStringReply   ,UpdateUserDataRequest } from '../../proto/dockerGet/dockerGet_pb';
-import { DockerClient } from '../../proto/dockerGet/dockerGet_grpc_pb';
 
   
 function unauthorized(){
@@ -37,10 +35,7 @@ export default async function handler(
   res: NextApiResponse<Data>
   ) 
 {
-    var target= 'api:50051';
-    var client = new DockerClient(
-        target,
-        grpc.credentials.createInsecure());
+  var client = grpcClient()
     const{sub}=req.query;
     const { darkMode, bio} = JSON.parse(req.body);//console.log(body)
     // if(!authentication(sub, req.oidc.user.sub)){

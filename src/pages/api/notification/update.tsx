@@ -7,22 +7,15 @@ type Data = {
   message:string
 }
 
-import * as grpc from 'grpc';
-
+import {grpcClient}from '../../../lib/grpcClient'
 import {    SuccessStringReply, UpdateSubscriptionRequest } from '../../../proto/dockerGet/dockerGet_pb';
-import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
 
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
   ) 
 {
-    console.log('inside update api')
-    var target= 'api:50051';
-    var client = new DockerClient(
-        target,
-        grpc.credentials.createInsecure());
-
+    var client = grpcClient()
     var body = JSON.parse(req.body);
     console.log(body)
     var docReq = new UpdateSubscriptionRequest();

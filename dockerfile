@@ -1,6 +1,5 @@
 FROM node:16
 
-USER 0
 # build the working directory
 RUN mkdir -p /app
 WORKDIR /app

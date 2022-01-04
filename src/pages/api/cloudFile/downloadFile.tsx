@@ -1,29 +1,21 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
+
 import fs from 'fs';
 import path from 'path';
 
+import {  DownloadRequest,  DownloadReply } from '../../../proto/dockerGet/dockerGet_pb';
+import {grpcClient}from '../../../lib/grpcClient'
 
 type Data = {
   filePath: string
 }
 
-
-
-import * as grpc from 'grpc';
-
-import {  DownloadRequest,  DownloadReply } from '../../../proto/dockerGet/dockerGet_pb';
-import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
-
-
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
   ) {
-    var target= 'api:50051';
-    var client = new DockerClient(
-       target,
-       grpc.credentials.createInsecure());
+    var client = grpcClient()
     const { userId } = req.query;
     var body = JSON.parse(req.body);
     var filePath:string=body.filePath

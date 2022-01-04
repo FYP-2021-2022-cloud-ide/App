@@ -5,11 +5,8 @@ type Data = {
   success:boolean
   message: string
 }
-import * as grpc from 'grpc';
-
+import {grpcClient}from '../../../lib/grpcClient'
 import {  SuccessStringReply,TemplateIdRequest  } from '../../../proto/dockerGet/dockerGet_pb';
-import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
-import { checkInSectionBySectionUserId, checkRoleBySectionUserId } from '../../../lib/authentication';
 
 
 function unauthorized(){
@@ -23,11 +20,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
   ) {
-    var target= 'api:50051';
-    var client = new DockerClient(
-       target,
-       grpc.credentials.createInsecure());
-    
+
+    var client = grpcClient()
     const {templateId, section_user_id} = JSON.parse(req.body);
     // if (section_user_id != undefined){
     //    {/* @ts-ignore */}

@@ -6,11 +6,10 @@ type Data = {
   message: string
   environmentID:string
 }
-import * as grpc from 'grpc';
 
 import {  AddEnvironmentReply,  BuildEnvironmentRequest } from '../../../proto/dockerGet/dockerGet_pb';
-import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
 import { checkHaveContainer, checkInSectionBySectionUserId, checkRoleBySectionUserId } from '../../../lib/authentication';
+import {grpcClient}from '../../../lib/grpcClient'
 
 function unauthorized(){
   return({
@@ -24,11 +23,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
   ) {
-    var target= 'api:50051';
-    var client = new DockerClient(
-       target,
-       grpc.credentials.createInsecure());
-    
+    var client = grpcClient()
     const {name, section_user_id, containerId, description} = JSON.parse(req.body);
     // if (section_user_id != undefined && containerId != undefined){
     //   {/* @ts-ignore */}

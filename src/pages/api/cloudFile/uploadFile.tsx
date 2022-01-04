@@ -2,9 +2,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { IncomingForm } from 'formidable'
 import fs from 'fs';
+import {grpcClient}from '../../../lib/grpcClient'
 import {Duplex}  from 'stream'; 
 import path from 'path';
+import {  UploadRequest,  UploadReply } from '../../../proto/dockerGet/dockerGet_pb';
 // import async from 'async'
+
 type Data = {
   success: boolean
   message:string
@@ -18,20 +21,11 @@ export const config = {
 };
 
 
-import * as grpc from 'grpc';
-
-import {  UploadRequest,  UploadReply } from '../../../proto/dockerGet/dockerGet_pb';
-import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
-
-
 export default  async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
   ) {
-    var target= 'api:50051';
-    var client = new DockerClient(
-       target,
-       grpc.credentials.createInsecure());
+    var client = grpcClient()
     const { userId } = req.query;
     // const {filePath,file} = JSON.parse(req.body);
     // var formData :FormData=req.body

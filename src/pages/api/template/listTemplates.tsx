@@ -20,11 +20,8 @@ type Template = {
 }
 
 
-import * as grpc from 'grpc';
-
+import {grpcClient}from '../../../lib/grpcClient'
 import {    ListTemplatesReply,  SectionAndSubRequest } from '../../../proto/dockerGet/dockerGet_pb';
-import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
-import { checkInSectionBySectionId } from '../../../lib/authentication';
 
 
 function unauthorized(){
@@ -39,12 +36,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
   ) {
-   console.log("listTemplate")
-    var target= 'api:50051';
-    var client = new DockerClient(
-       target,
-       grpc.credentials.createInsecure());
-
+    var client = grpcClient()
     // var body = JSON.parse(req.body);
     var docReq = new SectionAndSubRequest();
     const {sub, sectionid} = req.query;

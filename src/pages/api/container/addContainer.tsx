@@ -1,17 +1,15 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
+import {grpcClient}from '../../../lib/grpcClient'
+import {  AddContainerReply,  AddContainerRequest } from '../../../proto/dockerGet/dockerGet_pb';
+import { checkInSectionBySectionUserId } from '../../../lib/authentication';
+
 
 type Data = {
   success:boolean
   message: string
   containerID:string
 }
-import * as grpc from 'grpc';
-
-import {  AddContainerReply,  AddContainerRequest } from '../../../proto/dockerGet/dockerGet_pb';
-import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
-import { checkInSectionBySectionUserId } from '../../../lib/authentication';
-
 function unauthorized(){
   return({
     success: false,
@@ -32,10 +30,7 @@ export default async function handler(
     //   })
     // }
 
-    var target= 'api:50051';
-    var client = new DockerClient(
-       target,
-       grpc.credentials.createInsecure());
+    var client = grpcClient()
     
     const {imageName, memLimit, numCPU, section_user_id, template_id,dbStored, accessRight} = JSON.parse(req.body);//console.log(body)
 

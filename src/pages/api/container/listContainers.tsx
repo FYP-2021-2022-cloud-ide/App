@@ -1,5 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
+import {grpcClient}from '../../../lib/grpcClient'
+import {  ListContainerReply,  SubRequest } from '../../../proto/dockerGet/dockerGet_pb';
 
 type Data = {
   success: boolean
@@ -21,10 +23,6 @@ type Container = {
   containerID: string
 }
 
-import * as grpc from 'grpc';
-
-import {  ListContainerReply,  SubRequest } from '../../../proto/dockerGet/dockerGet_pb';
-import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
 
 function authentication(sub: string|string[], oidcSub: string){
   if(sub == undefined){
@@ -50,10 +48,7 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
   ) {
-    var target= 'api:50051';
-    var client = new DockerClient(
-       target,
-       grpc.credentials.createInsecure());
+    var client = grpcClient()
     const { sub } = req.query;
     {/* @ts-ignore */}
     // if(!authentication(sub, req.oidc.user.sub)){

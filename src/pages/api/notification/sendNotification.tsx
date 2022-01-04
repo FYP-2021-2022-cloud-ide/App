@@ -8,22 +8,15 @@ type Data = {
   notificationId: string
 }
 
-import * as grpc from 'grpc';
-
+import {grpcClient}from '../../../lib/grpcClient'
 import {    SendNotificationReply,  SendNotificationRequest } from '../../../proto/dockerGet/dockerGet_pb';
-import { DockerClient } from '../../../proto/dockerGet/dockerGet_grpc_pb';
 
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
   ) 
 {
-    console.log('inside api')
-    var target= 'api:50051';
-    var client = new DockerClient(
-        target,
-        grpc.credentials.createInsecure());
-
+    var client = grpcClient()
     const {title, body, sender, receiver, allowReply} = JSON.parse(req.body);
     var docReq = new SendNotificationRequest();
     docReq.setTitle(title)
