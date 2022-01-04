@@ -17,7 +17,6 @@
 //   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
 //   "exclude": ["node_modules"]
 // }
-
 {
   "compilerOptions": {
     "allowJs": true,
@@ -32,27 +31,35 @@
     ],
     "module": "esnext",
     "moduleResolution": "node",
-    "noEmit": false,
+    // "noEmit": false,
     // "noFallthroughCasesInSwitch": true,
     // "noUnusedLocals": false,
     // "noUnusedParameters": true,
     // "noImplicitAny": false,
-    "outDir":"out",
-		"rootDir": "src",
+    // "outDir":"out",
+    // "rootDir": "src",
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": false,
     "target": "esnext",
-    "incremental": true
+    "incremental": true,
+    "noEmit": true
   },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx"
+  ],
   "exclude": [
     "node_modules"
-  ],
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "next.config.js",
-    "pages/_document.js",
   ]
+  // "exclude": [
+  //   "node_modules"
+  // ],
+  // "include": [
+  //   "**/*.ts",
+  //   "**/*.tsx",
+  //   // "next.config.js",
+  //   // "pages/_document.js",
+  // ]
 }
-
