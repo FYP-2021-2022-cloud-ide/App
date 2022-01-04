@@ -32,7 +32,7 @@
     ],
     "module": "esnext",
     "moduleResolution": "node",
-    "noEmit": true,
+    "noEmit": false,
     // "noFallthroughCasesInSwitch": true,
     // "noUnusedLocals": false,
     // "noUnusedParameters": true,
