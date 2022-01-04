@@ -13,4 +13,7 @@ COPY . /app
 
 # Build and start the server
 RUN npm run build
+
+COPY src/proto/dockerGet /app/out/proto/
+
 CMD npm run start
