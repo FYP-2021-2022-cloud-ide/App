@@ -16,8 +16,8 @@ COPY . /app/
 RUN npm run build
 
 # #copy the proto file to the generated js
-COPY src/proto/dockerGet /app/out/proto/
+COPY src/proto/dockerGet /app/out/proto/dockerGet/
 
-# CMD npm run start
+CMD npm run start
 
-CMD npm run dev
+# CMD npm run dev
