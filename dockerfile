@@ -11,9 +11,12 @@ RUN npm install
 # copy all files to container
 COPY . /app
 
-# Build and start the server
+# # Build and start the server
 RUN npm run build
 
-COPY src/proto/dockerGet /app/out/proto/
+# #copy the proto file to the generated js
+# COPY src/proto/dockerGet /app/out/proto/
 
-CMD npm run start
+# CMD npm run start
+
+CMD npm run dev
