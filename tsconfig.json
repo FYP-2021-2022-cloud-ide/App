@@ -37,6 +37,8 @@
     // "noUnusedLocals": false,
     // "noUnusedParameters": true,
     // "noImplicitAny": false,
+    "outDir":"out",
+		"rootDir": "src",
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": false,
