@@ -2,7 +2,6 @@ import Image from 'next/image'
 import Link from 'next/link'
 import {HomeIcon, UserGroupIcon, CubeTransparentIcon, CogIcon, AnnotationIcon, CloudIcon} from '@heroicons/react/outline'
 import { useRouter } from "next/router";
-
 const SideBar = () => {
     var pages= [
       {name:"Dashboard", link:"/", icon:HomeIcon},

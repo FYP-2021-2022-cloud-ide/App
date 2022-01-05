@@ -1,12 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-//import type { NextApiRequest, NextApiResponse } from 'next'
-//import { ServiceError } from 'grpc';
-type Data = {
-  message: string[]
-}
-import * as grpc from 'grpc';
-import { SubRequest, ListContainerReply, InstantAddContainerRequest, AddContainerReply, SectionAndSubRequest, GetSectionInfoReply, GetUserDataReply } from '../proto/dockerGet/dockerGet_pb';
-import { DockerClient } from '../proto/dockerGet/dockerGet_grpc_pb';
+
+import {grpcClient}from '../lib/grpcClient'
+import { SubRequest,  InstantAddContainerRequest, AddContainerReply, GetUserDataReply } from '../proto/dockerGet/dockerGet_pb';
+
 import express from 'express';
 import { Request, Response, NextFunction } from 'express';
 import { Socket } from 'node:dgram';
@@ -14,14 +10,14 @@ import axios from "axios";
 
 // rest of the code remains same
 //const { createProxyMiddleware } = require('http-proxy-middleware')
-const next = require('next')
+import next from 'next';
 const port = 3000
 const dev = process.env.NODE_ENV !== 'production'
 var httpProxy = require('http-proxy');
 var proxy = httpProxy.createProxyServer({ ws: true });
 // var proxy = require('express-http-proxy');
 var http = require('http')
-const cookieParser = require('cookie-parser');
+// import cookieParser from 'cookie-parser';
 const app = next({ dev })
 const handle = app.getRequestHandler()
 import { auth, requiresAuth, OpenidRequest } from 'express-openid-connect';
@@ -86,11 +82,7 @@ app.prepare().then(() => {
           // @ts-ignore
           req.appSession!.userIdentity = additionalUserClaims.data;
           const { sub, name, email } = additionalUserClaims.data;
-          var target = 'api:50051';
-          var client = new DockerClient(
-            target,
-            grpc.credentials.createInsecure()
-          );
+          var client = grpcClient()
           console.log(client)
           var docReq = new SubRequest()
           docReq.setSub(sub)
@@ -193,11 +185,7 @@ app.prepare().then(() => {
   // grpc api route 
   server.all('/quickAssignmentInit/:templateID', async function (req: Request, res: Response) {
     try {
-      var target = 'api:50051';
-      var client = new DockerClient(
-        target,
-        grpc.credentials.createInsecure()
-      );
+      var client = grpcClient()
       var docReq = new InstantAddContainerRequest();
       docReq.setSub(req.oidc.user!.sub)
       docReq.setTemplateId(req.params.templateID)
