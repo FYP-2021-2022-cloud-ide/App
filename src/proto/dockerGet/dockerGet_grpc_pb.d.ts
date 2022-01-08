@@ -40,6 +40,8 @@ interface IDockerService extends grpc.ServiceDefinition<grpc.UntypedServiceImple
     downloadFile: IDockerService_IdownloadFile;
     uploadFile: IDockerService_IuploadFile;
     removeFile: IDockerService_IremoveFile;
+    makeFolder: IDockerService_ImakeFolder;
+    moveFile: IDockerService_ImoveFile;
 }
 
 interface IDockerService_Ilogin extends grpc.MethodDefinition<dockerGet_pb.LoginRequest, dockerGet_pb.ListReply> {
@@ -321,12 +323,30 @@ interface IDockerService_IuploadFile extends grpc.MethodDefinition<dockerGet_pb.
     responseSerialize: grpc.serialize<dockerGet_pb.UploadReply>;
     responseDeserialize: grpc.deserialize<dockerGet_pb.UploadReply>;
 }
-interface IDockerService_IremoveFile extends grpc.MethodDefinition<dockerGet_pb.RemoveFileRequest, dockerGet_pb.SuccessStringReply> {
+interface IDockerService_IremoveFile extends grpc.MethodDefinition<dockerGet_pb.PathRequest, dockerGet_pb.SuccessStringReply> {
     path: "/dockerGet.Docker/removeFile";
     requestStream: false;
     responseStream: false;
-    requestSerialize: grpc.serialize<dockerGet_pb.RemoveFileRequest>;
-    requestDeserialize: grpc.deserialize<dockerGet_pb.RemoveFileRequest>;
+    requestSerialize: grpc.serialize<dockerGet_pb.PathRequest>;
+    requestDeserialize: grpc.deserialize<dockerGet_pb.PathRequest>;
+    responseSerialize: grpc.serialize<dockerGet_pb.SuccessStringReply>;
+    responseDeserialize: grpc.deserialize<dockerGet_pb.SuccessStringReply>;
+}
+interface IDockerService_ImakeFolder extends grpc.MethodDefinition<dockerGet_pb.PathRequest, dockerGet_pb.SuccessStringReply> {
+    path: "/dockerGet.Docker/makeFolder";
+    requestStream: false;
+    responseStream: false;
+    requestSerialize: grpc.serialize<dockerGet_pb.PathRequest>;
+    requestDeserialize: grpc.deserialize<dockerGet_pb.PathRequest>;
+    responseSerialize: grpc.serialize<dockerGet_pb.SuccessStringReply>;
+    responseDeserialize: grpc.deserialize<dockerGet_pb.SuccessStringReply>;
+}
+interface IDockerService_ImoveFile extends grpc.MethodDefinition<dockerGet_pb.MoveFileRequest, dockerGet_pb.SuccessStringReply> {
+    path: "/dockerGet.Docker/moveFile";
+    requestStream: false;
+    responseStream: false;
+    requestSerialize: grpc.serialize<dockerGet_pb.MoveFileRequest>;
+    requestDeserialize: grpc.deserialize<dockerGet_pb.MoveFileRequest>;
     responseSerialize: grpc.serialize<dockerGet_pb.SuccessStringReply>;
     responseDeserialize: grpc.deserialize<dockerGet_pb.SuccessStringReply>;
 }
@@ -365,7 +385,9 @@ export interface IDockerServer {
     listFolders: grpc.handleUnaryCall<dockerGet_pb.UserIdRequest, dockerGet_pb.ListFolderReply>;
     downloadFile: grpc.handleServerStreamingCall<dockerGet_pb.DownloadRequest, dockerGet_pb.DownloadReply>;
     uploadFile: grpc.handleClientStreamingCall<dockerGet_pb.UploadRequest, dockerGet_pb.UploadReply>;
-    removeFile: grpc.handleUnaryCall<dockerGet_pb.RemoveFileRequest, dockerGet_pb.SuccessStringReply>;
+    removeFile: grpc.handleUnaryCall<dockerGet_pb.PathRequest, dockerGet_pb.SuccessStringReply>;
+    makeFolder: grpc.handleUnaryCall<dockerGet_pb.PathRequest, dockerGet_pb.SuccessStringReply>;
+    moveFile: grpc.handleUnaryCall<dockerGet_pb.MoveFileRequest, dockerGet_pb.SuccessStringReply>;
 }
 
 export interface IDockerClient {
@@ -462,9 +484,15 @@ export interface IDockerClient {
     uploadFile(metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.UploadReply) => void): grpc.ClientWritableStream<dockerGet_pb.UploadRequest>;
     uploadFile(options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.UploadReply) => void): grpc.ClientWritableStream<dockerGet_pb.UploadRequest>;
     uploadFile(metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.UploadReply) => void): grpc.ClientWritableStream<dockerGet_pb.UploadRequest>;
-    removeFile(request: dockerGet_pb.RemoveFileRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
-    removeFile(request: dockerGet_pb.RemoveFileRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
-    removeFile(request: dockerGet_pb.RemoveFileRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    removeFile(request: dockerGet_pb.PathRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    removeFile(request: dockerGet_pb.PathRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    removeFile(request: dockerGet_pb.PathRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    makeFolder(request: dockerGet_pb.PathRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    makeFolder(request: dockerGet_pb.PathRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    makeFolder(request: dockerGet_pb.PathRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    moveFile(request: dockerGet_pb.MoveFileRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    moveFile(request: dockerGet_pb.MoveFileRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    moveFile(request: dockerGet_pb.MoveFileRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
 }
 
 export class DockerClient extends grpc.Client implements IDockerClient {
@@ -562,7 +590,13 @@ export class DockerClient extends grpc.Client implements IDockerClient {
     public uploadFile(metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.UploadReply) => void): grpc.ClientWritableStream<dockerGet_pb.UploadRequest>;
     public uploadFile(options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.UploadReply) => void): grpc.ClientWritableStream<dockerGet_pb.UploadRequest>;
     public uploadFile(metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.UploadReply) => void): grpc.ClientWritableStream<dockerGet_pb.UploadRequest>;
-    public removeFile(request: dockerGet_pb.RemoveFileRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
-    public removeFile(request: dockerGet_pb.RemoveFileRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
-    public removeFile(request: dockerGet_pb.RemoveFileRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    public removeFile(request: dockerGet_pb.PathRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    public removeFile(request: dockerGet_pb.PathRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    public removeFile(request: dockerGet_pb.PathRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    public makeFolder(request: dockerGet_pb.PathRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    public makeFolder(request: dockerGet_pb.PathRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    public makeFolder(request: dockerGet_pb.PathRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    public moveFile(request: dockerGet_pb.MoveFileRequest, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    public moveFile(request: dockerGet_pb.MoveFileRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
+    public moveFile(request: dockerGet_pb.MoveFileRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: dockerGet_pb.SuccessStringReply) => void): grpc.ClientUnaryCall;
 }

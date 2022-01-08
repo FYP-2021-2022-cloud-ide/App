@@ -1,14 +1,14 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import {grpcClient}from '../../../lib/grpcClient'
-import {  PathRequest,  SuccessStringReply } from '../../../proto/dockerGet/dockerGet_pb';
+
+import {  SuccessStringReply,  PathRequest } from '../../../proto/dockerGet/dockerGet_pb';
 
 type Data = {
   success: boolean
   message:string
 }
-
-
 
 
 export default function handler(
@@ -20,9 +20,9 @@ export default function handler(
     const{path}= JSON.parse(req.body);
     var docReq = new PathRequest();
     docReq.setUserid(userId as string);
-    docReq.setPath(path)
+    docReq.setPath(path );
     try{
-      client.removeFile(docReq, function(err, GoLangResponse: SuccessStringReply) {
+      client.makeFolder(docReq, function(err, GoLangResponse: SuccessStringReply) {
         if(!GoLangResponse.getSuccess()){
           console.log(GoLangResponse.getMessage())
         }

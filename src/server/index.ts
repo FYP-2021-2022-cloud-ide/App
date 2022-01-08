@@ -25,7 +25,7 @@ import { Header } from 'next/dist/lib/load-custom-routes';
 //import fetch from "node-fetch";
 
 const SESSION_VALID_FOR = 8 * 60 * 60 * 1000;
-const ID_LENGTH = 12;
+const ID_LENGTH = 36;
 
 
 app.prepare().then(() => {
@@ -40,9 +40,17 @@ app.prepare().then(() => {
       var id = req.url.slice(
         userPosition + baseURL.length,
         userPosition + baseURL.length + ID_LENGTH);
-      req.url = req.url.slice(userPosition + baseURL.length + ID_LENGTH);
+      // req.url = req.url.slice(userPosition + baseURL.length + ID_LENGTH);
       console.log(id)
-      proxy.ws(req, socket, head, { target: 'http://' + id + ':8080/' });
+      // req.header('User-Agent')
+      // const reqHost = req.headers.host
+      req.headers.host = id
+      req.url = req.url.slice(userPosition + baseURL.length + ID_LENGTH);
+      // head.headers['host'] = reqHost
+
+      // req.url = 'http://traefik.codespace.ust.dev/'+req.url
+      // req.url = req.params.id
+      proxy.ws(req, socket, head, { target: 'http://traefik.codespace.ust.dev' });
     }else{
       proxy.ws(req, socket, head, { target: req.url });
     }
@@ -206,33 +214,43 @@ app.prepare().then(() => {
 
   // grpc api route 
   server.all('/user/container/:id/*', async function (req: Request, res: Response) {
-    try {
-      const response = await fetch("http://auth:8181/v1/data/container", {
-        body: JSON.stringify({
-          input: {
-            itsc: req.oidc.user!.sub,
-            container_id: req.params.id
-          }
-        }),
-        headers: {
-          Authorization: `Bearer ${process.env.OPASECRET}`,
-          "Content-Type": "application/json"
-        },
-        method: "POST"
-      })
-      const { result: { allow } } = await response.json()
-      if (allow) {
-        console.log('authenticated')
-        req.url = req.url.replace('/user/container/' + req.params.id + '/', '');
-        proxy.web(req, res, { target: 'http://' + req.params.id + ':8080/' })
-      } else {
-        res.redirect('/')
-      }
-    }
-    catch (error) {
-      console.log(error)
-      res.redirect('/')
-    }
+    // req.url = req.url.replace('/user/container/' + req.params.id + '/', '');
+    // req.header('User-Agent')
+    const reqHost = req.headers.host
+    req.headers.host = req.params.id
+    // req.header("Host") = req.params.id
+    req.url = req.url.replace('/user/container/' + req.params.id + '/', '');
+    // req.url = req.params.id
+    proxy.web(req, res, { target: 'http://traefik.codespace.ust.dev' })
+    // res.writeHead(200,{"Host":reqHost})
+    
+    // try {
+    //   const response = await fetch("http://auth:8181/v1/data/container", {
+    //     body: JSON.stringify({
+    //       input: {
+    //         itsc: req.oidc.user!.sub,
+    //         container_id: req.params.id
+    //       }
+    //     }),
+    //     headers: {
+    //       Authorization: `Bearer ${process.env.OPASECRET}`,
+    //       "Content-Type": "application/json"
+    //     },
+    //     method: "POST"
+    //   })
+    //   const { result: { allow } } = await response.json()
+    //   if (allow) {
+    //     console.log('authenticated')
+    //     req.url = req.url.replace('/user/container/' + req.params.id + '/', '');
+    //     proxy.web(req, res, { target: 'http://' + req.params.id + ':8080/' })
+    //   } else {
+    //     res.redirect('/')
+    //   }
+    // }
+    // catch (error) {
+    //   console.log(error)
+    //   res.redirect('/')
+    // }
   });
 
   // real

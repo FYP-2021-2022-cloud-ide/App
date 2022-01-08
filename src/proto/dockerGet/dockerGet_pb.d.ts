@@ -1501,25 +1501,51 @@ export namespace UploadReply {
     }
 }
 
-export class RemoveFileRequest extends jspb.Message { 
-    getFilepath(): string;
-    setFilepath(value: string): RemoveFileRequest;
+export class PathRequest extends jspb.Message { 
+    getPath(): string;
+    setPath(value: string): PathRequest;
     getUserid(): string;
-    setUserid(value: string): RemoveFileRequest;
+    setUserid(value: string): PathRequest;
 
     serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): RemoveFileRequest.AsObject;
-    static toObject(includeInstance: boolean, msg: RemoveFileRequest): RemoveFileRequest.AsObject;
+    toObject(includeInstance?: boolean): PathRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: PathRequest): PathRequest.AsObject;
     static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
     static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: RemoveFileRequest, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): RemoveFileRequest;
-    static deserializeBinaryFromReader(message: RemoveFileRequest, reader: jspb.BinaryReader): RemoveFileRequest;
+    static serializeBinaryToWriter(message: PathRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): PathRequest;
+    static deserializeBinaryFromReader(message: PathRequest, reader: jspb.BinaryReader): PathRequest;
 }
 
-export namespace RemoveFileRequest {
+export namespace PathRequest {
     export type AsObject = {
-        filepath: string,
+        path: string,
+        userid: string,
+    }
+}
+
+export class MoveFileRequest extends jspb.Message { 
+    getSource(): string;
+    setSource(value: string): MoveFileRequest;
+    getTarget(): string;
+    setTarget(value: string): MoveFileRequest;
+    getUserid(): string;
+    setUserid(value: string): MoveFileRequest;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): MoveFileRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: MoveFileRequest): MoveFileRequest.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: MoveFileRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): MoveFileRequest;
+    static deserializeBinaryFromReader(message: MoveFileRequest, reader: jspb.BinaryReader): MoveFileRequest;
+}
+
+export namespace MoveFileRequest {
+    export type AsObject = {
+        source: string,
+        target: string,
         userid: string,
     }
 }

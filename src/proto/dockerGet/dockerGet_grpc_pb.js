@@ -257,6 +257,28 @@ function deserialize_dockerGet_LoginRequest(buffer_arg) {
   return dockerGet_pb.LoginRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_dockerGet_MoveFileRequest(arg) {
+  if (!(arg instanceof dockerGet_pb.MoveFileRequest)) {
+    throw new Error('Expected argument of type dockerGet.MoveFileRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_MoveFileRequest(buffer_arg) {
+  return dockerGet_pb.MoveFileRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_dockerGet_PathRequest(arg) {
+  if (!(arg instanceof dockerGet_pb.PathRequest)) {
+    throw new Error('Expected argument of type dockerGet.PathRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_PathRequest(buffer_arg) {
+  return dockerGet_pb.PathRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_dockerGet_RemoveContainerRequest(arg) {
   if (!(arg instanceof dockerGet_pb.RemoveContainerRequest)) {
     throw new Error('Expected argument of type dockerGet.RemoveContainerRequest');
@@ -266,17 +288,6 @@ function serialize_dockerGet_RemoveContainerRequest(arg) {
 
 function deserialize_dockerGet_RemoveContainerRequest(buffer_arg) {
   return dockerGet_pb.RemoveContainerRequest.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_dockerGet_RemoveFileRequest(arg) {
-  if (!(arg instanceof dockerGet_pb.RemoveFileRequest)) {
-    throw new Error('Expected argument of type dockerGet.RemoveFileRequest');
-  }
-  return Buffer.from(arg.serializeBinary());
-}
-
-function deserialize_dockerGet_RemoveFileRequest(buffer_arg) {
-  return dockerGet_pb.RemoveFileRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_dockerGet_RemoveNotificationRequest(arg) {
@@ -802,10 +813,32 @@ var DockerService = exports.DockerService = {
     path: '/dockerGet.Docker/removeFile',
     requestStream: false,
     responseStream: false,
-    requestType: dockerGet_pb.RemoveFileRequest,
+    requestType: dockerGet_pb.PathRequest,
     responseType: dockerGet_pb.SuccessStringReply,
-    requestSerialize: serialize_dockerGet_RemoveFileRequest,
-    requestDeserialize: deserialize_dockerGet_RemoveFileRequest,
+    requestSerialize: serialize_dockerGet_PathRequest,
+    requestDeserialize: deserialize_dockerGet_PathRequest,
+    responseSerialize: serialize_dockerGet_SuccessStringReply,
+    responseDeserialize: deserialize_dockerGet_SuccessStringReply,
+  },
+  makeFolder: {
+    path: '/dockerGet.Docker/makeFolder',
+    requestStream: false,
+    responseStream: false,
+    requestType: dockerGet_pb.PathRequest,
+    responseType: dockerGet_pb.SuccessStringReply,
+    requestSerialize: serialize_dockerGet_PathRequest,
+    requestDeserialize: deserialize_dockerGet_PathRequest,
+    responseSerialize: serialize_dockerGet_SuccessStringReply,
+    responseDeserialize: deserialize_dockerGet_SuccessStringReply,
+  },
+  moveFile: {
+    path: '/dockerGet.Docker/moveFile',
+    requestStream: false,
+    responseStream: false,
+    requestType: dockerGet_pb.MoveFileRequest,
+    responseType: dockerGet_pb.SuccessStringReply,
+    requestSerialize: serialize_dockerGet_MoveFileRequest,
+    requestDeserialize: deserialize_dockerGet_MoveFileRequest,
     responseSerialize: serialize_dockerGet_SuccessStringReply,
     responseDeserialize: deserialize_dockerGet_SuccessStringReply,
   },

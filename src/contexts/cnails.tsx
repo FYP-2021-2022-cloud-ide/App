@@ -44,8 +44,12 @@ interface CnailsContextState {
     listFolders:(userId:string)=> Promise<any>,
     downloadFile:(userId:string, filePath:string)=> Promise<any>,
     uploadFile:(userId:string, filePath:string,blob:Blob)=> Promise<any>,
-    removeFile:(userId:string, filePath:string)=> Promise<any>,
+    removeFile:(userId:string, path:string)=> Promise<any>,
+    makeFolder:(userId:string, path:string)=> Promise<any>,
+    moveFile:(userId:string, source:string,target:string)=> Promise<any>,
     removeFileLocal:(userId:string,  filePath:string)=> Promise<any>,
+
+
     sub: string,
     name: string,
     email: string,
@@ -444,11 +448,30 @@ export const CnailsProvider = ({children}: CnailsProviderProps) => {
         })
         return res.json()
     }
-    const removeFile = async (userId:string,filePath:string)=>{
+    const removeFile = async (userId:string,path:string)=>{
         var res =  await fetch('/api/cloudFile/removeFile?userId='+userId,{
             method: 'POST', 
             body:JSON.stringify({ 
-                "filePath": filePath,
+                "path": path,
+            }),
+        })
+        return res.json()
+    }
+    const makeFolder = async (userId:string,path:string)=>{
+        var res =  await fetch('/api/cloudFile/makeFolder?userId='+userId,{
+            method: 'POST', 
+            body:JSON.stringify({ 
+                "path": path,
+            }),
+        })
+        return res.json()
+    }
+    const moveFile = async (userId:string,source:string,target:string)=>{
+        var res =  await fetch('/api/cloudFile/moveFile?userId='+userId,{
+            method: 'POST', 
+            body:JSON.stringify({ 
+                "source": source,
+                "target": target,
             }),
         })
         return res.json()
@@ -506,6 +529,8 @@ export const CnailsProvider = ({children}: CnailsProviderProps) => {
                     downloadFile,
                     uploadFile,
                     removeFile,
+                    makeFolder,
+                    moveFile,
                     removeFileLocal,
 
                     sub,

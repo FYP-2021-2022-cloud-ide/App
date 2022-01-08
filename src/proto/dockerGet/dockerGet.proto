@@ -49,7 +49,9 @@ service Docker {
   rpc listFolders(UserIdRequest)returns(ListFolderReply){}
   rpc downloadFile(DownloadRequest)returns(stream DownloadReply){}
   rpc uploadFile(stream UploadRequest)returns(UploadReply){}
-  rpc removeFile(RemoveFileRequest)returns(SuccessStringReply){}
+  rpc removeFile(PathRequest)returns(SuccessStringReply){}
+  rpc makeFolder(PathRequest)returns(SuccessStringReply){}
+  rpc moveFile(MoveFileRequest)returns(SuccessStringReply){}
 }
 
 
@@ -383,7 +385,13 @@ message UploadReply {
   int64 size =3;
 }
 
-message RemoveFileRequest{
-  string filePath = 1;
+message PathRequest{
+  string path = 1;
   string userId = 2;
+}
+
+message MoveFileRequest{
+  string source = 1;
+  string target = 2;
+  string userId = 3;
 }

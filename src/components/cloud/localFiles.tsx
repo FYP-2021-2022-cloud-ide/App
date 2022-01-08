@@ -49,7 +49,7 @@ async function downloadFileURL(filePath:string){
 }
 
 function FilesLocal({files}: filesLocalProps){
-const { userId,downloadFile,removeFile,removeFileLocal} = useCnails()
+const { userId,downloadFile,removeFile,moveFile,removeFileLocal} = useCnails()
 
     return files.map((file) => {
     return(
@@ -81,6 +81,17 @@ const { userId,downloadFile,removeFile,removeFileLocal} = useCnails()
                         window.location.reload()
                     }
             }}>remove</button>
+           {/* <button className='bg-blue-500 hover:bg-blue-700 text-white rounded '
+                onClick={async() => {
+                    const res = await moveFile(userId,file.path,"/volumes/7fac6d26-4f01-41c8-9b40-a9f372c7a691/persist/3/"+file.name)
+                    if (res.success){
+                        console.log(res)
+                        window.location.reload()
+                    }
+                }}                    
+            >
+                moveFileTest
+            </button> */}
         </div>
     )
     })
@@ -89,7 +100,7 @@ const { userId,downloadFile,removeFile,removeFileLocal} = useCnails()
 
 function DisplayLocal({tree}:props){
     const childrenList = tree.children
-    const { userId,uploadFile} = useCnails()
+    const { userId,uploadFile,makeFolder,removeFile} = useCnails()
     const [file, setFile] = useState(new Blob());
     const [createObjectURL, setCreateObjectURL] = useState("");
   
@@ -106,9 +117,10 @@ function DisplayLocal({tree}:props){
         <div>
             {childrenList.map(child=>{
                 return(
-                <div key={child.name} className="pl-5">
+                <div key={child.name} className="pl-5 ">
                     <div className="font-bold">
-                        {child.name.slice(child.name.indexOf("_data")+5,-1)}
+                   {/* { child.name} */}
+                        {child.name.slice(child.name.indexOf("persist")+7,-1)}
                     </div>
                     <input type="file" name="upload" onChange={uploadToClient} />
                     <button className='bg-blue-500 hover:bg-blue-700 text-white rounded '
@@ -116,12 +128,36 @@ function DisplayLocal({tree}:props){
                             const res = await uploadFile(userId,child.name,file)
                             if (res.success){
                                 console.log(res)
-                                // window.location.reload()
+                                window.location.reload()
                             }
                         }}                    
                     >
                         upload!
                     </button>
+                    <button className='bg-blue-500 hover:bg-blue-700 text-white rounded '
+                        onClick={async() => {
+                            const res = await makeFolder(userId,child.name+"/test")
+                            if (res.success){
+                                console.log(res)
+                                window.location.reload()
+                            }
+                        }}                    
+                    >
+                        makeDirectory
+                    </button>
+                    <button className='bg-blue-500 hover:bg-blue-700 text-white rounded '
+                        onClick={async() => {
+                            const res = await removeFile(userId,child.name)
+                            if (res.success){
+                                console.log(res)
+                                window.location.reload()
+                            }
+                        }}                    
+                    >
+                        DeleteDirectory(careful)
+                    </button>
+
+
                     <div>
                         <DisplayLocal tree={child}></DisplayLocal>
                     </div>
