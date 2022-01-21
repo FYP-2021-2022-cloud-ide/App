@@ -149,7 +149,7 @@ const EnvironmentUpdate = React.forwardRef(({ sectionUserID, environment, closeM
                         <button
                             onClick={async () => {
                                 nextStep()
-                                const response = await addContainer(environment.imageId, memory, CPU, sectionUserID, "", false, "root")//non-existent template id
+                                const response = await addContainer(environment.imageId, memory, CPU, sectionUserID, "", false, "root",true)//non-existent template id
                                 console.log(response)
                                 if (response.success) {
                                     setContainerID(response.containerID)
