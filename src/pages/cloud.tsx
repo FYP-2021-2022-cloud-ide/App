@@ -239,7 +239,7 @@ const FunctionLoader = React.forwardRef(({}, ref) =>{
   )
 })
 
-export default function cloud (){
+export default function Cloud (){
     const { listFolders,userId, sub} = useCnails()
     const [localFolders, setLocalFolders]=useState(undefined)
     const [flag, setFlag] = useState(false)
