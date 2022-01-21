@@ -1,13 +1,13 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import fs from 'fs';
-import archiver from 'archiver'
-import path from 'path';
-import extract from 'extract-zip';
+// import archiver from 'archiver'
+// import path from 'path';
+// import extract from 'extract-zip';
 import JSZip from 'jszip'
-import {  DownloadRequest,  DownloadReply } from '../../../proto/dockerGet/dockerGet_pb';
-import {grpcClient}from '../../../lib/grpcClient'
-import {v4 as uuidv4} from 'uuid';
+// import {  DownloadRequest,  DownloadReply } from '../../../proto/dockerGet/dockerGet_pb';
+// import {grpcClient}from '../../../lib/grpcClient'
+// import {v4 as uuidv4} from 'uuid';
 
 type Data = {
   fileName:string
@@ -18,7 +18,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
   ) {
-    var client = grpcClient()
+    // var client = grpcClient()
     const { userId } = req.query;
     var body = JSON.parse(req.body);
     var filePath:string=body.filePath
