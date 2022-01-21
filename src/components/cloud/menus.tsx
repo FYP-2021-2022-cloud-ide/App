@@ -106,6 +106,7 @@ export function ItemMenu({item,type,root,setMkdirNameOpen}){
                 <div>upload file/s</div>
                 <input type="file"  multiple name="file/s" onChange={setFiles}/>
                 <div>upload folder</div>
+                {/* @ts-expect-error */}
                 <input type="file"  multiple webkitdirectory="true"  name="folder"  onChange={setFiles} />
                 <div className="flex flex-row-reverse">
                     <button className={okButtonClass} onClick={
