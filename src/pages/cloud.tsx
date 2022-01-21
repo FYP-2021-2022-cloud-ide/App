@@ -252,7 +252,6 @@ export default ()=>{
       children: [],
       files: []
     })
-    const [selectedLocalFolder, setSelectedLocalFolder]=useState('')
     useEffect(()=>{
       const GetlocalFolders = async() => {
         const res=  await listFolders(userId)
@@ -301,7 +300,7 @@ export default ()=>{
     return(
         <div className="grid grid-cols-2 text-black w-full p-10 gap-x-6">
             {/* @ts-ignore */}
-            <LocalFiles opened={true} tree={localFolders!} setSelectedLocalFolder={setSelectedLocalFolder}></LocalFiles>
+            <LocalFiles opened={true} tree={localFolders!} ></LocalFiles>
             {/* <div className="border rounded-lg h-96 flex flex-col space-y-2">
                 <div>
                   Local volume
