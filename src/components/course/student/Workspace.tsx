@@ -8,7 +8,9 @@ import { Dialog} from '@headlessui/react'
 // import WorkspaceMenu from "./WorkspaceMenu"
 import Loader from "../../Loader"
 import {template}from "../instructor/Template/TemplateList"
-
+import ReactTooltip from "react-tooltip";
+import { InformationCircleIcon } from "@heroicons/react/solid";
+import Toggle from "../../Toggle";
 interface WorkspaceProps{
     template: template
     sectionUserId: string
@@ -23,6 +25,8 @@ function Workspace({template, sectionUserId}:WorkspaceProps){
     const [numCPU ,setnumCPU]= useState(1);
     const { addContainer ,removeContainer, sub} = useCnails();
     const [isOpen, setIsOpen] = useState(false)
+
+    let [useFreshSave, setUseFreshSave] = useState(false)
 
     // styles 
     const dialogClass = "inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl text-[#415A6E]"
@@ -62,6 +66,16 @@ function Workspace({template, sectionUserId}:WorkspaceProps){
                             {template.description}
                         </div>
                     </div>
+                    <div className="flex flex-row font-medium mt-4 dark:text-gray-300">
+                            <span>Use fresh new save</span>
+                            <span >
+                                <InformationCircleIcon data-for="messageTip" data-tip className="w-6 h-6"></InformationCircleIcon>
+                                <ReactTooltip id="messageTip" place="top" effect="solid">
+                                    this will overwrite the previous save(if exist)
+                                </ReactTooltip>
+                            </span>
+                        </div>
+                        <Toggle enabled={useFreshSave} onChange={() => setUseFreshSave(!useFreshSave)} />
                 </div>
                 <div className="w-1/12">
                     <Menu items={[
@@ -72,7 +86,7 @@ function Workspace({template, sectionUserId}:WorkspaceProps){
                                 window.location.reload()
                             } : async () => {
                                 setIsOpen(true)
-                                const response = await addContainer(template.imageId,memLimit,numCPU,sectionUserId,template.id,true,"student")
+                                const response = await addContainer(template.imageId,memLimit,numCPU,sectionUserId,template.id,true,"student",useFreshSave)
                                 window.location.reload();
                             }
                         }

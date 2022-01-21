@@ -1,7 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import {HomeIcon, UserGroupIcon, CubeTransparentIcon, CogIcon, AnnotationIcon, CloudIcon} from '@heroicons/react/outline'
+import {HomeIcon, UserGroupIcon, CubeTransparentIcon, CogIcon, AnnotationIcon, CloudIcon, IdentificationIcon} from '@heroicons/react/outline'
 import { useRouter } from "next/router";
+import { useCnails } from '../contexts/cnails';
 const SideBar = () => {
     var pages= [
       {name:"Dashboard", link:"/", icon:HomeIcon},
@@ -9,9 +10,13 @@ const SideBar = () => {
       // {name:"Workspace",link:"/Workspace", icon:CubeTransparentIcon},
       // {name:"Setting",link:"/settings", icon:CogIcon},
       {name:"Messages", link:"/messages", icon:AnnotationIcon},
-      {name:"Cloud", link:"/cloud", icon:CloudIcon}
+      {name:"Cloud", link:"/cloud", icon:CloudIcon},
+      {name:"Admin", link:"/admin", icon:IdentificationIcon}
     ]
     const router = useRouter();
+    const {isAdmin} = useCnails();
+    if (!isAdmin)
+      pages = pages.filter(page=>(page.name !== "Admin"))
     return (
         <div className="w-[240px] min-h-screen bg-gray-50 dark:bg-gray-700 dark:border-gray-800 flex flex-col border-r px-5 py-5">
           <div className="pb-10">

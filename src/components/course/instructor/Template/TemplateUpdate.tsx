@@ -3,6 +3,9 @@ import { Dialog, Transition, Switch } from "@headlessui/react";
 import { useCnails } from "../../../../contexts/cnails";
 import { template } from "./TemplateList"
 import Loader from "../../../Loader"
+import ReactTooltip from "react-tooltip";
+import { InformationCircleIcon } from "@heroicons/react/solid";
+import Toggle from "../../../Toggle";
 interface TemplateUpdateProps {
     sectionUserID: string
     template: template
@@ -149,12 +152,16 @@ const TemplateUpdate = React.forwardRef(({ sectionUserID, memLimit, numCPU, temp
                         onChange={(e) => setDescription(e.target.value)}></textarea>
 
 
-                    <div className="font-medium mt-4">Is it an Exam?(Optional)</div>
-
-                    <input className="focus:outline-none" type="checkbox"
-                        checked={isExam}
-                        onChange={(e) => setIsExam(!isExam)}></input>
-
+                    <div className="flex flex-row font-medium mt-4 dark:text-gray-300">
+                        <span>Is it an Exam?</span>
+                        <span >
+                            <InformationCircleIcon data-for="messageTip" data-tip className="w-6 h-6"></InformationCircleIcon>
+                            <ReactTooltip id="messageTip" place="top" effect="solid">
+                                this will allow them to use only the editor
+                            </ReactTooltip>
+                        </span>
+                    </div>
+                    <Toggle enabled={isExam} onChange={() => setIsExam(!isExam)} />
 
                     {isExam &&
                         <div>
@@ -167,19 +174,26 @@ const TemplateUpdate = React.forwardRef(({ sectionUserID, memLimit, numCPU, temp
                                 onChange={(e) => setTimeLimit(parseInt(e.target.value))}></input>
                         </div>
                     }
-                    <div className="font-medium mt-4 dark:text-gray-300">
-                        Can students send question to tutors? 
+                    <div className="flex flex-row font-medium mt-4 dark:text-gray-300 space-x-3">
+                        <span>Can students send question to You?</span>
+                        <span >
+
+                            <InformationCircleIcon data-for="messageTip" data-tip className="w-6 h-6"></InformationCircleIcon>
+                            <ReactTooltip id="messageTip" place="top" effect="solid">
+                                this is useful for labs
+                            </ReactTooltip>
+                        </span>
                     </div>
-                    <input className="focus:outline-none dark:bg-gray-600 dark:text-gray-600" type="checkbox"
-                        checked={canNotify}
-                        onChange={(e) => setCanNotify(!canNotify)}></input>
-                    <div className={buttonsClass}></div>
+                    <Toggle
+                        enabled={canNotify}
+                        onChange={() => setCanNotify(!canNotify)}
+                    />
                     
                     <div className={buttonsClass}>
                         <button
                             onClick={async () => {
                                 nextStep()
-                                const response = await addContainer(template.imageId, memLimit, numCPU, sectionUserID, template.id, false, "student")
+                                const response = await addContainer(template.imageId, memLimit, numCPU, sectionUserID, template.id, false, "student",true)
                                 if (response.success) {
                                     setContainerID(response.containerID)
                                 }

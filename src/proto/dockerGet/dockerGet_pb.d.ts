@@ -6,6 +6,110 @@
 
 import * as jspb from "google-protobuf";
 
+export class ListFilesRequest extends jspb.Message { 
+    getSub(): string;
+    setSub(value: string): ListFilesRequest;
+    getFolderid(): string;
+    setFolderid(value: string): ListFilesRequest;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): ListFilesRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: ListFilesRequest): ListFilesRequest.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: ListFilesRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): ListFilesRequest;
+    static deserializeBinaryFromReader(message: ListFilesRequest, reader: jspb.BinaryReader): ListFilesRequest;
+}
+
+export namespace ListFilesRequest {
+    export type AsObject = {
+        sub: string,
+        folderid: string,
+    }
+}
+
+export class ChildrenReply extends jspb.Message { 
+    clearFilesList(): void;
+    getFilesList(): Array<ChildrenReply.child>;
+    setFilesList(value: Array<ChildrenReply.child>): ChildrenReply;
+    addFiles(value?: ChildrenReply.child, index?: number): ChildrenReply.child;
+    clearFoldersList(): void;
+    getFoldersList(): Array<ChildrenReply.child>;
+    setFoldersList(value: Array<ChildrenReply.child>): ChildrenReply;
+    addFolders(value?: ChildrenReply.child, index?: number): ChildrenReply.child;
+    getSuccess(): boolean;
+    setSuccess(value: boolean): ChildrenReply;
+    getMessage(): string;
+    setMessage(value: string): ChildrenReply;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): ChildrenReply.AsObject;
+    static toObject(includeInstance: boolean, msg: ChildrenReply): ChildrenReply.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: ChildrenReply, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): ChildrenReply;
+    static deserializeBinaryFromReader(message: ChildrenReply, reader: jspb.BinaryReader): ChildrenReply;
+}
+
+export namespace ChildrenReply {
+    export type AsObject = {
+        filesList: Array<ChildrenReply.child.AsObject>,
+        foldersList: Array<ChildrenReply.child.AsObject>,
+        success: boolean,
+        message: string,
+    }
+
+
+    export class child extends jspb.Message { 
+        getId(): string;
+        setId(value: string): child;
+        getName(): string;
+        setName(value: string): child;
+
+        serializeBinary(): Uint8Array;
+        toObject(includeInstance?: boolean): child.AsObject;
+        static toObject(includeInstance: boolean, msg: child): child.AsObject;
+        static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+        static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+        static serializeBinaryToWriter(message: child, writer: jspb.BinaryWriter): void;
+        static deserializeBinary(bytes: Uint8Array): child;
+        static deserializeBinaryFromReader(message: child, reader: jspb.BinaryReader): child;
+    }
+
+    export namespace child {
+        export type AsObject = {
+            id: string,
+            name: string,
+        }
+    }
+
+}
+
+export class CodeRequest extends jspb.Message { 
+    getCode(): string;
+    setCode(value: string): CodeRequest;
+    getSub(): string;
+    setSub(value: string): CodeRequest;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): CodeRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: CodeRequest): CodeRequest.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: CodeRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): CodeRequest;
+    static deserializeBinaryFromReader(message: CodeRequest, reader: jspb.BinaryReader): CodeRequest;
+}
+
+export namespace CodeRequest {
+    export type AsObject = {
+        code: string,
+        sub: string,
+    }
+}
+
 export class UserIdRequest extends jspb.Message { 
     getUserid(): string;
     setUserid(value: string): UserIdRequest;
@@ -511,6 +615,8 @@ export class AddContainerRequest extends jspb.Message {
     setDbstored(value: boolean): AddContainerRequest;
     getAccessright(): string;
     setAccessright(value: string): AddContainerRequest;
+    getUsefresh(): boolean;
+    setUsefresh(value: boolean): AddContainerRequest;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): AddContainerRequest.AsObject;
@@ -531,6 +637,7 @@ export namespace AddContainerRequest {
         templateId: string,
         dbstored: boolean,
         accessright: string,
+        usefresh: boolean,
     }
 }
 
@@ -623,6 +730,38 @@ export namespace SubmitFilesRequest {
     export type AsObject = {
         containerid: string,
         sectionUserId: string,
+    }
+}
+
+export class ContainerTimeReply extends jspb.Message { 
+    getSuccess(): boolean;
+    setSuccess(value: boolean): ContainerTimeReply;
+    getMessage(): string;
+    setMessage(value: string): ContainerTimeReply;
+    getIsExam(): boolean;
+    setIsExam(value: boolean): ContainerTimeReply;
+    getTimeLimit(): string;
+    setTimeLimit(value: string): ContainerTimeReply;
+    getCreatedAt(): string;
+    setCreatedAt(value: string): ContainerTimeReply;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): ContainerTimeReply.AsObject;
+    static toObject(includeInstance: boolean, msg: ContainerTimeReply): ContainerTimeReply.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: ContainerTimeReply, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): ContainerTimeReply;
+    static deserializeBinaryFromReader(message: ContainerTimeReply, reader: jspb.BinaryReader): ContainerTimeReply;
+}
+
+export namespace ContainerTimeReply {
+    export type AsObject = {
+        success: boolean,
+        message: string,
+        isExam: boolean,
+        timeLimit: string,
+        createdAt: string,
     }
 }
 
@@ -1065,6 +1204,8 @@ export class GetUserDataReply extends jspb.Message {
     setMessage(value: string): GetUserDataReply;
     getUserid(): string;
     setUserid(value: string): GetUserDataReply;
+    getRole(): string;
+    setRole(value: string): GetUserDataReply;
     getSemesterid(): string;
     setSemesterid(value: string): GetUserDataReply;
     getDarkmode(): boolean;
@@ -1087,6 +1228,7 @@ export namespace GetUserDataReply {
         success: boolean,
         message: string,
         userid: string,
+        role: string,
         semesterid: string,
         darkmode: boolean,
         bio: string,
@@ -1275,95 +1417,17 @@ export namespace UpdateSubscriptionRequest {
     }
 }
 
-export class ListFolderReply extends jspb.Message { 
-    getSuccess(): boolean;
-    setSuccess(value: boolean): ListFolderReply;
-    getMessage(): string;
-    setMessage(value: string): ListFolderReply;
-
-    hasRoot(): boolean;
-    clearRoot(): void;
-    getRoot(): Folder | undefined;
-    setRoot(value?: Folder): ListFolderReply;
-
-    serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): ListFolderReply.AsObject;
-    static toObject(includeInstance: boolean, msg: ListFolderReply): ListFolderReply.AsObject;
-    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: ListFolderReply, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): ListFolderReply;
-    static deserializeBinaryFromReader(message: ListFolderReply, reader: jspb.BinaryReader): ListFolderReply;
-}
-
-export namespace ListFolderReply {
-    export type AsObject = {
-        success: boolean,
-        message: string,
-        root?: Folder.AsObject,
-    }
-}
-
-export class Folder extends jspb.Message { 
-    getName(): string;
-    setName(value: string): Folder;
-    clearChildrenList(): void;
-    getChildrenList(): Array<Folder>;
-    setChildrenList(value: Array<Folder>): Folder;
-    addChildren(value?: Folder, index?: number): Folder;
-    clearFilesList(): void;
-    getFilesList(): Array<Folder.Files>;
-    setFilesList(value: Array<Folder.Files>): Folder;
-    addFiles(value?: Folder.Files, index?: number): Folder.Files;
-
-    serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): Folder.AsObject;
-    static toObject(includeInstance: boolean, msg: Folder): Folder.AsObject;
-    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: Folder, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): Folder;
-    static deserializeBinaryFromReader(message: Folder, reader: jspb.BinaryReader): Folder;
-}
-
-export namespace Folder {
-    export type AsObject = {
-        name: string,
-        childrenList: Array<Folder.AsObject>,
-        filesList: Array<Folder.Files.AsObject>,
-    }
-
-
-    export class Files extends jspb.Message { 
-        getName(): string;
-        setName(value: string): Files;
-        getPath(): string;
-        setPath(value: string): Files;
-
-        serializeBinary(): Uint8Array;
-        toObject(includeInstance?: boolean): Files.AsObject;
-        static toObject(includeInstance: boolean, msg: Files): Files.AsObject;
-        static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-        static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-        static serializeBinaryToWriter(message: Files, writer: jspb.BinaryWriter): void;
-        static deserializeBinary(bytes: Uint8Array): Files;
-        static deserializeBinaryFromReader(message: Files, reader: jspb.BinaryReader): Files;
-    }
-
-    export namespace Files {
-        export type AsObject = {
-            name: string,
-            path: string,
-        }
-    }
-
-}
-
 export class DownloadRequest extends jspb.Message { 
+    getSub(): string;
+    setSub(value: string): DownloadRequest;
+    getFileid(): string;
+    setFileid(value: string): DownloadRequest;
+    getFilename(): string;
+    setFilename(value: string): DownloadRequest;
     getFilepath(): string;
     setFilepath(value: string): DownloadRequest;
-    getUserid(): string;
-    setUserid(value: string): DownloadRequest;
+    getFiletype(): string;
+    setFiletype(value: string): DownloadRequest;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): DownloadRequest.AsObject;
@@ -1377,54 +1441,23 @@ export class DownloadRequest extends jspb.Message {
 
 export namespace DownloadRequest {
     export type AsObject = {
+        sub: string,
+        fileid: string,
+        filename: string,
         filepath: string,
-        userid: string,
-    }
-}
-
-export class DownloadReply extends jspb.Message { 
-    getSuccess(): boolean;
-    setSuccess(value: boolean): DownloadReply;
-    getMessage(): string;
-    setMessage(value: string): DownloadReply;
-    getContent(): Uint8Array | string;
-    getContent_asU8(): Uint8Array;
-    getContent_asB64(): string;
-    setContent(value: Uint8Array | string): DownloadReply;
-
-    serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): DownloadReply.AsObject;
-    static toObject(includeInstance: boolean, msg: DownloadReply): DownloadReply.AsObject;
-    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: DownloadReply, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): DownloadReply;
-    static deserializeBinaryFromReader(message: DownloadReply, reader: jspb.BinaryReader): DownloadReply;
-}
-
-export namespace DownloadReply {
-    export type AsObject = {
-        success: boolean,
-        message: string,
-        content: Uint8Array | string,
+        filetype: string,
     }
 }
 
 export class UploadRequest extends jspb.Message { 
-
-    hasContent(): boolean;
-    clearContent(): void;
-    getContent(): Uint8Array | string;
-    getContent_asU8(): Uint8Array;
-    getContent_asB64(): string;
-    setContent(value: Uint8Array | string): UploadRequest;
-
-    hasMetadata(): boolean;
-    clearMetadata(): void;
-    getMetadata(): UploadRequest.UploadMetadata | undefined;
-    setMetadata(value?: UploadRequest.UploadMetadata): UploadRequest;
-
-    getDataCase(): UploadRequest.DataCase;
+    getSub(): string;
+    setSub(value: string): UploadRequest;
+    getFilepath(): string;
+    setFilepath(value: string): UploadRequest;
+    getParentid(): string;
+    setParentid(value: string): UploadRequest;
+    getFiletype(): string;
+    setFiletype(value: string): UploadRequest;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): UploadRequest.AsObject;
@@ -1438,114 +1471,9 @@ export class UploadRequest extends jspb.Message {
 
 export namespace UploadRequest {
     export type AsObject = {
-        content: Uint8Array | string,
-        metadata?: UploadRequest.UploadMetadata.AsObject,
-    }
-
-
-    export class UploadMetadata extends jspb.Message { 
-        getFilepath(): string;
-        setFilepath(value: string): UploadMetadata;
-        getUserid(): string;
-        setUserid(value: string): UploadMetadata;
-
-        serializeBinary(): Uint8Array;
-        toObject(includeInstance?: boolean): UploadMetadata.AsObject;
-        static toObject(includeInstance: boolean, msg: UploadMetadata): UploadMetadata.AsObject;
-        static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-        static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-        static serializeBinaryToWriter(message: UploadMetadata, writer: jspb.BinaryWriter): void;
-        static deserializeBinary(bytes: Uint8Array): UploadMetadata;
-        static deserializeBinaryFromReader(message: UploadMetadata, reader: jspb.BinaryReader): UploadMetadata;
-    }
-
-    export namespace UploadMetadata {
-        export type AsObject = {
-            filepath: string,
-            userid: string,
-        }
-    }
-
-
-    export enum DataCase {
-        DATA_NOT_SET = 0,
-        CONTENT = 2,
-        METADATA = 1,
-    }
-
-}
-
-export class UploadReply extends jspb.Message { 
-    getSuccess(): boolean;
-    setSuccess(value: boolean): UploadReply;
-    getMessage(): string;
-    setMessage(value: string): UploadReply;
-    getSize(): number;
-    setSize(value: number): UploadReply;
-
-    serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): UploadReply.AsObject;
-    static toObject(includeInstance: boolean, msg: UploadReply): UploadReply.AsObject;
-    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: UploadReply, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): UploadReply;
-    static deserializeBinaryFromReader(message: UploadReply, reader: jspb.BinaryReader): UploadReply;
-}
-
-export namespace UploadReply {
-    export type AsObject = {
-        success: boolean,
-        message: string,
-        size: number,
-    }
-}
-
-export class PathRequest extends jspb.Message { 
-    getPath(): string;
-    setPath(value: string): PathRequest;
-    getUserid(): string;
-    setUserid(value: string): PathRequest;
-
-    serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): PathRequest.AsObject;
-    static toObject(includeInstance: boolean, msg: PathRequest): PathRequest.AsObject;
-    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: PathRequest, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): PathRequest;
-    static deserializeBinaryFromReader(message: PathRequest, reader: jspb.BinaryReader): PathRequest;
-}
-
-export namespace PathRequest {
-    export type AsObject = {
-        path: string,
-        userid: string,
-    }
-}
-
-export class MoveFileRequest extends jspb.Message { 
-    getSource(): string;
-    setSource(value: string): MoveFileRequest;
-    getTarget(): string;
-    setTarget(value: string): MoveFileRequest;
-    getUserid(): string;
-    setUserid(value: string): MoveFileRequest;
-
-    serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): MoveFileRequest.AsObject;
-    static toObject(includeInstance: boolean, msg: MoveFileRequest): MoveFileRequest.AsObject;
-    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: MoveFileRequest, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): MoveFileRequest;
-    static deserializeBinaryFromReader(message: MoveFileRequest, reader: jspb.BinaryReader): MoveFileRequest;
-}
-
-export namespace MoveFileRequest {
-    export type AsObject = {
-        source: string,
-        target: string,
-        userid: string,
+        sub: string,
+        filepath: string,
+        parentid: string,
+        filetype: string,
     }
 }

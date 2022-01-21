@@ -36,7 +36,7 @@ export default function handler(
     docReq.setUserid(userId as string);
     try{
         client.listNotifications(docReq, function(err, GoLangResponse: ListNotificationsReply) {
-            console.log(GoLangResponse)
+            // console.log(GoLangResponse)
             if(!GoLangResponse.getSuccess()){
                 console.log(GoLangResponse.getMessage())
             }

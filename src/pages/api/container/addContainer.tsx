@@ -32,7 +32,7 @@ export default async function handler(
 
     var client = grpcClient()
     
-    const {imageName, memLimit, numCPU, section_user_id, template_id,dbStored, accessRight} = JSON.parse(req.body);//console.log(body)
+    const {imageName, memLimit, numCPU, section_user_id, template_id,dbStored, accessRight,useFresh} = JSON.parse(req.body);//console.log(body)
 
     // if (section_user_id != undefined){
     //   if(!(await checkInSectionBySectionUserId(req.oidc.user.sub, section_user_id))){
@@ -52,6 +52,7 @@ export default async function handler(
     docReq.setTemplateId(template_id);
     docReq.setDbstored(dbStored);
     docReq.setAccessright(accessRight);
+    docReq.setUsefresh(useFresh);
     try{
       client.addContainer(docReq, function(err, GoLangResponse: AddContainerReply) {
         if(!GoLangResponse.getSuccess()){

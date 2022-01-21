@@ -6,6 +6,9 @@ import { template } from "./TemplateList"
 import TemplateUpdate from "./TemplateUpdate";
 import { Dialog } from "@headlessui/react";
 import Loader from "../../../Loader" ; 
+import ReactTooltip from "react-tooltip";
+import { InformationCircleIcon } from "@heroicons/react/solid";
+import Toggle from "../../../Toggle";
 interface TemplateProps {
     template: template
     memLimit: number
@@ -20,7 +23,7 @@ function Template({ template, memLimit, numCPU, sectionUserID }: TemplateProps) 
     let [isOpen, setIsOpen] = useState(false)
     let [updateIsOpen, setUpdateIsOpen] = useState(false)
     let ref = useRef( )
-    
+    let [useFreshSave, setUseFreshSave] = useState(false)
     var instanceFlag = true
     if (template.containerID == undefined) {
         instanceFlag = false
@@ -54,7 +57,16 @@ function Template({ template, memLimit, numCPU, sectionUserID }: TemplateProps) 
                             <div className="font-medium text-xs text-gray-400  ">{template.imageId}</div>
                         </div>
                         <div className="font-medium text-xs text-gray-400 justify-self-end">{template.description}</div>
-
+                        <div className="flex flex-row font-medium mt-4 dark:text-gray-300">
+                            <span>Use fresh new save</span>
+                            <span >
+                                <InformationCircleIcon data-for="messageTip" data-tip className="w-6 h-6"></InformationCircleIcon>
+                                <ReactTooltip id="messageTip" place="top" effect="solid">
+                                    this will overwrite the previous save(if exist)
+                                </ReactTooltip>
+                            </span>
+                        </div>
+                        <Toggle enabled={useFreshSave} onChange={() => setUseFreshSave(!useFreshSave)} />
                         {template.isExam && <div className="badge border-0 dark:bg-gray-300 dark:text-gray-600">Exam</div>}
                     </div>
                 </div>
@@ -81,7 +93,7 @@ function Template({ template, memLimit, numCPU, sectionUserID }: TemplateProps) 
                                 window.location.reload()
                             }:async () => {
                                 setIsOpen(true) ; 
-                                const response = await addContainer(template.imageId,memLimit,numCPU,sectionUserID,template.id,true,"student")
+                                const response = await addContainer(template.imageId,memLimit,numCPU,sectionUserID,template.id,true,"student",useFreshSave)
                                 window.location.reload();
                             }
                         }, 

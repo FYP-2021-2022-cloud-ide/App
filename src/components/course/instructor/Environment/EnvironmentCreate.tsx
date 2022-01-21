@@ -16,11 +16,11 @@ const EnvironmentCreate = React.forwardRef(({ sectionUserID, closeModal }: Envir
     const [mode, setMode] = useState("")
     const [environmentName, setEnvironmentName] = useState("")
     const [description, setDescription] = useState("")
-    const rootImage = "5cd49927fb40"
+    const rootImage = "143.89.223.188:5000/codeserver:latest"
     const options : Option[] = [
-        { value: 'C++/C', id: 'a2f570bc987f' },
-        { value: 'Python3', id: '4610218071a3' },
-        { value: 'Java', id: '339c3a6ed6f3' },
+        { value: 'C++/C', id: '143.89.223.188:5000/codeserver:latest' },
+        { value: 'Python3', id: '143.89.223.188:5000/codeserver:latest' },
+        { value: 'Java', id: '143.89.223.188:5000/codeserver:latest' },
     ]
 
     const CPU = 0.5
@@ -151,7 +151,7 @@ const EnvironmentCreate = React.forwardRef(({ sectionUserID, closeModal }: Envir
                                 <button
                                     onClick={async () => {
                                         nextStep()
-                                        const response = await addContainer(rootImage, memory, CPU, sectionUserID, "", false, "root")//non-existent template id
+                                        const response = await addContainer(rootImage, memory, CPU, sectionUserID, "", false, "root",true)//non-existent template id
                                         console.log(response)
                                         if (response.success) {
                                             // const fakeWindow= window.open("",'_blank')

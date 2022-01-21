@@ -5,6 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 type Data = {
     success:boolean
     userId:string
+    role:string
     semesterId:string
     darkMode:boolean
     bio:string
@@ -48,6 +49,7 @@ export default async function handler(
         res.json({
             success: GoLangResponse.getSuccess(),
             userId: GoLangResponse.getUserid(),
+            role:GoLangResponse.getRole(),
             semesterId: GoLangResponse.getSemesterid(),
             darkMode:GoLangResponse.getDarkmode(),
             bio:GoLangResponse.getBio(),

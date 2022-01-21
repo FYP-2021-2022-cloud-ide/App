@@ -2,7 +2,6 @@ import React, { useContext, useState, useEffect } from "react";
 import { getMessaging, onMessage } from "firebase/messaging";
 import { firebaseCloudMessaging } from "../lib/webpush";
 // import {notificationStack} from "../lib/notificationStack";
-
 import toast, { Toaster } from "react-hot-toast";
 import { Notification,NotificationBody } from "../components/Notification";
 
@@ -22,7 +21,7 @@ interface CnailsContextState {
     environmentList: (sectionid:string, sub:string ) => Promise<any>,
     templateList: (sectionid:string, sub:string ) => Promise<any>,
     
-    addContainer: (imageName :string,memLimit :Number,numCPU:Number,section_user_id :string,template_id :string,dbStored:boolean,accessRight:string) => Promise<any>,
+    addContainer: (imageName :string,memLimit :Number,numCPU:Number,section_user_id :string,template_id :string,dbStored:boolean,accessRight:string,useFresh:boolean) => Promise<any>,
     removeContainer: (containerId:string, sub:string) => Promise<any>,
     submitFiles:(containerId:string, section_user_id:string ) => Promise<any>,
 
@@ -42,12 +41,12 @@ interface CnailsContextState {
     removeNotification:(userId:string, notificationId:string)=> Promise<any>,
 
     listFolders:(userId:string)=> Promise<any>,
-    downloadFile:(userId:string, filePath:string)=> Promise<any>,
-    uploadFile:(userId:string, filePath:string,blob:Blob)=> Promise<any>,
+    downloadFileToUser:(userId:string, filePath:string,type:string)=> Promise<any>,
+    downloadFileToNext:(userId:string, filePath:string)=> Promise<any>,
+    uploadFiles:(userId:string, content:FormData)=> Promise<any>,
     removeFile:(userId:string, path:string)=> Promise<any>,
     makeFolder:(userId:string, path:string)=> Promise<any>,
     moveFile:(userId:string, source:string,target:string)=> Promise<any>,
-    removeFileLocal:(userId:string,  filePath:string)=> Promise<any>,
 
 
     sub: string,
@@ -55,7 +54,8 @@ interface CnailsContextState {
     email: string,
     userId: string,
     semesterId: string,
-    bio:string
+    bio:string,
+    isAdmin: boolean,
 }
 
 interface CnailsProviderProps {
@@ -75,6 +75,7 @@ export const CnailsProvider = ({children}: CnailsProviderProps) => {
     const[userId, setUserId] = useState('')
     const[semesterId, setSemesterId] = useState('')
     const[bio, setBio] = useState('')
+    const[isAdmin, setIsAdmin] = useState(false)
     useEffect(() => {
         init()
         // setupNotification();
@@ -85,13 +86,15 @@ export const CnailsProvider = ({children}: CnailsProviderProps) => {
             })
             const cookiesContent = await cookies.json()
             console.log(cookiesContent)
-            const { sub, name, email, userId, semesterId,bio } = cookiesContent
+            const { sub, name, email, userId, semesterId,bio, role } = cookiesContent
             setSub(sub)
             setName(name)
             setEmail(email)
             setUserId(userId)
             setSemesterId(semesterId)
             setBio(bio)
+            if (role == "admin")
+                setIsAdmin(true)
             try {
                 const token = await firebaseCloudMessaging.init();
                 console.log('after token')
@@ -209,7 +212,8 @@ export const CnailsProvider = ({children}: CnailsProviderProps) => {
         section_user_id :string,
         template_id :string,
         dbStored:boolean,
-        accessRight:string)=>{
+        accessRight:string,
+        useFresh:boolean)=>{
         var res =  await fetch('/api/container/addContainer',{
             method: 'POST', 
             body:JSON.stringify({ 
@@ -220,6 +224,7 @@ export const CnailsProvider = ({children}: CnailsProviderProps) => {
                 "template_id" :template_id,
                 "dbStored":dbStored,
                 "accessRight":accessRight,
+                "useFresh":useFresh,
             }),
         })
         return res.json()
@@ -427,8 +432,18 @@ export const CnailsProvider = ({children}: CnailsProviderProps) => {
         })
         return res.json()
     }
-    const downloadFile = async (userId:string,filePath:string)=>{
-        var res =  await fetch('/api/cloudFile/downloadFile?userId='+userId,{
+    const downloadFileToUser = async (userId:string,filePath:string,type:string)=>{
+        var res =  await fetch('/api/cloudFile/downloadFileToUser?userId='+userId,{
+            method: 'POST', 
+            body:JSON.stringify({ 
+                "filePath": filePath,
+                type:type,
+            }),
+        })
+        return res.json()
+    }
+    const downloadFileToNext = async (userId:string,filePath:string)=>{
+        var res =  await fetch('/api/cloudFile/downloadFileToNext?userId='+userId,{
             method: 'POST', 
             body:JSON.stringify({ 
                 "filePath": filePath,
@@ -436,12 +451,7 @@ export const CnailsProvider = ({children}: CnailsProviderProps) => {
         })
         return res.json()
     }
-    const uploadFile = async (userId:string,filePath:string,blob:Blob)=>{
-        var content=new FormData()
-        content.append("filePath",filePath)
-        content.append("file",blob)
-        // console.log(content)
-        //var file = Buffer.from(blob)
+    const uploadFiles = async (userId:string,content:FormData)=>{
         var res =  await fetch('/api/cloudFile/uploadFile?userId='+userId,{
             method: 'POST', 
             body:content,
@@ -476,15 +486,7 @@ export const CnailsProvider = ({children}: CnailsProviderProps) => {
         })
         return res.json()
     }
-    const removeFileLocal = async (userId:string,filePath:string)=>{
-        var res =  await fetch('/api/cloudFile/removeFileLocal?userId='+userId,{
-            method: 'POST', 
-            body:JSON.stringify({ 
-                "filePath": filePath,
-            }),
-        })
-        return res.json()
-    }
+
     
     if (sub == "" || userId == "" ){
         return (
@@ -526,19 +528,20 @@ export const CnailsProvider = ({children}: CnailsProviderProps) => {
                     removeNotification,
 
                     listFolders,
-                    downloadFile,
-                    uploadFile,
+                    downloadFileToUser,
+                    downloadFileToNext,
+                    uploadFiles,
                     removeFile,
                     makeFolder,
                     moveFile,
-                    removeFileLocal,
 
                     sub,
                     name,
                     email,
                     userId,
                     semesterId,
-                    bio
+                    bio,
+                    isAdmin,
                 }}
             >
             <Toaster position="top-right" />

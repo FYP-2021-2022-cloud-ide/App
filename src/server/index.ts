@@ -102,11 +102,14 @@ app.prepare().then(() => {
                 semesterId: GolangResponse.getSemesterid(),
                 darkMode:GolangResponse.getDarkmode(),
                 bio:GolangResponse.getBio(),
+                role: GolangResponse.getRole()
               })
             })
           }).then((value) => {
             //@ts-ignore
             res.cookie('userId', value.userId, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `${process.env.HOSTNAME}` });
+            //@ts-ignore
+            res.cookie('role', value.role, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `${process.env.HOSTNAME}` });
             //@ts-ignore
             res.cookie('semesterId', value.semesterId, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `${process.env.HOSTNAME}` });
             //@ts-ignore
@@ -162,33 +165,33 @@ app.prepare().then(() => {
     });
   });
 
-  server.all('/course/:sectionId/:role', async function (req: Request, res: Response) {
-    try {
-      console.log('inside role checking')
-      const response = await fetch("http://auth:8181/v1/data/section_role/section_id", {
-        body: JSON.stringify({
-          input: {
-            itsc: req.oidc.user!.sub,
-            path: [req.params.sectionId, req.params.role]
-          }
-        }),
-        headers: {
-          Authorization: `Bearer ${process.env.OPASECRET}`,
-          "Content-Type": "application/json"
-        },
-        method: "POST"
-      })
-      const { result: { allow } } = await response.json()
-      if (allow) {
-        return handle(req, res);
-      } else {
-        res.redirect('/')
-      }
-    } catch (error) {
-      console.log(error)
-      res.redirect('/')
-    }
-  })
+  // server.all('/course/:sectionId/:role', async function (req: Request, res: Response) {
+  //   try {
+  //     console.log('inside role checking')
+  //     const response = await fetch("http://auth:8181/v1/data/section_role/section_id", {
+  //       body: JSON.stringify({
+  //         input: {
+  //           itsc: req.oidc.user!.sub,
+  //           path: [req.params.sectionId, req.params.role]
+  //         }
+  //       }),
+  //       headers: {
+  //         Authorization: `Bearer ${process.env.OPASECRET}`,
+  //         "Content-Type": "application/json"
+  //       },
+  //       method: "POST"
+  //     })
+  //     const { result: { allow } } = await response.json()
+  //     if (allow) {
+  //       return handle(req, res);
+  //     } else {
+  //       res.redirect('/')
+  //     }
+  //   } catch (error) {
+  //     console.log(error)
+  //     res.redirect('/')
+  //   }
+  // })
 
   // grpc api route 
   server.all('/quickAssignmentInit/:templateID', async function (req: Request, res: Response) {

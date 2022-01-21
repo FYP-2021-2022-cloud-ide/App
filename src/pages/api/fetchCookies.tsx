@@ -10,6 +10,7 @@ type Data = {
   semesterId: string
   darkMode:string
   bio:string
+  role: string
 }
 
 export default function handler(
@@ -17,7 +18,7 @@ export default function handler(
   res: NextApiResponse<Data>
   ) {
     //console.log(req.headers.cookie!)
-    const {sub, name, email, userId, semesterId , darkMode,bio} = parse(req.headers.cookie!)
+    const {sub, name, email, userId, semesterId , darkMode, bio, role} = parse(req.headers.cookie!)
     res.json({
         sub,
         name,
@@ -26,6 +27,6 @@ export default function handler(
         semesterId,
         darkMode,
         bio,
-      
+        role,
     })
   }

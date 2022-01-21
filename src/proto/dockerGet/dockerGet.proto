@@ -24,6 +24,7 @@ service Docker {
   rpc instantAddContainer(InstantAddContainerRequest)returns(AddContainerReply){}
   rpc removeContainer(RemoveContainerRequest)returns(SuccessStringReply){} 
   rpc submitFiles(SubmitFilesRequest)returns(SuccessStringReply){} 
+  rpc getContainerTime(RemoveContainerRequest)returns(ContainerTimeReply){} 
 
   rpc addTemplate(AddTemplateRequest)returns(AddTemplateReply){}
   rpc updateTemplate(UpdateTemplateRequest)returns(SuccessStringReply){}
@@ -46,15 +47,33 @@ service Docker {
   rpc updateNotificationToken(UpdateNotificationTokenRequest)returns(SuccessStringReply){}
   rpc updateSubscription(UpdateSubscriptionRequest)returns(SuccessStringReply){}
 
-  rpc listFolders(UserIdRequest)returns(ListFolderReply){}
-  rpc downloadFile(DownloadRequest)returns(stream DownloadReply){}
-  rpc uploadFile(stream UploadRequest)returns(UploadReply){}
-  rpc removeFile(PathRequest)returns(SuccessStringReply){}
-  rpc makeFolder(PathRequest)returns(SuccessStringReply){}
-  rpc moveFile(MoveFileRequest)returns(SuccessStringReply){}
+  rpc googleOAuth(EmptyRequest)returns(SuccessStringReply){}
+  rpc requestAccessToken(CodeRequest)returns(SuccessStringReply){}
+  rpc googleListFile(ListFilesRequest)returns(ChildrenReply){}
+  rpc googleDownloadFiles(DownloadRequest)returns(SuccessStringReply){}
+  rpc googleUploadFiles(UploadRequest)returns(SuccessStringReply){}
 }
 
+message ListFilesRequest{
+  string sub = 1;
+  string folderId = 2;
+}
 
+message ChildrenReply{
+  message child{
+    string id = 1;
+    string name = 2;
+  }
+  repeated child files = 1;
+  repeated child folders = 2;
+  bool success = 3;
+  string message = 4;
+}
+
+message CodeRequest{
+  string code = 1;
+  string sub = 2;
+}
 
 message UserIdRequest {
   string userId = 1;
@@ -168,6 +187,7 @@ message AddContainerRequest{
   string template_id=5;
   bool dbStored =6;
   string accessRight= 7;
+  bool useFresh=8;
 }
 
 message InstantAddContainerRequest {
@@ -186,6 +206,13 @@ message RemoveContainerRequest {
 message SubmitFilesRequest{
   string containerID=2;
   string section_user_id = 4;
+}
+message ContainerTimeReply{
+  bool success=1;
+	string message=2;
+  bool is_exam=3;
+  string time_limit=4;
+  string created_at=5;
 }
 
 
@@ -294,6 +321,7 @@ message GetUserDataReply{
   bool success = 1;
   string message = 2;
   string userId = 3;
+  string role=7;
   string semesterId = 4;
   bool darkMode =5;
   string bio =6;
@@ -339,59 +367,17 @@ message UpdateSubscriptionRequest{
   string semesterId = 3;
 }
 
-message ListFolderReply{
-  bool success=1;
-  string message=2;
-  Folder root =3;
-}
-message Folder{
-  string name=1;
-  repeated Folder children=2;
-  message Files {
-    string name=1;
-    string path =2;
-  }
-  repeated Files files =3;
-
+message DownloadRequest{
+  string sub=5;
+  string fileId=1;
+  string fileName=2;
+  string filePath=3;
+  string fileType=4;
 }
 
-
-
-message DownloadRequest {
-  string filePath = 1;
-  string userId = 2;
-}
-
-message DownloadReply {
-  bool success=1;
-  string message=2;
-  bytes content=3;
-}
-
-message UploadRequest {
-  oneof data{
-      bytes content=2;
-      UploadMetadata metaData=1;
-  }
-  message UploadMetadata{
-    string filePath=1;
-    string userId = 2;
-  }
-}
-
-message UploadReply {
-  bool success=1;
-  string message=2;
-  int64 size =3;
-}
-
-message PathRequest{
-  string path = 1;
-  string userId = 2;
-}
-
-message MoveFileRequest{
-  string source = 1;
-  string target = 2;
-  string userId = 3;
+message UploadRequest{
+  string sub=5;
+  string filePath=3;
+  string parentId=1;
+  string fileType=4;
 }

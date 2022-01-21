@@ -175,8 +175,14 @@ const TemplateCreate = React.forwardRef(({ memLimit, numCPU, sectionUserID, envi
                         onChange={(e) => setDescription(e.target.value)}></textarea>
 
 
-                    <div className="font-medium mt-4 dark:text-gray-300">
-                        Is it an Exam?
+                    <div className="flex flex-row font-medium mt-4 dark:text-gray-300">
+                        <span>Is it an Exam?</span>
+                        <span >
+                            <InformationCircleIcon data-for="messageTip" data-tip className="w-6 h-6"></InformationCircleIcon>
+                            <ReactTooltip id="messageTip" place="top" effect="solid">
+                                this will allow them to use only the editor
+                            </ReactTooltip>
+                        </span>
                     </div>
                     {/* <input className="focus:outline-none dark:bg-gray-600 dark:text-gray-600" type="checkbox"
                         checked={isExam}
@@ -217,7 +223,7 @@ const TemplateCreate = React.forwardRef(({ memLimit, numCPU, sectionUserID, envi
                         <button
                             onClick={async () => {
                                 nextStep()
-                                const response = await addContainer(selectedEnv.id, memLimit, numCPU, sectionUserID, "", false, "student")//non-existent template id
+                                const response = await addContainer(selectedEnv.id, memLimit, numCPU, sectionUserID, "", false, "student",true)//non-existent template id
                                 if (response.success) {
                                     setContainerID(response.containerID)
                                 }
