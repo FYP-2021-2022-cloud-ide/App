@@ -52,13 +52,13 @@ function DisplayLocal({opened,tree}:props){
         <div>
             {opened?
             <div>
-                {childrenList.map(child=>{fileOrFolder(child)})}
+                {childrenList.map(child=>{return <FileOrFolder child={child}></FileOrFolder>})}
             </div>:
             <div></div>}
         </div>)
 }
 
-function fileOrFolder(child){
+function FileOrFolder({child}){
     const { userId,makeFolder} = useCnails()
     const[mkdirOpen, setMkdirNameOpen]=useState(false)
     const[mkdirName, setMkdirName]=useState("")
