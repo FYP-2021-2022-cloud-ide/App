@@ -52,7 +52,7 @@ function DisplayLocal({opened,tree}:props){
         <div>
             {opened?
             <div>
-                {childrenList.map(child=>{return <FileOrFolder child={child}></FileOrFolder>})}
+                {childrenList.map(child=>{return <FileOrFolder key={ child.path} child={child}></FileOrFolder>})}
             </div>:
             <div></div>}
         </div>)
@@ -64,7 +64,7 @@ function FileOrFolder({child}){
     const[mkdirName, setMkdirName]=useState("")
     const[opened,setOpened]=useState(false)
     return(
-    <div key={child.path}>
+    <div>
         {child.type=="directory"?
         <div className="pl-6 flex flex-col py-1">
             <div className="flex flex-row gap-x-1">
