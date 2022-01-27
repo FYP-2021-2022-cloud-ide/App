@@ -1,84 +1,101 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { IncomingForm } from 'formidable'
-import fs from 'fs';
-// import {grpcClient}from '../../../lib/grpcClient'
+import fs from 'fs/promises';
 import { nobody } from '../../../lib/cloudFile';
-// import {Duplex}  from 'stream'; 
 import path from 'path';
-// import {  UploadRequest,  UploadReply } from '../../../proto/dockerGet/dockerGet_pb';
-// import { files } from 'jszip';
-// import async from 'async'
+import dirTree, { DirectoryTree } from "directory-tree"
+
 
 
 type Data = {
-  success: boolean
-  message:string
+    success: boolean
+    message: string
+    tree: DirectoryTree
 }
 
 export const config = {
-  api: {
-    bodyParser: false,
-  },
+    api: {
+        bodyParser: false,
+    },
 };
 
 
-export default  async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Data>
+export default async function handler(
+    req: NextApiRequest,
+    res: NextApiResponse<Data>
 ) {
-  // var client = grpcClient()
-  const { userId } = req.query;
-  // const {file} = JSON.parse(req.body);
-  // var formData :FormData=req.body
-  // //console.log(formData)
+    // var client = grpcClient()
+    const { userId } = req.query;
+    // const {file} = JSON.parse(req.body);
+    // var formData :FormData=req.body
+    // //console.log(formData)
 
-  const data = await new Promise((resolve, reject) => {
-    const form = new IncomingForm();
-    form.parse(req, (err, fields, files) => {
-      if (err) return reject(err);
-      resolve({ fields, files });
+    const data: any = await new Promise((resolve, reject) => {
+        const form = new IncomingForm({ multiples: true });
+        form.parse(req, (err, fields, { files }) => {
+            if (err) return reject(err);
+            resolve({ fields, files });
+        });
     });
-  });
 
-  // console.log(data)
-  // //@ts-ignore
-  // const file = data?.files?.folderzip.filepath;
-  // //@ts-ignore
-  // const fileName = data?.files?.folderzip.originalFilename+".zip"
-  //@ts-ignore
-  const filePath = data?.fields?.filePath;
-  // const filePath_next = path.join(process.cwd(), `/public/uploadTest/data.txt`);
-  // var readStream: fs.ReadStream = fs.createReadStream(data?.files?.nameOfTheInput.path);
+    let tree1: DirectoryTree
 
-  //@ts-ignore
-  for (let file in data?.files){
-      //@ts-ignore
-    var thisFile =data?.files[file]
-    var targetPath= filePath+'/'+thisFile.originalFilename
-    ensureDirectoryExistence(targetPath)
-    fs.copyFileSync(thisFile.filepath,targetPath)
-    fs.chmodSync(targetPath,0o777) 
-    fs.lchownSync(targetPath,nobody(),nobody()) 
-  }
-  res.json({ 
-    success :true,
-    message: ""
-  });
+    try {
+        tree1 = dirTree("/volumes/" + userId + "/persist")
+    } catch (error) {
+        res.json(error);
+        res.status(405).end();
+    }
 
-  res.status(200).end();
+
+    const { fields: { filePath }, files } = data
+    if (Array.isArray(files)) {
+        files.forEach(async (file, index) => {
+            var targetPath = `/${filePath.split("/").filter(t => t != "").join("/")}/${file.originalFilename.split("/").filter(t => t != "").join("/")}`
+            await ensureDirectoryExistence(targetPath)
+            await fs.copyFile(file.filepath, targetPath)
+            await fs.chmod(targetPath, 0o777)
+            await fs.lchown(targetPath, nobody(), nobody())
+        })
+    } else {
+        var file = files
+        console.log(file.filepath)
+        var targetPath = `${filePath}/${file.originalFilename}`
+        await ensureDirectoryExistence(targetPath)
+        await fs.copyFile(file.filepath, targetPath)
+        await fs.chmod(targetPath, 0o777)
+        await fs.chown(targetPath, nobody(), nobody())
+    }
+    let tree2: DirectoryTree
+    console.log("check tree2 ")
+
+    try {
+        tree2 = dirTree("/volumes/" + userId + "/persist")
+        // if (JSON.stringify(tree1) == JSON.stringify(tree2))
+        //     throw new Error("internal server error. Past tree and current tree is the same")
+        console.log("return data")
+        res.json({
+            success: true,
+            tree: tree2,
+            message: "upload successful"
+        });
+
+        res.status(200).end();
+    } catch (error) {
+        res.json(error);
+        res.status(405).end();
+    }
 }
-function ensureDirectoryExistence(filePath) {
-  var dirname = path.dirname(filePath);
-  if (fs.existsSync(dirname)) {
-    return true;
-  }
-  ensureDirectoryExistence(dirname);
-  fs.mkdirSync(dirname);
-  fs.chmodSync(dirname,0o777) 
-  fs.lchownSync(dirname,nobody(),nobody()) 
-
+async function ensureDirectoryExistence(filePath) {
+    try {
+        await fs.readdir(path.dirname(filePath))
+    } catch (error) {
+        console.log(`creating ${path.dirname(filePath)}`)
+        await fs.mkdir(path.dirname(filePath), { recursive: true })
+    }
 }
+
+
 
 // function bufferToStream(myBuffer:Buffer) {
 //   let tmp = new Duplex();

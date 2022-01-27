@@ -33,7 +33,7 @@ export default function Home() {
     // console.log('testing')
     console.log(containers)
     return (
-        <div>
+        <>
             {courses && containers ? (
                 <div className="flex flex-col mx-6">
                     {/* @ts-ignore */}
@@ -43,6 +43,6 @@ export default function Home() {
                 </div>
             ) : <div className="flex h-screen w-full"><div className='m-auto'><Loader></Loader></div></div>
             }
-        </div>
+        </>
     )
 }

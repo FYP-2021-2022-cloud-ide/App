@@ -41,6 +41,54 @@ function Template({ template, memLimit, numCPU, sectionUserID }: TemplateProps) 
         }
     }
 
+    var meunItems = [
+        {
+            text : "delete" , 
+            onClick : async () => {
+                const response = await removeTemplate(template.id,sectionUserID)
+                console.log(response)
+                window.location.reload()
+            } , 
+        }, 
+        { 
+            text : "update" , 
+            onClick : ()=> setUpdateIsOpen(true)
+        }, 
+        {
+            text :instanceFlag? "close" :  "open", 
+            onClick :instanceFlag?   async () => {
+                const response = await removeContainer(template.containerID, sub)
+                console.log(response)
+                window.location.reload()
+            }:async () => {
+                setIsOpen(true) ; 
+                const response = await addContainer(template.imageId,memLimit,numCPU,sectionUserID,template.id,true,"student",useFreshSave)
+                window.location.reload();
+            }
+        }, 
+        {
+            text : template.active ? "deactivate" : "activate" , 
+            onClick : template.active ? async () => {
+                        
+                const response = await deactivateTemplate(template.id,sectionUserID)
+                console.log(response)
+                window.location.reload();
+            }: async () => {
+                const response = await activateTemplate(template.id,sectionUserID)
+                console.log(response)
+                window.location.reload();
+            }
+        },
+    ]
+    if (template.active){
+        meunItems.push({
+            text :  "share link" , 
+            onClick : () => {
+                navigator.clipboard.writeText("https://codespace.ust.dev/quickAssignmentInit/"+template.id)
+            }
+        })
+    }
+
     return (
         <div onClick={OpenContainer} className={`min-h-36 h-36 border cursor-pointer border-gray-200 dark:border-gray-700 shadow-sm rounded-lg px-5 py-4 ${template.active ? "bg-white dark:bg-gray-600" : "bg-gray-200 dark:bg-gray-900"}`}>
             <div className="flex flex-row  justify-between h-full">
@@ -57,6 +105,8 @@ function Template({ template, memLimit, numCPU, sectionUserID }: TemplateProps) 
                             <div className="font-medium text-xs text-gray-400  ">{template.imageId}</div>
                         </div>
                         <div className="font-medium text-xs text-gray-400 justify-self-end">{template.description}</div>
+                        {!template.isExam &&
+                        <div>
                         <div className="flex flex-row font-medium mt-4 dark:text-gray-300">
                             <span>Use fresh new save</span>
                             <span >
@@ -67,50 +117,13 @@ function Template({ template, memLimit, numCPU, sectionUserID }: TemplateProps) 
                             </span>
                         </div>
                         <Toggle enabled={useFreshSave} onChange={() => setUseFreshSave(!useFreshSave)} />
+                        </div>}
                         {template.isExam && <div className="badge border-0 dark:bg-gray-300 dark:text-gray-600">Exam</div>}
                     </div>
                 </div>
 
                 <div className="w-1/12">
-                    <Menu items={[
-                        {
-                            text : "delete" , 
-                            onClick : async () => {
-                                const response = await removeTemplate(template.id,sectionUserID)
-                                console.log(response)
-                                window.location.reload()
-                            } , 
-                        }, 
-                        { 
-                            text : "update" , 
-                            onClick : ()=> setUpdateIsOpen(true)
-                        }, 
-                        {
-                            text :instanceFlag? "close" :  "open", 
-                            onClick :instanceFlag?   async () => {
-                                const response = await removeContainer(template.containerID, sub)
-                                console.log(response)
-                                window.location.reload()
-                            }:async () => {
-                                setIsOpen(true) ; 
-                                const response = await addContainer(template.imageId,memLimit,numCPU,sectionUserID,template.id,true,"student",useFreshSave)
-                                window.location.reload();
-                            }
-                        }, 
-                        {
-                            text : template.active ? "deactivate" : "active" , 
-                            onClick : template.active ? async () => {
-                                        
-                                const response = await deactivateTemplate(template.id,sectionUserID)
-                                console.log(response)
-                                window.location.reload();
-                            }: async () => {
-                                const response = await activateTemplate(template.id,sectionUserID)
-                                console.log(response)
-                                window.location.reload();
-                            }
-                        }
-                    ]}></Menu>
+                    <Menu items={meunItems}></Menu>
                 </div>
             </div>
             <Modal isOpen={isOpen} setOpen={setIsOpen}>

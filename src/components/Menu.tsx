@@ -24,15 +24,16 @@ const Menu = ({ sub, name, email }: props) => {
     }
 
     return (
-        <div className="flex flex-row mt-4 mr-8">
+        <div className="flex flex-row  justify-end z-30 items-center p-5">
             <SearchBar />
             <div className='flex flex-row items-center text-gray-500 justify-end gap-x-4'>
+
                 <UserMenu sub={sub} name={name} email={email}></UserMenu>
-                <NotiStack/>
+                <NotiStack />
                 {/* <QuestionMarkCircleIcon className='w-6 h-6 hover:scale-110 transition  ease-in-out duration-300 dark:text-gray-300'></QuestionMarkCircleIcon> */}
                 {
-                    isDark ? <SunIcon className="w-6 h-6 text-yellow-400" onClick={() => setDark(!isDark)}></SunIcon> :
-                     <MoonIcon className='w-6 h-6 hover:scale-110 transition-all ease-in-out duration-300' onClick={() => setDark(!isDark)}></MoonIcon>
+                    isDark ? <SunIcon className="w-6 h-6 text-yellow-400 cursor-pointer" onClick={() => setDark(!isDark)}></SunIcon> :
+                        <MoonIcon className='w-6 h-6 hover:scale-110 transition-all ease-in-out duration-300 cursor-pointer' onClick={() => setDark(!isDark)}></MoonIcon>
                 }
             </div>
         </div>

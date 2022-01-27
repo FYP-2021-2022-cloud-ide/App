@@ -201,6 +201,7 @@ app.prepare().then(() => {
       docReq.setSub(req.oidc.user!.sub)
       docReq.setTemplateId(req.params.templateID)
       client.instantAddContainer(docReq, function (err, GoLangResponse: AddContainerReply) {
+        // console.log(err,GoLangResponse.getMessage())
         if (!GoLangResponse.getSuccess()) {
           console.log(GoLangResponse.getMessage())
           res.redirect('/')

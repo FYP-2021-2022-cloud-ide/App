@@ -22,7 +22,7 @@ export default async function handler(
     const { userId } = req.query;
     var body = JSON.parse(req.body);
     var filePath:string=body.filePath
-    var fileType:string=body.type
+    var isFolder : boolean = body.isFolder 
     // var docReq = new DownloadRequest();
     // docReq.setFilepath(filePath)
     // docReq.setUserid(userId as string);
@@ -49,7 +49,7 @@ export default async function handler(
       //   fs.chmodSync(filePath_next,0o777)  
       // }
       var base64:string
-      if (fileType=='folder'){
+      if (isFolder){
         fileName+='.zip'
         const zip = new JSZip();
         addFilesFromDirectoryToZip(filePath,rootPath, zip);
@@ -66,7 +66,6 @@ export default async function handler(
       res.status(200).end()
     }
     catch(error) {
-        //@ts-ignore
         res.json(error);
         res.status(405).end();
     }

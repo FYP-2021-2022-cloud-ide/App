@@ -9,9 +9,9 @@ import dirTree from 'directory-tree'
 // import {  ListFolderReply,  UserIdRequest,Folder } from '../../../proto/dockerGet/dockerGet_pb';
 
 type Data = {
-  success: boolean
-  message:string
-  root: directoryTree.DirectoryTree | null
+    success: boolean
+    message: string
+    tree: directoryTree.DirectoryTree | null
 }
 
 // type Folder= {
@@ -38,7 +38,7 @@ type Data = {
 //       }),
 //       children:f?.getChildrenList().map(child=>recursiveFolder(child))
 
-        
+
 //     })
 // }
 
@@ -50,41 +50,40 @@ type Data = {
 // }
 
 export default function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Data>
-  ) {
+    req: NextApiRequest,
+    res: NextApiResponse<Data>
+) {
     // var client = grpcClient()
+    console.log("get files from server ")
     const { userId } = req.query;
-    
+
     // var docReq = new UserIdRequest();
     // docReq.setUserid(userId as string);
-    
-    try{
-      // client.listFolders(docReq, function(err, GoLangResponse: ListFolderReply) {
-      //   if(!GoLangResponse.getSuccess()){
-      //     console.log(GoLangResponse.getMessage())
-      //   }
-      //   // console.log(GoLangResponse)
-      //   var root =GoLangResponse.getRoot();
-      //   res.json({ 
-      //     success : GoLangResponse.getSuccess(),
-      //     message: GoLangResponse.getMessage(),
-      //     root:recursiveFolder(root!)
-      //   });
-      const tree = dirTree("/volumes/"+userId+"/persist")
-      // console.log(tree)
-      res.json({ 
-        success :true,
-        message: "",
-        root:tree
-      });
 
-      res.status(200).end();
-      // })
+    try {
+        // client.listFolders(docReq, function(err, GoLangResponse: ListFolderReply) {
+        //   if(!GoLangResponse.getSuccess()){
+        //     console.log(GoLangResponse.getMessage())
+        //   }
+        //   // console.log(GoLangResponse)
+        //   var root =GoLangResponse.getRoot();
+        //   res.json({ 
+        //     success : GoLangResponse.getSuccess(),
+        //     message: GoLangResponse.getMessage(),
+        //     root:recursiveFolder(root!)
+        //   });
+        const tree = dirTree("/volumes/" + userId + "/persist")
+        // console.log(tree)
+        res.json({
+            success: true,
+            message: "",
+            tree: tree
+        });
+
+        res.status(200).end();
     }
-    catch(error) {
-        //@ts-ignore
+    catch (error) {
         res.json(error);
         res.status(405).end();
     }
-  }
+}
