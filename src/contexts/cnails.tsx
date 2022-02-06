@@ -229,11 +229,10 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
         return res.json()
     }
     const removeContainer = async (containerId: string, sub: string) => {
-        var res = await fetch('/api/container/removeContainer', {
+        var res = await fetch('/api/container/removeContainer?sub='+sub, {
             method: 'POST',
             body: JSON.stringify({
-                "containerId": containerId,
-                "sub": sub
+                "containerId": containerId
             }),
         })
         return res.json()

@@ -1,5 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { fetchAppSession } from '../../../lib/fetchAppSession';
 import {grpcClient}from '../../../lib/grpcClient'
 type Data = {
   success:boolean
@@ -7,31 +8,20 @@ type Data = {
 }
 import {  SuccessStringReply,RemoveContainerRequest  } from '../../../proto/dockerGet/dockerGet_pb';
 
-import { checkHaveContainer } from '../../../lib/authentication';
 
-function unauthorized(){
-  return({
-    success: false,
-    message: "unauthorized"
-  })
-}
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
   ) {
     var client = grpcClient()
-    var body = JSON.parse(req.body);console.log(body)
-    // check empty containerId --> user have that container?
-    {/* @ts-ignore */}
-    // if (!(await checkHaveContainer(body.containerId, req.oidc.user.sub)) ){
-    //   res.json(unauthorized())
-    //   return
-    // }
+    var body = JSON.parse(req.body)
+    const { sub} = req.query
 
     var docReq = new RemoveContainerRequest();
+    docReq.setSessionKey(fetchAppSession(req));
     docReq.setContainerid(body.containerId);
-    // docReq.setSub(body.sub)
+    docReq.setSub(sub as string)
     try{
       client.removeContainer(docReq, function(err, GoLangResponse: SuccessStringReply) {
         if(!GoLangResponse.getSuccess()){

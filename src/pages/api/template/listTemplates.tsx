@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 //remember to set the ownership after adding new api
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { fetchAppSession } from '../../../lib/fetchAppSession';
 
 type Data = {
   success: boolean
@@ -40,9 +41,7 @@ export default async function handler(
     // var body = JSON.parse(req.body);
     var docReq = new SectionAndSubRequest();
     const {sub, sectionid} = req.query;
-    {/* @ts-ignore */}
-    // if(!(await checkInSectionBySectionId(sub, sectionid, req.oidc.user.sub)))
-    // {res.json(unauthorized());return}
+    docReq.setSessionKey(fetchAppSession(req));
     docReq.setSub(sub as string);
     docReq.setSectionid(sectionid as string);
     try{

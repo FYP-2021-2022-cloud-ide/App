@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 //remember to set the ownership after adding new api
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { fetchAppSession } from '../../lib/fetchAppSession';
 
 type Data = {
   success: boolean
@@ -43,6 +44,7 @@ export default async function handler(
     //     return
     // } 
     var docReq = new UpdateUserDataRequest();
+    docReq.setSessionKey(fetchAppSession(req));
     docReq.setSub(sub as string);
     docReq.setDarkmode(darkMode);
     docReq.setBio(bio);

@@ -9,9 +9,9 @@ const SideBar = () => {
         // {name:"Teams",link:"/Teams", icon:UserGroupIcon},
         // {name:"Workspace",link:"/Workspace", icon:CubeTransparentIcon},
         // {name:"Setting",link:"/settings", icon:CogIcon},
-        { name: "Messages", link: "/messages", icon: AnnotationIcon },
+        { name: "Notifications", link: "/messages", icon: AnnotationIcon },
         { name: "Cloud", link: "/cloud", icon: CloudIcon },
-        { name: "Admin", link: "/admin", icon: IdentificationIcon }
+        // { name: "Admin", link: "/admin", icon: IdentificationIcon }
     ]
     const router = useRouter();
     const { isAdmin } = useCnails();

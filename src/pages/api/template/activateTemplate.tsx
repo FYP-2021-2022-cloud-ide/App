@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 //remember to set the ownership after adding new api
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { fetchAppSession } from '../../../lib/fetchAppSession';
 
 type Data = {
   success: boolean
@@ -33,6 +34,7 @@ export default async function handler(
     //     return
     //   }
     var docReq = new TemplateIdRequest();
+    docReq.setSessionKey(fetchAppSession(req));
     docReq.setTemplateid(templateId);
     docReq.setSectionUserId(section_user_id);
     try{

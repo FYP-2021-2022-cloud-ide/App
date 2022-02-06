@@ -24,7 +24,7 @@ const Menu = ({ sub, name, email }: props) => {
     }
 
     return (
-        <div className="flex flex-row  justify-end z-30 items-center p-5">
+        <div className="flex flex-row  justify-end  items-center p-5">
             <SearchBar />
             <div className='flex flex-row items-center text-gray-500 justify-end gap-x-4'>
 

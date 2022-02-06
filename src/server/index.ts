@@ -1,12 +1,14 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 
 import {grpcClient}from '../lib/grpcClient'
-import { SubRequest,  InstantAddContainerRequest, AddContainerReply, GetUserDataReply } from '../proto/dockerGet/dockerGet_pb';
+import { GetUserDataRequest,  InstantAddContainerRequest, AddContainerReply, GetUserDataReply, CheckHaveContainerRequest, SuccessStringReply } from '../proto/dockerGet/dockerGet_pb';
 
 import express from 'express';
 import { Request, Response, NextFunction } from 'express';
 import { Socket } from 'node:dgram';
 import axios from "axios";
+import crypto from "crypto";
+import redis from "redis";
 
 // rest of the code remains same
 //const { createProxyMiddleware } = require('http-proxy-middleware')
@@ -22,10 +24,13 @@ const app = next({ dev })
 const handle = app.getRequestHandler()
 import { auth, requiresAuth, OpenidRequest } from 'express-openid-connect';
 import { Header } from 'next/dist/lib/load-custom-routes';
+import { parse } from 'cookie';
+import { fetchAppSession } from '../lib/fetchAppSession';
 //import fetch from "node-fetch";
 
 const SESSION_VALID_FOR = 8 * 60 * 60 * 1000;
 const ID_LENGTH = 36;
+const client = redis.createClient(parseInt(process.env.REDIS_PORT!, 10), process.env.REDIS_HOST);
 
 
 app.prepare().then(() => {
@@ -33,23 +38,18 @@ app.prepare().then(() => {
   var httpServer = http.createServer(server)
 
   httpServer.on('upgrade', function (req: Request, socket: Socket, head: Header) {
-    // req.url = req.url.replace('/user/container/'+ req.params.id, '');
+    
     if (req.url.search('/_next/webpack-hmr') == -1){
       var baseURL = '/user/container/'
       var userPosition = req.url.search(baseURL)
       var id = req.url.slice(
         userPosition + baseURL.length,
         userPosition + baseURL.length + ID_LENGTH);
-      // req.url = req.url.slice(userPosition + baseURL.length + ID_LENGTH);
       console.log(id)
-      // req.header('User-Agent')
-      // const reqHost = req.headers.host
+
       req.headers.host = id
       req.url = req.url.slice(userPosition + baseURL.length + ID_LENGTH);
-      // head.headers['host'] = reqHost
 
-      // req.url = 'http://traefik.codespace.ust.dev/'+req.url
-      // req.url = req.params.id
       proxy.ws(req, socket, head, { target: 'http://traefik.codespace.ust.dev' });
     }else{
       proxy.ws(req, socket, head, { target: req.url });
@@ -74,11 +74,44 @@ app.prepare().then(() => {
         scope: 'openid profile email'
       },
       session:{
-        rolling:false,
-        absoluteDuration:SESSION_VALID_FOR/1000,
+        genid: () => crypto.randomBytes(16).toString('hex'),
+        store: {
+          get: (sid, callback) => {
+            const key = crypto.createHmac('sha1', process.env.SESSIONSECRET!).update(sid).digest().toString('base64');
+            client.get(key, (err, data)=>{
+              if(err) return callback(err)
+              if(!data) return callback(null)
+    
+              let result
+              try{
+                result = JSON.parse(data);
+              }catch(err){
+                return callback(err)
+              }
+              return callback(null, result)
+            });
+          },
+          set: (sid, data, callback) => {
+            // console.log(data)
+            const key = crypto.createHmac('sha1', process.env.SESSIONSECRET!).update(sid).digest().toString('base64');
+            client.set(key, JSON.stringify(data),'EX', 86400, callback)
+            // client.expire(key, 86400)
+          },
+          destroy: (sid,callback) => {
+            const key = crypto.createHmac('sha1', process.env.SESSIONSECRET!).update(sid).digest().toString('base64');
+            client.del(key, callback)
+          },
+        },
+        absoluteDuration: SESSION_VALID_FOR,
+        cookie: {
+          domain: process.env.HOSTNAME,
+          secure: true,
+        }
       },
       afterCallback: async (req, res, session, decodedState) => {
         try {
+          // // // @ts-ignore
+          console.log("session: ",session)
           const additionalUserClaims = await axios('https://cas.ust.hk/cas/oidc' + '/profile', {
             headers: {
               Authorization: 'Bearer ' + session.access_token
@@ -91,8 +124,10 @@ app.prepare().then(() => {
           req.appSession!.userIdentity = additionalUserClaims.data;
           const { sub, name, email } = additionalUserClaims.data;
           var client = grpcClient()
-          console.log(client)
-          var docReq = new SubRequest()
+          // console.log(client)
+          var docReq = new GetUserDataRequest()
+          docReq.setSessionKey(session.id_token)
+          docReq.setIsSessionKey(false)
           docReq.setSub(sub)
 
           await new Promise((resolve, reject) => {
@@ -220,12 +255,37 @@ app.prepare().then(() => {
   server.all('/user/container/:id/*', async function (req: Request, res: Response) {
     // req.url = req.url.replace('/user/container/' + req.params.id + '/', '');
     // req.header('User-Agent')
-    const reqHost = req.headers.host
-    req.headers.host = req.params.id
-    // req.header("Host") = req.params.id
-    req.url = req.url.replace('/user/container/' + req.params.id + '/', '');
-    // req.url = req.params.id
-    proxy.web(req, res, { target: 'http://traefik.codespace.ust.dev' })
+
+    try {
+      var client = grpcClient()
+      var docReq = new CheckHaveContainerRequest();
+      const {appSession} = parse(req.headers.cookie!)
+      const key = crypto.createHmac('sha1', process.env.SESSIONSECRET!).update(appSession).digest().toString('base64');
+      docReq.setSessionKey(key)
+      docReq.setSub(req.oidc.user!.sub)
+      docReq.setContainerid(req.params.id)
+      client.checkHaveContainer(docReq, function (err, GoLangResponse: SuccessStringReply) {
+        // console.log(err,GoLangResponse.getMessage())
+        if (GoLangResponse.getSuccess()) {
+          const reqHost = req.headers.host
+          req.headers.host = req.params.id
+          // req.header("Host") = req.params.id
+          req.url = req.url.replace('/user/container/' + req.params.id + '/', '');
+          // req.url = req.params.id
+          proxy.web(req, res, { target: 'http://traefik.codespace.ust.dev' })
+        } else {
+          console.log(GoLangResponse.getMessage())
+          console.log("unauthenticated")
+          res.redirect(`/`)
+        }
+      })
+    }
+    catch (error) {
+      console.log(error)
+      res.redirect('/')
+    }
+
+
     // res.writeHead(200,{"Host":reqHost})
     
     // try {

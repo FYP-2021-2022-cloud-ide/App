@@ -2,49 +2,27 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import {grpcClient}from '../../../lib/grpcClient'
 import {  AddContainerReply,  AddContainerRequest } from '../../../proto/dockerGet/dockerGet_pb';
-import { checkInSectionBySectionUserId } from '../../../lib/authentication';
-
+import {fetchAppSession} from '../../../lib/fetchAppSession'
 
 type Data = {
   success:boolean
   message: string
   containerID:string
 }
-function unauthorized(){
-  return({
-    success: false,
-    message: "unauthorized",
-    containerID: ""
-  })
-}
+
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
   ) {
-    // if (req.body == "") {
-    //   res.json({
-    //     success: false,
-    //     message: "unauthorized",
-    //     containerID: ""
-    //   })
-    // }
 
     var client = grpcClient()
     
     const {imageName, memLimit, numCPU, section_user_id, template_id,dbStored, accessRight,useFresh} = JSON.parse(req.body);//console.log(body)
 
-    // if (section_user_id != undefined){
-    //   if(!(await checkInSectionBySectionUserId(req.oidc.user.sub, section_user_id))){
-    //     res.json(unauthorized())
-    //     return
-    //   }
-    // }else{
-    //   res.json(unauthorized())
-    //   return
-    // }
 
     var docReq = new AddContainerRequest();
+    docReq.setSessionKey(fetchAppSession(req));
     docReq.setImagename(imageName);
     docReq.setMemlimit(memLimit);
     docReq.setNumcpu(numCPU);

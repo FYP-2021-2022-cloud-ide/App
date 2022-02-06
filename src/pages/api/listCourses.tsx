@@ -1,5 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { fetchAppSession } from '../../lib/fetchAppSession';
 
 type Data = {
   success: boolean
@@ -45,6 +46,7 @@ export default function handler(
     // }
 
     var docReq = new SubRequest();
+    docReq.setSessionKey(fetchAppSession(req));
     docReq.setSub(sub as string);
     try{
       client.listCourses(docReq, function(err, GoLangResponse: ListCoursesReply) {

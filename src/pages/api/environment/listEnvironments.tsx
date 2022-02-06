@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 //remember to set the ownership after adding new api
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { fetchAppSession } from '../../../lib/fetchAppSession';
 
 type Data = {
   success: boolean
@@ -18,32 +19,17 @@ type Environment = {
 
 import {grpcClient}from '../../../lib/grpcClient'
 import {  ListEnvironmentsReply,  SectionAndSubRequest } from '../../../proto/dockerGet/dockerGet_pb';
-import { checkInSectionBySectionId, checkRoleBySectionId } from '../../../lib/authentication';
 
-function unauthorized(){
-  return({
-    success: false,
-    message: "unauthorized",
-    environments: null
-  })
-}
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
   ) {
     var client = grpcClient()
-    // var body = JSON.parse(req.body);
     const{sectionid, sub} = req.query
-    // if (sectionid != undefined){
-    //   {/* @ts-ignore */}
-    //   if(!(await checkInSectionBySectionId(req.oidc.user.sub, sectionid)) || !(await checkRoleBySectionId(req.oidc.user.sub, sectionid, "instructor")))
-    //   {res.json(unauthorized());return;}
-    // }else{
-    //   res.json(unauthorized())
-    //   return
-    // }
+
     var docReq = new SectionAndSubRequest();
+    docReq.setSessionKey(fetchAppSession(req));
     docReq.setSectionid(sectionid as string);
     docReq.setSub(sub as string);
 

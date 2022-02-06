@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import Router, { useRouter } from "next/router";
 import CourseBar from "../../../../components/course/CourseBar";
 import WorkspacesList from "../../../../components/course/student/WorkspaceList";
 import React, { useEffect, useState } from 'react';
@@ -36,14 +36,18 @@ const Home = () => {
     }
     const fetchTemplates = async () => {
       const response = await templateList(sectionId, sub)//
-      if (response.success) {
-        console.log(response)
+      if (response.success && response.role=="student") {
         response.templates = response.templates.filter((template: Template) => template.active == true)
         setTemplateList(response.templates)
+      }else{
+        Router.push('/')
       }
     }
-    fetchSectionInfo()
-    fetchTemplates()
+    fetchSectionInfo().then(
+      ()=>{
+        fetchTemplates()
+      }
+    )
   }, [])
 
   return (

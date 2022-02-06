@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import Router, { useRouter } from "next/router";
 import CourseBar from "../../../../components/course/CourseBar";
 import EnvironmentList from "../../../../components/course/instructor/Environment/EnvironmentList";
 import TemplateList from "../../../../components/course/instructor/Template/TemplateList";
@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { useCnails } from "../../../../contexts/cnails";
 import Loader from "../../../../components/Loader";
 import Breadcrumbs from "../../../../components/Breadcrumbs";
+
 
 const Home = () => {
   const router = useRouter();
@@ -31,14 +32,18 @@ const Home = () => {
     }
     const fetchSectionInfo = async () => {
       const response = await getSectionInfo(sectionId, sub)//
-      if (response.success) {
+      console.log(response)
+      if (response.success && response.role == "instructor") {
         setSectionUserID(response.sectionUserID)
         setCourseName(response.courseName)
+      }else{
+        Router.push('/')
       }
     }
-    fetchEnvironments()
-    fetchTemplates()
-    fetchSectionInfo()
+    fetchSectionInfo().then(()=>{
+      fetchEnvironments()
+      fetchTemplates()
+    })
   }, [])
 
   return (

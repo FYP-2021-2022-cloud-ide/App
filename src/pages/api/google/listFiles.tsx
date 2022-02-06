@@ -1,4 +1,5 @@
 import { google } from 'googleapis';
+import { fetchAppSession } from '../../../lib/fetchAppSession';
 import {grpcClient}from '../../../lib/grpcClient'
 
 import {  ChildrenReply,  ListFilesRequest } from '../../../proto/dockerGet/dockerGet_pb';
@@ -40,6 +41,7 @@ export default async function handler(req, res) {
     const {folderId, sub} = JSON.parse(req.body)
     var client = grpcClient()
     var docReq = new ListFilesRequest();
+    docReq.setSessionKey(fetchAppSession(req));
     docReq.setFolderid(folderId)
     docReq.setSub(sub)
     try{

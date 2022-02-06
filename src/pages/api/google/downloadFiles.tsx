@@ -1,5 +1,6 @@
 // import { google } from 'googleapis';
 // import * as fs from 'fs';
+import { fetchAppSession } from '../../../lib/fetchAppSession';
 import {grpcClient}from '../../../lib/grpcClient'
 
 import {  SuccessStringReply,  DownloadRequest } from '../../../proto/dockerGet/dockerGet_pb';
@@ -41,6 +42,7 @@ export default async function handler(req, res) {
     const {sub,  fileId, fileName,filePath,fileType} = JSON.parse(req.body)
     var client = grpcClient()
     var docReq = new DownloadRequest();
+    docReq.setSessionKey(fetchAppSession(req));
     docReq.setSub(sub)
     docReq.setFileid(fileId)
     docReq.setFilename(fileName)

@@ -191,6 +191,17 @@ function deserialize_dockerGet_GetUserDataReply(buffer_arg) {
   return dockerGet_pb.GetUserDataReply.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_dockerGet_GetUserDataRequest(arg) {
+  if (!(arg instanceof dockerGet_pb.GetUserDataRequest)) {
+    throw new Error('Expected argument of type dockerGet.GetUserDataRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_GetUserDataRequest(buffer_arg) {
+  return dockerGet_pb.GetUserDataRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_dockerGet_InstantAddContainerRequest(arg) {
   if (!(arg instanceof dockerGet_pb.InstantAddContainerRequest)) {
     throw new Error('Expected argument of type dockerGet.InstantAddContainerRequest');
@@ -257,17 +268,6 @@ function deserialize_dockerGet_ListNotificationsReply(buffer_arg) {
   return dockerGet_pb.ListNotificationsReply.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_dockerGet_ListReply(arg) {
-  if (!(arg instanceof dockerGet_pb.ListReply)) {
-    throw new Error('Expected argument of type dockerGet.ListReply');
-  }
-  return Buffer.from(arg.serializeBinary());
-}
-
-function deserialize_dockerGet_ListReply(buffer_arg) {
-  return dockerGet_pb.ListReply.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
 function serialize_dockerGet_ListTemplatesReply(arg) {
   if (!(arg instanceof dockerGet_pb.ListTemplatesReply)) {
     throw new Error('Expected argument of type dockerGet.ListTemplatesReply');
@@ -277,17 +277,6 @@ function serialize_dockerGet_ListTemplatesReply(arg) {
 
 function deserialize_dockerGet_ListTemplatesReply(buffer_arg) {
   return dockerGet_pb.ListTemplatesReply.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_dockerGet_LoginRequest(arg) {
-  if (!(arg instanceof dockerGet_pb.LoginRequest)) {
-    throw new Error('Expected argument of type dockerGet.LoginRequest');
-  }
-  return Buffer.from(arg.serializeBinary());
-}
-
-function deserialize_dockerGet_LoginRequest(buffer_arg) {
-  return dockerGet_pb.LoginRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_dockerGet_RemoveContainerRequest(arg) {
@@ -468,17 +457,6 @@ function deserialize_dockerGet_UserIdRequest(buffer_arg) {
 
 
 var DockerService = exports.DockerService = {
-  login: {
-    path: '/dockerGet.Docker/login',
-    requestStream: false,
-    responseStream: false,
-    requestType: dockerGet_pb.LoginRequest,
-    responseType: dockerGet_pb.ListReply,
-    requestSerialize: serialize_dockerGet_LoginRequest,
-    requestDeserialize: deserialize_dockerGet_LoginRequest,
-    responseSerialize: serialize_dockerGet_ListReply,
-    responseDeserialize: deserialize_dockerGet_ListReply,
-  },
   checkHaveContainer: {
     path: '/dockerGet.Docker/checkHaveContainer',
     requestStream: false,
@@ -703,10 +681,10 @@ var DockerService = exports.DockerService = {
     path: '/dockerGet.Docker/getUserData',
     requestStream: false,
     responseStream: false,
-    requestType: dockerGet_pb.SubRequest,
+    requestType: dockerGet_pb.GetUserDataRequest,
     responseType: dockerGet_pb.GetUserDataReply,
-    requestSerialize: serialize_dockerGet_SubRequest,
-    requestDeserialize: deserialize_dockerGet_SubRequest,
+    requestSerialize: serialize_dockerGet_GetUserDataRequest,
+    requestDeserialize: deserialize_dockerGet_GetUserDataRequest,
     responseSerialize: serialize_dockerGet_GetUserDataReply,
     responseDeserialize: deserialize_dockerGet_GetUserDataReply,
   },

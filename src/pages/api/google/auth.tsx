@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { google } from 'googleapis';
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { fetchAppSession } from '../../../lib/fetchAppSession';
 import {grpcClient}from '../../../lib/grpcClient'
 // type Data = {
 //   success:boolean
@@ -24,6 +25,7 @@ export default function handler(req: NextApiRequest, res:NextApiResponse) {
   // res.status(200).json({ url: authUrl })
   console.log('inside auth')
   var docReq = new EmptyRequest();
+  docReq.setSessionKey(fetchAppSession(req));
   var client = grpcClient()
   try{
     client.googleOAuth(docReq, function(err, GoLangResponse: SuccessStringReply) {

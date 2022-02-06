@@ -1,5 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { fetchAppSession } from '../../../lib/fetchAppSession';
 import {grpcClient}from '../../../lib/grpcClient'
 type Data = {
   success:boolean
@@ -15,6 +16,7 @@ export default function handler(
     
     var body = JSON.parse(req.body);console.log(body)
     var docReq = new SubmitFilesRequest();
+    docReq.setSessionKey(fetchAppSession(req));
     docReq.setContainerid(body.containerId);
     try{
       client.submitFiles(docReq, function(err, GoLangResponse: SuccessStringReply) {

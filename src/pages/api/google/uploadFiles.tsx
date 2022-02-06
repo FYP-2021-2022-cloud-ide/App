@@ -1,3 +1,4 @@
+import { fetchAppSession } from '../../../lib/fetchAppSession';
 import {grpcClient}from '../../../lib/grpcClient'
 
 import {  SuccessStringReply,  UploadRequest } from '../../../proto/dockerGet/dockerGet_pb';
@@ -43,6 +44,7 @@ export default async function handler(req, res) {
     const {sub,  filePath,parentId,fileType} = JSON.parse(req.body)
     var client = grpcClient()
     var docReq = new UploadRequest();
+    docReq.setSessionKey(fetchAppSession(req));
     docReq.setSub(sub)
     docReq.setFilepath(filePath)
     docReq.setParentid(parentId)

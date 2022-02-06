@@ -17,7 +17,6 @@ const GoogleAuth = ()=>{
             router.push('/cloud')
         }
         init()
-        
     },[router.isReady])
 
     return(

@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 //remember to set the ownership after adding new api
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { fetchAppSession } from '../../../lib/fetchAppSession'
 
 type Data = {
   success: boolean
@@ -33,6 +34,7 @@ export default function handler(
     var client = grpcClient()
     const {userId} = req.query! 
     var docReq = new UserIdRequest();
+    docReq.setSessionKey(fetchAppSession(req));
     docReq.setUserid(userId as string);
     try{
         client.listNotifications(docReq, function(err, GoLangResponse: ListNotificationsReply) {

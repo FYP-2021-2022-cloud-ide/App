@@ -8,16 +8,9 @@ type Data = {
 }
 
 import {  AddEnvironmentReply,  BuildEnvironmentRequest } from '../../../proto/dockerGet/dockerGet_pb';
-import { checkHaveContainer, checkInSectionBySectionUserId, checkRoleBySectionUserId } from '../../../lib/authentication';
 import {grpcClient}from '../../../lib/grpcClient'
+import { fetchAppSession } from '../../../lib/fetchAppSession';
 
-function unauthorized(){
-  return({
-    success: false,
-    message: "unauthorized",
-    environmentID: ""
-  })
-}
 
 export default async function handler(
   req: NextApiRequest,
@@ -34,6 +27,7 @@ export default async function handler(
     //   return
     // }
     var docReq = new BuildEnvironmentRequest();
+    docReq.setSessionKey(fetchAppSession(req));
     docReq.setName(name);
     docReq.setSectionUserId(section_user_id);
     docReq.setContainerid(containerId);

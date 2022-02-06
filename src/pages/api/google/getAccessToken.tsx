@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { fetchAppSession } from '../../../lib/fetchAppSession';
 import {grpcClient}from '../../../lib/grpcClient'
 
 import {  SuccessStringReply,  CodeRequest } from '../../../proto/dockerGet/dockerGet_pb';
@@ -16,6 +17,7 @@ export default function handler(req: NextApiRequest, res:NextApiResponse) {
     const {code, sub} = JSON.parse(req.body)
     var client = grpcClient()
     var docReq = new CodeRequest();
+    docReq.setSessionKey(fetchAppSession(req));
     docReq.setCode(code)
     docReq.setSub(sub)
     try{

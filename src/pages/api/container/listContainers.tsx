@@ -1,5 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { fetchAppSession } from '../../../lib/fetchAppSession';
 import {grpcClient}from '../../../lib/grpcClient'
 import {  ListContainerReply,  SubRequest } from '../../../proto/dockerGet/dockerGet_pb';
 
@@ -24,25 +25,6 @@ type Container = {
 }
 
 
-function authentication(sub: string|string[], oidcSub: string){
-  if(sub == undefined){
-    return false
-  }else{
-    if(sub != oidcSub)
-      return false
-  }
-  return true
-}
-
-function unauthorized(){
-  return {
-    success:false,
-    message: "unauthorized",
-    containersInfo: null,
-    containers: null,
-    tempContainers: null
-  }
-}
 
 export default function handler(
   req: NextApiRequest,
@@ -50,12 +32,9 @@ export default function handler(
   ) {
     var client = grpcClient()
     const { sub } = req.query;
-    {/* @ts-ignore */}
-    // if(!authentication(sub, req.oidc.user.sub)){
-    //   res.json(unauthorized())
-    //   return
-    // } 
+
     var docReq = new SubRequest();
+    docReq.setSessionKey(fetchAppSession(req));
     docReq.setSub(sub as string);
     
     try{

@@ -7,6 +7,8 @@
 import * as jspb from "google-protobuf";
 
 export class ListFilesRequest extends jspb.Message { 
+    getSessionKey(): string;
+    setSessionKey(value: string): ListFilesRequest;
     getSub(): string;
     setSub(value: string): ListFilesRequest;
     getFolderid(): string;
@@ -24,6 +26,7 @@ export class ListFilesRequest extends jspb.Message {
 
 export namespace ListFilesRequest {
     export type AsObject = {
+        sessionKey: string,
         sub: string,
         folderid: string,
     }
@@ -88,6 +91,8 @@ export namespace ChildrenReply {
 }
 
 export class CodeRequest extends jspb.Message { 
+    getSessionKey(): string;
+    setSessionKey(value: string): CodeRequest;
     getCode(): string;
     setCode(value: string): CodeRequest;
     getSub(): string;
@@ -105,12 +110,15 @@ export class CodeRequest extends jspb.Message {
 
 export namespace CodeRequest {
     export type AsObject = {
+        sessionKey: string,
         code: string,
         sub: string,
     }
 }
 
 export class UserIdRequest extends jspb.Message { 
+    getSessionKey(): string;
+    setSessionKey(value: string): UserIdRequest;
     getUserid(): string;
     setUserid(value: string): UserIdRequest;
 
@@ -126,6 +134,7 @@ export class UserIdRequest extends jspb.Message {
 
 export namespace UserIdRequest {
     export type AsObject = {
+        sessionKey: string,
         userid: string,
     }
 }
@@ -226,30 +235,9 @@ export namespace ListNotificationsReply {
 
 }
 
-export class LoginRequest extends jspb.Message { 
-    getSub(): string;
-    setSub(value: string): LoginRequest;
-    getName(): string;
-    setName(value: string): LoginRequest;
-
-    serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): LoginRequest.AsObject;
-    static toObject(includeInstance: boolean, msg: LoginRequest): LoginRequest.AsObject;
-    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: LoginRequest, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): LoginRequest;
-    static deserializeBinaryFromReader(message: LoginRequest, reader: jspb.BinaryReader): LoginRequest;
-}
-
-export namespace LoginRequest {
-    export type AsObject = {
-        sub: string,
-        name: string,
-    }
-}
-
 export class EmptyRequest extends jspb.Message { 
+    getSessionKey(): string;
+    setSessionKey(value: string): EmptyRequest;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): EmptyRequest.AsObject;
@@ -263,6 +251,7 @@ export class EmptyRequest extends jspb.Message {
 
 export namespace EmptyRequest {
     export type AsObject = {
+        sessionKey: string,
     }
 }
 
@@ -601,6 +590,8 @@ export namespace ListTemplatesReply {
 }
 
 export class AddContainerRequest extends jspb.Message { 
+    getSessionKey(): string;
+    setSessionKey(value: string): AddContainerRequest;
     getImagename(): string;
     setImagename(value: string): AddContainerRequest;
     getMemlimit(): number;
@@ -630,6 +621,7 @@ export class AddContainerRequest extends jspb.Message {
 
 export namespace AddContainerRequest {
     export type AsObject = {
+        sessionKey: string,
         imagename: string,
         memlimit: number,
         numcpu: number,
@@ -642,6 +634,8 @@ export namespace AddContainerRequest {
 }
 
 export class InstantAddContainerRequest extends jspb.Message { 
+    getSessionKey(): string;
+    setSessionKey(value: string): InstantAddContainerRequest;
     getSub(): string;
     setSub(value: string): InstantAddContainerRequest;
     getTemplateId(): string;
@@ -659,6 +653,7 @@ export class InstantAddContainerRequest extends jspb.Message {
 
 export namespace InstantAddContainerRequest {
     export type AsObject = {
+        sessionKey: string,
         sub: string,
         templateId: string,
     }
@@ -691,8 +686,12 @@ export namespace AddContainerReply {
 }
 
 export class RemoveContainerRequest extends jspb.Message { 
+    getSessionKey(): string;
+    setSessionKey(value: string): RemoveContainerRequest;
     getContainerid(): string;
     setContainerid(value: string): RemoveContainerRequest;
+    getSub(): string;
+    setSub(value: string): RemoveContainerRequest;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): RemoveContainerRequest.AsObject;
@@ -706,11 +705,15 @@ export class RemoveContainerRequest extends jspb.Message {
 
 export namespace RemoveContainerRequest {
     export type AsObject = {
+        sessionKey: string,
         containerid: string,
+        sub: string,
     }
 }
 
 export class SubmitFilesRequest extends jspb.Message { 
+    getSessionKey(): string;
+    setSessionKey(value: string): SubmitFilesRequest;
     getContainerid(): string;
     setContainerid(value: string): SubmitFilesRequest;
     getSectionUserId(): string;
@@ -728,6 +731,7 @@ export class SubmitFilesRequest extends jspb.Message {
 
 export namespace SubmitFilesRequest {
     export type AsObject = {
+        sessionKey: string,
         containerid: string,
         sectionUserId: string,
     }
@@ -766,6 +770,8 @@ export namespace ContainerTimeReply {
 }
 
 export class AddTemplateRequest extends jspb.Message { 
+    getSessionKey(): string;
+    setSessionKey(value: string): AddTemplateRequest;
     getName(): string;
     setName(value: string): AddTemplateRequest;
     getDescription(): string;
@@ -797,6 +803,7 @@ export class AddTemplateRequest extends jspb.Message {
 
 export namespace AddTemplateRequest {
     export type AsObject = {
+        sessionKey: string,
         name: string,
         description: string,
         containerid: string,
@@ -810,6 +817,8 @@ export namespace AddTemplateRequest {
 }
 
 export class UpdateTemplateRequest extends jspb.Message { 
+    getSessionKey(): string;
+    setSessionKey(value: string): UpdateTemplateRequest;
     getTemplateid(): string;
     setTemplateid(value: string): UpdateTemplateRequest;
     getName(): string;
@@ -843,6 +852,7 @@ export class UpdateTemplateRequest extends jspb.Message {
 
 export namespace UpdateTemplateRequest {
     export type AsObject = {
+        sessionKey: string,
         templateid: string,
         name: string,
         description: string,
@@ -857,6 +867,8 @@ export namespace UpdateTemplateRequest {
 }
 
 export class TemplateIdRequest extends jspb.Message { 
+    getSessionKey(): string;
+    setSessionKey(value: string): TemplateIdRequest;
     getTemplateid(): string;
     setTemplateid(value: string): TemplateIdRequest;
     getSectionUserId(): string;
@@ -874,6 +886,7 @@ export class TemplateIdRequest extends jspb.Message {
 
 export namespace TemplateIdRequest {
     export type AsObject = {
+        sessionKey: string,
         templateid: string,
         sectionUserId: string,
     }
@@ -906,6 +919,8 @@ export namespace AddTemplateReply {
 }
 
 export class AddEnvironmentRequest extends jspb.Message { 
+    getSessionKey(): string;
+    setSessionKey(value: string): AddEnvironmentRequest;
     clearLibrariesList(): void;
     getLibrariesList(): Array<string>;
     setLibrariesList(value: Array<string>): AddEnvironmentRequest;
@@ -929,6 +944,7 @@ export class AddEnvironmentRequest extends jspb.Message {
 
 export namespace AddEnvironmentRequest {
     export type AsObject = {
+        sessionKey: string,
         librariesList: Array<string>,
         sectionUserId: string,
         name: string,
@@ -963,6 +979,8 @@ export namespace AddEnvironmentReply {
 }
 
 export class BuildEnvironmentRequest extends jspb.Message { 
+    getSessionKey(): string;
+    setSessionKey(value: string): BuildEnvironmentRequest;
     getName(): string;
     setName(value: string): BuildEnvironmentRequest;
     getDescription(): string;
@@ -984,6 +1002,7 @@ export class BuildEnvironmentRequest extends jspb.Message {
 
 export namespace BuildEnvironmentRequest {
     export type AsObject = {
+        sessionKey: string,
         name: string,
         description: string,
         sectionUserId: string,
@@ -992,6 +1011,8 @@ export namespace BuildEnvironmentRequest {
 }
 
 export class UpdateEnvironmentRequest extends jspb.Message { 
+    getSessionKey(): string;
+    setSessionKey(value: string): UpdateEnvironmentRequest;
     getEnvironmentid(): string;
     setEnvironmentid(value: string): UpdateEnvironmentRequest;
     getName(): string;
@@ -1015,6 +1036,7 @@ export class UpdateEnvironmentRequest extends jspb.Message {
 
 export namespace UpdateEnvironmentRequest {
     export type AsObject = {
+        sessionKey: string,
         environmentid: string,
         name: string,
         description: string,
@@ -1024,6 +1046,8 @@ export namespace UpdateEnvironmentRequest {
 }
 
 export class EnvironmentIdRequest extends jspb.Message { 
+    getSessionKey(): string;
+    setSessionKey(value: string): EnvironmentIdRequest;
     getEnvironmentid(): string;
     setEnvironmentid(value: string): EnvironmentIdRequest;
     getSectionUserId(): string;
@@ -1041,12 +1065,15 @@ export class EnvironmentIdRequest extends jspb.Message {
 
 export namespace EnvironmentIdRequest {
     export type AsObject = {
+        sessionKey: string,
         environmentid: string,
         sectionUserId: string,
     }
 }
 
 export class SectionAndSubRequest extends jspb.Message { 
+    getSessionKey(): string;
+    setSessionKey(value: string): SectionAndSubRequest;
     getSectionid(): string;
     setSectionid(value: string): SectionAndSubRequest;
     getSub(): string;
@@ -1064,14 +1091,17 @@ export class SectionAndSubRequest extends jspb.Message {
 
 export namespace SectionAndSubRequest {
     export type AsObject = {
+        sessionKey: string,
         sectionid: string,
         sub: string,
     }
 }
 
 export class CheckHaveContainerRequest extends jspb.Message { 
-    getSectionUserId(): string;
-    setSectionUserId(value: string): CheckHaveContainerRequest;
+    getSessionKey(): string;
+    setSessionKey(value: string): CheckHaveContainerRequest;
+    getSub(): string;
+    setSub(value: string): CheckHaveContainerRequest;
     getContainerid(): string;
     setContainerid(value: string): CheckHaveContainerRequest;
 
@@ -1087,12 +1117,15 @@ export class CheckHaveContainerRequest extends jspb.Message {
 
 export namespace CheckHaveContainerRequest {
     export type AsObject = {
-        sectionUserId: string,
+        sessionKey: string,
+        sub: string,
         containerid: string,
     }
 }
 
 export class SubRequest extends jspb.Message { 
+    getSessionKey(): string;
+    setSessionKey(value: string): SubRequest;
     getSub(): string;
     setSub(value: string): SubRequest;
 
@@ -1108,11 +1141,14 @@ export class SubRequest extends jspb.Message {
 
 export namespace SubRequest {
     export type AsObject = {
+        sessionKey: string,
         sub: string,
     }
 }
 
 export class SectionRequest extends jspb.Message { 
+    getSessionKey(): string;
+    setSessionKey(value: string): SectionRequest;
     getSectionid(): string;
     setSectionid(value: string): SectionRequest;
 
@@ -1128,6 +1164,7 @@ export class SectionRequest extends jspb.Message {
 
 export namespace SectionRequest {
     export type AsObject = {
+        sessionKey: string,
         sectionid: string,
     }
 }
@@ -1197,6 +1234,32 @@ export namespace ListReply {
     }
 }
 
+export class GetUserDataRequest extends jspb.Message { 
+    getSessionKey(): string;
+    setSessionKey(value: string): GetUserDataRequest;
+    getIsSessionKey(): boolean;
+    setIsSessionKey(value: boolean): GetUserDataRequest;
+    getSub(): string;
+    setSub(value: string): GetUserDataRequest;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): GetUserDataRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: GetUserDataRequest): GetUserDataRequest.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: GetUserDataRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): GetUserDataRequest;
+    static deserializeBinaryFromReader(message: GetUserDataRequest, reader: jspb.BinaryReader): GetUserDataRequest;
+}
+
+export namespace GetUserDataRequest {
+    export type AsObject = {
+        sessionKey: string,
+        isSessionKey: boolean,
+        sub: string,
+    }
+}
+
 export class GetUserDataReply extends jspb.Message { 
     getSuccess(): boolean;
     setSuccess(value: boolean): GetUserDataReply;
@@ -1236,6 +1299,8 @@ export namespace GetUserDataReply {
 }
 
 export class UpdateUserDataRequest extends jspb.Message { 
+    getSessionKey(): string;
+    setSessionKey(value: string): UpdateUserDataRequest;
     getSub(): string;
     setSub(value: string): UpdateUserDataRequest;
     getDarkmode(): boolean;
@@ -1255,6 +1320,7 @@ export class UpdateUserDataRequest extends jspb.Message {
 
 export namespace UpdateUserDataRequest {
     export type AsObject = {
+        sessionKey: string,
         sub: string,
         darkmode: boolean,
         bio: string,
@@ -1288,6 +1354,8 @@ export namespace GetNotificationTokenReply {
 }
 
 export class SendNotificationRequest extends jspb.Message { 
+    getSessionKey(): string;
+    setSessionKey(value: string): SendNotificationRequest;
     getTitle(): string;
     setTitle(value: string): SendNotificationRequest;
     getBody(): string;
@@ -1311,6 +1379,7 @@ export class SendNotificationRequest extends jspb.Message {
 
 export namespace SendNotificationRequest {
     export type AsObject = {
+        sessionKey: string,
         title: string,
         body: string,
         sender: string,
@@ -1346,6 +1415,8 @@ export namespace SendNotificationReply {
 }
 
 export class UpdateNotificationTokenRequest extends jspb.Message { 
+    getSessionKey(): string;
+    setSessionKey(value: string): UpdateNotificationTokenRequest;
     getSub(): string;
     setSub(value: string): UpdateNotificationTokenRequest;
     getToken(): string;
@@ -1363,12 +1434,15 @@ export class UpdateNotificationTokenRequest extends jspb.Message {
 
 export namespace UpdateNotificationTokenRequest {
     export type AsObject = {
+        sessionKey: string,
         sub: string,
         token: string,
     }
 }
 
 export class RemoveNotificationRequest extends jspb.Message { 
+    getSessionKey(): string;
+    setSessionKey(value: string): RemoveNotificationRequest;
     getUserid(): string;
     setUserid(value: string): RemoveNotificationRequest;
     getNotificationid(): string;
@@ -1386,12 +1460,15 @@ export class RemoveNotificationRequest extends jspb.Message {
 
 export namespace RemoveNotificationRequest {
     export type AsObject = {
+        sessionKey: string,
         userid: string,
         notificationid: string,
     }
 }
 
 export class UpdateSubscriptionRequest extends jspb.Message { 
+    getSessionKey(): string;
+    setSessionKey(value: string): UpdateSubscriptionRequest;
     getUserid(): string;
     setUserid(value: string): UpdateSubscriptionRequest;
     getToken(): string;
@@ -1411,6 +1488,7 @@ export class UpdateSubscriptionRequest extends jspb.Message {
 
 export namespace UpdateSubscriptionRequest {
     export type AsObject = {
+        sessionKey: string,
         userid: string,
         token: string,
         semesterid: string,
@@ -1418,6 +1496,8 @@ export namespace UpdateSubscriptionRequest {
 }
 
 export class DownloadRequest extends jspb.Message { 
+    getSessionKey(): string;
+    setSessionKey(value: string): DownloadRequest;
     getSub(): string;
     setSub(value: string): DownloadRequest;
     getFileid(): string;
@@ -1441,6 +1521,7 @@ export class DownloadRequest extends jspb.Message {
 
 export namespace DownloadRequest {
     export type AsObject = {
+        sessionKey: string,
         sub: string,
         fileid: string,
         filename: string,
@@ -1450,6 +1531,8 @@ export namespace DownloadRequest {
 }
 
 export class UploadRequest extends jspb.Message { 
+    getSessionKey(): string;
+    setSessionKey(value: string): UploadRequest;
     getSub(): string;
     setSub(value: string): UploadRequest;
     getFilepath(): string;
@@ -1471,6 +1554,7 @@ export class UploadRequest extends jspb.Message {
 
 export namespace UploadRequest {
     export type AsObject = {
+        sessionKey: string,
         sub: string,
         filepath: string,
         parentid: string,
