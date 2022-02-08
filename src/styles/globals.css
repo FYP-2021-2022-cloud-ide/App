@@ -2,22 +2,96 @@
 @tailwind components;
 @tailwind utilities; */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 .card.title {
-    @apply font-semibold  text-gray-800 dark:text-gray-300 whitespace-nowrap
+  @apply font-semibold  text-gray-800 dark:text-gray-300 whitespace-nowrap;
 }
 
+.course-dialog-modal {
+  @apply max-h-[70vh] inline-block w-full max-w-md p-6 my-8 overflow-visible text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl text-[#415A6E];
+}
+
+.course-dialog-content {
+  @apply h-full overflow-y-visible  px-2 py-2 overflow-x-visible space-y-4;
+}
+
+.course-dialog-title {
+  @apply text-xl font-medium leading-6 dark:text-gray-300 mb-5;
+}
+
+.course-dialog-textarea {
+  @apply max-h-[500px] border dark:border-0 focus:outline-none dark:bg-gray-700 p-1 px-3 w-full text-gray-500 dark:text-gray-300 flex-row space-x-2  text-left rounded-xl shadow-lg h-32;
+}
+
+.modal-form-title-md {
+  @apply font-medium mt-4 text-gray-700 dark:text-gray-300;
+}
+
+.tooltip {
+  @apply z-[100];
+}
+
+.modal-form-text-base {
+  @apply text-gray-700 dark:text-gray-300;
+}
+
+.modal-form-toggle {
+  @apply flex flex-row items-center space-x-2;
+}
+
+.modal-form-input {
+  @apply border dark:border-0 focus:outline-none dark:bg-gray-700 p-1 px-3 w-full text-gray-500 dark:text-gray-300 flex-row space-x-2  text-left rounded-md shadow-lg;
+}
+
+.modal-form-list-box {
+}
+
+.modal-form-btn-ok {
+  @apply w-fit rounded-md px-4 py-2 bg-green-500 hover:bg-green-600 text-base leading-6 font-medium text-white shadow-sm focus:outline-none focus:border-blue-300  transition ease-in-out duration-150 sm:text-sm sm:leading-5;
+}
+
+.modal-form-btn-cancel {
+  @apply w-fit rounded-md px-4 py-2 bg-gray-400 hover:bg-gray-500 text-base leading-6 font-medium text-white shadow-sm focus:outline-none focus:border-blue-300 transition ease-in-out duration-150 sm:text-sm sm:leading-5;
+}
+
+.tooltip-icon {
+  @apply w-5 h-5 text-gray-700 dark:text-gray-300;
+}
+
+/* .tooltip {
+  @apply invisible absolute  whitespace-nowrap top-0;
+}
+
+.has-tooltip {
+  @apply relative;
+}
+
+.has-tooltip:hover .tooltip {
+  @apply visible;
+} */
 
 .hide-scroll::-webkit-scrollbar {
-    display: none;
-  }
-
+}
 
 .hide-scroll {
-    -ms-overflow-style: none;
-    scrollbar-width: none; 
-  }
+  -ms-overflow-style: none;
+  scrollbar-width: 20px;
+}
+
+.course-dialog-content::-webkit-scrollbar {
+  width: 3px;
+}
+
+.course-dialog-content::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+}
+
+.course-dialog-content::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+}

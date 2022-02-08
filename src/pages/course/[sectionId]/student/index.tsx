@@ -5,6 +5,8 @@ import React, { useEffect, useState } from 'react';
 import { useCnails } from "../../../../contexts/cnails";
 import Loader from "../../../../components/Loader"; 
 import Breadcrumbs from "../../../../components/Breadcrumbs";
+import {templateAPI} from "../../../../lib/templateAPI"
+import {generalAPI} from "../../../../lib/generalAPI"
 
 interface Template {
   imageId: string
@@ -23,24 +25,25 @@ const Home = () => {
   const [courseName, setCourseName] = useState("")
   const [sectionUserID, setSUID] = useState("")
   const [thisTemplateList, setTemplateList] = useState(null)
-  const { templateList, getSectionInfo, sub } = useCnails();
+  const { sub } = useCnails();
+  const {templateList} = templateAPI
+  const {getSectionInfo} = generalAPI
   // data fetching from API 
   useEffect(() => {
     const fetchSectionInfo = async () => {
       const response = await getSectionInfo(sectionId, sub)
-      if (response.success) {
-        console.log(response)
+      if (response.success && response.role=="student") {
         setCourseName(response.courseName)
         setSUID(response.sectionUserID)
+      }else{
+        Router.push('/')
       }
     }
     const fetchTemplates = async () => {
       const response = await templateList(sectionId, sub)//
-      if (response.success && response.role=="student") {
+      if (response.success) {
         response.templates = response.templates.filter((template: Template) => template.active == true)
         setTemplateList(response.templates)
-      }else{
-        Router.push('/')
       }
     }
     fetchSectionInfo().then(

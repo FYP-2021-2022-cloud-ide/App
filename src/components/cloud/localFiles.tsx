@@ -2,6 +2,7 @@ import { useState} from 'react';
 import { ItemMenu } from './menus';
 import { FolderIcon, DocumentIcon } from "@heroicons/react/outline"
 import {useCnails} from '../../contexts/cnails'
+import{localFileAPI} from '../../lib/localFile'
 interface props{
     tree: directoryTree.DirectoryTree
     opened:boolean
@@ -10,7 +11,8 @@ interface props{
 const LocalFiles = ({tree,}:props)=>{ 
     const[mkdirOpen, setMkdirNameOpen]=useState(false)
     const[mkdirName, setMkdirName]=useState("")
-    const { userId,makeFolder} = useCnails()
+    const { userId} = useCnails()
+    const {makeFolder}=localFileAPI
     return(
         <div className="border rounded-lg  h-96">
             {(tree===undefined)?<div></div>:
@@ -59,7 +61,8 @@ function DisplayLocal({opened,tree}:props){
 }
 
 function FileOrFolder({child}){
-    const { userId,makeFolder} = useCnails()
+    const { userId} = useCnails()
+    const {makeFolder}=localFileAPI
     const[mkdirOpen, setMkdirNameOpen]=useState(false)
     const[mkdirName, setMkdirName]=useState("")
     const[opened,setOpened]=useState(false)

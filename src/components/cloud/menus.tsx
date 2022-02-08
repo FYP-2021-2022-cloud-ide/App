@@ -5,9 +5,10 @@ import { MenuIcon } from "@heroicons/react/outline"
 import { Menu, Transition } from "@headlessui/react"
 import Modal from "../Modal";
 import { Dialog } from '@headlessui/react'
-
+import{localFileAPI} from '../../lib/localFile'
 export function ItemMenu({ item, type, root, setMkdirNameOpen }) {
-    const { userId, uploadFiles, downloadFileToUser, removeFile, moveFile } = useCnails()
+    const { userId } = useCnails()
+    const {uploadFiles, downloadFileToUser, removeFile, moveFile}=localFileAPI
     const [loading, setLoading] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
     const [filesUpload, setFilesUpload] = useState(new FormData())
@@ -114,6 +115,7 @@ export function ItemMenu({ item, type, root, setMkdirNameOpen }) {
                                 setLoading(true)
                                 filesUpload.append("filePath", item.path)
                                 const res = await uploadFiles(userId, filesUpload)
+                                // @ts-ignore
                                 if (res.success) {
                                     console.log(res)
                                     setLoading(false)

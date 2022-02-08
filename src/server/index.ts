@@ -286,45 +286,11 @@ app.prepare().then(() => {
     }
 
 
-    // res.writeHead(200,{"Host":reqHost})
-    
-    // try {
-    //   const response = await fetch("http://auth:8181/v1/data/container", {
-    //     body: JSON.stringify({
-    //       input: {
-    //         itsc: req.oidc.user!.sub,
-    //         container_id: req.params.id
-    //       }
-    //     }),
-    //     headers: {
-    //       Authorization: `Bearer ${process.env.OPASECRET}`,
-    //       "Content-Type": "application/json"
-    //     },
-    //     method: "POST"
-    //   })
-    //   const { result: { allow } } = await response.json()
-    //   if (allow) {
-    //     console.log('authenticated')
-    //     req.url = req.url.replace('/user/container/' + req.params.id + '/', '');
-    //     proxy.web(req, res, { target: 'http://' + req.params.id + ':8080/' })
-    //   } else {
-    //     res.redirect('/')
-    //   }
-    // }
-    // catch (error) {
-    //   console.log(error)
-    //   res.redirect('/')
-    // }
   });
 
-  // real
   server.all('*', requiresAuth(), (req, res) => {
     return handle(req, res);
   })
-
-  // server.all(/^\/_next\/webpack-hmr(\/.*)?/, async (req: Request, res: Response) => {
-  //   void handle(req, res)
-  // })
 
 
   httpServer.listen(port, (err?: any) => {

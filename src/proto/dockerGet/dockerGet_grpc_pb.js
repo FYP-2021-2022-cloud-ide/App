@@ -48,6 +48,72 @@ function deserialize_dockerGet_AddEnvironmentRequest(buffer_arg) {
   return dockerGet_pb.AddEnvironmentRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_dockerGet_AddSandBoxImageReply(arg) {
+  if (!(arg instanceof dockerGet_pb.AddSandBoxImageReply)) {
+    throw new Error('Expected argument of type dockerGet.AddSandBoxImageReply');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_AddSandBoxImageReply(buffer_arg) {
+  return dockerGet_pb.AddSandBoxImageReply.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_dockerGet_AddSandBoxImageRequest(arg) {
+  if (!(arg instanceof dockerGet_pb.AddSandBoxImageRequest)) {
+    throw new Error('Expected argument of type dockerGet.AddSandBoxImageRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_AddSandBoxImageRequest(buffer_arg) {
+  return dockerGet_pb.AddSandBoxImageRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_dockerGet_AddSandBoxReply(arg) {
+  if (!(arg instanceof dockerGet_pb.AddSandBoxReply)) {
+    throw new Error('Expected argument of type dockerGet.AddSandBoxReply');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_AddSandBoxReply(buffer_arg) {
+  return dockerGet_pb.AddSandBoxReply.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_dockerGet_AddSandBoxRequest(arg) {
+  if (!(arg instanceof dockerGet_pb.AddSandBoxRequest)) {
+    throw new Error('Expected argument of type dockerGet.AddSandBoxRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_AddSandBoxRequest(buffer_arg) {
+  return dockerGet_pb.AddSandBoxRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_dockerGet_AddTempContainerReply(arg) {
+  if (!(arg instanceof dockerGet_pb.AddTempContainerReply)) {
+    throw new Error('Expected argument of type dockerGet.AddTempContainerReply');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_AddTempContainerReply(buffer_arg) {
+  return dockerGet_pb.AddTempContainerReply.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_dockerGet_AddTempContainerRequest(arg) {
+  if (!(arg instanceof dockerGet_pb.AddTempContainerRequest)) {
+    throw new Error('Expected argument of type dockerGet.AddTempContainerRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_AddTempContainerRequest(buffer_arg) {
+  return dockerGet_pb.AddTempContainerRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_dockerGet_AddTemplateReply(arg) {
   if (!(arg instanceof dockerGet_pb.AddTemplateReply)) {
     throw new Error('Expected argument of type dockerGet.AddTemplateReply');
@@ -268,6 +334,28 @@ function deserialize_dockerGet_ListNotificationsReply(buffer_arg) {
   return dockerGet_pb.ListNotificationsReply.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_dockerGet_ListSandBoxImageReply(arg) {
+  if (!(arg instanceof dockerGet_pb.ListSandBoxImageReply)) {
+    throw new Error('Expected argument of type dockerGet.ListSandBoxImageReply');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_ListSandBoxImageReply(buffer_arg) {
+  return dockerGet_pb.ListSandBoxImageReply.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_dockerGet_ListSandBoxImageRequest(arg) {
+  if (!(arg instanceof dockerGet_pb.ListSandBoxImageRequest)) {
+    throw new Error('Expected argument of type dockerGet.ListSandBoxImageRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_ListSandBoxImageRequest(buffer_arg) {
+  return dockerGet_pb.ListSandBoxImageRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_dockerGet_ListTemplatesReply(arg) {
   if (!(arg instanceof dockerGet_pb.ListTemplatesReply)) {
     throw new Error('Expected argument of type dockerGet.ListTemplatesReply');
@@ -299,6 +387,39 @@ function serialize_dockerGet_RemoveNotificationRequest(arg) {
 
 function deserialize_dockerGet_RemoveNotificationRequest(buffer_arg) {
   return dockerGet_pb.RemoveNotificationRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_dockerGet_RemoveTempContainerRequest(arg) {
+  if (!(arg instanceof dockerGet_pb.RemoveTempContainerRequest)) {
+    throw new Error('Expected argument of type dockerGet.RemoveTempContainerRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_RemoveTempContainerRequest(buffer_arg) {
+  return dockerGet_pb.RemoveTempContainerRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_dockerGet_SandBoxIdRequest(arg) {
+  if (!(arg instanceof dockerGet_pb.SandBoxIdRequest)) {
+    throw new Error('Expected argument of type dockerGet.SandBoxIdRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_SandBoxIdRequest(buffer_arg) {
+  return dockerGet_pb.SandBoxIdRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_dockerGet_SandBoxImageIdRequest(arg) {
+  if (!(arg instanceof dockerGet_pb.SandBoxImageIdRequest)) {
+    throw new Error('Expected argument of type dockerGet.SandBoxImageIdRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_SandBoxImageIdRequest(buffer_arg) {
+  return dockerGet_pb.SandBoxImageIdRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_dockerGet_SectionAndSubRequest(arg) {
@@ -398,6 +519,17 @@ function serialize_dockerGet_UpdateNotificationTokenRequest(arg) {
 
 function deserialize_dockerGet_UpdateNotificationTokenRequest(buffer_arg) {
   return dockerGet_pb.UpdateNotificationTokenRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_dockerGet_UpdateSandBoxImageRequest(arg) {
+  if (!(arg instanceof dockerGet_pb.UpdateSandBoxImageRequest)) {
+    throw new Error('Expected argument of type dockerGet.UpdateSandBoxImageRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_UpdateSandBoxImageRequest(buffer_arg) {
+  return dockerGet_pb.UpdateSandBoxImageRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_dockerGet_UpdateSubscriptionRequest(arg) {
@@ -674,6 +806,94 @@ var DockerService = exports.DockerService = {
     responseType: dockerGet_pb.SuccessStringReply,
     requestSerialize: serialize_dockerGet_EnvironmentIdRequest,
     requestDeserialize: deserialize_dockerGet_EnvironmentIdRequest,
+    responseSerialize: serialize_dockerGet_SuccessStringReply,
+    responseDeserialize: deserialize_dockerGet_SuccessStringReply,
+  },
+  addTempContainer: {
+    path: '/dockerGet.Docker/addTempContainer',
+    requestStream: false,
+    responseStream: false,
+    requestType: dockerGet_pb.AddTempContainerRequest,
+    responseType: dockerGet_pb.AddTempContainerReply,
+    requestSerialize: serialize_dockerGet_AddTempContainerRequest,
+    requestDeserialize: deserialize_dockerGet_AddTempContainerRequest,
+    responseSerialize: serialize_dockerGet_AddTempContainerReply,
+    responseDeserialize: deserialize_dockerGet_AddTempContainerReply,
+  },
+  removeTempContainer: {
+    path: '/dockerGet.Docker/removeTempContainer',
+    requestStream: false,
+    responseStream: false,
+    requestType: dockerGet_pb.RemoveTempContainerRequest,
+    responseType: dockerGet_pb.SuccessStringReply,
+    requestSerialize: serialize_dockerGet_RemoveTempContainerRequest,
+    requestDeserialize: deserialize_dockerGet_RemoveTempContainerRequest,
+    responseSerialize: serialize_dockerGet_SuccessStringReply,
+    responseDeserialize: deserialize_dockerGet_SuccessStringReply,
+  },
+  addSandboxImage: {
+    path: '/dockerGet.Docker/addSandboxImage',
+    requestStream: false,
+    responseStream: false,
+    requestType: dockerGet_pb.AddSandBoxImageRequest,
+    responseType: dockerGet_pb.AddSandBoxImageReply,
+    requestSerialize: serialize_dockerGet_AddSandBoxImageRequest,
+    requestDeserialize: deserialize_dockerGet_AddSandBoxImageRequest,
+    responseSerialize: serialize_dockerGet_AddSandBoxImageReply,
+    responseDeserialize: deserialize_dockerGet_AddSandBoxImageReply,
+  },
+  updateSandboxImage: {
+    path: '/dockerGet.Docker/updateSandboxImage',
+    requestStream: false,
+    responseStream: false,
+    requestType: dockerGet_pb.UpdateSandBoxImageRequest,
+    responseType: dockerGet_pb.SuccessStringReply,
+    requestSerialize: serialize_dockerGet_UpdateSandBoxImageRequest,
+    requestDeserialize: deserialize_dockerGet_UpdateSandBoxImageRequest,
+    responseSerialize: serialize_dockerGet_SuccessStringReply,
+    responseDeserialize: deserialize_dockerGet_SuccessStringReply,
+  },
+  removeSandboxImage: {
+    path: '/dockerGet.Docker/removeSandboxImage',
+    requestStream: false,
+    responseStream: false,
+    requestType: dockerGet_pb.SandBoxImageIdRequest,
+    responseType: dockerGet_pb.SuccessStringReply,
+    requestSerialize: serialize_dockerGet_SandBoxImageIdRequest,
+    requestDeserialize: deserialize_dockerGet_SandBoxImageIdRequest,
+    responseSerialize: serialize_dockerGet_SuccessStringReply,
+    responseDeserialize: deserialize_dockerGet_SuccessStringReply,
+  },
+  listSandboxImage: {
+    path: '/dockerGet.Docker/listSandboxImage',
+    requestStream: false,
+    responseStream: false,
+    requestType: dockerGet_pb.ListSandBoxImageRequest,
+    responseType: dockerGet_pb.ListSandBoxImageReply,
+    requestSerialize: serialize_dockerGet_ListSandBoxImageRequest,
+    requestDeserialize: deserialize_dockerGet_ListSandBoxImageRequest,
+    responseSerialize: serialize_dockerGet_ListSandBoxImageReply,
+    responseDeserialize: deserialize_dockerGet_ListSandBoxImageReply,
+  },
+  addSandbox: {
+    path: '/dockerGet.Docker/addSandbox',
+    requestStream: false,
+    responseStream: false,
+    requestType: dockerGet_pb.AddSandBoxRequest,
+    responseType: dockerGet_pb.AddSandBoxReply,
+    requestSerialize: serialize_dockerGet_AddSandBoxRequest,
+    requestDeserialize: deserialize_dockerGet_AddSandBoxRequest,
+    responseSerialize: serialize_dockerGet_AddSandBoxReply,
+    responseDeserialize: deserialize_dockerGet_AddSandBoxReply,
+  },
+  removeSandbox: {
+    path: '/dockerGet.Docker/removeSandbox',
+    requestStream: false,
+    responseStream: false,
+    requestType: dockerGet_pb.SandBoxIdRequest,
+    responseType: dockerGet_pb.SuccessStringReply,
+    requestSerialize: serialize_dockerGet_SandBoxIdRequest,
+    requestDeserialize: deserialize_dockerGet_SandBoxIdRequest,
     responseSerialize: serialize_dockerGet_SuccessStringReply,
     responseDeserialize: deserialize_dockerGet_SuccessStringReply,
   },

@@ -6,13 +6,17 @@ import { props as CourseListProps } from "../components/index/CoursesList"
 import { props as ContainerListProps } from "../components/index/ContainersList"
 import Loader from "../components/Loader"
 import { NotificationBody } from '../components/Notification';
+import {containerAPI} from "../lib/containerAPI"
+import {generalAPI} from "../lib/generalAPI"
 
 
 export default function Home() {
     // load once when page is rendered
     const [courses, setCourses] = useState<CourseListProps>()
     const [containers, setContainers] = useState<ContainerListProps>()
-    const { containerList, courseList, sub } = useCnails();
+    const { sub } = useCnails();
+    const {containerList} = containerAPI;
+    const {courseList} = generalAPI;
     console.log("sub is ", sub)
     // data fetching from API
     useEffect(() => {
@@ -21,16 +25,12 @@ export default function Home() {
             setCourses(courses)
         }
         const fetchContainers = async () => {
-            // console.log('part A')
             const containers = await containerList(sub)
-            // console.log(containers)
             setContainers(containers)
         }
-        // while(sub == "")
         fetchCourses()
         fetchContainers()
     }, [])
-    // console.log('testing')
     console.log(containers)
     return (
         <>

@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useCnails } from "../../../../contexts/cnails";
 import Loader from "../../../Loader";
 import { EnvironmentContent as Environment } from "./EnvironmentList"
+import {envAPI} from "../../../../lib/envAPI"
+import { containerAPI } from "../../../../lib/containerAPI";
 interface EnvironmentUpdateProps {
     sectionUserID: string
     environment: Environment
@@ -18,7 +20,9 @@ const EnvironmentUpdate = React.forwardRef(({ sectionUserID, environment, closeM
     const [description, setDescription] = useState(environment.description)
     const [finishLoading, setFinishLoading] = useState(true)
     const [containerID, setContainerID] = useState("")
-    const { updateEnvironment, removeContainer, addContainer, sub } = useCnails();
+    const { sub } = useCnails();
+    const {updateEnvironment} = envAPI
+    const { addTempContainer, removeTempContainer } = containerAPI;
     const [step, setStep] = useState(1);
     const nextStep = () => {
         setStep(step + 1);
@@ -87,7 +91,7 @@ const EnvironmentUpdate = React.forwardRef(({ sectionUserID, environment, closeM
                         <button onClick={async () => {
                             setFinishLoading(false)
                             nextStep();
-                            const response = await removeContainer(containerID, sub)
+                            const response = await removeTempContainer(containerID, sub)
                             if (response.success == true || response.success == false) {
                                 setFinishLoading(true)
                             }
@@ -149,7 +153,7 @@ const EnvironmentUpdate = React.forwardRef(({ sectionUserID, environment, closeM
                         <button
                             onClick={async () => {
                                 nextStep()
-                                const response = await addContainer(environment.imageId, memory, CPU, sectionUserID, "", false, "root",true)//non-existent template id
+                                const response = await addTempContainer(memory, CPU,environment.imageId ,sub, "root")
                                 console.log(response)
                                 if (response.success) {
                                     setContainerID(response.containerID)

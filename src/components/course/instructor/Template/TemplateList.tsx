@@ -7,7 +7,6 @@ import { Dialog, Transition } from "@headlessui/react";
 import Modal from "../../../Modal";
 import ListBox, {Option} from "../ListBox"
 import TemplateCreate from "./TemplateCreate";
-
 //testing
 import templateData from "../../../../data/testing/templateList"
 import EmptyDiv from "../../../EmptyDiv";
@@ -38,7 +37,6 @@ export interface props {
 const TemplateList = ({ templates, sectionUserID, environments }: props) => {
     const [memLimit, setmemLimit] = useState(400);
     const [numCPU, setnumCPU] = useState(0.5);
-    const { addContainer } = useCnails();
     let [isOpen, setIsOpen] = useState(false)
 
     function openModal() {

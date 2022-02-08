@@ -5,6 +5,7 @@ import { Fragment } from 'react'
 // import { notificationStack } from '../lib/notificationStack'
 import { useCnails } from '../contexts/cnails'
 import Link from "next/link";
+import {notificationAPI} from "../lib/notificationAPI"
 
 interface notification {
     id: string
@@ -37,7 +38,8 @@ export default function NotiStack() {
         }
     ] as notification[]
     const [notifications, setNotifications] = useState<notification[]>([])
-    const { listNotifications, userId } = useCnails()
+    const { userId } = useCnails()
+    const {listNotifications} = notificationAPI
 
     // data fetching from API
     useEffect(() => {

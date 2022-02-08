@@ -20,6 +20,7 @@ import path, { dirname } from "path"
 import { DirectoryTree } from "directory-tree"
 import { useTheme } from "../contexts/theme"
 import { file, files } from "jszip"
+import {localFileAPI} from "../lib/localFile"
 
 // import {useE}
 function Files({ files, sub }) {
@@ -397,7 +398,8 @@ const blacklist = (path: string): boolean => {
 }
 
 export default function Cloud() {
-    const { listFolders, userId, sub, uploadFiles, moveFile, makeFolder, removeFile, downloadFileToUser } = useCnails()
+    const { userId, sub } = useCnails()
+    const {listFolders, uploadFiles, moveFile, makeFolder, removeFile, downloadFileToUser} = localFileAPI
     const [isLogin, setIsLogin] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
     const filesRef = useRef<GoogleFolder>(undefined)

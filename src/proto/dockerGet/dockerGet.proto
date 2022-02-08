@@ -37,6 +37,16 @@ service Docker {
   rpc buildEnvironment(BuildEnvironmentRequest)returns(AddEnvironmentReply){}
   rpc removeEnvironment(EnvironmentIdRequest)returns(SuccessStringReply){}
 
+  rpc addTempContainer(AddTempContainerRequest)returns(AddTempContainerReply){}
+  rpc removeTempContainer(RemoveTempContainerRequest)returns(SuccessStringReply){}
+  
+  rpc addSandboxImage(AddSandBoxImageRequest)returns(AddSandBoxImageReply){}
+  rpc updateSandboxImage(UpdateSandBoxImageRequest)returns(SuccessStringReply){}
+  rpc removeSandboxImage(SandBoxImageIdRequest)returns(SuccessStringReply){}
+  rpc listSandboxImage(ListSandBoxImageRequest)returns(ListSandBoxImageReply){}
+  rpc addSandbox(AddSandBoxRequest)returns(AddSandBoxReply){}
+  rpc removeSandbox(SandBoxIdRequest)returns(SuccessStringReply){}
+
   rpc getUserData(GetUserDataRequest)returns(GetUserDataReply){}
   rpc updateUserData(UpdateUserDataRequest)returns(SuccessStringReply){}
 
@@ -186,7 +196,6 @@ message AddContainerRequest{
   float numCPU=3;
   string section_user_id=4;  
   string template_id=5;
-  bool dbStored =6;
   string accessRight= 7;
   bool useFresh=8;
 }
@@ -415,4 +424,87 @@ message UploadRequest{
   string filePath=3;
   string parentId=1;
   string fileType=4;
+}
+
+message AddTempContainerRequest{
+  string imageName=42;
+  float memLimit=5;
+  float numCPU=3;
+  string sessionKey=1;
+  string sub=4;
+  string accessRight=6;
+}
+message AddTempContainerReply{
+  bool success=1;
+  string message =2;
+  string tempContainerId=3;
+}
+
+message RemoveTempContainerRequest{
+  string session_key=42;
+  string containerId=5;
+  string sub =1;
+}
+
+
+
+
+message AddSandBoxImageRequest{
+  string session_key=42;
+  string userId=5;
+  string title=3;
+  string description=1;
+  string tempContainerId=4;
+}
+message AddSandBoxImageReply{
+  bool success=1;
+  string message =2;
+  string sandBoxImageId=3;
+}
+message UpdateSandBoxImageRequest{
+  string session_key=42;
+  string sandBoxImageId=2;
+  string userId=5;
+  string title=3;
+  string description=1;
+  string tempContainerId=4;
+}
+message SandBoxImageIdRequest{
+  string session_key=42;
+  string sandBoxImageId=5;
+  string user_id=3;
+}
+message ListSandBoxImageRequest{
+  string session_key=42;
+  string userId=5;
+}
+message ListSandBoxImageReply{
+  bool success=1;
+  string message = 4;
+  message SandBoxImage {
+    string id =1;
+    string title   =2;
+    string description=7;
+    string imageId  =3; 
+    repeated string sandboxId=6; 
+  }
+	repeated SandBoxImage sandboxImages=3;
+}
+
+
+message AddSandBoxRequest{
+  string session_key=42;
+  float memLimit=5;
+  float numCPU=3;
+  string sandBoxImageId=1;
+}
+message AddSandBoxReply{
+  bool success=1;
+  string message =2;
+  string sandBoxId=3;
+}
+message SandBoxIdRequest{
+  string session_key=42;
+  string sandBoxId=5;
+  string user_id =1;
 }

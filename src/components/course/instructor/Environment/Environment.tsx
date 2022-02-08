@@ -4,6 +4,7 @@ import {EnvironmentContent}  from "./EnvironmentList"
 import { useCnails } from "../../../../contexts/cnails";
 import Modal from "../../../Modal";
 import EnvironmentUpdate from "./EnvironmentUpdate";
+import {envAPI} from "../../../../lib/envAPI"
 
 interface EnvironmentProps {
     key: string
@@ -12,7 +13,8 @@ interface EnvironmentProps {
 }
 
 function Environment({ environment, sectionUserID }: EnvironmentProps) {
-    const { removeEnvironment} = useCnails();
+    // const { removeEnvironment} = useCnails();
+    const {removeEnvironment} = envAPI
     let [updateIsOpen, setUpdateIsOpen] = useState(false)
     function openUpdateModal() {
         setUpdateIsOpen(true)

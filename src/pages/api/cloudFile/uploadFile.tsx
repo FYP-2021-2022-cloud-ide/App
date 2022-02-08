@@ -40,7 +40,7 @@ export default async function handler(
 
     let tree1: DirectoryTree
 
-    try {
+    try { 
         tree1 = dirTree("/volumes/" + userId + "/persist")
     } catch (error) {
         res.json(error);

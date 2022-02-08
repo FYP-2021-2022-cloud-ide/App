@@ -13,7 +13,7 @@ interface UserMenuProps{
 export default function UserMenu({sub,name,email}: UserMenuProps) {
   const {isDark} =  useTheme()  ; 
   return (
-    <div className={`w-14 text-right top-16 ${isDark && "dark"}`}>
+    <div className={`w-14 z-10 text-right top-16 ${isDark && "dark"}`}>
       <Menu as="div" className="relative text-left">
         <div>
           <Menu.Button className="justify-center text-sm font-medium rounded-md hover:scale-110 transition ease-in-out duration-300 dark:text-gray-300">

@@ -6,7 +6,7 @@ import Modal from '../components/Modal'
 import NotificationSend from '../components/NotificationSend'
 import { useCnails } from '../contexts/cnails'
 import EmptyDiv from '../components/EmptyDiv'
-
+import{notificationAPI} from '../lib/notificationAPI'
 interface notification{
     id: string
     sender: {
@@ -78,8 +78,8 @@ export default function Messages(){
     const [title, setTitle] = useState("")
     const [body, setBody] = useState("")
     const [receiver, setReceiver] = useState("")
-    const {listNotifications,sendNotification,removeNotification, userId,listFolders} = useCnails()
-
+    const { userId} = useCnails()
+    const{listNotifications,sendNotification,removeNotification}=notificationAPI
     useEffect(()=>{
         const fetchNotifications = async ()=>{
             const response = await listNotifications(userId)

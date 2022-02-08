@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useTheme,setCookie } from '../contexts/theme';
 import { UserIcon } from '@heroicons/react/solid';
 import { useCnails } from '../contexts/cnails';
+import{generalAPI} from '../lib/generalAPI'
 export default function Setting() {
-    const {  sub,name,email,bio,updateUserData } = useCnails();
+    const {  sub,name,email,bio } = useCnails();
+    const {  updateUserData } = generalAPI;
     const {isDark}=useTheme();
     const[newBio,setNewBio]=useState(bio);
     return (

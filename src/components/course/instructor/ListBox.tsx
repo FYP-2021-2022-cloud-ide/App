@@ -1,25 +1,34 @@
-import { Fragment, useState } from 'react'
-import { Listbox, Transition } from '@headlessui/react'
-import { CheckIcon, SelectorIcon } from '@heroicons/react/solid'
+import { Fragment, useState } from "react";
+import { Listbox, Transition } from "@headlessui/react";
+import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
+import React from "react";
 
-export interface ListBoxProps{
-  environments: Option[]
-  selected: Option
-  setSelected: React.Dispatch<React.SetStateAction<Option>>
+export interface ListBoxProps {
+  environments: Option[];
+  initSelected: Option;
+  onChange?: (newValve: Option) => void;
 }
 
-export interface Option{
-    value: string
-    id : string
+export interface Option {
+  value: string;
+  id: string;
 }
 
-export default function ListBox({environments, selected, setSelected}:ListBoxProps) {
-  // const [selected, setSelected] = useState(environments[0])
+function ListBox({ environments, initSelected, onChange }: ListBoxProps) {
+  const [selected, setSelected] = useState(initSelected);
 
   return (
     <div className="w-full top-16">
-      <Listbox value={selected} onChange={setSelected}>
-        <div className="relative mt-1">
+      <Listbox
+        value={selected}
+        onChange={(newValue) => {
+          if (onChange) {
+            onChange(newValue);
+            setSelected(newValue);
+          }
+        }}
+      >
+        <div className="relative mt-1 z-50">
           <Listbox.Button className="relative border dark:border-0 w-full py-2 pl-3 pr-10 text-left bg-white dark:bg-gray-700 dark:text-white rounded-lg shadow-md cursor-default focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75 focus-visible:ring-white focus-visible:ring-offset-orange-300 focus-visible:ring-offset-2 focus-visible:border-indigo-500 sm:text-sm">
             <span className="block truncate">{selected.value}</span>
             <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
@@ -35,12 +44,16 @@ export default function ListBox({environments, selected, setSelected}:ListBoxPro
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Listbox.Options className="absolute w-full py-1 mt-1 overflow-auto text-base bg-white dark:bg-gray-700 dark:text-gray-400 rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+            <Listbox.Options className="mb-10  absolute overflow-visible z-50 w-full py-1 mt-1  text-base bg-white dark:bg-gray-700 dark:text-gray-400 rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
               {environments.map((environment, environmentIndex) => (
                 <Listbox.Option
                   key={environmentIndex}
                   className={({ active }) =>
-                    `${active ? 'text-amber-900 bg-amber-100' : 'text-gray-900 dark:text-white'}
+                    `${
+                      active
+                        ? "text-gray-800 bg-gray-300 "
+                        : "text-gray-900 dark:text-white "
+                    }
                           cursor-default select-none relative py-2 pl-10 pr-4`
                   }
                   value={environment}
@@ -49,7 +62,7 @@ export default function ListBox({environments, selected, setSelected}:ListBoxPro
                     <>
                       <span
                         className={`${
-                          selected ? 'font-medium' : 'font-normal'
+                          selected ? "font-medium" : "font-normal"
                         } block truncate`}
                       >
                         {environment.value}
@@ -57,7 +70,9 @@ export default function ListBox({environments, selected, setSelected}:ListBoxPro
                       {selected ? (
                         <span
                           className={`${
-                            active ? 'text-amber-600 dark:text-white' : 'text-amber-600 dark:text-white'
+                            active
+                              ? "text-amber-600 dark:text-white"
+                              : "text-amber-600 dark:text-white"
                           }
                                 absolute inset-y-0 left-0 flex items-center pl-3`}
                         >
@@ -73,5 +88,8 @@ export default function ListBox({environments, selected, setSelected}:ListBoxPro
         </div>
       </Listbox>
     </div>
-  )
+  );
 }
+
+// export default React.memo(ListBox, () => true);
+export default ListBox;
