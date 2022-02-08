@@ -29,33 +29,31 @@ const containerAPI = {
         return res.json()
     },
     removeContainer: async (containerId: string, sub: string) => {
-        var res = await fetch('/api/container/removeContainer?sub='+sub, {
+        var res = await fetch('/api/container/removeContainer?sub=' + sub, {
             method: 'POST',
             body: JSON.stringify({
                 "containerId": containerId
             }),
         })
         return res.json()
-    },    
-    addTempContainer: async (memLimit: Number, numCPU: Number, imageName: string, sub: string,accessRight:string) =>{
-        var res = await fetch('/api/container/addTempContainer',{
+    },
+    addTempContainer: async (memLimit: Number, numCPU: Number, imageName: string, sub: string, accessRight: string) => {
+        var res = await fetch('/api/container/addTempContainer?sub=' + sub, {
             method: 'POST',
             body: JSON.stringify({
                 memLimit,
                 numCPU,
                 imageName,
-                sub,
                 accessRight
             })
         })
         return res.json()
     },
-    removeTempContainer: async (containerId:string, sub: string) =>{
-        var res = await fetch('/api/container/removeTempContainer',{
+    removeTempContainer: async (containerId: string, sub: string) => {
+        var res = await fetch('/api/container/removeTempContainer?sub=' + sub, {
             method: 'POST',
             body: JSON.stringify({
                 containerId,
-                sub
             })
         })
         return res.json()
@@ -63,4 +61,4 @@ const containerAPI = {
 
 }
 
-export {containerAPI}
+export { containerAPI }

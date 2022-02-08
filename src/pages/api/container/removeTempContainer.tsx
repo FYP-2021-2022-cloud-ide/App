@@ -18,11 +18,12 @@ export default function handler(
 {
     var client = grpcClient()
 
-    const {containerId, sub} = JSON.parse(req.body);
+    const { sub} = req.query
+    const {containerId} = JSON.parse(req.body);
     var docReq = new RemoveTempContainerRequest();
     docReq.setSessionKey(fetchAppSession(req));
     docReq.setContainerid(containerId);
-    docReq.setSub(sub)
+    docReq.setSub(sub as string)
     try{
         client.removeTempContainer(docReq, function(err, GoLangResponse: SuccessStringReply) {
             console.log(GoLangResponse)

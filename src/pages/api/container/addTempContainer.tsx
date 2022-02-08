@@ -19,14 +19,15 @@ export default function handler(
 {
     var client = grpcClient()
 
-    const {memLimit, numCPU, imageName, sub,accessRight} = JSON.parse(req.body);
+    const { sub} = req.query
+    const {memLimit, numCPU, imageName, accessRight} = JSON.parse(req.body);
     var docReq = new AddTempContainerRequest();
     docReq.setSessionkey(fetchAppSession(req));
     docReq.setAccessright(accessRight)
     docReq.setMemlimit(memLimit);
     docReq.setNumcpu(numCPU);
     docReq.setImagename(imageName);
-    docReq.setSub(sub)
+    docReq.setSub(sub as string)
     try{
         client.addTempContainer(docReq, function(err, GoLangResponse: AddTempContainerReply) {
             console.log(GoLangResponse)

@@ -6,8 +6,14 @@ import React, { useState } from "react";
 import Modal from "../../../Modal";
 import EmptyDiv from "../../../EmptyDiv";
 import ModalForm, { Section } from "../../../ModalForm";
+import { useCnails } from "../../../../contexts/cnails";
+import { containerAPI } from "../../../../lib/containerAPI";
+import { envAPI } from "../../../../lib/envAPI";
 
 const registry = "143.89.223.188:5000";
+const rootImage = "143.89.223.188:5000/codeserver:latest";
+const CPU = 0.5;
+const memory = 400;
 
 export interface EnvironmentContent {
   id: string;
@@ -25,7 +31,11 @@ export interface props {
 const EnvironmentList = ({ sectionUserID, environments }: props) => {
   let [isOpen, setIsOpen] = useState(false);
   let createRef = React.createRef<HTMLDivElement>();
-  const iniCreateEnvironmentFormData: { [title: string]: Section } = {
+  const { sub } = useCnails();
+  const { addContainer, removeContainer, removeTempContainer } = containerAPI;
+  const { buildEnvironment } = envAPI;
+  const [loading, setLoading] = useState(false);
+  const iniCreateEnvironmentFormStructure: { [title: string]: Section } = {
     create_environment: {
       displayTitle: false,
       entries: {
@@ -33,7 +43,8 @@ const EnvironmentList = ({ sectionUserID, environments }: props) => {
           type: "toggle",
           text: "Use predefined environment? ",
           description: "whether this environment is a predefined environment",
-          tooltip: "whether this environment is a predefined environment",
+          tooltip:
+            "whether this environment is a predefined environment. You will be prompt to a temporary workspace where you can set up the environment",
         },
         environment_choice: {
           type: "listbox",
@@ -49,7 +60,7 @@ const EnvironmentList = ({ sectionUserID, environments }: props) => {
             return data.is_predefined as boolean;
           },
         },
-        environment_title: {
+        environment_name: {
           type: "input",
           text: "Environment name",
           placeholder: "e.g. Environment 1",
@@ -69,12 +80,9 @@ const EnvironmentList = ({ sectionUserID, environments }: props) => {
     setIsOpen(false);
   }
 
-  console.log(
-    iniCreateEnvironmentFormData.create_environment.entries.environment_choice
-      .options[0]
-  );
   return (
     <div className="flex flex-col w-full">
+      {loading && <p>loading</p>}
       <div className="flex flex-row text-gray-700 dark:text-gray-300 justify-start gap-x-4 pb-4">
         <CubeIcon className="w-7 h-7"></CubeIcon>
         <div className="text-lg">Environments</div>
@@ -100,34 +108,63 @@ const EnvironmentList = ({ sectionUserID, environments }: props) => {
           </div>
         )
       }
-      <Modal isOpen={isOpen} setOpen={setIsOpen} clickOutsideToClose={true}>
+      {/* <Modal isOpen={isOpen} setOpen={setIsOpen} clickOutsideToClose={true}>
         <EnvironmentCreate
           sectionUserID={sectionUserID}
           closeModal={closeModal}
           ref={createRef}
         ></EnvironmentCreate>
-      </Modal>
-      {/* <ModalForm
+      </Modal> */}
+      <ModalForm
         isOpen={isOpen}
         setOpen={setIsOpen}
         clickOutsideToClose={true}
         title="Create Environment"
-        formStructure={iniCreateEnvironmentFormData}
+        formStructure={iniCreateEnvironmentFormStructure}
         initData={{
-          is_predefined: false,
+          is_predefined: true,
           environment_choice:
-            iniCreateEnvironmentFormData.create_environment.entries
+            iniCreateEnvironmentFormStructure.create_environment.entries
               .environment_choice.options[0],
-          environment_title: "",
+          environment_name: "",
           environment_description: "",
         }}
         onChange={(data, id) => {
           console.log(data, id);
         }}
-        onEnter={(data) => {
-          console.log(data);
+        onEnter={async (data) => {
+          if (data.is_predefined) {
+          } else {
+            setLoading(true);
+            try {
+              const response = await addContainer(
+                rootImage,
+                memory,
+                CPU,
+                sectionUserID,
+                "",
+                "root",
+                true
+              );
+              console.log(response);
+              if (response.success) {
+                // const link = "https://codespace.ust.dev/user/container/" + response.containerID + "/"
+                window.open("https://www.google.com");
+                await buildEnvironment(
+                  data.environment_name as string,
+                  data.environment_description as string,
+                  sectionUserID,
+                  response.containerID
+                );
+              }
+            } catch (error) {
+              console.log(error);
+            } finally {
+              setLoading(false);
+            }
+          }
         }}
-      ></ModalForm> */}
+      ></ModalForm>
     </div>
   );
 };

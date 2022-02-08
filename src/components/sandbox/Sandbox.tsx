@@ -14,11 +14,13 @@ interface props{
     numCPU:Number
 }
 
-function LoadingBox(){
+
+const LoadingBox = React.forwardRef(({},ref)=>{
     const dialogClass = "inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl text-[#415A6E]"
     const titleClass = "text-xl font-medium leading-6 dark:text-gray-300 mb-5"
     return(
-        <div className={dialogClass}>
+         //@ts-ignore
+        <div  ref={ref} className={dialogClass}>
             <Dialog.Title
                 as="h3"
                 className={titleClass}
@@ -31,7 +33,7 @@ function LoadingBox(){
             <Loader/>
         </div>
     )
-}
+})
 
 function Sandbox({sandbox,memLimit,numCPU}:props){
     const baseClass = "relative inline-flex rounded-full h-3 w-3"
@@ -39,8 +41,7 @@ function Sandbox({sandbox,memLimit,numCPU}:props){
     const inactiveClass = "bg-gray-400"
     const [isOpen, setIsOpen] = useState(false)
     const [modalType, setModalType] = useState("loadingBox")
-    let [useFreshSave, setUseFreshSave] = useState(false)
-    const {userId, sub} = useCnails()
+    const {userId} = useCnails()
     const { addSandbox,removeSandbox,removeSandboxImage } = sandboxAPI;
     // styles 
     const closeModal = ()=>{
@@ -70,9 +71,9 @@ function Sandbox({sandbox,memLimit,numCPU}:props){
         {
             text:instanceFlag? "Close" :  "Open", 
             onClick :instanceFlag?async ()=>{
-                setModalType('loadingBox')
+                // setModalType('loadingBox')
 
-                openModal()
+                // openModal()
                 const response = await removeSandbox( sandbox.sandboxesId,userId)
                 if (response.success) {
                     closeModal()
@@ -100,7 +101,6 @@ function Sandbox({sandbox,memLimit,numCPU}:props){
                 if (response.success) {
                     window.location.reload();
                 } else {
-                    window.location.reload();
                     alert(response.message)
                 }
             }
@@ -140,11 +140,15 @@ function Sandbox({sandbox,memLimit,numCPU}:props){
                 </div>
             </div>
             <Modal isOpen={isOpen} setOpen={setIsOpen}>
-                    {modalType == 'loadingBox'?(
-                        <LoadingBox/>
-                    ):(
-                        <SandboxUpdate  memLimit={memLimit} numCPU={numCPU} sandbox={sandbox} closeModal={closeModal}/>
-                    )}
+                {modalType == 'loadingBox'?(
+                    <LoadingBox/>
+                ):(
+                    <SandboxUpdate  
+                    memLimit={memLimit} 
+                    numCPU={numCPU}
+                    sandbox={sandbox} 
+                    closeModal={closeModal}/>
+                )}
             </Modal>
         </div>
     )

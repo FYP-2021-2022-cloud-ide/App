@@ -1,17 +1,9 @@
 import { Dialog } from "@headlessui/react";
-import { ssrEntries } from "next/dist/build/webpack/plugins/middleware-plugin";
-import React, {
-  createRef,
-  LegacyRef,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { createRef, useRef, useState } from "react";
 import ListBox, { Option } from "./course/instructor/ListBox";
 import Modal, { ModalProps } from "./Modal";
 import Toggle from "./Toggle";
 import { InformationCircleIcon } from "@heroicons/react/solid";
-import assert from "assert";
 
 export type Entry = {
   type: "input" | "textarea" | "listbox" | "toggle";
@@ -41,6 +33,164 @@ export type Props = ModalProps & {
   onEnter?: (data: { [id: string]: boolean | string | Option }) => void;
 };
 
+const Entry = ({
+  entry,
+  id,
+  data,
+  onChange,
+}: {
+  entry: Entry;
+  id: string;
+  data: { [id: string]: boolean | string | Option };
+  onChange: (
+    newData: { [id: string]: boolean | string | Option },
+    id: string
+  ) => void;
+}) => {
+  if (entry.conditional) {
+    if (!entry.conditional(data)) return <></>;
+  }
+  if (entry.type == "input") {
+    return (
+      <div className="">
+        <p className="modal-form-text-base">{entry.text}</p>
+        <Input
+          text={data[id] as string}
+          placeholder={entry.placeholder}
+          onChange={(text) => onChange(Object.assign(data, { [id]: text }), id)}
+        ></Input>
+      </div>
+    );
+  } else if (entry.type == "textarea") {
+    return (
+      <div>
+        <p className="modal-form-text-base">{entry.text}</p>
+        <TextArea
+          text={data[id] as string}
+          placeholder={entry.placeholder}
+          onChange={(text) => onChange(Object.assign(data, { [id]: text }), id)}
+        ></TextArea>
+      </div>
+    );
+  } else if (entry.type == "listbox") {
+    return (
+      <div className="modal-form-list-box">
+        <p className="modal-form-text-base">{entry.text}</p>
+        <ListBox
+          initSelected={data[id] as Option}
+          onChange={(option) =>
+            onChange(Object.assign(data, { [id]: option }), id)
+          }
+          environments={entry.options}
+        />
+      </div>
+    );
+  } else if (entry.type == "toggle") {
+    return (
+      <div className="modal-form-toggle">
+        <p className="modal-form-text-base">{entry.text}</p>
+        {entry.tooltip && (
+          <div className="tooltip tooltip-bottom" data-tip={entry.tooltip}>
+            <InformationCircleIcon className="tooltip-icon" />
+          </div>
+        )}
+        <Toggle
+          text={entry.text}
+          onChange={(newValue) =>
+            onChange(Object.assign(data, { [id]: newValue }), id)
+          }
+          enabled={data[id] as boolean}
+        ></Toggle>
+      </div>
+    );
+  } else throw new Error("not such entry type in <ModalForm>");
+};
+
+const TextArea = ({
+  text: _text,
+  placeholder,
+  onChange,
+}: {
+  text: string;
+  placeholder: string;
+  onChange: (text: string) => void;
+}) => {
+  const [text, setText] = useState(_text);
+  return (
+    <textarea
+      className="modal-form-textarea"
+      placeholder={placeholder}
+      value={text}
+      onChange={(e) => {
+        setText(e.target.value);
+        onChange(text);
+      }}
+    ></textarea>
+  );
+};
+
+const Section = ({
+  section,
+  title,
+  data,
+  onChange,
+}: {
+  section: Section;
+  title: string;
+  data: {
+    [id: string]: boolean | string | Option;
+  };
+  onChange: (
+    newValues: { [id: string]: boolean | string | Option },
+    id: string
+  ) => void; // return the new values of this sections
+}) => {
+  if (section.conditional) {
+    if (!section.conditional(data)) return <></>;
+  } else
+    return (
+      <>
+        {title && section.displayTitle && (
+          <div className="font-medium mt-4 dark:text-gray-300">{title}</div>
+        )}
+        {React.isValidElement(section.entries)
+          ? section.entries
+          : Object.keys(section.entries).map((id) => (
+              <Entry
+                key={id}
+                entry={section.entries[id]}
+                id={id}
+                data={data}
+                onChange={(newData) => onChange(newData, id)}
+              ></Entry>
+            ))}
+      </>
+    );
+};
+
+const Input = ({
+  text: _text,
+  placeholder,
+  onChange,
+}: {
+  text: string;
+  placeholder: string;
+  onChange: (text: string) => void;
+}) => {
+  const [text, setText] = useState(_text);
+  return (
+    <input
+      className="modal-form-input"
+      placeholder={placeholder}
+      value={text}
+      onChange={(e) => {
+        setText(e.target.value);
+        onChange(e.target.value);
+      }}
+    ></input>
+  );
+};
+
 const ModalForm = ({
   isOpen,
   setOpen,
@@ -56,10 +206,8 @@ const ModalForm = ({
   let ref = createRef<HTMLDivElement>();
   const [data, setData] =
     useState<{ [id: string]: boolean | string | Option }>(initData);
+
   // check if data match form structure
-  const inputRefs: { [id: string]: React.MutableRefObject<HTMLInputElement> } =
-    {};
-  // const inputRef = React;
   Object.keys(formStructure).forEach((sectionTitle) => {
     const section = formStructure[sectionTitle];
     if (!React.isValidElement(section.entries))
@@ -69,131 +217,20 @@ const ModalForm = ({
             `form data does not match form structure : ${id} not found in data`
           );
         }
-        if (section.entries[id].type == "input") {
-          Object.assign(inputRefs, {
-            [id]: useRef<HTMLInputElement>(),
-          });
-        }
       });
   });
 
-  const Entry = React.memo(
-    ({ entry, id }: { entry: Entry; id: string }) => {
-      if (entry.conditional) {
-        if (!entry.conditional(data)) return <></>;
-      }
-      if (entry.type == "input") {
-        return (
-          <div className="">
-            <p className="modal-form-text-base">{entry.text}</p>
-            <input
-              ref={inputRefs[id]}
-              className="modal-form-input"
-              placeholder={entry.placeholder}
-              value={inputRefs[id].current.value}
-              onChange={(e) => {
-                const newData = Object.assign(Object.assign({}, data), {
-                  [id]: e.target.value,
-                });
-                setData(newData);
-                if (onChange) {
-                  onChange(newData, id);
-                }
-              }}
-            ></input>
-          </div>
-        );
-      } else if (entry.type == "textarea") {
-        return (
-          <div>
-            <p></p>
-          </div>
-        );
-      } else if (entry.type == "listbox") {
-        return (
-          <div className="modal-form-list-box">
-            <p className="modal-form-text-base">{entry.text}</p>
-            <ListBox
-              initSelected={data[id] as Option}
-              onChange={(e) => {
-                const newData = Object.assign(Object.assign({}, data), {
-                  [id]: e,
-                });
-                setData(newData);
-                if (onChange) {
-                  onChange(newData, id);
-                }
-              }}
-              environments={entry.options}
-            />
-          </div>
-        );
-      } else if (entry.type == "toggle") {
-        return (
-          <div className="modal-form-toggle">
-            <p className="modal-form-text-base">{entry.text}</p>
-            {entry.tooltip && (
-              <div className="tooltip tooltip-bottom" data-tip={entry.tooltip}>
-                <InformationCircleIcon className="tooltip-icon" />
-              </div>
-            )}
-            <Toggle
-              text={entry.text}
-              onChange={(newValue) => {
-                const newData = Object.assign(Object.assign({}, data), {
-                  [id]: newValue,
-                });
-                setData(newData);
-                if (onChange) {
-                  onChange(newData, id);
-                }
-              }}
-              enabled={data[id] as boolean}
-            ></Toggle>
-          </div>
-        );
-      } else throw new Error("not such entry type in <ModalForm>");
-    },
-    (prevProps, nextProps) => {
-      const same =
-        prevProps.entry.conditional(data) == nextProps.entry.conditional(data);
-      if (!same) console.log(prevProps.id, "is rerender");
-      return same;
+  const patchedOnClose = () => {
+    if (onClose) {
+      onClose();
     }
-  );
-
-  const Section = React.memo(
-    ({ section, title }: { section: Section; title: string }) => {
-      if (section.conditional) {
-        if (!section.conditional(data)) return <></>;
-      } else
-        return (
-          <>
-            {title && section.displayTitle && (
-              <div className="font-medium mt-4 dark:text-gray-300">{title}</div>
-            )}
-            {React.isValidElement(section.entries)
-              ? section.entries
-              : Object.keys(section.entries).map((id) => (
-                  <Entry key={id} entry={section.entries[id]} id={id}></Entry>
-                ))}
-          </>
-        );
-    },
-    (prevProps, nextProps) => {
-      const same =
-        prevProps.section.conditional(data) ==
-        nextProps.section.conditional(data);
-      if (!same) console.log(prevProps.title, "is rerender");
-      return same;
-    }
-  );
-
+    setData(initData);
+  };
   return (
     <Modal
       isOpen={isOpen}
       setOpen={setOpen}
-      onClose={onClose}
+      onClose={patchedOnClose}
       onOpen={onOpen}
       clickOutsideToClose={clickOutsideToClose}
     >
@@ -209,11 +246,22 @@ const ModalForm = ({
                 key={sectionTitle}
                 section={section}
                 title={sectionTitle}
+                data={data}
+                onChange={(newData, id) => {
+                  setData(Object.assign({}, newData));
+                  onChange(newData, id);
+                }}
               ></Section>
             );
           })}
           <div className="flex flex-row justify-end space-x-2">
-            <button className="modal-form-btn-cancel" onClick={() => {}}>
+            <button
+              className="modal-form-btn-cancel"
+              onClick={() => {
+                setOpen(false);
+                patchedOnClose();
+              }}
+            >
               Cancel
             </button>
             <button
@@ -221,6 +269,8 @@ const ModalForm = ({
               onClick={() => {
                 if (onEnter) {
                   onEnter(data);
+                  setOpen(false);
+                  patchedOnClose();
                 }
               }}
             >
@@ -233,6 +283,8 @@ const ModalForm = ({
   );
 };
 
-export default React.memo(ModalForm, (prevProps, nextProps) => {
-  return false;
-});
+// export default React.memo(ModalForm, (prevProps, nextProps) => {
+//   return false;
+// });
+
+export default ModalForm;

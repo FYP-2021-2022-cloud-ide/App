@@ -9,7 +9,7 @@ import { useCnails } from "../../../../contexts/cnails";
 import { toast } from "react-hot-toast";
 import { envAPI } from "../../../../lib/envAPI";
 
-import { containerAPI } from "../../../../lib/containerAPI";
+import { sandboxAPI } from "../../../../lib/sandboxAPI";
 import Toggle from "../../../Toggle";
 interface EnvironmentCreateProps {
   sectionUserID: string;
@@ -41,7 +41,7 @@ const EnvironmentCreate = React.forwardRef(
     const { buildEnvironment, addEnvironment } = envAPI;
     const [containerID, setContainerID] = useState("");
     const [selectedEnv, setSelectedEnv] = useState<Option>(options[0]);
-    const { addTempContainer, removeTempContainer } = containerAPI;
+    // const { addTempContainer, removeTempContainer } = sandboxAPI;
     const { sub } = useCnails();
     const [step, setStep] = useState(1);
     const nextStep = () => {

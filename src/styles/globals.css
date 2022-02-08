@@ -11,7 +11,8 @@
   @apply font-semibold  text-gray-800 dark:text-gray-300 whitespace-nowrap;
 }
 
-.course-dialog-modal {
+.course-dialog-modal,
+.modal-form-modal {
   @apply max-h-[70vh] inline-block w-full max-w-md p-6 my-8 overflow-visible text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl text-[#415A6E];
 }
 
@@ -23,8 +24,8 @@
   @apply text-xl font-medium leading-6 dark:text-gray-300 mb-5;
 }
 
-.course-dialog-textarea {
-  @apply max-h-[500px] border dark:border-0 focus:outline-none dark:bg-gray-700 p-1 px-3 w-full text-gray-500 dark:text-gray-300 flex-row space-x-2  text-left rounded-xl shadow-lg h-32;
+.modal-form-textarea {
+  @apply min-h-[100px] max-h-[300px] border dark:border-0 focus:outline-none dark:bg-gray-700 p-1 px-3 w-full text-gray-500 dark:text-gray-300 flex-row space-x-2  text-left rounded-xl shadow-lg h-32;
 }
 
 .modal-form-title-md {

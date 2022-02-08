@@ -91,5 +91,4 @@ function ListBox({ environments, initSelected, onChange }: ListBoxProps) {
   );
 }
 
-// export default React.memo(ListBox, () => true);
 export default ListBox;
