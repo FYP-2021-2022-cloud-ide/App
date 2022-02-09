@@ -1,19 +1,18 @@
-import Environment from "./Environment";
-import EnvironmentCreate from "./EnvironmentCreate";
+import EnvironmentCard from "./EnvironmentCard";
 import { CubeIcon } from "@heroicons/react/outline";
-import { InformationCircleIcon, PlusCircleIcon } from "@heroicons/react/solid";
+import { PlusCircleIcon } from "@heroicons/react/solid";
 import React, { useEffect, useState } from "react";
-import Modal from "../../../Modal";
-import ListBox, { Option } from "../../../course/instructor/ListBox";
-import EmptyDiv from "../../../EmptyDiv";
-import ModalForm, { Section } from "../../../ModalForm";
-import { useCnails } from "../../../../contexts/cnails";
-import { containerAPI } from "../../../../lib/containerAPI";
-import { envAPI } from "../../../../lib/envAPI";
+import { Option } from "../../ListBox";
+import EmptyDiv from "../../EmptyDiv";
+import ModalForm, { Section } from "../../ModalForm";
+import { useCnails } from "../../../contexts/cnails";
+import { containerAPI } from "../../../lib/containerAPI";
+import { envAPI } from "../../../lib/envAPI";
 import { useRouter } from "next/router";
-import { Environment as EnvironmentData } from "../../../../lib/cnails";
+import { Environment as EnvironmentData } from "../../../lib/cnails";
 import _ from "lodash";
 import toast from "react-hot-toast";
+import myToast from "../../CustomToast";
 
 const registry = "143.89.223.188:5000";
 const rootImage = "143.89.223.188:5000/codeserver:latest";
@@ -32,15 +31,21 @@ export interface props {
   sectionUserID: string;
 }
 
+export const getValidEnvName = (environments: EnvironmentData[]): string => {
+  for (let i = environments.length + 1; ; i++) {
+    if (environments.every((env) => env.environmentName != `Environment ${i}`))
+      return `Environment ${i}`;
+  }
+};
+
 const EnvironmentList = ({ sectionUserID }: props) => {
-  let [isCreateOpen, setIsCreateOpen] = useState(false);
-  let [isUpdateOpen, setIsUpdateOpen] = useState(false);
-  let [warningOpen, setWarningOpen] = useState(false);
-  let warningRef = React.createRef<HTMLDivElement>();
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isUpdateOpen, setIsUpdateOpen] = useState(false);
+  const [updateTarget, setUpdateTarget] = useState<EnvironmentContent>();
   const router = useRouter();
   const sectionId = router.query.sectionId as string;
   const { sub } = useCnails();
-  const { addContainer, removeContainer, removeTempContainer } = containerAPI;
+  const { addContainer } = containerAPI;
   const {
     buildEnvironment,
     addEnvironment,
@@ -68,6 +73,11 @@ const EnvironmentList = ({ sectionUserID }: props) => {
     // this will be called everytime rerender --> fetch the container
     fetchEnvironments();
   });
+
+  const updateEnvironment = (environment: EnvironmentContent) => {
+    setIsUpdateOpen(true);
+    setUpdateTarget(environment);
+  };
 
   const iniCreateEnvironmentFormStructure: { [title: string]: Section } = {
     create_environment: {
@@ -97,7 +107,7 @@ const EnvironmentList = ({ sectionUserID }: props) => {
         environment_name: {
           type: "input",
           text: "Environment name",
-          placeholder: "e.g. Environment 1",
+          placeholder: `e.g. ${getValidEnvName(environments)}`,
         },
         environment_description: {
           type: "textarea",
@@ -122,10 +132,10 @@ const EnvironmentList = ({ sectionUserID }: props) => {
         environments?.length == 0 ? (
           <EmptyDiv message="There is no environment for this course yet." />
         ) : (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="env-grid">
             {environments.map((environment) => {
               return (
-                <Environment
+                <EnvironmentCard
                   key={environment.id}
                   sectionUserID={sectionUserID}
                   environment={environment}
@@ -137,14 +147,20 @@ const EnvironmentList = ({ sectionUserID }: props) => {
                     const { success } = response;
                     if (success) {
                       fetchEnvironments();
+                      myToast.success(
+                        `Environment (${environment.id}) is successfully deleted.`
+                      );
                     } else {
                       // do something else
+                      myToast.error(
+                        `Some error happened. Environment (${environment.id}) was not deleted.`
+                      );
                     }
                   }}
                   onUpdate={(environment) => {
-                    setIsUpdateOpen(true);
+                    updateEnvironment(environment);
                   }}
-                ></Environment>
+                ></EnvironmentCard>
               );
             })}
           </div>
@@ -183,7 +199,7 @@ const EnvironmentList = ({ sectionUserID }: props) => {
             const description = data.environment_descripiton as string;
             const response = await addEnvironment(
               [environment.value + ":" + environment.id],
-              name,
+              name == "" ? getValidEnvName(environments) : name,
               description,
               sectionUserID
             );

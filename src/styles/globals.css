@@ -7,8 +7,27 @@
 @tailwind components;
 @tailwind utilities;
 
-.card.title {
+.course-card-title {
   @apply font-semibold  text-gray-800 dark:text-gray-300 whitespace-nowrap;
+}
+.course-card-last-update {
+  @apply text-xs text-gray-400 mt-10;
+}
+
+.course-card-name {
+  @apply font-medium text-xs text-gray-600 dark:text-gray-400;
+}
+
+.course-card {
+  @apply border border-gray-200 shadow-sm transition rounded-lg bg-white p-4 dark:bg-gray-600 dark:border-gray-700;
+}
+
+.instructor-badge {
+  @apply badge bg-purple-500 border-purple-500 uppercase font-normal select-none;
+}
+
+.student-badge {
+  @apply badge bg-blue-500 border-blue-500 uppercase font-normal select-none;
 }
 
 .course-dialog-modal,
@@ -73,6 +92,14 @@
   @apply z-[1];
 }
 
+.tooltip::before {
+  @apply shadow-lg;
+}
+
+.tooltip::after {
+  @apply shadow-lg;
+}
+
 .tooltip-bottom-left::before {
   @apply -translate-x-[90%] z-[100];
 }
@@ -82,11 +109,11 @@
 }
 
 .tooltip-info::before {
-  @apply bg-blue-300/50 backdrop-blur-sm;
+  @apply bg-blue-100/50 dark:bg-blue-300/50 backdrop-blur-sm;
 }
 
 .tooltip-info::after {
-  @apply border-b-blue-300/50 backdrop-blur-sm;
+  @apply bg-blue-100/50 dark:border-b-blue-300/50 backdrop-blur-sm;
 }
 
 .course-list-title-add {
@@ -127,6 +154,18 @@
   -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
 }
 
+.toaster {
+  @apply cursor-pointer rounded text-gray-600 bg-gray-50 border border-gray-200 dark:bg-slate-900  dark:border-gray-900 dark:text-gray-300 !important;
+}
+
+.toaster-content {
+  @apply flex flex-row items-start space-x-2;
+}
+
+.toaster-text {
+  @apply text-justify text-sm;
+}
+
 .toaster-success {
   @apply bg-white !important;
 }
@@ -134,5 +173,45 @@
 .toaster-error {
 }
 
-.env-card {
+.toaster-warning {
+}
+
+.env-grid,
+.template-grid {
+  @apply grid grid-cols-1 gap-4 lg:grid-cols-2 flex-1;
+}
+
+.env-card,
+.template-card {
+  @apply cursor-pointer border border-gray-200 dark:border-gray-700 shadow-sm rounded-lg bg-white dark:bg-gray-600 px-4 py-4 min-h-[9rem] h-36 flex flex-row items-start justify-between shrink;
+}
+
+.env-card-content,
+.template-card-content {
+  @apply flex flex-col h-full shrink  overflow-hidden;
+}
+
+.env-card-name,
+.template-card-name {
+  @apply font-semibold text-sm text-gray-600 dark:text-gray-300 text-left truncate;
+}
+
+.env-card-lib {
+  @apply font-medium text-xs text-gray-600 dark:text-gray-300 text-left truncate;
+}
+
+.env-card-ref {
+  @apply font-medium text-xs text-gray-400 truncate;
+}
+
+.env-card-des {
+  @apply font-medium text-xs text-gray-400 truncate;
+}
+
+.empty-div {
+  @apply bg-gray-200 dark:bg-gray-700 rounded-md h-36 p-6 flex flex-grow max-h-[400px];
+}
+
+.empty-div-text {
+  @apply text-gray-400 dark:text-gray-300 font-bold m-auto object-center select-none;
 }

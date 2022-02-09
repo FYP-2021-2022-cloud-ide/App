@@ -2,9 +2,10 @@ import React, { useContext, useState, useEffect } from "react";
 import { getMessaging, onMessage } from "firebase/messaging";
 import { firebaseCloudMessaging } from "../lib/webpush";
 // import {notificationStack} from "../lib/notificationStack";
-import toast, { ToastBar, Toaster } from "react-hot-toast";
+import toast, { Toast, ToastBar, Toaster } from "react-hot-toast";
 import { Notification, NotificationBody } from "../components/Notification";
 import { Transition } from "@headlessui/react";
+import myToast from "../components/CustomToast";
 
 interface CnailsContextState {
   sub: string;
@@ -135,22 +136,31 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
           position="bottom-right"
           toastOptions={{
             duration: 50000,
-            success: {
-              className: "toaster-success",
-            },
           }}
         >
-          {(t) => (
-            <ToastBar
-              toast={t}
-              style={{
-                ...t.style,
-                animation: t.visible
-                  ? "custom-enter 1s ease"
-                  : "custom-exit 1s ease",
-              }}
-            />
-          )}
+          {(t: Toast) => {
+            t.className = `toaster ${t.className}`;
+            return (
+              <div
+                onClick={() => {
+                  myToast.dismiss(t.id);
+                }}
+              >
+                <ToastBar toast={t}>
+                  {({ icon, message }) => {
+                    return (
+                      <div className="toaster-content">
+                        {icon}
+                        <p className="toaster-text">
+                          {(message as JSX.Element).props.children}
+                        </p>
+                      </div>
+                    );
+                  }}
+                </ToastBar>
+              </div>
+            );
+          }}
         </Toaster>
         {children}
       </CnailsContext.Provider>

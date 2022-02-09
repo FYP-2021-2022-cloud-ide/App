@@ -10,3 +10,12 @@ export type Environment = {
     environmentName: string;
     description: string;
 };
+
+export type Course = {
+    sectionID: string;
+    courseCode: string;
+    section: string;
+    name: string;
+    sectionRole: "INSTRUCTOR" | "STUDENT";
+    lastUpdateTime: string;
+}

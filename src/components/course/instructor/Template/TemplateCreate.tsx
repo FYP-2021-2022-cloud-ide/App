@@ -1,6 +1,6 @@
 import React, { MouseEventHandler, useRef, useState } from "react";
 import { Dialog, Transition, Switch } from "@headlessui/react";
-import ListBox, { Option } from "../ListBox";
+import ListBox, { Option } from "../../../ListBox";
 import Loader from "../../../../components/Loader";
 import { useCnails } from "../../../../contexts/cnails";
 import { InformationCircleIcon } from "@heroicons/react/solid";

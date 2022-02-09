@@ -1,16 +1,17 @@
 import { useCnails } from "../../../../contexts/cnails";
 import React, { useEffect, useRef, useState } from "react";
-import Template from "./Template";
+import Template from "./TemplateCard";
 import { DocumentTextIcon } from "@heroicons/react/outline";
 import { PlusCircleIcon, InformationCircleIcon } from "@heroicons/react/solid";
 import Modal from "../../../Modal";
-import ListBox, { Option } from "../ListBox";
+import ListBox, { Option } from "../../../ListBox";
 import TemplateCreate from "./TemplateCreate";
 //testing
 import EmptyDiv from "../../../EmptyDiv";
-import { EnvironmentContent as environment } from "../Environment/EnvironmentList";
+import { EnvironmentContent as environment } from "../EnvironmentList";
 import ModalForm, { Section } from "../../../ModalForm";
 import { envAPI } from "../../../../lib/envAPI";
+import myToast from "../../../CustomToast";
 
 export interface template {
   id: string;
@@ -68,8 +69,10 @@ const TemplateList = ({ templates, sectionUserID, environments }: props) => {
         <div className="course-list-title-text">Templates</div>
         <button
           onClick={() => {
-            if (environmentList.length == 0 || false) {
-              setWarningOpen(true);
+            if (environmentList.length == 0) {
+              myToast.warning(
+                "You need to have at least one environment before creating a template."
+              );
             } else {
               setIsOpen(true);
             }
@@ -83,7 +86,7 @@ const TemplateList = ({ templates, sectionUserID, environments }: props) => {
         templates?.length == 0 ? (
           <EmptyDiv message="There is no template for this course yet." />
         ) : (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 flex-1">
             {templates.map((template: template) => {
               return (
                 <Template
@@ -98,7 +101,7 @@ const TemplateList = ({ templates, sectionUserID, environments }: props) => {
           </div>
         )
       }
-      <Modal isOpen={isOpen} setOpen={setIsOpen}>
+      {/* <Modal isOpen={isOpen} setOpen={setIsOpen}>
         <TemplateCreate
           closeModal={() => setIsOpen(false)}
           memLimit={memLimit}
@@ -107,45 +110,20 @@ const TemplateList = ({ templates, sectionUserID, environments }: props) => {
           ref={ref}
           sectionUserID={sectionUserID}
         ></TemplateCreate>
-      </Modal>
-      {/* <ModalForm
-        isOpen={isOpen}
-        setOpen={setIsOpen}
-        formStructure={initTemplateCreateFormStructure}
-        title="Create Template"
-        initData={{
-          select_environment:
-            initTemplateCreateFormStructure.create_template.entries
-              .select_environment.options[0],
-        }}
-      ></ModalForm> */}
-      <Modal
-        isOpen={warningOpen}
-        setOpen={setWarningOpen}
-        clickOutsideToClose={true}
-      >
-        <div ref={ref} className="course-dialog-modal">
-          <div className="course-dialog-content">
-            <div className="alert alert-warning items-start space-x-3">
-              <InformationCircleIcon className="w-7 h-7" />
-              <label className="">
-                You need to have at least one environment before creating a
-                template.
-              </label>
-            </div>
-            <div className="modal-form-btn-row">
-              <button
-                className="modal-form-btn-ok"
-                onClick={() => {
-                  setWarningOpen(false);
-                }}
-              >
-                OK
-              </button>
-            </div>
-          </div>
-        </div>
-      </Modal>
+      </Modal> */}
+      {environmentList.length != 0 && (
+        <ModalForm
+          isOpen={isOpen}
+          setOpen={setIsOpen}
+          formStructure={initTemplateCreateFormStructure}
+          title="Create Template"
+          initData={{
+            select_environment:
+              initTemplateCreateFormStructure.create_template.entries
+                .select_environment.options[0],
+          }}
+        ></ModalForm>
+      )}
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import { Dialog } from "@headlessui/react";
 import React, { createRef, useRef, useState } from "react";
-import ListBox, { Option } from "./course/instructor/ListBox";
+import ListBox, { Option } from "./ListBox";
 import Modal, { ModalProps } from "./Modal";
 import Toggle from "./Toggle";
 import { InformationCircleIcon } from "@heroicons/react/solid";

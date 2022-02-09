@@ -6,12 +6,12 @@ export type Props = {
 
 const EmptyDiv = ({ children, message, icon }: Props) => {
   return (
-    <div className="bg-gray-200 dark:bg-gray-700 rounded-md h-36 p-6 flex flex-grow max-h-[400px]">
+    <div className="empty-div">
       {children ? (
         children
       ) : (
-        <p className="text-gray-400 dark:text-gray-300 font-bold whitespace-nowrap m-auto object-center">
-          <span className="mr-3 text-2xl ">🤷‍♂️</span>
+        <p className="empty-div-text">
+          <span className="mr-3 text-2xl ">{icon ? icon : " 🤷‍♂️ "}</span>
           {message}
         </p>
       )}

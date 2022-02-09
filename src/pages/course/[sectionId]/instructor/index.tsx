@@ -1,6 +1,6 @@
 import Router, { useRouter } from "next/router";
 import CourseBar from "../../../../components/course/CourseBar";
-import EnvironmentList from "../../../../components/course/instructor/Environment/EnvironmentList";
+import EnvironmentList from "../../../../components/course/instructor/EnvironmentList";
 import TemplateList from "../../../../components/course/instructor/Template/TemplateList";
 import React, { useEffect, useState } from "react";
 import { useCnails } from "../../../../contexts/cnails";
@@ -67,7 +67,7 @@ const Home = () => {
               },
             ]}
           />
-          <CourseBar role={"Instructor"} courseName={courseName!}></CourseBar>
+          <CourseBar role={"INSTRUCTOR"} courseName={courseName!}></CourseBar>
 
           <div className="flex flex-row space-x-10 w-full">
             <EnvironmentList sectionUserID={sectionUserID}></EnvironmentList>
