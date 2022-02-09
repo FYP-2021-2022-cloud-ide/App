@@ -90,7 +90,10 @@ const Entry = ({
       <div className="modal-form-toggle">
         <p className="modal-form-text-base">{entry.text}</p>
         {entry.tooltip && (
-          <div className="tooltip tooltip-bottom" data-tip={entry.tooltip}>
+          <div
+            className="tooltip tooltip-bottom tooltip-info"
+            data-tip={entry.tooltip}
+          >
             <InformationCircleIcon className="tooltip-icon" />
           </div>
         )}
@@ -234,9 +237,9 @@ const ModalForm = ({
       onOpen={onOpen}
       clickOutsideToClose={clickOutsideToClose}
     >
-      <div ref={ref} className="course-dialog-modal ">
-        <div className="course-dialog-content">
-          <Dialog.Title as="h3" className="course-dialog-title">
+      <div ref={ref} className="modal-form ">
+        <div className="modal-form-content">
+          <Dialog.Title as="h3" className="modal-form-title">
             {title}
           </Dialog.Title>
           {Object.keys(formStructure).map((sectionTitle) => {
@@ -254,7 +257,7 @@ const ModalForm = ({
               ></Section>
             );
           })}
-          <div className="flex flex-row justify-end space-x-2">
+          <div className="modal-form-btn-row">
             <button
               className="modal-form-btn-cancel"
               onClick={() => {

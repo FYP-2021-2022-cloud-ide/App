@@ -39,6 +39,7 @@
     "react-dropzone": "^11.5.1",
     "react-hot-toast": "^2.1.1",
     "react-loader-spinner": "^4.0.0",
+    "react-parallax-tilt": "^1.5.92",
     "react-select": "^5.1.0",
     "react-table": "^7.7.0",
     "redis": "^3.1.2",

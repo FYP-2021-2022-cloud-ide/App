@@ -12,15 +12,17 @@
 }
 
 .course-dialog-modal,
-.modal-form-modal {
+.modal-form {
   @apply max-h-[70vh] inline-block w-full max-w-md p-6 my-8 overflow-visible text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl text-[#415A6E];
 }
 
-.course-dialog-content {
-  @apply h-full overflow-y-visible  px-2 py-2 overflow-x-visible space-y-4;
+.course-dialog-content,
+.modal-form-content {
+  @apply h-full overflow-y-visible  px-2 py-2 overflow-x-visible flex flex-col space-y-4;
 }
 
-.course-dialog-title {
+.course-dialog-title,
+.modal-form-title {
   @apply text-xl font-medium leading-6 dark:text-gray-300 mb-5;
 }
 
@@ -32,8 +34,8 @@
   @apply font-medium mt-4 text-gray-700 dark:text-gray-300;
 }
 
-.tooltip {
-  @apply z-[100];
+.modal-form-btn-row {
+  @apply flex flex-row justify-end space-x-2;
 }
 
 .modal-form-text-base {
@@ -59,21 +61,49 @@
   @apply w-fit rounded-md px-4 py-2 bg-gray-400 hover:bg-gray-500 text-base leading-6 font-medium text-white shadow-sm focus:outline-none focus:border-blue-300 transition ease-in-out duration-150 sm:text-sm sm:leading-5;
 }
 
+.listbox-options {
+  @apply mb-10  absolute overflow-visible w-full py-1 mt-1  text-base bg-white dark:bg-gray-700 dark:text-gray-400 rounded-md shadow-lg shadow-black/30 max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm;
+}
+
 .tooltip-icon {
   @apply w-5 h-5 text-gray-700 dark:text-gray-300;
 }
 
-/* .tooltip {
-  @apply invisible absolute  whitespace-nowrap top-0;
+.tooltip {
+  @apply z-[1];
 }
 
-.has-tooltip {
-  @apply relative;
+.tooltip-bottom-left::before {
+  @apply -translate-x-[90%] z-[100];
 }
 
-.has-tooltip:hover .tooltip {
-  @apply visible;
-} */
+.tooltip-bottom-right::before {
+  @apply -translate-x-[10%] z-[100];
+}
+
+.tooltip-info::before {
+  @apply bg-blue-300/50 backdrop-blur-sm;
+}
+
+.tooltip-info::after {
+  @apply border-b-blue-300/50 backdrop-blur-sm;
+}
+
+.course-list-title-add {
+  @apply w-7 h-7 hover:scale-110 transition ease-in-out duration-300;
+}
+
+.course-list-title-icon {
+  @apply w-7 h-7;
+}
+
+.course-list-title {
+  @apply flex flex-row text-gray-700 dark:text-gray-300 justify-start gap-x-4 pb-4 items-center;
+}
+
+.course-list-title-text {
+  @apply text-lg font-bold;
+}
 
 .hide-scroll::-webkit-scrollbar {
 }
@@ -95,4 +125,14 @@
 .course-dialog-content::-webkit-scrollbar-thumb {
   border-radius: 10px;
   -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+}
+
+.toaster-success {
+  @apply bg-white !important;
+}
+
+.toaster-error {
+}
+
+.env-card {
 }

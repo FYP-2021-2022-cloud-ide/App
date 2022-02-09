@@ -1,14 +1,19 @@
 import Environment from "./Environment";
 import EnvironmentCreate from "./EnvironmentCreate";
 import { CubeIcon } from "@heroicons/react/outline";
-import { PlusCircleIcon } from "@heroicons/react/solid";
-import React, { useState } from "react";
+import { InformationCircleIcon, PlusCircleIcon } from "@heroicons/react/solid";
+import React, { useEffect, useState } from "react";
 import Modal from "../../../Modal";
+import ListBox, { Option } from "../../../course/instructor/ListBox";
 import EmptyDiv from "../../../EmptyDiv";
 import ModalForm, { Section } from "../../../ModalForm";
 import { useCnails } from "../../../../contexts/cnails";
 import { containerAPI } from "../../../../lib/containerAPI";
 import { envAPI } from "../../../../lib/envAPI";
+import { useRouter } from "next/router";
+import { Environment as EnvironmentData } from "../../../../lib/cnails";
+import _ from "lodash";
+import toast from "react-hot-toast";
 
 const registry = "143.89.223.188:5000";
 const rootImage = "143.89.223.188:5000/codeserver:latest";
@@ -25,16 +30,45 @@ export interface EnvironmentContent {
 
 export interface props {
   sectionUserID: string;
-  environments: EnvironmentContent[];
 }
 
-const EnvironmentList = ({ sectionUserID, environments }: props) => {
-  let [isOpen, setIsOpen] = useState(false);
-  let createRef = React.createRef<HTMLDivElement>();
+const EnvironmentList = ({ sectionUserID }: props) => {
+  let [isCreateOpen, setIsCreateOpen] = useState(false);
+  let [isUpdateOpen, setIsUpdateOpen] = useState(false);
+  let [warningOpen, setWarningOpen] = useState(false);
+  let warningRef = React.createRef<HTMLDivElement>();
+  const router = useRouter();
+  const sectionId = router.query.sectionId as string;
   const { sub } = useCnails();
   const { addContainer, removeContainer, removeTempContainer } = containerAPI;
-  const { buildEnvironment } = envAPI;
+  const {
+    buildEnvironment,
+    addEnvironment,
+    environmentList,
+    removeEnvironment,
+  } = envAPI;
+  const [environments, setEnvironments] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const fetchEnvironments = async () => {
+    const response = await environmentList(sectionId, sub);
+    const {
+      success,
+      environments: newEnvironemnts,
+    }: { success: boolean; environments: EnvironmentData[] } = response;
+    if (success) {
+      // check if the past environment is different from the new environments, rerender if yes
+      if (!_.isEqual(environments, newEnvironemnts)) {
+        setEnvironments(newEnvironemnts);
+      }
+    }
+  };
+
+  useEffect(() => {
+    // this will be called everytime rerender --> fetch the container
+    fetchEnvironments();
+  });
+
   const iniCreateEnvironmentFormStructure: { [title: string]: Section } = {
     create_environment: {
       displayTitle: false,
@@ -72,13 +106,6 @@ const EnvironmentList = ({ sectionUserID, environments }: props) => {
       },
     },
   };
-  function openModal() {
-    setIsOpen(true);
-  }
-
-  function closeModal() {
-    setIsOpen(false);
-  }
 
   return (
     <div className="flex flex-col w-full">
@@ -86,7 +113,7 @@ const EnvironmentList = ({ sectionUserID, environments }: props) => {
       <div className="flex flex-row text-gray-700 dark:text-gray-300 justify-start gap-x-4 pb-4">
         <CubeIcon className="w-7 h-7"></CubeIcon>
         <div className="text-lg">Environments</div>
-        <button onClick={openModal}>
+        <button onClick={() => setIsCreateOpen(true)}>
           <PlusCircleIcon className="w-7 h-7 hover:scale-110 transition  ease-in-out duration-300"></PlusCircleIcon>
         </button>
       </div>
@@ -102,6 +129,21 @@ const EnvironmentList = ({ sectionUserID, environments }: props) => {
                   key={environment.id}
                   sectionUserID={sectionUserID}
                   environment={environment}
+                  onDelete={async (environment) => {
+                    const response = await removeEnvironment(
+                      environment.id,
+                      sectionUserID
+                    );
+                    const { success } = response;
+                    if (success) {
+                      fetchEnvironments();
+                    } else {
+                      // do something else
+                    }
+                  }}
+                  onUpdate={(environment) => {
+                    setIsUpdateOpen(true);
+                  }}
                 ></Environment>
               );
             })}
@@ -115,9 +157,10 @@ const EnvironmentList = ({ sectionUserID, environments }: props) => {
           ref={createRef}
         ></EnvironmentCreate>
       </Modal> */}
+      {/* the create environment modal */}
       <ModalForm
-        isOpen={isOpen}
-        setOpen={setIsOpen}
+        isOpen={isCreateOpen}
+        setOpen={setIsCreateOpen}
         clickOutsideToClose={true}
         title="Create Environment"
         formStructure={iniCreateEnvironmentFormStructure}
@@ -133,7 +176,24 @@ const EnvironmentList = ({ sectionUserID, environments }: props) => {
           console.log(data, id);
         }}
         onEnter={async (data) => {
+          console.log(data);
           if (data.is_predefined) {
+            const environment = data.environment_choice as Option;
+            const name = data.environment_name as string;
+            const description = data.environment_descripiton as string;
+            const response = await addEnvironment(
+              [environment.value + ":" + environment.id],
+              name,
+              description,
+              sectionUserID
+            );
+            const { success, environmentID } = response;
+            if (success) {
+              toast.success(
+                `Environment (${environmentID}) is successfully created.`
+              );
+              fetchEnvironments();
+            }
           } else {
             setLoading(true);
             try {
@@ -148,7 +208,6 @@ const EnvironmentList = ({ sectionUserID, environments }: props) => {
               );
               console.log(response);
               if (response.success) {
-                // const link = "https://codespace.ust.dev/user/container/" + response.containerID + "/"
                 window.open("https://www.google.com");
                 await buildEnvironment(
                   data.environment_name as string,
@@ -159,11 +218,20 @@ const EnvironmentList = ({ sectionUserID, environments }: props) => {
               }
             } catch (error) {
               console.log(error);
+              toast.error(error.message);
             } finally {
               setLoading(false);
             }
           }
         }}
+      ></ModalForm>
+      <ModalForm
+        isOpen={isUpdateOpen}
+        setOpen={setIsUpdateOpen}
+        clickOutsideToClose
+        formStructure={{}}
+        initData={{}}
+        title="Update Environment"
       ></ModalForm>
     </div>
   );

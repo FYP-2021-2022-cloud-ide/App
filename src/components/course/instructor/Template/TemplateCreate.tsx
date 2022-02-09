@@ -24,7 +24,7 @@ const TemplateCreate = React.forwardRef(
       environments,
       closeModal,
     }: TemplateCreateProps,
-    ref
+    ref: React.LegacyRef<HTMLDivElement>
   ) => {
     const [step, setStep] = useState(1);
     const [active, setActive] = useState(false);

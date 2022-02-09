@@ -1,94 +1,153 @@
 import { useCnails } from "../../../../contexts/cnails";
-import React, { useEffect, useRef, useState } from 'react';
-import Template from "./Template"
-import { DocumentTextIcon } from "@heroicons/react/outline"
-import { PlusCircleIcon } from "@heroicons/react/solid"
-import { Dialog, Transition } from "@headlessui/react";
+import React, { useEffect, useRef, useState } from "react";
+import Template from "./Template";
+import { DocumentTextIcon } from "@heroicons/react/outline";
+import { PlusCircleIcon, InformationCircleIcon } from "@heroicons/react/solid";
 import Modal from "../../../Modal";
-import ListBox, {Option} from "../ListBox"
+import ListBox, { Option } from "../ListBox";
 import TemplateCreate from "./TemplateCreate";
 //testing
-import templateData from "../../../../data/testing/templateList"
 import EmptyDiv from "../../../EmptyDiv";
-import {EnvironmentContent as environment} from "../Environment/EnvironmentList"
-
+import { EnvironmentContent as environment } from "../Environment/EnvironmentList";
+import ModalForm, { Section } from "../../../ModalForm";
+import { envAPI } from "../../../../lib/envAPI";
 
 export interface template {
-    id: string
-    name: string
-    description: string
-    imageId: string
-    assignment_config_id: string
-    storage: string
-    containerID: string
-    active: boolean
-    isExam:boolean
-    timeLimit:Number
-    allow_notification:boolean
+  id: string;
+  name: string;
+  description: string;
+  imageId: string;
+  assignment_config_id: string;
+  storage: string;
+  containerID: string;
+  active: boolean;
+  isExam: boolean;
+  timeLimit: Number;
+  allow_notification: boolean;
 }
 
-
 export interface props {
-    templates: template[]
-    environments: environment[]
-    sectionUserID: string
+  templates: template[];
+  environments: environment[];
+  sectionUserID: string;
 }
 
 const TemplateList = ({ templates, sectionUserID, environments }: props) => {
-    const [memLimit, setmemLimit] = useState(400);
-    const [numCPU, setnumCPU] = useState(0.5);
-    let [isOpen, setIsOpen] = useState(false)
+  const [memLimit, setmemLimit] = useState(400);
+  const [numCPU, setnumCPU] = useState(0.5);
+  const [warningOpen, setWarningOpen] = useState(false);
+  let [isOpen, setIsOpen] = useState(false);
+  let ref = React.createRef<HTMLDivElement>();
 
-    function openModal() {
-        setIsOpen(true)
-    }
+  // building the environemnts list
+  var environmentList: Option[] = [];
+  for (let i = 0; i < environments.length; i++) {
+    environmentList.push({
+      value:
+        environments[i].environmentName + " (" + environments[i].imageId + ")",
+      id: environments[i].imageId,
+    } as Option);
+  }
 
-    function closeModal() {
-        setIsOpen(false)
-    }
+  const initTemplateCreateFormStructure: { [title: string]: Section } = {
+    create_template: {
+      entries: {
+        select_environment: {
+          type: "listbox",
+          options: environmentList,
+          tooltip: "Pick an environment which has been defined in the course.",
+        },
+      },
+    },
+  };
 
-    const dialogClass = "inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl text-[#415A6E]"
-
-
-    // building the environemnts list
-    var environmentsList : Option[] = []
-    for (let i = 0; i < environments.length; i++) {
-        environmentsList.push({
-            value: environments[i].environmentName + " (" + environments[i].imageId + ")",
-            id: environments[i].imageId
-        } as Option )
-    }
-
-    console.log(environments.length)
-    let ref = useRef();
-    return (
-        <div className="flex flex-col w-full">
-            <div className="flex flex-row text-gray-700 dark:text-gray-300 justify-start gap-x-4 pb-4">
-                <DocumentTextIcon className="w-7 h-7"></DocumentTextIcon>
-                <div className="text-lg">Templates</div>
-                <button onClick={openModal}>
-                    <PlusCircleIcon className="w-7 h-7 hover:scale-110 transition ease-in-out duration-300"></PlusCircleIcon>
-                </button>
-            </div>
-            {
-                // generate the templates
-                templates?.length == 0 ? <EmptyDiv message="There is no template for this course yet." /> :
-                    <div className="grid grid-cols-2 gap-4">
-                        {
-                            templates.map((template: template) => {
-                                return (
-                                    <Template key={template.id} template={template} memLimit={memLimit} numCPU={numCPU} sectionUserID={sectionUserID}></Template>
-                                );
-                            })
-                        }
-                    </div>
+  return (
+    <div className="flex flex-col w-full">
+      <div className="course-list-title">
+        <DocumentTextIcon className="course-list-title-icon"></DocumentTextIcon>
+        <div className="course-list-title-text">Templates</div>
+        <button
+          onClick={() => {
+            if (environmentList.length == 0 || false) {
+              setWarningOpen(true);
+            } else {
+              setIsOpen(true);
             }
-            <Modal isOpen={isOpen} setOpen={setIsOpen}>
-                <TemplateCreate  closeModal={closeModal} memLimit={memLimit} numCPU={numCPU} environments={environmentsList} ref={ref} sectionUserID={sectionUserID}></TemplateCreate>
-            </Modal>
-            
+          }}
+        >
+          <PlusCircleIcon className="course-list-title-add"></PlusCircleIcon>
+        </button>
+      </div>
+      {
+        // generate the templates
+        templates?.length == 0 ? (
+          <EmptyDiv message="There is no template for this course yet." />
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            {templates.map((template: template) => {
+              return (
+                <Template
+                  key={template.id}
+                  template={template}
+                  memLimit={memLimit}
+                  numCPU={numCPU}
+                  sectionUserID={sectionUserID}
+                ></Template>
+              );
+            })}
+          </div>
+        )
+      }
+      <Modal isOpen={isOpen} setOpen={setIsOpen}>
+        <TemplateCreate
+          closeModal={() => setIsOpen(false)}
+          memLimit={memLimit}
+          numCPU={numCPU}
+          environments={environmentList}
+          ref={ref}
+          sectionUserID={sectionUserID}
+        ></TemplateCreate>
+      </Modal>
+      {/* <ModalForm
+        isOpen={isOpen}
+        setOpen={setIsOpen}
+        formStructure={initTemplateCreateFormStructure}
+        title="Create Template"
+        initData={{
+          select_environment:
+            initTemplateCreateFormStructure.create_template.entries
+              .select_environment.options[0],
+        }}
+      ></ModalForm> */}
+      <Modal
+        isOpen={warningOpen}
+        setOpen={setWarningOpen}
+        clickOutsideToClose={true}
+      >
+        <div ref={ref} className="course-dialog-modal">
+          <div className="course-dialog-content">
+            <div className="alert alert-warning items-start space-x-3">
+              <InformationCircleIcon className="w-7 h-7" />
+              <label className="">
+                You need to have at least one environment before creating a
+                template.
+              </label>
+            </div>
+            <div className="modal-form-btn-row">
+              <button
+                className="modal-form-btn-ok"
+                onClick={() => {
+                  setWarningOpen(false);
+                }}
+              >
+                OK
+              </button>
+            </div>
+          </div>
         </div>
-    )
-}
+      </Modal>
+    </div>
+  );
+};
 
-export default TemplateList
+export default TemplateList;

@@ -28,7 +28,7 @@ function ListBox({ environments, initSelected, onChange }: ListBoxProps) {
           }
         }}
       >
-        <div className="relative mt-1 z-50">
+        <div className="relative mt-1 ">
           <Listbox.Button className="relative border dark:border-0 w-full py-2 pl-3 pr-10 text-left bg-white dark:bg-gray-700 dark:text-white rounded-lg shadow-md cursor-default focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75 focus-visible:ring-white focus-visible:ring-offset-orange-300 focus-visible:ring-offset-2 focus-visible:border-indigo-500 sm:text-sm">
             <span className="block truncate">{selected.value}</span>
             <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
@@ -44,7 +44,7 @@ function ListBox({ environments, initSelected, onChange }: ListBoxProps) {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Listbox.Options className="mb-10  absolute overflow-visible z-50 w-full py-1 mt-1  text-base bg-white dark:bg-gray-700 dark:text-gray-400 rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+            <Listbox.Options className="listbox-options">
               {environments.map((environment, environmentIndex) => (
                 <Listbox.Option
                   key={environmentIndex}

@@ -23,7 +23,6 @@ function Modal({
 }: ModalProps & { children: React.ReactNode }) {
   useEffect(() => {
     if (isOpen) {
-      console.log("open modal");
       if (onOpen) onOpen();
     }
   }, [isOpen]);

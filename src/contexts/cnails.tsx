@@ -2,8 +2,9 @@ import React, { useContext, useState, useEffect } from "react";
 import { getMessaging, onMessage } from "firebase/messaging";
 import { firebaseCloudMessaging } from "../lib/webpush";
 // import {notificationStack} from "../lib/notificationStack";
-import toast, { Toaster } from "react-hot-toast";
+import toast, { ToastBar, Toaster } from "react-hot-toast";
 import { Notification, NotificationBody } from "../components/Notification";
+import { Transition } from "@headlessui/react";
 
 interface CnailsContextState {
   sub: string;
@@ -130,7 +131,27 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
           isAdmin,
         }}
       >
-        <Toaster position="top-right" />
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            duration: 50000,
+            success: {
+              className: "toaster-success",
+            },
+          }}
+        >
+          {(t) => (
+            <ToastBar
+              toast={t}
+              style={{
+                ...t.style,
+                animation: t.visible
+                  ? "custom-enter 1s ease"
+                  : "custom-exit 1s ease",
+              }}
+            />
+          )}
+        </Toaster>
         {children}
       </CnailsContext.Provider>
     );

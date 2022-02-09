@@ -70,10 +70,7 @@ const Home = () => {
           <CourseBar role={"Instructor"} courseName={courseName!}></CourseBar>
 
           <div className="flex flex-row space-x-10 w-full">
-            <EnvironmentList
-              environments={thisEnvironmentList!}
-              sectionUserID={sectionUserID}
-            ></EnvironmentList>
+            <EnvironmentList sectionUserID={sectionUserID}></EnvironmentList>
             <TemplateList
               environments={thisEnvironmentList!}
               templates={thisTemplateList!}
