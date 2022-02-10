@@ -1,11 +1,10 @@
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment, MouseEventHandler } from "react";
 import { MenuIcon } from "@heroicons/react/outline";
-import { EnvironmentContent as Environment } from "./instructor/EnvironmentList";
 interface MenuProps {
   items: {
     text: string;
-    onClick: MouseEventHandler<HTMLButtonElement> | undefined;
+    onClick?: MouseEventHandler<HTMLButtonElement>;
   }[];
 }
 
@@ -36,8 +35,11 @@ export default function CardMenu({ items }: MenuProps) {
                           active
                             ? "bg-gray-200 dark:bg-gray-800 font-semibold"
                             : ""
-                        } text-gray-900 dark:text-white group flex rounded-md items-center w-full px-2 py-2 text-sm`}
-                        onClick={item.onClick}
+                        } text-left text-gray-900 dark:text-white group flex rounded-md items-center w-full px-2 py-2 text-sm`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          item.onClick(e);
+                        }}
                       >
                         {item.text}
                       </button>

@@ -16,12 +16,12 @@ interface props {
   email: string;
 }
 
-const Menu = ({ sub, name, email }: props) => {
+const TopBar = ({ sub, name, email }: props) => {
   const { isDark, setDark } = useTheme();
 
   const SearchBar = () => {
     return (
-      <div className="border flex  flex-row space-x-2 items-center focus:border-black-600 text-left rounded dark:border-gray-700 dark:bg-gray-700 hover:border-gray-300 w-36 md:w-96 px-2 shadow mr-6">
+      <div className="border flex flex-row space-x-2 items-center focus:border-black-600 text-left rounded dark:border-gray-700 dark:bg-gray-700 hover:border-gray-300 w-36 md:w-96 px-2 shadow mr-6">
         <SearchIcon className="w-6 h-6 text-gray-500"></SearchIcon>
         <input
           placeholder="Search..."
@@ -32,7 +32,7 @@ const Menu = ({ sub, name, email }: props) => {
   };
 
   return (
-    <div className="flex flex-row  justify-end  items-center p-5">
+    <div className="flex flex-row z-[10] justify-end  items-center p-5">
       <SearchBar />
       <div className="flex flex-row items-center text-gray-500 justify-end gap-x-4">
         <UserMenu sub={sub} name={name} email={email}></UserMenu>
@@ -41,7 +41,7 @@ const Menu = ({ sub, name, email }: props) => {
           className="tooltip tooltip-bottom tooltip-primary"
           data-tip="Help and docs"
         >
-          <QuestionMarkCircleIcon className="w-6 h-6 hover:scale-110 transition  ease-in-out duration-300 dark:text-gray-300"></QuestionMarkCircleIcon>
+          <QuestionMarkCircleIcon className="top-bar-icon"></QuestionMarkCircleIcon>
         </div>
         <div
           className="tooltip tooltip-bottom tooltip-bottom-left tooltip-primary"
@@ -49,12 +49,12 @@ const Menu = ({ sub, name, email }: props) => {
         >
           {isDark ? (
             <SunIcon
-              className="w-6 h-6 text-yellow-400 cursor-pointer"
+              className="top-bar-icon top-bar-icon-sun"
               onClick={() => setDark(!isDark)}
             ></SunIcon>
           ) : (
             <MoonIcon
-              className="w-6 h-6 hover:scale-110 transition-all ease-in-out duration-300 cursor-pointer"
+              className="top-bar-icon"
               onClick={() => setDark(!isDark)}
             ></MoonIcon>
           )}
@@ -64,4 +64,4 @@ const Menu = ({ sub, name, email }: props) => {
   );
 };
 
-export default Menu;
+export default TopBar;

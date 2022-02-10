@@ -20,23 +20,37 @@ interface notification {
   allow_reply: boolean;
 }
 
+const MoreButton = () => {
+  return (
+    <Link href="/messages">
+      <div className="text-sm flex  justify-center cursor-pointer py-3 rounded-lg  text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-500 ring-opacity-5">
+        more messages
+        <span>
+          <MailIcon className="text-gray-600 dark:text-gray-300 w-4 h-4 ml-2"></MailIcon>
+        </span>
+      </div>
+    </Link>
+  );
+};
+
+const NotificationBtn = ({ num }: { num: number }) => {
+  return (
+    <div
+      className="tooltip tooltip-bottom tooltip-primary flex item-center"
+      data-tip="Notification"
+    >
+      <Popover.Button className="indicator">
+        {num == 0 || (
+          <div className="indicator-item badge badge-info">{num}</div>
+        )}
+        <BellIcon className="top-bar-icon"></BellIcon>
+      </Popover.Button>
+    </div>
+  );
+};
+
 export default function NotiStack() {
   // load once when page is rendered
-  const test = [
-    {
-      id: "soemthe",
-      sender: {
-        id: "osdkf",
-        name: "sender name ",
-        sub: "send sub",
-      },
-      title:
-        "noti title htieitoewjroewhtieitoewjroewhtieitoewjroewhtieitoewjroewhtieitoewjroewhtieitoewjroewhtieitoewjroew",
-      body: "noti body htieitoewjroewhtieitoewjroewhtieitoewjroewhtie itoewjroewhtieitoewjr oewhtieitoewjroewhtieitoewjroewhtieitoewjroewh tieitoewjroewhtieitoewjroewhtieitoewjroewhtieitoewjroewhtieitoewjroew",
-      updatedAt: "sdkfoskdf",
-      allow_reply: false,
-    },
-  ] as notification[];
   const [notifications, setNotifications] = useState<notification[]>([]);
   const { userId } = useCnails();
   const { listNotifications } = notificationAPI;
@@ -54,22 +68,10 @@ export default function NotiStack() {
   }
 
   return (
-    <Popover className="relative">
+    <Popover className="relative z-[1] ">
       {({ open }) => (
         <>
-          <div
-            className="tooltip tooltip-bottom tooltip-primary  flex item-center"
-            data-tip="Notification"
-          >
-            <Popover.Button className="indicator">
-              {notifications?.length == 0 || (
-                <div className="indicator-item badge badge-info">
-                  {notifications?.length}
-                </div>
-              )}
-              <BellIcon className="w-6 h-6 hover:scale-110 transition ease-in-out duration-300 dark:text-gray-300"></BellIcon>
-            </Popover.Button>
-          </div>
+          <NotificationBtn num={notifications?.length} />
           <Transition
             as={Fragment}
             enter="transition ease-out duration-200"
@@ -79,10 +81,10 @@ export default function NotiStack() {
             leaveFrom="opacity-100 translate-y-0"
             leaveTo="opacity-0 translate-y-1"
           >
-            <Popover.Panel className="absolute z-10 min-w-fit px-4 mt-3 transform -translate-x-full left-1/2 sm:px-0">
+            <Popover.Panel className="absolute z-1 min-w-fit px-4 mt-3 transform -translate-x-[80%] left-1/2 sm:px-0">
               <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 bg-white dark:bg-gray-700 p-2">
                 {notifications?.length == 0 ? (
-                  <div className="text-gray-400 bg-white dark:text-gray-300 dark:bg-gray-700 w-96 flex flex-col items-center p-5">
+                  <div className="text-gray-400 bg-white dark:text-gray-300 dark:bg-gray-700 w-96 flex flex-col items-center p-5 select-none">
                     You have no notifications
                   </div>
                 ) : (
@@ -102,14 +104,7 @@ export default function NotiStack() {
                         </div>
                       </div>
                     ))}
-                    <Link href="/messages">
-                      <div className="text-sm flex  justify-center cursor-pointer py-3 rounded-lg  text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-500 ring-opacity-5">
-                        more messages
-                        <span>
-                          <MailIcon className="text-gray-600 dark:text-gray-300 w-4 h-4 ml-2"></MailIcon>
-                        </span>
-                      </div>
-                    </Link>
+                    <MoreButton />
                   </div>
                 )}
               </div>

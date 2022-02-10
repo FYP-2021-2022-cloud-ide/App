@@ -1,3 +1,4 @@
+import { SectionUserInfo } from "./api"
 
 const generalAPI = {
     updateUserData: async (sub: string, darkMode: boolean, bio: string) => {
@@ -25,7 +26,7 @@ const generalAPI = {
         return res.json()
     },
 
-    getSectionInfo: async (sectionid: string, sub: string) => {
+    getSectionInfo: async (sectionid: string, sub: string): Promise<SectionUserInfo> => {
         var res = await fetch('/api/getSectionInfo?sectionid=' + sectionid + '&sub=' + sub, {
             method: 'GET'
         })
@@ -33,4 +34,4 @@ const generalAPI = {
     }
 }
 
-export {generalAPI}
+export { generalAPI }

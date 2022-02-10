@@ -7,6 +7,82 @@
 @tailwind components;
 @tailwind utilities;
 
+.current-run-title {
+  @apply text-xl text-gray-600 dark:text-gray-300;
+}
+
+.current-run-header {
+  @apply flex flex-row  max-w-xs justify-between mb-6;
+}
+
+.current-run-percentage {
+  @apply h-1 text-xs  text-gray-400 text-right;
+}
+
+.current-run-bar-outer {
+  @apply h-2 rounded-full w-full bg-gray-300;
+}
+
+.current-run-bar-inner {
+  @apply h-2 rounded-full;
+}
+
+.top-bar-icon {
+  @apply w-6 h-6 hover:scale-110 transition-all ease-in-out duration-300 cursor-pointer dark:text-gray-300;
+}
+
+.top-bar-icon-sun {
+  @apply text-yellow-400 !important;
+}
+
+.file-tree-wrapper {
+  @apply w-full h-full rounded max-h-full flex flex-col space-y-5;
+}
+
+.file-tree-root {
+  @apply relative p-3 w-full bg-gray-100 overflow-scroll hide-scroll  rounded dark:bg-gray-600 text-gray-700 dark:text-gray-200 h-full;
+}
+
+.file-tree-root-nothing {
+  @apply border-8 border-dashed border-gray-400 dark:border-gray-800 hover:bg-gray-200 dark:hover:bg-gray-500;
+}
+
+.file-tree-root-nothing-text {
+  @apply absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl text-gray-400 dark:text-gray-800 font-bold select-none;
+}
+
+.error-page-status-code {
+  @apply text-5xl text-gray-800 font-extrabold dark:text-white;
+}
+
+.error-page-textarea {
+  @apply textarea w-full min-h-[6rem] h-24 max-h-[12rem] textarea-bordered textarea-primary bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300;
+}
+
+.error-page-text {
+  @apply text-gray-600 dark:text-gray-300;
+}
+
+.sidebar-icon {
+  @apply w-[80%] mx-auto mt-5  dark:invert-[1] dark:brightness-50 dark:contrast-200 dark:hue-rotate-60 dark:saturate-[3];
+}
+
+.sidebar-container {
+  @apply w-[200px] min-h-screen bg-gray-50 dark:bg-gray-700 dark:border-gray-800 flex flex-col border-r;
+}
+
+.sidebar-text {
+  @apply text-xs uppercase tracking-widest font-medium ml-2;
+}
+
+.sidebar-btn {
+  @apply p-5 flex flex-row items-center hover:text-gray-900 hover:bg-gray-200 dark:hover:bg-gray-600;
+}
+
+.sidebar-btn-col {
+  @apply flex flex-col w-full mt-5;
+}
+
 .course-card-title {
   @apply font-semibold  text-gray-800 dark:text-gray-300 whitespace-nowrap;
 }
@@ -32,7 +108,7 @@
 
 .course-dialog-modal,
 .modal-form {
-  @apply max-h-[70vh] inline-block w-full max-w-md p-6 my-8 overflow-visible text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl text-[#415A6E];
+  @apply max-h-[70vh] inline-block w-full z-10 max-w-md p-6 my-8 overflow-visible text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl text-[#415A6E];
 }
 
 .course-dialog-content,
@@ -89,23 +165,23 @@
 }
 
 .tooltip {
-  @apply z-[1];
+  @apply z-10;
 }
 
 .tooltip::before {
-  @apply shadow-lg;
+  @apply shadow-lg z-10;
 }
 
 .tooltip::after {
-  @apply shadow-lg;
+  @apply shadow-lg z-10;
 }
 
 .tooltip-bottom-left::before {
-  @apply -translate-x-[90%] z-[100];
+  @apply -translate-x-[90%] z-10;
 }
 
 .tooltip-bottom-right::before {
-  @apply -translate-x-[10%] z-[100];
+  @apply -translate-x-[10%] z-10;
 }
 
 .tooltip-info::before {
@@ -133,6 +209,7 @@
 }
 
 .hide-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 .hide-scroll {
@@ -167,7 +244,6 @@
 }
 
 .toaster-success {
-  @apply bg-white !important;
 }
 
 .toaster-error {
@@ -179,6 +255,11 @@
 .env-grid,
 .template-grid {
   @apply grid grid-cols-1 gap-4 lg:grid-cols-2 flex-1;
+}
+
+.env-grid-title,
+.template-grid-title {
+  @apply text-lg font-bold;
 }
 
 .env-card,

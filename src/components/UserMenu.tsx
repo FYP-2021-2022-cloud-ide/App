@@ -13,7 +13,7 @@ interface UserMenuProps {
 export default function UserMenu({ sub, name, email }: UserMenuProps) {
   const { isDark } = useTheme();
   return (
-    <div className={`w-14 z-10 text-right top-16 ${isDark && "dark"}`}>
+    <div className={`w-fit  text-right top-16 ${isDark && "dark"}`}>
       <Menu as="div" className="relative text-left">
         <div
           data-tip="User menu"

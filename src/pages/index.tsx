@@ -3,7 +3,7 @@ import { useCnails } from "../contexts/cnails";
 import CoursesList from "../components/index/CoursesList";
 import ContainersList from "../components/index/ContainersList";
 import { props as CourseListProps } from "../components/index/CoursesList";
-import { props as ContainerListProps } from "../components/index/ContainersList";
+import { Props as ContainerListProps } from "../components/index/ContainersList";
 import Loader from "../components/Loader";
 import { NotificationBody } from "../components/Notification";
 import { containerAPI } from "../lib/containerAPI";
@@ -16,7 +16,6 @@ export default function Home() {
   const { sub } = useCnails();
   const { containerList } = containerAPI;
   const { courseList } = generalAPI;
-  console.log("sub is ", sub);
   // data fetching from API
   useEffect(() => {
     const fetchCourses = async () => {

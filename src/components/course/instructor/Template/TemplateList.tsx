@@ -1,66 +1,38 @@
-import { useCnails } from "../../../../contexts/cnails";
-import React, { useEffect, useRef, useState } from "react";
-import Template from "./TemplateCard";
+import React, { useState } from "react";
 import { DocumentTextIcon } from "@heroicons/react/outline";
-import { PlusCircleIcon, InformationCircleIcon } from "@heroicons/react/solid";
-import Modal from "../../../Modal";
-import ListBox, { Option } from "../../../ListBox";
-import TemplateCreate from "./TemplateCreate";
+import { PlusCircleIcon } from "@heroicons/react/solid";
+import { Option } from "../../../ListBox";
 //testing
 import EmptyDiv from "../../../EmptyDiv";
-import { EnvironmentContent as environment } from "../EnvironmentList";
 import ModalForm, { Section } from "../../../ModalForm";
-import { envAPI } from "../../../../lib/envAPI";
 import myToast from "../../../CustomToast";
+import { Environment, Template } from "../../../../lib/cnails";
+import TemplateCard from "./TemplateCard";
 
-export interface template {
-  id: string;
-  name: string;
-  description: string;
-  imageId: string;
-  assignment_config_id: string;
-  storage: string;
-  containerID: string;
-  active: boolean;
-  isExam: boolean;
-  timeLimit: Number;
-  allow_notification: boolean;
-}
-
-export interface props {
-  templates: template[];
-  environments: environment[];
+export type Props = {
+  templates: Template[];
+  environments: Environment[];
   sectionUserID: string;
-}
+  onCreate?: () => void;
+  onClick?: (template: Template) => void;
+  onDelete?: (template: Template) => void;
+  onUpdate?: (template: Template) => void;
+  onToggle?: (template: Template, open: boolean) => void;
+  onToggleActivation?: (template: Template, open: boolean) => void;
+};
 
-const TemplateList = ({ templates, sectionUserID, environments }: props) => {
-  const [memLimit, setmemLimit] = useState(400);
-  const [numCPU, setnumCPU] = useState(0.5);
-  const [warningOpen, setWarningOpen] = useState(false);
-  let [isOpen, setIsOpen] = useState(false);
+const TemplateList = ({
+  templates,
+  sectionUserID,
+  environments,
+  onClick,
+  onCreate,
+  onDelete,
+  onToggle,
+  onToggleActivation,
+  onUpdate,
+}: Props) => {
   let ref = React.createRef<HTMLDivElement>();
-
-  // building the environemnts list
-  var environmentList: Option[] = [];
-  for (let i = 0; i < environments.length; i++) {
-    environmentList.push({
-      value:
-        environments[i].environmentName + " (" + environments[i].imageId + ")",
-      id: environments[i].imageId,
-    } as Option);
-  }
-
-  const initTemplateCreateFormStructure: { [title: string]: Section } = {
-    create_template: {
-      entries: {
-        select_environment: {
-          type: "listbox",
-          options: environmentList,
-          tooltip: "Pick an environment which has been defined in the course.",
-        },
-      },
-    },
-  };
 
   return (
     <div className="flex flex-col w-full">
@@ -69,13 +41,7 @@ const TemplateList = ({ templates, sectionUserID, environments }: props) => {
         <div className="course-list-title-text">Templates</div>
         <button
           onClick={() => {
-            if (environmentList.length == 0) {
-              myToast.warning(
-                "You need to have at least one environment before creating a template."
-              );
-            } else {
-              setIsOpen(true);
-            }
+            if (onCreate) onCreate();
           }}
         >
           <PlusCircleIcon className="course-list-title-add"></PlusCircleIcon>
@@ -87,43 +53,33 @@ const TemplateList = ({ templates, sectionUserID, environments }: props) => {
           <EmptyDiv message="There is no template for this course yet." />
         ) : (
           <div className="grid grid-cols-2 gap-4 flex-1">
-            {templates.map((template: template) => {
+            {templates.map((template: Template) => {
               return (
-                <Template
+                <TemplateCard
                   key={template.id}
                   template={template}
-                  memLimit={memLimit}
-                  numCPU={numCPU}
+                  memLimit={400}
+                  numCPU={0.5}
                   sectionUserID={sectionUserID}
-                ></Template>
+                  onClick={() => {
+                    if (onClick) onClick(template);
+                  }}
+                  onDelete={() => {
+                    if (onDelete) onDelete(template);
+                  }}
+                  onToggle={(open) => {
+                    if (onToggle) onToggle(template, open);
+                  }}
+                  onToggleActivation={(active) => {
+                    if (onToggleActivation)
+                      onToggleActivation(template, active);
+                  }}
+                ></TemplateCard>
               );
             })}
           </div>
         )
       }
-      {/* <Modal isOpen={isOpen} setOpen={setIsOpen}>
-        <TemplateCreate
-          closeModal={() => setIsOpen(false)}
-          memLimit={memLimit}
-          numCPU={numCPU}
-          environments={environmentList}
-          ref={ref}
-          sectionUserID={sectionUserID}
-        ></TemplateCreate>
-      </Modal> */}
-      {environmentList.length != 0 && (
-        <ModalForm
-          isOpen={isOpen}
-          setOpen={setIsOpen}
-          formStructure={initTemplateCreateFormStructure}
-          title="Create Template"
-          initData={{
-            select_environment:
-              initTemplateCreateFormStructure.create_template.entries
-                .select_environment.options[0],
-          }}
-        ></ModalForm>
-      )}
     </div>
   );
 };

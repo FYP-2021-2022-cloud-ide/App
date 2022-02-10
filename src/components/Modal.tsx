@@ -45,7 +45,7 @@ function Modal({
           &#8203;
           <Dialog
             as="div"
-            className={`fixed inset-0 z-10 overflow-y-auto `}
+            className={`fixed inset-0 z-[10] overflow-y-auto `}
             onClose={() => {
               if (clickOutsideToClose) {
                 if (onClose) onClose();
@@ -53,7 +53,7 @@ function Modal({
               }
             }}
           >
-            <div className="min-h-screen w-full px-4 text-center">
+            <div className="min-h-screen w-full px-4 text-center z-[100]">
               <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"

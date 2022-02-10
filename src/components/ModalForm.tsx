@@ -5,32 +5,32 @@ import Modal, { ModalProps } from "./Modal";
 import Toggle from "./Toggle";
 import { InformationCircleIcon } from "@heroicons/react/solid";
 
+export type Data = { [id: string]: boolean | string | Option };
+
 export type Entry = {
-  type: "input" | "textarea" | "listbox" | "toggle";
   text?: string;
-  placeholder?: string;
-  options?: Option[]; // for listbox
   description?: string;
   tooltip?: string;
-  conditional?: (data: { [id: string]: boolean | string | Option }) => boolean; // return a boolean which determine whether it is shown
-};
+  conditional?: (data: Data) => boolean; // return a boolean which determine whether it is shown
+} & (
+  | { type: "input"; defaultValue: string; placeholder?: string }
+  | { type: "textarea"; defaultValue: string; placeholder?: string }
+  | { type: "listbox"; defaultValue: Option; options: Option[] }
+  | { type: "toggle"; defaultValue: boolean }
+);
 
 export type Section = {
   children?: React.ReactNode; // support drop in react elements
   displayTitle?: boolean;
-  conditional?: (data: { [id: string]: boolean | string | Option }) => boolean;
+  conditional?: (data: Data) => boolean;
   entries: { [id: string]: Entry };
 };
 
 export type Props = ModalProps & {
   title: string;
-  formStructure?: { [title: string]: Section };
-  initData: { [id: string]: boolean | string | Option };
-  onChange?: (
-    data: { [id: string]: boolean | string | Option },
-    id: string
-  ) => void;
-  onEnter?: (data: { [id: string]: boolean | string | Option }) => void;
+  formStructure: { [title: string]: Section };
+  onChange?: (data: Data, id: string) => void;
+  onEnter?: (data: Data) => void;
 };
 
 const Entry = ({
@@ -41,11 +41,8 @@ const Entry = ({
 }: {
   entry: Entry;
   id: string;
-  data: { [id: string]: boolean | string | Option };
-  onChange: (
-    newData: { [id: string]: boolean | string | Option },
-    id: string
-  ) => void;
+  data: Data;
+  onChange: (newData: Data, id: string) => void;
 }) => {
   if (entry.conditional) {
     if (!entry.conditional(data)) return <></>;
@@ -194,34 +191,31 @@ const Input = ({
   );
 };
 
+const fromStructureToData = (structure: { [title: string]: Section }): Data => {
+  const data: Data = {};
+  Object.keys(structure).forEach((title) =>
+    Object.keys(structure[title].entries).forEach(
+      (entry) => (data[entry] = structure[title].entries[entry].defaultValue)
+    )
+  );
+  return data;
+};
+
 const ModalForm = ({
   isOpen,
   setOpen,
   onClose,
   onOpen,
   clickOutsideToClose,
-  initData,
   formStructure,
   onEnter,
   title,
   onChange,
 }: Props) => {
+  const initData = fromStructureToData(formStructure);
   let ref = createRef<HTMLDivElement>();
   const [data, setData] =
     useState<{ [id: string]: boolean | string | Option }>(initData);
-
-  // check if data match form structure
-  Object.keys(formStructure).forEach((sectionTitle) => {
-    const section = formStructure[sectionTitle];
-    if (!React.isValidElement(section.entries))
-      Object.keys(section.entries).forEach((id) => {
-        if (data[id] == undefined) {
-          throw new Error(
-            `form data does not match form structure : ${id} not found in data`
-          );
-        }
-      });
-  });
 
   const patchedOnClose = () => {
     if (onClose) {
