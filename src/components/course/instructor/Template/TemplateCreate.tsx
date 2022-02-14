@@ -5,8 +5,8 @@ import Loader from "../../../../components/Loader";
 import { useCnails } from "../../../../contexts/cnails";
 import { InformationCircleIcon } from "@heroicons/react/solid";
 import Toggle from "../../../Toggle";
-import { templateAPI } from "../../../../lib/templateAPI";
-import { containerAPI } from "../../../../lib/containerAPI";
+import { templateAPI } from "../../../../lib/api/templateAPI";
+import { containerAPI } from "../../../../lib/api/containerAPI";
 interface TemplateCreateProps {
   sectionUserID: string;
   memLimit: number;

@@ -5,7 +5,7 @@ import { MenuIcon } from "@heroicons/react/outline"
 import { Menu, Transition } from "@headlessui/react"
 import Modal from "../Modal";
 import { Dialog } from '@headlessui/react'
-import{localFileAPI} from '../../lib/localFile'
+import{localFileAPI} from '../../lib/api/localFile'
 export function ItemMenu({ item, type, root, setMkdirNameOpen }) {
     const { userId } = useCnails()
     const {uploadFiles, downloadFileToUser, removeFile, moveFile}=localFileAPI

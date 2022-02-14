@@ -1,21 +1,11 @@
-import React, { useContext, useState, useEffect } from "react";
-import { getMessaging, onMessage } from "firebase/messaging";
+import React, { useContext, useState, useEffect, useRef } from "react";
+import { getMessaging, MessagePayload, onMessage } from "firebase/messaging";
 import { firebaseCloudMessaging } from "../lib/webpush";
-// import {notificationStack} from "../lib/notificationStack";
-import toast, { Toast, ToastBar, Toaster } from "react-hot-toast";
-import { Notification, NotificationBody } from "../components/Notification";
-import { Transition } from "@headlessui/react";
+import { Toast, ToastBar, Toaster } from "react-hot-toast";
 import myToast from "../components/CustomToast";
-
-interface CnailsContextState {
-  sub: string;
-  name: string;
-  email: string;
-  userId: string;
-  semesterId: string;
-  bio: string;
-  isAdmin: boolean;
-}
+import { CnailsContextState, Notification } from "../lib/cnails";
+import { useRouter } from "next/router";
+import { notificationAPI } from "../lib/api/notificationAPI";
 
 interface CnailsProviderProps {
   children: JSX.Element;
@@ -24,7 +14,6 @@ interface CnailsProviderProps {
 const CnailsContext = React.createContext({} as CnailsContextState);
 export const useCnails = () => useContext(CnailsContext);
 
-// need to do it on server side --> cannot resolve the fs
 export const CnailsProvider = ({ children }: CnailsProviderProps) => {
   const [sub, setSub] = useState("");
   const [name, setName] = useState("");
@@ -33,18 +22,31 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
   const [semesterId, setSemesterId] = useState("");
   const [bio, setBio] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
+  const router = useRouter();
+  const { listNotifications } = notificationAPI;
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const fetchNotifications = async (userId: string) => {
+    const response = await listNotifications(userId);
+    if (response.success) {
+      console.log(response.notifications);
+      setNotifications(response.notifications);
+      return response.notifications;
+    } else console.log("[ ❌ ] : fail to fetch notifications ", response);
+  };
   useEffect(() => {
     init();
-    // setupNotification();
 
     async function init() {
       const cookies = await fetch(`/api/fetchCookies`, {
         method: "GET",
       });
       const cookiesContent = await cookies.json();
-      console.log(cookiesContent);
+
       const { sub, name, email, userId, semesterId, bio, role } =
         cookiesContent;
+      if (userId == "") {
+        throw new Error("user id is null ");
+      }
       setSub(sub);
       setName(name);
       setEmail(email);
@@ -54,67 +56,54 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
       if (role == "admin") setIsAdmin(true);
       try {
         const token = await firebaseCloudMessaging.init();
-        console.log("after token");
-        console.log(token);
         if (token) {
           const messaging = getMessaging();
           // TODO: call API to fetch lastest notification
-          console.log("calling noti API");
-          const notiRes = await fetch(`/api/notification/getNotification`, {
-            method: "POST",
-            body: JSON.stringify({
-              sub: sub,
-            }),
-          });
-          const noti = await notiRes.json();
-          const notification = noti.notification;
-          // console.log('testing 1')
-          // console.log(token, notification)
-          // if the fetch token is not the same as DB
-          if (token != notification) {
-            console.log("updating");
-            // update the DB one
-            const response = await fetch(`/api/notification/update`, {
+          const notiRes = await fetch(
+            `/api/notification/getNotificationToken`,
+            {
               method: "POST",
               body: JSON.stringify({
-                registrationToken: token,
-                userId,
-                semesterId,
+                sub: sub,
               }),
-            });
+            }
+          );
+          const noti = await notiRes.json();
+          const notification = noti.notification;
+          if (token != notification) {
+            // update the DB one
+            console.log(token);
+            console.log(notification);
+            const response = await fetch(
+              `/api/notification/updateSubscription`,
+              {
+                method: "POST",
+                body: JSON.stringify({
+                  registrationToken: token,
+                  userId,
+                  semesterId,
+                }),
+              }
+            );
             console.log(await response.json());
             console.log("updated");
           }
-          //   toast.custom((t)=>(
-          //     <Notification trigger={t}>
-          //         <NotificationBody title={"testing"} body={"testing"} success={false} id = {t.id}></NotificationBody>
-          //     </Notification>
-          //   ))
-          onMessage(messaging, async (message) => {
-            console.log("message recevied");
-            console.log(message.data);
-            const { title, body } = message.data!;
-            // notificationStack.set(notificationStack.push((await notificationStack.get()),title, body))
-            toast.custom((t) => (
-              <Notification trigger={t}>
-                <NotificationBody
-                  title={title}
-                  body={body}
-                  success={true}
-                  id={t.id}
-                ></NotificationBody>
-              </Notification>
-            ));
+          const s = onMessage(messaging, async (message) => {
+            setTimeout(async () => {
+              await fetchNotifications(userId);
+              myToast.notification("You have a new notification", () => {
+                router.push("/messages");
+              });
+            }, 2000);
           });
+          return () => {
+            s();
+          };
         }
       } catch (error) {
         console.log(error);
       }
     }
-
-    // async function setupNotification() {
-
-    // }
   }, []);
 
   if (sub == "" || userId == "") {
@@ -130,20 +119,35 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
           semesterId,
           bio,
           isAdmin,
+          notifications,
+          fetchNotifications,
         }}
       >
         <Toaster
           position="bottom-right"
           toastOptions={{
-            duration: 50000,
+            duration: 5000,
           }}
         >
           {(t: Toast) => {
+            const oldClassName = t.className;
             t.className = `toaster ${t.className}`;
+            if (oldClassName == "toaster-loading") t.duration = 60000;
+            if (oldClassName == "toaster-set-template") t.duration = 60 * 60000;
             return (
               <div
                 onClick={() => {
-                  myToast.dismiss(t.id);
+                  if (
+                    !["toaster-loading", "toaster-set-template"].includes(
+                      oldClassName
+                    )
+                  )
+                    myToast.dismiss(t.id);
+                  // dirty
+                  if (myToast.onClickCallbacks[t.id]) {
+                    myToast.onClickCallbacks[t.id]();
+                    delete myToast.onClickCallbacks[t.id];
+                  }
                 }}
               >
                 <ToastBar toast={t}>

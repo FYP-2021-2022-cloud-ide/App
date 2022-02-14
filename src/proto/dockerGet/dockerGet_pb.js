@@ -1099,7 +1099,7 @@ if (goog.DEBUG && !COMPILED) {
  * @constructor
  */
 proto.dockerGet.RemoveNotificationRequest = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.dockerGet.RemoveNotificationRequest.repeatedFields_, null);
 };
 goog.inherits(proto.dockerGet.RemoveNotificationRequest, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
@@ -5371,6 +5371,7 @@ proto.dockerGet.ListTemplatesReply.Template.toObject = function(includeInstance,
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     name: jspb.Message.getFieldWithDefault(msg, 2, ""),
     description: jspb.Message.getFieldWithDefault(msg, 7, ""),
+    environmentId: jspb.Message.getFieldWithDefault(msg, 12, ""),
     imageid: jspb.Message.getFieldWithDefault(msg, 3, ""),
     assignmentConfigId: jspb.Message.getFieldWithDefault(msg, 4, ""),
     storage: jspb.Message.getFieldWithDefault(msg, 5, ""),
@@ -5426,6 +5427,10 @@ proto.dockerGet.ListTemplatesReply.Template.deserializeBinaryFromReader = functi
     case 7:
       var value = /** @type {string} */ (reader.readString());
       msg.setDescription(value);
+      break;
+    case 12:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setEnvironmentId(value);
       break;
     case 3:
       var value = /** @type {string} */ (reader.readString());
@@ -5506,6 +5511,13 @@ proto.dockerGet.ListTemplatesReply.Template.serializeBinaryToWriter = function(m
   if (f.length > 0) {
     writer.writeString(
       7,
+      f
+    );
+  }
+  f = message.getEnvironmentId();
+  if (f.length > 0) {
+    writer.writeString(
+      12,
       f
     );
   }
@@ -5619,6 +5631,24 @@ proto.dockerGet.ListTemplatesReply.Template.prototype.getDescription = function(
  */
 proto.dockerGet.ListTemplatesReply.Template.prototype.setDescription = function(value) {
   return jspb.Message.setProto3StringField(this, 7, value);
+};
+
+
+/**
+ * optional string environment_id = 12;
+ * @return {string}
+ */
+proto.dockerGet.ListTemplatesReply.Template.prototype.getEnvironmentId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 12, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.dockerGet.ListTemplatesReply.Template} returns this
+ */
+proto.dockerGet.ListTemplatesReply.Template.prototype.setEnvironmentId = function(value) {
+  return jspb.Message.setProto3StringField(this, 12, value);
 };
 
 
@@ -5893,6 +5923,7 @@ proto.dockerGet.AddContainerRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     sessionKey: jspb.Message.getFieldWithDefault(msg, 42, ""),
     imagename: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    environmentId: jspb.Message.getFieldWithDefault(msg, 12, ""),
     memlimit: jspb.Message.getFloatingPointFieldWithDefault(msg, 2, 0.0),
     numcpu: jspb.Message.getFloatingPointFieldWithDefault(msg, 3, 0.0),
     sectionUserId: jspb.Message.getFieldWithDefault(msg, 4, ""),
@@ -5942,6 +5973,10 @@ proto.dockerGet.AddContainerRequest.deserializeBinaryFromReader = function(msg, 
     case 1:
       var value = /** @type {string} */ (reader.readString());
       msg.setImagename(value);
+      break;
+    case 12:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setEnvironmentId(value);
       break;
     case 2:
       var value = /** @type {number} */ (reader.readFloat());
@@ -6007,6 +6042,13 @@ proto.dockerGet.AddContainerRequest.serializeBinaryToWriter = function(message, 
   if (f.length > 0) {
     writer.writeString(
       1,
+      f
+    );
+  }
+  f = message.getEnvironmentId();
+  if (f.length > 0) {
+    writer.writeString(
+      12,
       f
     );
   }
@@ -6088,6 +6130,24 @@ proto.dockerGet.AddContainerRequest.prototype.getImagename = function() {
  */
 proto.dockerGet.AddContainerRequest.prototype.setImagename = function(value) {
   return jspb.Message.setProto3StringField(this, 1, value);
+};
+
+
+/**
+ * optional string environment_id = 12;
+ * @return {string}
+ */
+proto.dockerGet.AddContainerRequest.prototype.getEnvironmentId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 12, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.dockerGet.AddContainerRequest} returns this
+ */
+proto.dockerGet.AddContainerRequest.prototype.setEnvironmentId = function(value) {
+  return jspb.Message.setProto3StringField(this, 12, value);
 };
 
 
@@ -7244,6 +7304,7 @@ proto.dockerGet.AddTemplateRequest.toObject = function(includeInstance, msg) {
     sessionKey: jspb.Message.getFieldWithDefault(msg, 42, ""),
     name: jspb.Message.getFieldWithDefault(msg, 2, ""),
     description: jspb.Message.getFieldWithDefault(msg, 6, ""),
+    environmentId: jspb.Message.getFieldWithDefault(msg, 12, ""),
     containerid: jspb.Message.getFieldWithDefault(msg, 5, ""),
     assignmentConfigId: jspb.Message.getFieldWithDefault(msg, 3, ""),
     sectionUserId: jspb.Message.getFieldWithDefault(msg, 4, ""),
@@ -7298,6 +7359,10 @@ proto.dockerGet.AddTemplateRequest.deserializeBinaryFromReader = function(msg, r
     case 6:
       var value = /** @type {string} */ (reader.readString());
       msg.setDescription(value);
+      break;
+    case 12:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setEnvironmentId(value);
       break;
     case 5:
       var value = /** @type {string} */ (reader.readString());
@@ -7374,6 +7439,13 @@ proto.dockerGet.AddTemplateRequest.serializeBinaryToWriter = function(message, w
   if (f.length > 0) {
     writer.writeString(
       6,
+      f
+    );
+  }
+  f = message.getEnvironmentId();
+  if (f.length > 0) {
+    writer.writeString(
+      12,
       f
     );
   }
@@ -7480,6 +7552,24 @@ proto.dockerGet.AddTemplateRequest.prototype.getDescription = function() {
  */
 proto.dockerGet.AddTemplateRequest.prototype.setDescription = function(value) {
   return jspb.Message.setProto3StringField(this, 6, value);
+};
+
+
+/**
+ * optional string environment_id = 12;
+ * @return {string}
+ */
+proto.dockerGet.AddTemplateRequest.prototype.getEnvironmentId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 12, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.dockerGet.AddTemplateRequest} returns this
+ */
+proto.dockerGet.AddTemplateRequest.prototype.setEnvironmentId = function(value) {
+  return jspb.Message.setProto3StringField(this, 12, value);
 };
 
 
@@ -12322,6 +12412,13 @@ proto.dockerGet.UpdateNotificationTokenRequest.prototype.setToken = function(val
 
 
 
+/**
+ * List of repeated fields within this message type.
+ * @private {!Array<number>}
+ * @const
+ */
+proto.dockerGet.RemoveNotificationRequest.repeatedFields_ = [2];
+
 
 
 if (jspb.Message.GENERATE_TO_OBJECT) {
@@ -12355,7 +12452,7 @@ proto.dockerGet.RemoveNotificationRequest.toObject = function(includeInstance, m
   var f, obj = {
     sessionKey: jspb.Message.getFieldWithDefault(msg, 42, ""),
     userid: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    notificationid: jspb.Message.getFieldWithDefault(msg, 2, "")
+    notificationidList: (f = jspb.Message.getRepeatedField(msg, 2)) == null ? undefined : f
   };
 
   if (includeInstance) {
@@ -12402,7 +12499,7 @@ proto.dockerGet.RemoveNotificationRequest.deserializeBinaryFromReader = function
       break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
-      msg.setNotificationid(value);
+      msg.addNotificationid(value);
       break;
     default:
       reader.skipField();
@@ -12447,9 +12544,9 @@ proto.dockerGet.RemoveNotificationRequest.serializeBinaryToWriter = function(mes
       f
     );
   }
-  f = message.getNotificationid();
+  f = message.getNotificationidList();
   if (f.length > 0) {
-    writer.writeString(
+    writer.writeRepeatedString(
       2,
       f
     );
@@ -12494,20 +12591,39 @@ proto.dockerGet.RemoveNotificationRequest.prototype.setUserid = function(value) 
 
 
 /**
- * optional string notificationId = 2;
- * @return {string}
+ * repeated string notificationId = 2;
+ * @return {!Array<string>}
  */
-proto.dockerGet.RemoveNotificationRequest.prototype.getNotificationid = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+proto.dockerGet.RemoveNotificationRequest.prototype.getNotificationidList = function() {
+  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 2));
+};
+
+
+/**
+ * @param {!Array<string>} value
+ * @return {!proto.dockerGet.RemoveNotificationRequest} returns this
+ */
+proto.dockerGet.RemoveNotificationRequest.prototype.setNotificationidList = function(value) {
+  return jspb.Message.setField(this, 2, value || []);
 };
 
 
 /**
  * @param {string} value
+ * @param {number=} opt_index
  * @return {!proto.dockerGet.RemoveNotificationRequest} returns this
  */
-proto.dockerGet.RemoveNotificationRequest.prototype.setNotificationid = function(value) {
-  return jspb.Message.setProto3StringField(this, 2, value);
+proto.dockerGet.RemoveNotificationRequest.prototype.addNotificationid = function(value, opt_index) {
+  return jspb.Message.addToRepeatedField(this, 2, value, opt_index);
+};
+
+
+/**
+ * Clears the list making it empty but non-null.
+ * @return {!proto.dockerGet.RemoveNotificationRequest} returns this
+ */
+proto.dockerGet.RemoveNotificationRequest.prototype.clearNotificationidList = function() {
+  return this.setNotificationidList([]);
 };
 
 
@@ -13954,10 +14070,10 @@ proto.dockerGet.AddSandBoxImageRequest.prototype.toObject = function(opt_include
 proto.dockerGet.AddSandBoxImageRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     sessionKey: jspb.Message.getFieldWithDefault(msg, 42, ""),
-    userid: jspb.Message.getFieldWithDefault(msg, 5, ""),
+    userid: jspb.Message.getFieldWithDefault(msg, 2, ""),
     title: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    description: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    tempcontainerid: jspb.Message.getFieldWithDefault(msg, 4, "")
+    description: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    imageId: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
 
   if (includeInstance) {
@@ -13998,7 +14114,7 @@ proto.dockerGet.AddSandBoxImageRequest.deserializeBinaryFromReader = function(ms
       var value = /** @type {string} */ (reader.readString());
       msg.setSessionKey(value);
       break;
-    case 5:
+    case 2:
       var value = /** @type {string} */ (reader.readString());
       msg.setUserid(value);
       break;
@@ -14006,13 +14122,13 @@ proto.dockerGet.AddSandBoxImageRequest.deserializeBinaryFromReader = function(ms
       var value = /** @type {string} */ (reader.readString());
       msg.setTitle(value);
       break;
-    case 1:
+    case 4:
       var value = /** @type {string} */ (reader.readString());
       msg.setDescription(value);
       break;
-    case 4:
+    case 1:
       var value = /** @type {string} */ (reader.readString());
-      msg.setTempcontainerid(value);
+      msg.setImageId(value);
       break;
     default:
       reader.skipField();
@@ -14053,7 +14169,7 @@ proto.dockerGet.AddSandBoxImageRequest.serializeBinaryToWriter = function(messag
   f = message.getUserid();
   if (f.length > 0) {
     writer.writeString(
-      5,
+      2,
       f
     );
   }
@@ -14067,14 +14183,14 @@ proto.dockerGet.AddSandBoxImageRequest.serializeBinaryToWriter = function(messag
   f = message.getDescription();
   if (f.length > 0) {
     writer.writeString(
-      1,
+      4,
       f
     );
   }
-  f = message.getTempcontainerid();
+  f = message.getImageId();
   if (f.length > 0) {
     writer.writeString(
-      4,
+      1,
       f
     );
   }
@@ -14100,11 +14216,11 @@ proto.dockerGet.AddSandBoxImageRequest.prototype.setSessionKey = function(value)
 
 
 /**
- * optional string userId = 5;
+ * optional string userId = 2;
  * @return {string}
  */
 proto.dockerGet.AddSandBoxImageRequest.prototype.getUserid = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
@@ -14113,7 +14229,7 @@ proto.dockerGet.AddSandBoxImageRequest.prototype.getUserid = function() {
  * @return {!proto.dockerGet.AddSandBoxImageRequest} returns this
  */
 proto.dockerGet.AddSandBoxImageRequest.prototype.setUserid = function(value) {
-  return jspb.Message.setProto3StringField(this, 5, value);
+  return jspb.Message.setProto3StringField(this, 2, value);
 };
 
 
@@ -14136,28 +14252,10 @@ proto.dockerGet.AddSandBoxImageRequest.prototype.setTitle = function(value) {
 
 
 /**
- * optional string description = 1;
+ * optional string description = 4;
  * @return {string}
  */
 proto.dockerGet.AddSandBoxImageRequest.prototype.getDescription = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
-};
-
-
-/**
- * @param {string} value
- * @return {!proto.dockerGet.AddSandBoxImageRequest} returns this
- */
-proto.dockerGet.AddSandBoxImageRequest.prototype.setDescription = function(value) {
-  return jspb.Message.setProto3StringField(this, 1, value);
-};
-
-
-/**
- * optional string tempContainerId = 4;
- * @return {string}
- */
-proto.dockerGet.AddSandBoxImageRequest.prototype.getTempcontainerid = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
 };
 
@@ -14166,8 +14264,26 @@ proto.dockerGet.AddSandBoxImageRequest.prototype.getTempcontainerid = function()
  * @param {string} value
  * @return {!proto.dockerGet.AddSandBoxImageRequest} returns this
  */
-proto.dockerGet.AddSandBoxImageRequest.prototype.setTempcontainerid = function(value) {
+proto.dockerGet.AddSandBoxImageRequest.prototype.setDescription = function(value) {
   return jspb.Message.setProto3StringField(this, 4, value);
+};
+
+
+/**
+ * optional string image_id = 1;
+ * @return {string}
+ */
+proto.dockerGet.AddSandBoxImageRequest.prototype.getImageId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.dockerGet.AddSandBoxImageRequest} returns this
+ */
+proto.dockerGet.AddSandBoxImageRequest.prototype.setImageId = function(value) {
+  return jspb.Message.setProto3StringField(this, 1, value);
 };
 
 

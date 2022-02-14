@@ -1,41 +1,23 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../../lib/fetchAppSession';
+import { TemplateAddResponse } from "../../../lib/api/api";
 
-type Data = {
-  success:boolean
-  message: string
-  templateID:string
-}
 import {grpcClient}from '../../../lib/grpcClient'
 import {  AddTemplateReply,  AddTemplateRequest } from '../../../proto/dockerGet/dockerGet_pb';
 
-function unauthorized(){
-  return({
-    success: false,
-    message: "unauthorized",
-    templateID: ""
-  })
-}
-
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse<TemplateAddResponse>
   ) {
     var client = grpcClient()
-    const {templateName, section_user_id, assignment_config_id, containerId, description, active, isExam, timeLimit,allow_notification} = JSON.parse(req.body);
-    // if (section_user_id != undefined && containerId != undefined){
-    //   {/* @ts-ignore */}
-    //   if(!(await checkInSectionBySectionUserId(req.oidc.user.sub, section_user_id)) || !(await checkHaveContainer(containerId, req.oidc.user.sub))  || !(await checkRoleBySectionUserId(req.oidc.user.sub, section_user_id, "instructor")))
-    //   {res.json(unauthorized());return}
-    // }else{
-    //   res.json(unauthorized())
-    //   return
-    // }
+    const {templateName, section_user_id, assignment_config_id,environment_id, containerId, description, active, isExam, timeLimit,allow_notification} = JSON.parse(req.body);
+
     var docReq = new AddTemplateRequest();
     docReq.setSessionKey(fetchAppSession(req));
     docReq.setName(templateName);
     docReq.setSectionUserId(section_user_id);
+    docReq.setEnvironmentId(environment_id);
     docReq.setAssignmentConfigId(assignment_config_id);
     docReq.setContainerid(containerId);
     docReq.setDescription(description);
@@ -58,8 +40,10 @@ export default async function handler(
       })
     }
     catch(error) {
-        //@ts-ignore
-        res.json(error);
+        res.json({
+          success: false,
+          message: error
+        });
         res.status(405).end();
     }
   }

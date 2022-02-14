@@ -2,6 +2,10 @@ import { NextPageContext } from "next";
 import { useState } from "react";
 import CryingFace from "../components/CryingFace";
 import myToast from "../components/CustomToast";
+import sc from "../lib/statusCode.json";
+
+const defaultText =
+  "There is some unexpected error in the server. The error is logged and we will try to fix it ASAP. We are sorry for the inconvenience.";
 
 const Error = ({
   statusCode,
@@ -11,16 +15,15 @@ const Error = ({
   status?: any;
 }) => {
   const [text, setText] = useState("");
-  let message: string;
-  if (statusCode == 404)
-    message =
-      "There is some unexpected error in the server. The error is logged and we will try to fix it ASAP. We are sorry for the inconvenience.";
   return (
     <div className="w-full h-full relative">
-      <div className="flex flex-col items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 space-y-2">
+      <div className="flex flex-col items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 space-y-2 min-w-[1/2] w-1/2">
         <CryingFace className="h-[200px] w-[200px]"></CryingFace>
         <p className="error-page-status-code">{statusCode}</p>
-        <p className="error-page-text ">{message}</p>
+        <p className="error-page-text font-semibold">{sc[statusCode].text}</p>
+        <p className="error-page-text ">
+          {sc[statusCode].message ?? defaultText}
+        </p>
         <button
           className="btn btn-primary"
           onClick={() => {

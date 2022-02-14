@@ -3,43 +3,22 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../lib/fetchAppSession';
 
-type Data = {
-    success:boolean
-    userId:string
-    role:string
-    semesterId:string
-    darkMode:boolean
-    bio:string
-}
-
+import { GetUserDataResponse } from "../../lib/api/api";
 
 import {grpcClient}from '../../lib/grpcClient'
-import { SubRequest   ,GetUserDataReply } from '../../proto/dockerGet/dockerGet_pb';
+import { GetUserDataReply, GetUserDataRequest } from '../../proto/dockerGet/dockerGet_pb';
 
 
-function authentication(sub: string|string[], oidcSub: string){
-    if(sub == undefined){
-      return false
-    }else{
-      if(sub != oidcSub)
-        return false
-    }
-    return true
-  }
-  
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse<GetUserDataResponse>
   ) 
 {
   var client = grpcClient()
     const{sub}=req.query;
-    // if(!authentication(sub, req.oidc.user.sub)){
-    //     res.status(405).end();
-    //     return
-    // } 
-    var docReq = new SubRequest();
+
+    var docReq = new GetUserDataRequest();
     docReq.setSessionKey(fetchAppSession(req));
     docReq.setSub(sub as string);
     try{
@@ -47,9 +26,10 @@ export default async function handler(
         if(!GoLangResponse.getSuccess()){
             console.log(GoLangResponse.getMessage())
         }
-        
+
         res.json({
             success: GoLangResponse.getSuccess(),
+            message:GoLangResponse.getMessage(),
             userId: GoLangResponse.getUserid(),
             role:GoLangResponse.getRole(),
             semesterId: GoLangResponse.getSemesterid(),
@@ -61,7 +41,10 @@ export default async function handler(
     }
     catch(error) {
         //@ts-ignore
-        res.json(error);
+        res.json({
+          success:false,
+          message:error
+        });
         res.status(405).end();
     }
 }

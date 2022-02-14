@@ -3,32 +3,13 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../../lib/fetchAppSession';
 import {grpcClient}from '../../../lib/grpcClient'
 import {  ListContainerReply,  SubRequest } from '../../../proto/dockerGet/dockerGet_pb';
-
-type Data = {
-  success: boolean
-  message:string
-  containersInfo: ContainerInfo | null
-  containers: Container [] | null
-  tempContainers:Container [] | null
-}
-
-type ContainerInfo = {
-  containersAlive: number | undefined
-  containersTotal: number | undefined
-}
-
-type Container = {
-  courseTitle: string
-  assignmentName: string
-  existedTime: string
-  containerID: string
-}
+import { ContainerListResponse } from "../../../lib/api/api";
 
 
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse<ContainerListResponse>
   ) {
     var client = grpcClient()
     const { sub } = req.query;
@@ -59,7 +40,7 @@ export default function handler(
               existedTime: containers.getExistedtime(),
               containerID: containers.getContainerid(),
             })
-          }),
+          })||[],
           tempContainers: tempContainers.map( containers =>{
             return ({
               courseTitle: containers.getCoursetitle(),
@@ -67,14 +48,16 @@ export default function handler(
               existedTime: containers.getExistedtime(),
               containerID: containers.getContainerid(),
             })
-          }),
+          })||[],
          });
         res.status(200).end();
       })
     }
     catch(error) {
-        //@ts-ignore
-        res.json(error);
+        res.json({
+          success:false,
+          message:error
+        });
         res.status(405).end();
     }
   }

@@ -1,0 +1,42 @@
+{
+    "400": {
+        "text": "Bad Request",
+        "message": ""
+    },
+    "401": {
+        "text": "Unauthorized",
+        "message": "Server fails to identify your identity. If you believe that this is a server error, please report an issue."
+    },
+    "403": {
+        "text": "Forbidden",
+        "message": "You are forbidden to access some resources or make some requests. If you believe this is a server error, please report an issue."
+    },
+    "404": {
+        "text": "Not Found",
+        "message": "Requested page not found."
+    },
+    "408": {
+        "text": "Request Timeout",
+        "message": ""
+    },
+    "500": {
+        "text": "Internal Server Error",
+        "message": "There is some unexpected error in the server. The error is logged and we will try to fix it ASAP. We are sorry for the inconvenience."
+    },
+    "501": {
+        "text": "Not implemented",
+        "message": "The request method is not supported by the server and cannot be handled."
+    },
+    "502": {
+        "text": "Bad Gateway",
+        "message": "There is some unexpected error in the server. The error is logged and we will try to fix it ASAP. We are sorry for the inconvenience."
+    },
+    "503": {
+        "text": "Service Unavailable",
+        "message": "There is some unexpected error in the server. The error is logged and we will try to fix it ASAP. We are sorry for the inconvenience."
+    },
+    "504": {
+        "text": "Gateway Timeout",
+        "message": "There is some unexpected error in the server. The error is logged and we will try to fix it ASAP. We are sorry for the inconvenience."
+    }
+}

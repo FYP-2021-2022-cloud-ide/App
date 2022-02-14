@@ -1,31 +1,19 @@
 import CodeSpace from "./CodeSpace";
 import EmptyDiv from "../EmptyDiv";
+import { Container, ContainerInfo } from "../../lib/cnails";
 
-export interface container {
-  courseTitle: string;
-  assignmentName: string;
-  existedTime: string;
-  containerID: string;
-}
-export interface containerInfo {
-  containersAlive: number;
-  containersTotal: number;
-}
-
-export type Props = {
-  containerInfo: containerInfo;
-  containers: container[];
+type Props = {
+  containerInfo: ContainerInfo;
+  containers: Container[];
 };
 
-const ContainersList = ({
-  containerInfo: { containersAlive, containersTotal },
-  containers,
-}: Props) => {
+const ContainersList = ({ containers, containerInfo }: Props) => {
   // var percentage = containerInfo.containersAlive/containerInfo.containersTotal * 100 ;
-  const quota = 5;
-
-  if (!containersAlive) containersAlive = 0;
-  var percentage = (containersAlive / quota) * 100;
+  const quota = containerInfo.containersTotal;
+  if (containerInfo.containersAlive != containers.length) {
+    console.error("container active number does not match");
+  }
+  var percentage = (containers.length / quota) * 100;
 
   const Header = () => {
     return (
@@ -33,7 +21,7 @@ const ContainersList = ({
         <div className="current-run-title">Current Run</div>
         <div className="flex flex-col justify-between w-3/5">
           <div className="current-run-percentage">
-            {containersAlive}/{quota}
+            {containers.length}/{quota}
           </div>
           <div className="current-run-bar-outer">
             <div

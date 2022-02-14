@@ -2,18 +2,12 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../../lib/fetchAppSession';
 import {grpcClient}from '../../../lib/grpcClient'
 
+import { SuccessStringResponse } from "../../../lib/api/api";
 import {  SuccessStringReply,  CodeRequest } from '../../../proto/dockerGet/dockerGet_pb';
-export default function handler(req: NextApiRequest, res:NextApiResponse) {
-    // const {credentials, code} = JSON.parse(req.body)
-    // const {client_secret, client_id, redirect_uris} = credentials;
-    // const oAuth2Client = new google.auth.OAuth2(
-    //     client_id, client_secret, redirect_uris[0]);
+export default function handler(
+    req: NextApiRequest, 
+    res:NextApiResponse<SuccessStringResponse>) {
 
-    // oAuth2Client.getToken(code, (err, token) => {
-    //     res.status(200).json({token})
-    // });
-  // window.location(authUrl)
-//   res.status(200).json({ url: authUrl })
     const {code, sub} = JSON.parse(req.body)
     var client = grpcClient()
     var docReq = new CodeRequest();
@@ -30,7 +24,7 @@ export default function handler(req: NextApiRequest, res:NextApiResponse) {
     }catch(error) {
         res.status(405).json({
           success: false,
-          message: error
+          message: error as string
         });
     }
 }

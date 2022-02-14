@@ -1,6 +1,11 @@
-
+import { 
+    ContainerAddResponse ,
+    ContainerListResponse,
+    SuccessStringResponse
+  } from "./api";
+  
 const containerAPI = {
-    containerList: async (sub: string) => {
+    containerList: async (sub: string): Promise<ContainerListResponse> => {
         var res = await fetch('/api/container/listContainers?sub=' + sub, {
             method: 'GET'
         })
@@ -13,7 +18,7 @@ const containerAPI = {
         section_user_id: string,
         template_id: string,
         accessRight: string,
-        useFresh: boolean) => {
+        useFresh: boolean): Promise<ContainerAddResponse> => {
         var res = await fetch('/api/container/addContainer', {
             method: 'POST',
             body: JSON.stringify({
@@ -28,7 +33,7 @@ const containerAPI = {
         })
         return res.json()
     },
-    removeContainer: async (containerId: string, sub: string) => {
+    removeContainer: async (containerId: string, sub: string) : Promise<SuccessStringResponse>=> {
         var res = await fetch('/api/container/removeContainer?sub=' + sub, {
             method: 'POST',
             body: JSON.stringify({
@@ -37,7 +42,12 @@ const containerAPI = {
         })
         return res.json()
     },
-    addTempContainer: async (memLimit: Number, numCPU: Number, imageName: string, sub: string, accessRight: string) => {
+    addTempContainer: async (
+        memLimit: Number,
+        numCPU: Number, 
+        imageName: string, 
+        sub: string, 
+        accessRight: string): Promise<ContainerAddResponse> => {
         var res = await fetch('/api/container/addTempContainer?sub=' + sub, {
             method: 'POST',
             body: JSON.stringify({
@@ -49,7 +59,7 @@ const containerAPI = {
         })
         return res.json()
     },
-    removeTempContainer: async (containerId: string, sub: string) => {
+    removeTempContainer: async (containerId: string, sub: string): Promise<SuccessStringResponse> => {
         var res = await fetch('/api/container/removeTempContainer?sub=' + sub, {
             method: 'POST',
             body: JSON.stringify({

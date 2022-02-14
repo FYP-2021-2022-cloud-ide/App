@@ -2,23 +2,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../../lib/fetchAppSession';
 
-type Data = {
-  success:boolean
-  message: string
-}
+import { SuccessStringResponse } from "../../../lib/api/api";
+
 import {grpcClient}from '../../../lib/grpcClient'
 import {  SuccessStringReply,UpdateEnvironmentRequest  } from '../../../proto/dockerGet/dockerGet_pb';
 
-function unauthorized(){
-  return({
-    success: false,
-    message: "unauthorized"
-  })
-}
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse<SuccessStringResponse>
   ) {
     var client = grpcClient()
     const{envId, name, section_user_id, containerId, description} = JSON.parse(req.body);
@@ -44,8 +36,10 @@ export default async function handler(
       })
     }
     catch(error) {
-        //@ts-ignore
-        res.json(error);
+        res.json({
+          success:false,
+          message:error
+        });
         res.status(405).end();
     }
   }

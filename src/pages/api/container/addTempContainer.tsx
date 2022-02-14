@@ -3,18 +3,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../../lib/fetchAppSession';
 
-type Data = {
-  success: boolean
-  message:string
-  tempContainerId: string
-}
+import { ContainerAddResponse } from "../../../lib/api/api";
+
 
 import {grpcClient}from '../../../lib/grpcClient'
 import {    AddTempContainerReply,  AddTempContainerRequest } from '../../../proto/dockerGet/dockerGet_pb';
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse<ContainerAddResponse>
   ) 
 {
     var client = grpcClient()
@@ -37,15 +34,17 @@ export default function handler(
             res.json({
                 success : GoLangResponse.getSuccess(),
                 message: GoLangResponse.getMessage(),
-                tempContainerId: GoLangResponse.getTempcontainerid()
+                containerID: GoLangResponse.getTempcontainerid()
             })
             res.status(200).end();
             }
         )
     }
     catch(error) {
-        //@ts-ignore
-        res.json(error);
+        res.json({
+            success:false,
+            message:error
+          });
         res.status(405).end();
     }
 }

@@ -3,17 +3,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../../lib/fetchAppSession';
 
-type Data = {
-  success: boolean
-  message:string
-}
+import { SuccessStringResponse } from "../../../lib/api/api";
+
 
 import {grpcClient}from '../../../lib/grpcClient'
 import {    SuccessStringReply,  UpdateSandBoxImageRequest } from '../../../proto/dockerGet/dockerGet_pb';
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse<SuccessStringResponse>
   ) 
 {
     var client = grpcClient()
@@ -41,8 +39,10 @@ export default function handler(
         )
     }
     catch(error) {
-        //@ts-ignore
-        res.json(error);
+        res.json({
+            success: false,
+            message: error
+          });
         res.status(405).end();
     }
 }

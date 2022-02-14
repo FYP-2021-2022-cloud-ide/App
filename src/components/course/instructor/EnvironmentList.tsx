@@ -25,20 +25,18 @@ const EnvironmentList = ({
   onEnvHighlight,
   onEnvUpdate,
 }: Props) => {
-  const router = useRouter();
-  const { sub } = useCnails();
-
   return (
-    <div className="flex flex-col w-full">
-      <div className="flex flex-row text-gray-700 dark:text-gray-300 justify-start gap-x-4 pb-4">
-        <CubeIcon className="w-7 h-7"></CubeIcon>
+    <div className="env-list-container">
+      <div onMouseLeave={() => {}}></div>
+      <div className="env-list-header">
+        <CubeIcon className="course-list-title-icon"></CubeIcon>
         <div className="env-grid-title">Environments</div>
         <button
           onClick={() => {
             if (onEnvCreateBtnClick) onEnvCreateBtnClick();
           }}
         >
-          <PlusCircleIcon className="w-7 h-7 hover:scale-110 transition  ease-in-out duration-300"></PlusCircleIcon>
+          <PlusCircleIcon className="course-list-title-add"></PlusCircleIcon>
         </button>
       </div>
       {

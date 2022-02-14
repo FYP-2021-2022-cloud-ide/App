@@ -2,34 +2,19 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../../lib/fetchAppSession';
 
-type Data = {
-  success:boolean
-  message: string
-}
+import { SuccessStringResponse } from "../../../lib/api/api";
+
+
 import {grpcClient}from '../../../lib/grpcClient'
 import {  SuccessStringReply,UpdateTemplateRequest  } from '../../../proto/dockerGet/dockerGet_pb';
 
-function unauthorized(){
-  return({
-    success: false,
-    message: "unauthorized"
-  })
-}
-
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse<SuccessStringResponse>
   ) {
     var client = grpcClient()
     const {templateId, templateName, section_user_id, containerId, description, isExam, timeLimit,allow_notification} = JSON.parse(req.body);
-    // if (section_user_id != undefined && containerId != undefined){
-    //    {/* @ts-ignore */}
-    //   if(!(await checkInSectionBySectionUserId(req.oidc.user.sub, section_user_id)) || !(await checkHaveContainer(containerId, req.oidc.user.sub))  || !(await checkRoleBySectionUserId(req.oidc.user.sub, section_user_id, "instructor")))
-    //   {res.json(unauthorized());return}
-    // }else{
-    //   res.json(unauthorized())
-    //   return
-    // }
+
     var docReq = new UpdateTemplateRequest();
     docReq.setSessionKey(fetchAppSession(req));
     docReq.setTemplateid(templateId);
@@ -54,8 +39,10 @@ export default async function handler(
       })
     }
     catch(error) {
-        //@ts-ignore
-        res.json(error);
+        res.json({
+          success: false,
+          message: error
+        });
         res.status(405).end();
     }
   }

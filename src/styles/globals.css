@@ -7,6 +7,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.select {
+  appearance: none;
+  @apply min-h-[0px] outline-none border-none;
+}
 .current-run-title {
   @apply text-xl text-gray-600 dark:text-gray-300;
 }
@@ -250,6 +254,20 @@
 }
 
 .toaster-warning {
+}
+
+.env-list-container,
+.template-list-container,
+.sandbox-list-container,
+.workspace-list-container {
+  @apply flex flex-col w-full;
+}
+
+.env-list-header,
+.template-list-header,
+.sandbox-list-header,
+.workspace-list-header {
+  @apply flex flex-row text-gray-700 dark:text-gray-300 justify-start gap-x-4 pb-4;
 }
 
 .env-grid,

@@ -2,19 +2,15 @@
 //remember to set the ownership after adding new api
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../../lib/fetchAppSession';
+import { SandboxAddResponse } from "../../../lib/api/api";
 
-type Data = {
-  success: boolean
-  message:string
-  sandboxId: string
-}
 
 import {grpcClient}from '../../../lib/grpcClient'
 import {    AddSandBoxReply,  AddSandBoxRequest } from '../../../proto/dockerGet/dockerGet_pb';
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse<SandboxAddResponse>
   ) 
 {
     var client = grpcClient()
@@ -41,8 +37,10 @@ export default function handler(
         )
     }
     catch(error) {
-        //@ts-ignore
-        res.json(error);
+        res.json({
+            success: false,
+            message: error
+          });
         res.status(405).end();
     }
 }

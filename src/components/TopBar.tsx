@@ -9,6 +9,7 @@ import {
 import UserMenu from "./UserMenu";
 import { useTheme } from "../contexts/theme";
 import NotiStack from "./NotiStack";
+import Link from "next/link";
 
 interface props {
   sub: string;
@@ -33,7 +34,7 @@ const TopBar = ({ sub, name, email }: props) => {
 
   return (
     <div className="flex flex-row z-[10] justify-end  items-center p-5">
-      <SearchBar />
+      {/* <SearchBar /> */}
       <div className="flex flex-row items-center text-gray-500 justify-end gap-x-4">
         <UserMenu sub={sub} name={name} email={email}></UserMenu>
         <NotiStack />
@@ -41,7 +42,9 @@ const TopBar = ({ sub, name, email }: props) => {
           className="tooltip tooltip-bottom tooltip-primary"
           data-tip="Help and docs"
         >
-          <QuestionMarkCircleIcon className="top-bar-icon"></QuestionMarkCircleIcon>
+          <Link href="/FAQ">
+            <QuestionMarkCircleIcon className="top-bar-icon"></QuestionMarkCircleIcon>
+          </Link>
         </div>
         <div
           className="tooltip tooltip-bottom tooltip-bottom-left tooltip-primary"

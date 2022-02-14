@@ -1,13 +1,13 @@
 import { CubeTransparentIcon } from "@heroicons/react/outline"
 import { PlusCircleIcon } from "@heroicons/react/solid"
 import Workspace from "./Workspace"
-import { template } from "../instructor/Template/TemplateList"
+import { Template } from "../../../lib/cnails";
 import EmptyDiv from "../../EmptyDiv"
 
 
 
 interface props {
-    templates: template[]
+    templates: Template[]
     sectionUserId: string
 }
 

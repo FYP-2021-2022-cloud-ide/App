@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 
-import {grpcClient}from '../lib/grpcClient'
-import { GetUserDataRequest,  InstantAddContainerRequest, AddContainerReply, GetUserDataReply, CheckHaveContainerRequest, SuccessStringReply } from '../proto/dockerGet/dockerGet_pb';
+import { grpcClient } from '../lib/grpcClient'
+import { GetUserDataRequest, InstantAddContainerRequest, AddContainerReply, GetUserDataReply, CheckHaveContainerRequest, SuccessStringReply } from '../proto/dockerGet/dockerGet_pb';
 
 import express from 'express';
 import { Request, Response, NextFunction } from 'express';
@@ -38,8 +38,8 @@ app.prepare().then(() => {
   var httpServer = http.createServer(server)
 
   httpServer.on('upgrade', function (req: Request, socket: Socket, head: Header) {
-    
-    if (req.url.search('/_next/webpack-hmr') == -1){
+
+    if (req.url.search('/_next/webpack-hmr') == -1) {
       var baseURL = '/user/container/'
       var userPosition = req.url.search(baseURL)
       var id = req.url.slice(
@@ -51,10 +51,10 @@ app.prepare().then(() => {
       req.url = req.url.slice(userPosition + baseURL.length + ID_LENGTH);
 
       proxy.ws(req, socket, head, { target: 'http://traefik.codespace.ust.dev' });
-    }else{
+    } else {
       proxy.ws(req, socket, head, { target: req.url });
     }
-    
+
   })
 
   // server.use(cookieParser())
@@ -73,19 +73,19 @@ app.prepare().then(() => {
         response_type: 'code',
         scope: 'openid profile email'
       },
-      session:{
+      session: {
         genid: () => crypto.randomBytes(16).toString('hex'),
         store: {
           get: (sid, callback) => {
             const key = crypto.createHmac('sha1', process.env.SESSIONSECRET!).update(sid).digest().toString('base64');
-            client.get(key, (err, data)=>{
-              if(err) return callback(err)
-              if(!data) return callback(null)
-    
+            client.get(key, (err, data) => {
+              if (err) return callback(err)
+              if (!data) return callback(null)
+
               let result
-              try{
+              try {
                 result = JSON.parse(data);
-              }catch(err){
+              } catch (err) {
                 return callback(err)
               }
               return callback(null, result)
@@ -94,10 +94,10 @@ app.prepare().then(() => {
           set: (sid, data, callback) => {
             // console.log(data)
             const key = crypto.createHmac('sha1', process.env.SESSIONSECRET!).update(sid).digest().toString('base64');
-            client.set(key, JSON.stringify(data),'EX', 86400, callback)
+            client.set(key, JSON.stringify(data), 'EX', 86400, callback)
             // client.expire(key, 86400)
           },
-          destroy: (sid,callback) => {
+          destroy: (sid, callback) => {
             const key = crypto.createHmac('sha1', process.env.SESSIONSECRET!).update(sid).digest().toString('base64');
             client.del(key, callback)
           },
@@ -111,12 +111,13 @@ app.prepare().then(() => {
       afterCallback: async (req, res, session, decodedState) => {
         try {
           // // // @ts-ignore
-          console.log("session: ",session)
+          // console.log("session: ", session)
           const additionalUserClaims = await axios('https://cas.ust.hk/cas/oidc' + '/profile', {
             headers: {
               Authorization: 'Bearer ' + session.access_token
             }
           });
+          // console.log(additionalUserClaims)
           // @ts-ignore
           req.appSession!.openidTokens = session.access_token;
           session.expired_at
@@ -135,8 +136,8 @@ app.prepare().then(() => {
               resolve({
                 userId: GolangResponse.getUserid(),
                 semesterId: GolangResponse.getSemesterid(),
-                darkMode:GolangResponse.getDarkmode(),
-                bio:GolangResponse.getBio(),
+                darkMode: GolangResponse.getDarkmode(),
+                bio: GolangResponse.getBio(),
                 role: GolangResponse.getRole()
               })
             })
@@ -185,7 +186,7 @@ app.prepare().then(() => {
     })
   });
 
-  
+
 
   // authentication logout 
   server.all('/logout', async function (req: Request, res: Response) {
@@ -259,7 +260,7 @@ app.prepare().then(() => {
     try {
       var client = grpcClient()
       var docReq = new CheckHaveContainerRequest();
-      const {appSession} = parse(req.headers.cookie!)
+      const { appSession } = parse(req.headers.cookie!)
       const key = crypto.createHmac('sha1', process.env.SESSIONSECRET!).update(appSession).digest().toString('base64');
       docReq.setSessionKey(key)
       docReq.setSub(req.oidc.user!.sub)

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTheme,setCookie } from '../contexts/theme';
 import { UserIcon } from '@heroicons/react/solid';
 import { useCnails } from '../contexts/cnails';
-import{generalAPI} from '../lib/generalAPI'
+import{generalAPI} from '../lib/api/generalAPI'
 export default function Setting() {
     const {  sub,name,email,bio } = useCnails();
     const {  updateUserData } = generalAPI;

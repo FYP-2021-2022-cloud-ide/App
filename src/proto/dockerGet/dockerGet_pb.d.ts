@@ -542,6 +542,8 @@ export namespace ListTemplatesReply {
         setName(value: string): Template;
         getDescription(): string;
         setDescription(value: string): Template;
+        getEnvironmentId(): string;
+        setEnvironmentId(value: string): Template;
         getImageid(): string;
         setImageid(value: string): Template;
         getAssignmentConfigId(): string;
@@ -576,6 +578,7 @@ export namespace ListTemplatesReply {
             id: string,
             name: string,
             description: string,
+            environmentId: string,
             imageid: string,
             assignmentConfigId: string,
             storage: string,
@@ -594,6 +597,8 @@ export class AddContainerRequest extends jspb.Message {
     setSessionKey(value: string): AddContainerRequest;
     getImagename(): string;
     setImagename(value: string): AddContainerRequest;
+    getEnvironmentId(): string;
+    setEnvironmentId(value: string): AddContainerRequest;
     getMemlimit(): number;
     setMemlimit(value: number): AddContainerRequest;
     getNumcpu(): number;
@@ -621,6 +626,7 @@ export namespace AddContainerRequest {
     export type AsObject = {
         sessionKey: string,
         imagename: string,
+        environmentId: string,
         memlimit: number,
         numcpu: number,
         sectionUserId: string,
@@ -773,6 +779,8 @@ export class AddTemplateRequest extends jspb.Message {
     setName(value: string): AddTemplateRequest;
     getDescription(): string;
     setDescription(value: string): AddTemplateRequest;
+    getEnvironmentId(): string;
+    setEnvironmentId(value: string): AddTemplateRequest;
     getContainerid(): string;
     setContainerid(value: string): AddTemplateRequest;
     getAssignmentConfigId(): string;
@@ -803,6 +811,7 @@ export namespace AddTemplateRequest {
         sessionKey: string,
         name: string,
         description: string,
+        environmentId: string,
         containerid: string,
         assignmentConfigId: string,
         sectionUserId: string,
@@ -1442,8 +1451,10 @@ export class RemoveNotificationRequest extends jspb.Message {
     setSessionKey(value: string): RemoveNotificationRequest;
     getUserid(): string;
     setUserid(value: string): RemoveNotificationRequest;
-    getNotificationid(): string;
-    setNotificationid(value: string): RemoveNotificationRequest;
+    clearNotificationidList(): void;
+    getNotificationidList(): Array<string>;
+    setNotificationidList(value: Array<string>): RemoveNotificationRequest;
+    addNotificationid(value: string, index?: number): string;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): RemoveNotificationRequest.AsObject;
@@ -1459,7 +1470,7 @@ export namespace RemoveNotificationRequest {
     export type AsObject = {
         sessionKey: string,
         userid: string,
-        notificationid: string,
+        notificationidList: Array<string>,
     }
 }
 
@@ -1655,8 +1666,8 @@ export class AddSandBoxImageRequest extends jspb.Message {
     setTitle(value: string): AddSandBoxImageRequest;
     getDescription(): string;
     setDescription(value: string): AddSandBoxImageRequest;
-    getTempcontainerid(): string;
-    setTempcontainerid(value: string): AddSandBoxImageRequest;
+    getImageId(): string;
+    setImageId(value: string): AddSandBoxImageRequest;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): AddSandBoxImageRequest.AsObject;
@@ -1674,7 +1685,7 @@ export namespace AddSandBoxImageRequest {
         userid: string,
         title: string,
         description: string,
-        tempcontainerid: string,
+        imageId: string,
     }
 }
 

@@ -1,4 +1,8 @@
-import { TemplateListResponse } from "./api";
+import { 
+  TemplateListResponse ,
+  TemplateAddResponse,
+  SuccessStringResponse
+} from "./api";
 
 const templateAPI = {
   templateList: async (
@@ -18,19 +22,21 @@ const templateAPI = {
     templateName: string,
     description: string,
     section_user_id: string,
+    environment_id:string,
     assignment_config_id: string,
     containerId: string,
     active: boolean,
     isExam: boolean,
     timeLimit: Number,
     allow_notification: boolean
-  ) => {
+  ): Promise<TemplateAddResponse> => {
     var res = await fetch("/api/template/addTemplate", {
       method: "POST",
       body: JSON.stringify({
         templateName: templateName,
         description: description,
         section_user_id: section_user_id,
+        environment_id:environment_id,
         assignment_config_id: assignment_config_id,
         containerId: containerId,
         active: active,
@@ -50,7 +56,7 @@ const templateAPI = {
     isExam: boolean,
     timeLimit: Number,
     allow_notification: boolean
-  ) => {
+  ): Promise<SuccessStringResponse> => {
     var res = await fetch("/api/template/updateTemplate", {
       method: "POST",
       body: JSON.stringify({
@@ -66,7 +72,9 @@ const templateAPI = {
     });
     return res.json();
   },
-  activateTemplate: async (templateId: string, section_user_id: string) => {
+  activateTemplate: async (
+    templateId: string,
+    section_user_id: string): Promise<SuccessStringResponse> => {
     var res = await fetch("/api/template/activateTemplate", {
       method: "POST",
       body: JSON.stringify({
@@ -76,7 +84,9 @@ const templateAPI = {
     });
     return res.json();
   },
-  deactivateTemplate: async (templateId: string, section_user_id: string) => {
+  deactivateTemplate: async (
+    templateId: string, 
+    section_user_id: string) : Promise<SuccessStringResponse> => {
     var res = await fetch("/api/template/deactivateTemplate", {
       method: "POST",
       body: JSON.stringify({
@@ -87,7 +97,9 @@ const templateAPI = {
     return res.json();
   },
 
-  removeTemplate: async (templateId: string, section_user_id: string) => {
+  removeTemplate: async (
+    templateId: string,
+     section_user_id: string): Promise<SuccessStringResponse>  => {
     var res = await fetch("/api/template/removeTemplate", {
       method: "POST",
       body: JSON.stringify({

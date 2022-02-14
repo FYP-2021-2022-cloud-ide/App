@@ -2,34 +2,21 @@ import { Popover, Transition } from "@headlessui/react";
 import { BellIcon, MailIcon } from "@heroicons/react/solid";
 import React, { useEffect, useState } from "react";
 import { Fragment } from "react";
-// import { notificationStack } from '../lib/notificationStack'
+import { Notification } from "../lib/cnails";
 import { useCnails } from "../contexts/cnails";
-import Link from "next/link";
-import { notificationAPI } from "../lib/notificationAPI";
+import { useRouter } from "next/router";
 
-interface notification {
-  id: string;
-  sender: {
-    id: string;
-    name: string;
-    sub: string;
-  };
-  title: string;
-  body: string;
-  updatedAt: string;
-  allow_reply: boolean;
-}
-
-const MoreButton = () => {
+const MoreButton = ({ onClick }: { onClick: () => void }) => {
   return (
-    <Link href="/messages">
-      <div className="text-sm flex  justify-center cursor-pointer py-3 rounded-lg  text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-500 ring-opacity-5">
-        more messages
-        <span>
-          <MailIcon className="text-gray-600 dark:text-gray-300 w-4 h-4 ml-2"></MailIcon>
-        </span>
-      </div>
-    </Link>
+    <div
+      onClick={onClick}
+      className="text-sm flex  justify-center cursor-pointer py-3 rounded-lg  text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-500 ring-opacity-5"
+    >
+      more messages
+      <span>
+        <MailIcon className="text-gray-600 dark:text-gray-300 w-4 h-4 ml-2"></MailIcon>
+      </span>
+    </div>
   );
 };
 
@@ -50,26 +37,11 @@ const NotificationBtn = ({ num }: { num: number }) => {
 };
 
 export default function NotiStack() {
-  // load once when page is rendered
-  const [notifications, setNotifications] = useState<notification[]>([]);
-  const { userId } = useCnails();
-  const { listNotifications } = notificationAPI;
-
-  // data fetching from API
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      const response = await listNotifications(userId);
-      setNotifications(response.notifications);
-    };
-    fetchNotifications();
-  }, []);
-  if (notifications == undefined) {
-    setNotifications([]);
-  }
-
+  const { userId, notifications } = useCnails();
+  const router = useRouter();
   return (
     <Popover className="relative z-[1] ">
-      {({ open }) => (
+      {({ open, close }) => (
         <>
           <NotificationBtn num={notifications?.length} />
           <Transition
@@ -89,8 +61,12 @@ export default function NotiStack() {
                   </div>
                 ) : (
                   <div className="flex  flex-col space-y-2">
-                    {notifications!.slice(0, 6).map((item: notification) => (
+                    {notifications!.slice(0, 6).map((item: Notification) => (
                       <div
+                        onClick={() => {
+                          router.push("/messages");
+                          close();
+                        }}
                         key={item.id}
                         className="cursor-pointer flex items-center p-2 transition duration-150 ease-in-out rounded-lg hover:bg-gray-200 dark:hover:bg-gray-500 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
                       >
@@ -101,10 +77,21 @@ export default function NotiStack() {
                           <p className="w-96 text-sm text-gray-500 dark:text-gray-300 text-ellipsis overflow-hidden">
                             {item.body}
                           </p>
+                          <p className="text-primary text-xs">
+                            @{item.sender.sub}
+                          </p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500">
+                            {item.updatedAt}
+                          </p>
                         </div>
                       </div>
                     ))}
-                    <MoreButton />
+                    <MoreButton
+                      onClick={() => {
+                        router.push("/messages");
+                        close();
+                      }}
+                    />
                   </div>
                 )}
               </div>

@@ -2,17 +2,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../../lib/fetchAppSession';
 import {grpcClient}from '../../../lib/grpcClient'
-type Data = {
-  success:boolean
-  message: string
-  environmentID:string
-}
+
+import { EnvironmentAddResponse } from "../../../lib/api/api";
+
 import {  AddEnvironmentReply,  AddEnvironmentRequest } from '../../../proto/dockerGet/dockerGet_pb';
 
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse<EnvironmentAddResponse>
   ) {
     var client = grpcClient()
     const {libraries, name, section_user_id, description} = JSON.parse(req.body);
@@ -38,8 +36,10 @@ export default async function handler(
       })
     }
     catch(error) {
-        //@ts-ignore
-        res.json(error);
+        res.json({
+          success:false,
+          message:error
+        });
         res.status(405).end();
     }
   }

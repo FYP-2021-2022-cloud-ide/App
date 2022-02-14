@@ -3,6 +3,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../lib/fetchAppSession';
 
+import { SuccessStringResponse } from "../../lib/api/api";
 type Data = {
   success: boolean
   message:string
@@ -13,36 +14,16 @@ type Data = {
 import {grpcClient}from '../../lib/grpcClient'
 import { SuccessStringReply   ,UpdateUserDataRequest } from '../../proto/dockerGet/dockerGet_pb';
 
-  
-function unauthorized(){
-  return({
-      success: false,
-      message: "unauthorized",
-  })
-}
-function authentication(sub: string|string[], oidcSub: string){
-    if(sub == undefined){
-      return false
-    }else{
-      if(sub != oidcSub)
-        return false
-    }
-    return true
-  }
-  
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse<SuccessStringResponse>
   ) 
 {
   var client = grpcClient()
     const{sub}=req.query;
     const { darkMode, bio} = JSON.parse(req.body);//console.log(body)
-    // if(!authentication(sub, req.oidc.user.sub)){
-    //     res.json(unauthorized())
-    //     return
-    // } 
+
     var docReq = new UpdateUserDataRequest();
     docReq.setSessionKey(fetchAppSession(req));
     docReq.setSub(sub as string);
@@ -62,8 +43,10 @@ export default async function handler(
         })
     }
     catch(error) {
-        //@ts-ignore
-        res.json(error);
+        res.json({
+          success: false,
+          message: error
+        });
         res.status(405).end();
     }
 }

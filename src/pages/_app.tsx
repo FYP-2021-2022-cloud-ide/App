@@ -27,6 +27,8 @@ function CnailsApp({ Component, pageProps }: CnailsProps) {
   )
 }
 
+
+
 // CnailsApp.getInitialProps = async ({ctx}: any) => {
 //   // console.log(ctx)
 //   const{sub, name, email, userId, semesterId} = parse(ctx.req.headers.cookie)
@@ -39,4 +41,8 @@ function CnailsApp({ Component, pageProps }: CnailsProps) {
 //   }
 // }
 
+// for client-side performance test
+export function reportWebVitals(metric) {
+    console.log(metric) // The metric object ({ id, name, startTime, value, label }) is logged to the console
+}
 export default CnailsApp

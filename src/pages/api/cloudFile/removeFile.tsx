@@ -5,35 +5,17 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import fs from 'fs/promises'
 import dirTree, { DirectoryTree } from 'directory-tree';
 
-type Data = {
-    success: boolean
-    message: string
-    tree: DirectoryTree
-}
-
-
-
+import { LocalFilesListResponse } from "../../../lib/api/api";
 
 export default async function handler(
     req: NextApiRequest,
-    res: NextApiResponse<Data>
+    res: NextApiResponse<LocalFilesListResponse>
 ) {
     // var client = grpcClient()
     const { userId } = req.query;
     const { path } = JSON.parse(req.body);
-    // var docReq = new PathRequest();
-    // docReq.setUserid(userId as string);
-    // docReq.setPath(path)
-    // console.log(docReq)
     try {
-        // client.removeFile(docReq, function(err, GoLangResponse: SuccessStringReply) {
-        //   if(!GoLangResponse.getSuccess()){
-        //     console.log(GoLangResponse.getMessage())
-        //   }
-        //   res.json({ 
-        //     success : GoLangResponse.getSuccess(),
-        //     message: GoLangResponse.getMessage(),
-        //   });
+
         await fs.rm(path, {
             recursive: true
         })
@@ -50,7 +32,10 @@ export default async function handler(
             });
             res.status(200).end();
         } catch (error) {
-            res.json(error);
+            res.json({
+                success:false,
+                message:error
+              });
             res.status(405).end();
         }
         // })
@@ -66,7 +51,10 @@ export default async function handler(
             });
             res.status(405).end();
         } catch (error) {
-            res.json(error);
+            res.json({
+                success:false,
+                message:error
+              });
             res.status(405).end();
         }
     }

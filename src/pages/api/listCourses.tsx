@@ -2,48 +2,19 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../lib/fetchAppSession';
 
-type Data = {
-  success: boolean
-  message: string
-  courses: Course[] | null
-  //cutMes: string[]
-}
-
-type Course = {
-  sectionID: string
-  courseCode: string
-  section: string
-  name: string
-  sectionRole: string
-  lastUpdateTime: string
-}
+import { CourseListResponse } from "../../lib/api/api";
 
 import {grpcClient}from '../../lib/grpcClient'
 import {  ListCoursesReply,  SubRequest } from '../../proto/dockerGet/dockerGet_pb';
 
-function unauthorized(){
-  return({
-    success: false,
-    message: "unauthorized",
-    courses: null
-  })
-}
+
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse<CourseListResponse>
   ) {
     var client = grpcClient()
-    // var body = JSON.parse(req.body);
     const { sub } = req.query;
-    // if(sub == undefined){
-    //   {res.json(unauthorized());return}
-    // }else{
-    //   if(sub != req.oidc.user.sub){
-    //     res.json(unauthorized())
-    //     return;
-    //   }
-    // }
 
     var docReq = new SubRequest();
     docReq.setSessionKey(fetchAppSession(req));
@@ -66,14 +37,16 @@ export default function handler(
               sectionRole: course.getSectionrole(),
               lastUpdateTime: course.getLastupdatetime()
             })
-          })
+          })||[],
         });
         res.status(200).end();
       })
     }
     catch(error) {
-        //@ts-ignore
-        res.json(error);
+        res.json({
+          success: false,
+          message: error
+        });
         res.status(405).end();
     }
   }

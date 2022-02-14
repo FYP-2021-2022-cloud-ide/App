@@ -3,25 +3,27 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../../lib/fetchAppSession';
 
-type Data = {
-  success: boolean
-  message:string
-}
+import { SuccessStringResponse } from "../../../lib/api/api";
+
 
 import {grpcClient}from '../../../lib/grpcClient'
 import {    SuccessStringReply,  RemoveNotificationRequest } from '../../../proto/dockerGet/dockerGet_pb';
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse<SuccessStringResponse>
   ) 
 {
     var client = grpcClient()
-    const {userId, notificationId} = JSON.parse(req.body);
+    const {userId, notificationIds} = JSON.parse(req.body);
+    // console.log(notificationIds)
     var docReq = new RemoveNotificationRequest();
     docReq.setSessionKey(fetchAppSession(req));
     docReq.setUserid(userId);
-    docReq.setNotificationid(notificationId);
+    notificationIds.forEach((element:string) => {
+        docReq.addNotificationid(element);
+    });
+   
     try{
         client.removeNotification(docReq, function(err, GoLangResponse: SuccessStringReply) {
             console.log(GoLangResponse)
@@ -34,8 +36,10 @@ export default function handler(
         )
     }
     catch(error) {
-        //@ts-ignore
-        res.json(error);
+        res.json({
+            success: false,
+            message: error
+          });
         res.status(405).end();
     }
 }

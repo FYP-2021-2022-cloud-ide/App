@@ -1,16 +1,15 @@
-import React from "react";
-import Menu from "../CardMenu";
-
+import React, { useRef } from "react";
+import Menu from "../../CardMenu";
 import Tilt from "react-parallax-tilt";
 import { Environment } from "../../../lib/cnails";
 
-interface EnvironmentProps {
+type Props = {
   environment: Environment;
   onClick?: (environment: Environment) => void;
   onDelete?: (environment: Environment) => void;
   onUpdate?: (environment: Environment) => void;
   onHighlight?: (environment: Environment) => void;
-}
+};
 
 function EnvironmentCard({
   environment,
@@ -18,9 +17,27 @@ function EnvironmentCard({
   onDelete,
   onUpdate,
   onHighlight,
-}: EnvironmentProps) {
+}: Props) {
+  const ref = useRef<Tilt>();
+  const cleanStyle = () =>
+    setTimeout(() => {
+      if (ref.current) {
+        //@ts-ignore
+        let node = ref.current.wrapperEl.node as HTMLDivElement;
+        if (node.getAttribute("style") != "") {
+          node.setAttribute("style", "");
+          cleanStyle();
+        }
+      }
+    }, 10);
   return (
-    <Tilt tiltMaxAngleX={4} tiltMaxAngleY={4} tiltReverse>
+    <Tilt
+      onLeave={cleanStyle}
+      ref={ref}
+      tiltMaxAngleX={4}
+      tiltMaxAngleY={4}
+      tiltReverse
+    >
       <div
         className="env-card"
         onClick={() => {

@@ -3,27 +3,24 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../../lib/fetchAppSession';
 
-type Data = {
-  success: boolean
-  message:string
-  sandboxImageId: string
-}
+import { SandboxImageAddResponse } from "../../../lib/api/api";
+
 
 import {grpcClient}from '../../../lib/grpcClient'
 import {    AddSandBoxImageReply,  AddSandBoxImageRequest } from '../../../proto/dockerGet/dockerGet_pb';
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse<SandboxImageAddResponse>
   ) 
 {
     var client = grpcClient()
 
-    const {description, tempContainerId, title, userId} = JSON.parse(req.body);
+    const {description, imageId, title, userId} = JSON.parse(req.body);
     var docReq = new AddSandBoxImageRequest();
     docReq.setSessionKey(fetchAppSession(req));
     docReq.setDescription(description);
-    docReq.setTempcontainerid(tempContainerId);
+    docReq.setImageId(imageId);
     docReq.setTitle(title);
     docReq.setUserid(userId);
     try{
@@ -42,8 +39,10 @@ export default function handler(
         )
     }
     catch(error) {
-        //@ts-ignore
-        res.json(error);
+        res.json({
+            success: false,
+            message: error
+          });
         res.status(405).end();
     }
 }

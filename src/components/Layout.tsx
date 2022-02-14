@@ -31,7 +31,7 @@ const Layout = ({ children }: LayoutProps) => {
       <div className="flex flex-col bg-white dark:bg-gray-800 w-full  z-10 ">
         <TopBar sub={sub} name={name} email={email}></TopBar>
 
-        <div className=" w-full z-0 grow">{children}</div>
+        <div className=" w-full grow">{children}</div>
       </div>
     </div>
   );

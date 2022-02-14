@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 //remember to set the ownership after adding new api
 import type { NextApiRequest, NextApiResponse } from "next";
-import { TemplateListResponse } from "../../../lib/api";
+import { TemplateListResponse } from "../../../lib/api/api";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 
 import { grpcClient } from "../../../lib/grpcClient";
@@ -10,20 +10,13 @@ import {
   SectionAndSubRequest,
 } from "../../../proto/dockerGet/dockerGet_pb";
 
-function unauthorized() {
-  return {
-    success: false,
-    message: "unauthorized",
-    templates: null,
-  };
-}
+
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<TemplateListResponse>
 ) {
   var client = grpcClient();
-  // var body = JSON.parse(req.body);
   var docReq = new SectionAndSubRequest();
   const { sub, sectionid } = req.query;
   docReq.setSessionKey(fetchAppSession(req));
@@ -34,8 +27,11 @@ export default async function handler(
       docReq,
       function (err, GoLangResponse: ListTemplatesReply) {
         var templates = GoLangResponse.getTemplatesList();
+        console.log(GoLangResponse.getMessage())
         let success = GoLangResponse.getSuccess();
-        if (success)
+        if (success){
+
+       
           res.json({
             success: success,
             message: GoLangResponse.getMessage(),
@@ -46,6 +42,7 @@ export default async function handler(
                   name: t.getName(),
                   description: t.getDescription(),
                   imageId: t.getImageid(),
+                  environment_id:t.getEnvironmentId(),
                   assignment_config_id: t.getAssignmentConfigId(),
                   storage: t.getStorage(),
                   active: t.getActive(),
@@ -55,14 +52,16 @@ export default async function handler(
                   containerID: t.getContaineridList()[0],
                 };
               }) || [],
-          });
-        else throw new Error("internal server error");
+          }); }
+        else {throw new Error("internal server error");}
         res.status(200).end();
       }
     );
   } catch (error) {
-    //@ts-ignore
-    res.json(error);
+    res.json({
+      success: false,
+      message: error
+    });
     res.status(405).end();
   }
 }

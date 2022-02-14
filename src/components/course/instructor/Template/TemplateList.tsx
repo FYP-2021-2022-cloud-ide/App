@@ -17,7 +17,7 @@ export type Props = {
   onClick?: (template: Template) => void;
   onDelete?: (template: Template) => void;
   onUpdate?: (template: Template) => void;
-  onToggle?: (template: Template, open: boolean) => void;
+  onToggle?: (template: Template) => void;
   onToggleActivation?: (template: Template, open: boolean) => void;
 };
 
@@ -58,9 +58,6 @@ const TemplateList = ({
                 <TemplateCard
                   key={template.id}
                   template={template}
-                  memLimit={400}
-                  numCPU={0.5}
-                  sectionUserID={sectionUserID}
                   onClick={() => {
                     if (onClick) onClick(template);
                   }}
@@ -68,7 +65,10 @@ const TemplateList = ({
                     if (onDelete) onDelete(template);
                   }}
                   onToggle={(open) => {
-                    if (onToggle) onToggle(template, open);
+                    if (onToggle) onToggle(template);
+                  }}
+                  onUpdate={(environment) => {
+                    if (onUpdate) onUpdate(environment);
                   }}
                   onToggleActivation={(active) => {
                     if (onToggleActivation)

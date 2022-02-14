@@ -2,39 +2,54 @@ import toast from "react-hot-toast";
 
 const myToast = {
   ...toast,
-  error: (text: string) => {
-    const id = Math.random().toString(36).slice(2, 10);
-    toast.error(text, {
+  error: (text: string | JSX.Element, onClick?: () => void) => {
+    const id = toast.error(text, {
       className: "toaster-error",
-      id: id,
     });
+    myToast.onClickCallbacks[id] = onClick;
     return id;
   },
-  success: (text: string) => {
-    const id = Math.random().toString(36).slice(2, 10);
-    toast.success(text, {
+  success: (text: string | JSX.Element, onClick?: () => void) => {
+    const id = toast.success(text, {
       className: "toaster-success",
-      id: id,
     });
+    myToast.onClickCallbacks[id] = onClick;
     return id;
   },
-  loading: (text: string) => {
-    const id = Math.random().toString(36).slice(2, 10);
-    toast.loading(text, {
+  loading: (text: string | JSX.Element, onClick?: () => void) => {
+    const id = toast.loading(text, {
       className: "toaster-loading",
     });
+    myToast.onClickCallbacks[id] = onClick;
     return id;
   },
-  warning: (text: string) => {
+  warning: (text: string | JSX.Element, onClick?: () => void) => {
     // the custom is broken
-    const id = Math.random().toString(36).slice(2, 10);
-    toast.success(text, {
+    const id = toast.success(text, {
       icon: "⚠️",
       className: "toaster-warning",
-      id: id,
     });
+    myToast.onClickCallbacks[id] = onClick;
     return id;
   },
+  notification: (text: string | JSX.Element, onClick?: () => void) => {
+    const id = toast.success(text, {
+      icon: "📩",
+      className: "toaster-notification",
+    });
+    myToast.onClickCallbacks[id] = onClick;
+    return id;
+  },
+  setTemplate: (text: string | JSX.Element, onClick?: () => void) => {
+    const id = toast.success(text, {
+      icon: "🗂",
+      className: "toaster-set-template",
+    });
+    myToast.onClickCallbacks[id] = onClick;
+
+    return id;
+  },
+  onClickCallbacks: {} as { [id: string]: () => void },
 };
 
 export default myToast;

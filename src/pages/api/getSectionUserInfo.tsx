@@ -3,47 +3,21 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../lib/fetchAppSession';
 
-type Data = {
-  success: boolean
-  message:string
-  sectionUserID:string
-  courseName:string
-  role:string
-}
+import { SectionUserInfoResponse,SectionRole } from "../../lib/api/api";
 
 
 
 import {grpcClient}from '../../lib/grpcClient'
 import {    GetSectionInfoReply,  SectionAndSubRequest } from '../../proto/dockerGet/dockerGet_pb';
 
-  
-function unauthorized(){
-  return({
-      success: false,
-      message: "unauthorized",
-      sectionUserID: "",
-      courseName: "",
-      role: ""
-  })
-}
-
-
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse<SectionUserInfoResponse>
   ) 
 {
     var client = grpcClient()
     const {sectionid, sub} = req.query
-     {/* @ts-ignore */}
-    // if(sub == req.oidc.user.sub){
-    //    {/* @ts-ignore */}
-    //   if(!(await checkInSectionBySectionId(req.oidc.user.sub, sectionid as string) ) )
-    //   {res.json(unauthorized());return}
-    // }else{
-    //   res.json(unauthorized())
-    //   return;
-    // }
+  
     var docReq = new SectionAndSubRequest();
     docReq.setSessionKey(fetchAppSession(req));
     docReq.setSub(sub as string);
@@ -59,14 +33,16 @@ export default async function handler(
             message: GoLangResponse.getMessage(),
             sectionUserID : GoLangResponse.getSectionuserid(),
             courseName: GoLangResponse.getCoursename(),
-            role:GoLangResponse.getRole(),
+            role:GoLangResponse.getRole() as SectionRole,
         })
         res.status(200).end();
         })
     }
     catch(error) {
-        //@ts-ignore
-        res.json(error);
+        res.json({
+            success: false,
+            message: error
+          });
         res.status(405).end();
     }
 }

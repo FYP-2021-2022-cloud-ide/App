@@ -4,6 +4,8 @@ import {toast} from "react-hot-toast"
 import {Notification, NotificationBody} from './Notification'
 import { Switch } from '@headlessui/react'
 
+import{notificationAPI} from '../lib/api/notificationAPI'
+import { useCnails } from "../contexts/cnails";
 interface NotificationReplyProps {
     defaultBody: string
     defaultTitle: string
@@ -15,7 +17,8 @@ const NotificationSend = React.forwardRef(({ closeModal, defaultTitle, defaultBo
     const [title, setTitle] = useState("Re: "+defaultTitle)
     const [body, setBody] = useState("```" + defaultBody + "``` \n")
     const [allowReply, setAllowReply] = useState(false)
-    
+    const{userId}=useCnails()
+    const{sendNotification}=notificationAPI
     // styles 
     const dialogClass = "inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl text-[#415A6E]"
     const titleClass = "text-xl font-medium leading-6 dark:text-gray-300 mb-5"
@@ -77,11 +80,15 @@ const NotificationSend = React.forwardRef(({ closeModal, defaultTitle, defaultBo
                     onClick={async () => {
                         //@ts-ignore
                         closeModal()
-                        toast.custom((t) =>(
-                            <Notification trigger={t}>
-                              <NotificationBody title="Message sent" body="Reply success" success={true} id = {t.id}></NotificationBody>
-                            </Notification>
-                        ))
+                        const response = await sendNotification(title,body,userId,receiver, allowReply)
+                        if(response.success){
+                            window.location.reload()
+                            toast.custom((t) =>(
+                                <Notification trigger={t}>
+                                <NotificationBody title="Message sent" body="Reply success" success={true} id = {t.id}></NotificationBody>
+                                </Notification>
+                            ))
+                        }                        
                     }}
                     className={okButtonClass}>
                     Send

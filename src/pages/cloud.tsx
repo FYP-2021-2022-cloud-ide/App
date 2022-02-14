@@ -1,4 +1,4 @@
-import { googleAPI } from "../lib/googleAPI";
+import { googleAPI } from "../lib/api/googleAPI";
 import React, { useEffect, useState, Fragment, useRef, createRef } from "react";
 import { MenuIcon, FolderIcon, DocumentIcon } from "@heroicons/react/outline";
 import { Menu, Transition, Dialog } from "@headlessui/react";
@@ -28,8 +28,7 @@ import path, { dirname } from "path";
 import { DirectoryTree } from "directory-tree";
 import { useTheme } from "../contexts/theme";
 import { file, files } from "jszip";
-import { localFileAPI } from "../lib/localFile";
-
+import { localFileAPI } from "../lib/api/localFile";
 // import {useE}
 function Files({ files, sub }) {
   return files.map((file) => {
@@ -66,22 +65,22 @@ async function updateTree(
         ) {
           // fetch data
           const response = await googleAPI.expandFolder(treeCopy.id, sub);
-          const {
-            loadedFiles: { files, folders },
-          } = response;
-          treeCopy.children = folders.map((child) => ({
-            id: child.id,
-            name: child.name,
-            path: prevPath + "/" + child.name,
-            closed: true,
-            children: [],
-            files: [],
-          }));
-          treeCopy.files = files.map((file) => ({
-            id: file.id,
-            name: file.name,
-            path: prevPath + "/" + file.name,
-          }));
+          if (response.success){
+            const {loadedFiles: { files, folders },} = response;
+            treeCopy.children = folders.map((child) => ({
+                id: child.id,
+                name: child.name,
+                path: prevPath + "/" + child.name,
+                closed: true,
+                children: [],
+                files: [],
+              }));
+              treeCopy.files = files.map((file) => ({
+                id: file.id,
+                name: file.name,
+                path: prevPath + "/" + file.name,
+                  }));
+          }
         }
       }
     } else {
@@ -730,7 +729,7 @@ export default function Cloud() {
               node.data.filePath,
               node.droppable
             );
-            if (data != undefined) {
+            if (data != undefined &&data.success) {
               // console.log(res)
               var decodedByte = Buffer.from(data.file, "base64");
               var b = new Blob([decodedByte]);

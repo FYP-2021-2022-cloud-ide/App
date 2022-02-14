@@ -1,15 +1,15 @@
 import React, { MouseEventHandler, useRef, useState } from "react";
 import { Dialog, Transition, Switch } from "@headlessui/react";
 import { useCnails } from "../../../../contexts/cnails";
-import { template } from "./TemplateList";
+import { Template } from "../../../../lib/cnails";
 import Loader from "../../../Loader";
 import { InformationCircleIcon } from "@heroicons/react/solid";
 import Toggle from "../../../Toggle";
-import { templateAPI } from "../../../../lib/templateAPI";
-import { containerAPI } from "../../../../lib/containerAPI";
+import { templateAPI } from "../../../../lib/api/templateAPI";
+import { containerAPI } from "../../../../lib/api/containerAPI";
 interface TemplateUpdateProps {
   sectionUserID: string;
-  template: template;
+  template: Template;
   memLimit: number;
   numCPU: number;
   closeModal: MouseEventHandler<HTMLButtonElement> | undefined;

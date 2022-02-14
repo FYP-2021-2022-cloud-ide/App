@@ -2,17 +2,17 @@ import React from "react";
 import { LogoutIcon } from "@heroicons/react/outline";
 import { useCnails } from "../../../contexts/cnails";
 import { useState } from "react";
-import Menu from "../CardMenu";
+import Menu from "../../CardMenu";
 import Modal from "../../Modal";
 import { Dialog } from "@headlessui/react";
 // import WorkspaceMenu from "./WorkspaceMenu"
 import Loader from "../../Loader";
-import { template } from "../instructor/Template/TemplateList";
+import { Template } from "../../../lib/cnails";
 import { InformationCircleIcon } from "@heroicons/react/solid";
 import Toggle from "../../Toggle";
-import { containerAPI } from "../../../lib/containerAPI";
+import { containerAPI } from "../../../lib/api/containerAPI";
 interface WorkspaceProps {
-  template: template;
+  template: Template;
   sectionUserId: string;
 }
 

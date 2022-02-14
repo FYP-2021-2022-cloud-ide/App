@@ -1,21 +1,16 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { grpcClient } from "../../../lib/grpcClient";
+import { ContainerAddResponse } from "../../../lib/api/api";
 import {
   AddContainerReply,
   AddContainerRequest,
 } from "../../../proto/dockerGet/dockerGet_pb";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 
-type Data = {
-  success: boolean;
-  message: string;
-  containerID: string;
-};
-
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse<ContainerAddResponse>
 ) {
   var client = grpcClient();
 
@@ -36,7 +31,6 @@ export default async function handler(
   docReq.setNumcpu(numCPU);
   docReq.setSectionUserId(section_user_id);
   docReq.setTemplateId(template_id);
-  // docReq.setDbstored(dbStored);
   docReq.setAccessright(accessRight);
   docReq.setUsefresh(useFresh);
   try {
@@ -56,8 +50,10 @@ export default async function handler(
     );
   } catch (error) {
     console.log(error);
-    //@ts-ignore
-    res.json(error);
+    res.json({
+      success:false,
+      message:error
+    });
     res.status(405).end();
   }
 }

@@ -3,18 +3,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../../lib/fetchAppSession';
 
-type Data = {
-  success: boolean
-  message:string
-  notification: string
-}
+import { NotificationTokenResponse } from "../../../lib/api/api";
+
 
 import {grpcClient}from '../../../lib/grpcClient'
 import {    GetNotificationTokenReply,  SubRequest } from '../../../proto/dockerGet/dockerGet_pb';
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse<NotificationTokenResponse>
   ) 
 {
     var client = grpcClient()
@@ -32,15 +29,17 @@ export default function handler(
             res.json({
                 success : GoLangResponse.getSuccess(),
                 message: GoLangResponse.getMessage(),
-                notification: GoLangResponse.getNotificationToken()
+                notification_token: GoLangResponse.getNotificationToken()
             })
             res.status(200).end();
             }
         )
     }
     catch(error) {
-        //@ts-ignore
-        res.json(error);
+        res.json({
+            success: false,
+            message: error
+          });
         res.status(405).end();
     }
 }

@@ -1,5 +1,18 @@
+import { 
+    NotificationListResponse ,
+    NotificationSendResponse,
+    SuccessStringResponse
+  } from "./api";
+  
+
 const notificationAPI = {
-    sendNotification: async (title: string, body: string, sender: string, receiver: string, allowReply: boolean) => {
+    sendNotification: async (
+        title: string, 
+        body: string,
+         sender: string,
+          receiver: string,
+           allowReply: boolean
+           ): Promise<NotificationSendResponse>  => {
         var res = await fetch('/api/notification/sendNotification', {
             method: 'POST',
             body: JSON.stringify({
@@ -12,18 +25,18 @@ const notificationAPI = {
         })
         return res.json()
     },
-    listNotifications: async (userId: string) => {
+    listNotifications: async (userId: string) : Promise<NotificationListResponse>  => {
         var res = await fetch('/api/notification/listNotifications?userId=' + userId, {
             method: 'GET',
         })
         return res.json()
     },
-    removeNotification: async (userId: string, notificationId: string) => {
+    removeNotification: async (userId: string, notificationIds: string[]) : Promise<SuccessStringResponse>  => {
         var res = await fetch('/api/notification/removeNotification', {
             method: 'POST',
             body: JSON.stringify({
                 "userId": userId,
-                "notificationId": notificationId,
+                "notificationIds": notificationIds,
             }),
         })
         return res.json()

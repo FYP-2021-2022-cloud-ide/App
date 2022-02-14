@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useCnails } from "./cnails";
-import { generalAPI as gapi } from "../lib/generalAPI";
+import { generalAPI as gapi } from "../lib/api/generalAPI";
 type ThemeState = {
   isDark: boolean;
   getDark: () => Promise<any>;

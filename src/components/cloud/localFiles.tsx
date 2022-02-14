@@ -2,7 +2,7 @@ import { useState} from 'react';
 import { ItemMenu } from './menus';
 import { FolderIcon, DocumentIcon } from "@heroicons/react/outline"
 import {useCnails} from '../../contexts/cnails'
-import{localFileAPI} from '../../lib/localFile'
+import{localFileAPI} from '../../lib/api/localFile'
 interface props{
     tree: directoryTree.DirectoryTree
     opened:boolean

@@ -1,4 +1,8 @@
-import { EnvironmentListResponse } from "./api";
+import { 
+  SuccessStringResponse ,
+  EnvironmentAddResponse,
+  EnvironmentListResponse
+} from "./api";
 
 const envAPI = {
   environmentList: async (
@@ -21,7 +25,7 @@ const envAPI = {
     name: string,
     description: string,
     section_user_id: string
-  ) => {
+  ) : Promise<EnvironmentAddResponse>=> {
     var res = await fetch("/api/environment/addEnvironment", {
       method: "POST",
       body: JSON.stringify({
@@ -39,7 +43,7 @@ const envAPI = {
     description: string,
     section_user_id: string,
     containerId: string
-  ) => {
+  ) : Promise<SuccessStringResponse>=> {
     var res = await fetch("/api/environment/updateEnvironment", {
       method: "POST",
       body: JSON.stringify({
@@ -57,7 +61,7 @@ const envAPI = {
     description: string,
     section_user_id: string,
     containerId: string
-  ) => {
+  ) : Promise<EnvironmentAddResponse>=> {
     var res = await fetch("/api/environment/buildEnvironment", {
       method: "POST",
       body: JSON.stringify({
@@ -69,7 +73,9 @@ const envAPI = {
     });
     return res.json();
   },
-  removeEnvironment: async (envId: string, section_user_id: string) => {
+  removeEnvironment: async (
+    envId: string,
+     section_user_id: string) : Promise<SuccessStringResponse>=> {
     var res = await fetch("/api/environment/removeEnvironment", {
       method: "POST",
       body: JSON.stringify({

@@ -5,25 +5,13 @@ import EmptyDiv from "../EmptyDiv";
 import { useState } from "react";
 import Modal from "../Modal";
 import SandboxCreate from "./SandboxCreate";
+import { SandboxImage } from "../../lib/cnails";
 
-// interface props {
-//     templates: template[]
-//     sectionUserId: string
-// }
+type props = {
+  sandboxImages: SandboxImage[];
+};
 
-export interface sandbox {
-  id: string;
-  title: string;
-  description: string;
-  imageId: string;
-  sandboxesId: string;
-}
-
-interface props {
-  sandboxes: sandbox[];
-}
-
-const SandboxList = ({ sandboxes }: props) => {
+const SandboxList = ({ sandboxImages }: props) => {
   let [isOpen, setIsOpen] = useState(false);
   const [memLimit, setmemLimit] = useState(300);
   const [numCPU, setnumCPU] = useState(1);
@@ -43,13 +31,14 @@ const SandboxList = ({ sandboxes }: props) => {
           <PlusCircleIcon className="w-7 h-7 hover:scale-110 transition ease-in-out duration-300"></PlusCircleIcon>
         </button>
       </div>
-      {sandboxes?.length == 0 ? (
+      {sandboxImages?.length == 0 ? (
         <EmptyDiv message="There is no sandboxes yet."></EmptyDiv>
       ) : (
         <div className="grid grid-cols-2 gap-8">
-          {sandboxes.map((sandbox) => {
+          {sandboxImages.map((sandboxImage) => {
             return (
-              <Sandbox memLimit={memLimit} numCPU={numCPU} sandbox={sandbox} />
+              // <></>
+                <Sandbox memLimit={memLimit} numCPU={numCPU} sandboxImage={sandboxImage} />
             );
           })}
         </div>

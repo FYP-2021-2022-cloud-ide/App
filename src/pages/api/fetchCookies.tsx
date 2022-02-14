@@ -2,20 +2,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import {parse} from 'cookie'
 
-type Data = {
-  sub: string
-  name: string
-  email: string
-  userId: string
-  semesterId: string
-  darkMode:string
-  bio:string
-  role: string
-}
+import { FetchCookieResponse } from "../../lib/api/api";
+
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse<FetchCookieResponse>
   ) {
     //console.log(req.headers.cookie!)
     const {sub, name, email, userId, semesterId , darkMode, bio, role} = parse(req.headers.cookie!)

@@ -1,5 +1,8 @@
 import localforage from 'localforage'
-import credentials from './googleCredential.json'
+import { 
+    GoogleDriveListResponse ,
+    SuccessStringResponse
+  } from "./api";
 
 const googleAPI = {
     getLocalToken: function (){
@@ -12,7 +15,7 @@ const googleAPI = {
             return e
         }
     },
-    auth: async function(){
+    auth: async ()=>{
         // console.log(credentials.web)
         const response = await fetch("/api/google/auth",{
             method:"POST"
@@ -23,7 +26,7 @@ const googleAPI = {
         else
             console.log(message)
     },
-    getAccessToken: async function(code, sub){
+    getAccessToken: async(code, sub)=>{
         const response = await fetch("/api/google/getAccessToken",{
             method:"POST",
             body: JSON.stringify({
@@ -35,8 +38,8 @@ const googleAPI = {
         if(!success)
             console.log(message)
     },
-    expandFolder: async function(folderId, sub){
-        const token = await this.getLocalToken()
+    expandFolder: async (folderId, sub):Promise<GoogleDriveListResponse>=>{
+        const token = await googleAPI.getLocalToken()
         const response = await fetch("/api/google/listFiles",{
             method: "POST",
             body: JSON.stringify({
@@ -50,41 +53,34 @@ const googleAPI = {
             return ({
                 success: false,
                 message: content.message,
-                loadedFiles: null
             })
         }
         return {
             success: true,
             message: "",
-            loadedFiles: {
-                files: content.files,
-                folders: content.folders
-            }
+            loadedFiles: content.loadedFiles
         }
     },
-    downloadFiles: async function(sub,  fileId, fileName,filePath,fileType){
+    downloadFiles: async (
+        sub, 
+        fileId,
+        fileName,
+        filePath,
+        fileType):Promise<SuccessStringResponse>=>{
         const response = await fetch("/api/google/downloadFiles",{
             method: "POST",
             body: JSON.stringify({
                 sub,  fileId, fileName,filePath,fileType
             })
         })
-        return await response.json()
+        return response.json()
     },
-    // downloadFolder: async function(folderName, folderId){
-    //     const token = await this.getLocalToken()
-    //     const response = await fetch("/api/google/downloadFolder",{
-    //         method: "POST",
-    //         body: JSON.stringify({
-    //             credentials: credentials.web,
-    //             token,
-    //             folderName,
-    //             folderId
-    //         })
-    //     })
-    //     return await response.json()
-    // },
-    uploadFiles: async function(sub,  filePath,parentId,fileType){
+
+    uploadFiles: async (
+        sub,  
+        filePath,
+        parentId,
+        fileType):Promise<SuccessStringResponse>=>{
         // const token = await this.getLocalToken()
         const response = await fetch("/api/google/uploadFiles",{
             method: "POST",
@@ -92,21 +88,9 @@ const googleAPI = {
                 sub,  filePath,parentId,fileType
             })
         })
-        return await response.json()
+        return response.json()
     },
-    // uploadFolder: async function(filePath, parent){
-    //     const token = await this.getLocalToken()
-    //     const response = await fetch("/api/google/uploadFolder",{
-    //         method: "POST",
-    //         body: JSON.stringify({
-    //             credentials: credentials.web,
-    //             token,
-    //             filePath,
-    //             parent
-    //         })
-    //     })
-    //     return await response.json()
-    // }    
+   
 }
 
 export {googleAPI}

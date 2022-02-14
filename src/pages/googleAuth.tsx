@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { googleAPI } from '../lib/googleAPI'
+import { googleAPI } from '../lib/api/googleAPI'
 import {useEffect} from "react"
 import Loader from '../components/Loader'
 import { useCnails } from '../contexts/cnails'
