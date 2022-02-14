@@ -97,6 +97,8 @@ export const getUpdateEnvironmentFormStructure = (targetEnvironment: Environment
 
 export const getTemplateCreateFormStructure = (templates: Template[], environments: Environment[]): { [title: string]: Section } => {
     const envOptions = getEnvOptions(environments)
+    if (envOptions.length == 0)
+        throw new Error("there is no environment. The form should not be called")
     return {
         create_template: {
             entries: {
@@ -192,6 +194,27 @@ export const getTemplateUpdateFormStructure = (TargetTemplate: Template, templat
                 },
             },
         },
+    }
+}
+
+export const getMessageReplyFormStructure = (targets: { id: string, sub: string, name: string }[]): { [title: string]: Section } => {
+    return {
+        reply_message: {
+            displayTitle: false,
+            entries: {
+                target: {
+                    text: "Reply to",
+                    type: "input",
+                    defaultValue: targets.map(t => t.name).join(", "),
+                    disabled: true,
+                },
+                message: {
+                    text: "Message",
+                    type: "textarea",
+                    defaultValue: "",
+                }
+            }
+        }
     }
 }
 

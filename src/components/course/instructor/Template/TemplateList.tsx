@@ -52,7 +52,7 @@ const TemplateList = ({
         templates?.length == 0 ? (
           <EmptyDiv message="There is no template for this course yet." />
         ) : (
-          <div className="grid grid-cols-2 gap-4 flex-1">
+          <div className="template-grid">
             {templates.map((template: Template) => {
               return (
                 <TemplateCard

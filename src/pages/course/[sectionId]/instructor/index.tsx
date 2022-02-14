@@ -31,6 +31,7 @@ import {
   getUpdateEnvironmentFormStructure,
   getValidEnvName,
 } from "../../../../lib/forms";
+import _ from "lodash";
 
 const registry = "143.89.223.188:5000";
 const rootImage = "143.89.223.188:5000/codeserver:latest";
@@ -118,19 +119,25 @@ const EnvironmentTemplateWrapper = ({
 
   const createEnvironmentFormStructure =
     getCreateEnvironmentFormStructure(environments);
-  const updateEnvironmentFormStructure = getUpdateEnvironmentFormStructure(
-    envUpdateTarget,
-    environments
-  );
-  const templateCreateFormStructure = getTemplateCreateFormStructure(
-    templates,
-    environments
-  );
-  const iniTemplateUpdateFormStructure = getTemplateUpdateFormStructure(
-    templateUpdateTarget,
-    templates,
-    environments
-  );
+  const updateEnvironmentFormStructure =
+    environments.length == 0
+      ? {}
+      : getUpdateEnvironmentFormStructure(envUpdateTarget, environments);
+  const templateCreateFormStructure =
+    environments.length == 0
+      ? {}
+      : getTemplateCreateFormStructure(templates, environments);
+  if (_.isEqual(templateCreateFormStructure, {}) && environments.length != 0) {
+    throw new Error("it should not happen");
+  }
+  const templateUpdateFormStructure =
+    environments.length == 0 || templates.length == 0
+      ? {}
+      : getTemplateUpdateFormStructure(
+          templateUpdateTarget,
+          templates,
+          environments
+        );
 
   return (
     <>
@@ -172,17 +179,6 @@ const EnvironmentTemplateWrapper = ({
         ></EnvironmentList>
         <TemplateList
           templates={templates}
-          // onClick={async (template) => {
-          //   const response = await removeContainer(template.containerID, sub);
-          //   if (response.success) {
-          //     myToast.success(
-          //       `container ${template.containerID} is successfully deleted.`
-          //     );
-          //     fetch();
-          //   } else {
-          //     myToast.error(response.message);
-          //   }
-          // }}
           onCreate={() => {
             if (environments.length == 0)
               myToast.warning(
@@ -200,9 +196,6 @@ const EnvironmentTemplateWrapper = ({
             fetch();
           }}
           onUpdate={(template) => {
-            // console.log(templateUpdateOpen &&
-            //   environments.length != 0 &&
-            //   templates.length != 0)
             setTemplateUpdateOpen(true);
             setTemplateUpdateTarget(template);
           }}
@@ -319,7 +312,7 @@ const EnvironmentTemplateWrapper = ({
 
       {/* environment update form  */}
       <ModalForm
-        isOpen={envUpdateOpen}
+        isOpen={envUpdateOpen && environments.length != 0}
         setOpen={setEnvUpdateOpen}
         clickOutsideToClose
         formStructure={updateEnvironmentFormStructure}
@@ -491,7 +484,7 @@ const EnvironmentTemplateWrapper = ({
         }
         // clickOutsideToClose
         setOpen={setTemplateUpdateOpen}
-        formStructure={iniTemplateUpdateFormStructure}
+        formStructure={templateUpdateFormStructure}
         title="Update Template"
       ></ModalForm>
     </>

@@ -7,6 +7,22 @@
 @tailwind components;
 @tailwind utilities;
 
+.rdt_TableRow {
+  @apply bg-gray-100 dark:bg-gray-700  text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600  !important;
+}
+
+.rdt_Table {
+  @apply bg-transparent shadow-lg !important;
+}
+
+.rdt_TableHead {
+  @apply rounded-t-md overflow-hidden bg-transparent !important;
+}
+
+.rdt_TableHeadRow {
+  @apply bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 overflow-hidden !important;
+}
+
 .select {
   appearance: none;
   @apply min-h-[0px] outline-none border-none;
@@ -112,7 +128,7 @@
 
 .course-dialog-modal,
 .modal-form {
-  @apply max-h-[70vh] inline-block w-full z-10 max-w-md p-6 my-8 overflow-visible text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl text-[#415A6E];
+  @apply max-h-[70vh] inline-block z-10 max-w-[1000px] p-6 my-8 overflow-visible text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl text-[#415A6E];
 }
 
 .course-dialog-content,
@@ -193,7 +209,7 @@
 }
 
 .tooltip-info::after {
-  @apply bg-blue-100/50 dark:border-b-blue-300/50 backdrop-blur-sm;
+  @apply border-b-blue-100/50 dark:border-b-blue-300/50 backdrop-blur-sm;
 }
 
 .course-list-title-add {

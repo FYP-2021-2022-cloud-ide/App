@@ -76,14 +76,14 @@ function TemplateCard({
       onClick={() => {
         if (onClick) onClick(template);
       }}
-      className={`min-h-36 h-36 border cursor-pointer border-gray-200 dark:border-gray-700 shadow-sm rounded-lg px-5 py-4 ${
+      className={`env-card ${
         template.active
           ? "bg-white dark:bg-gray-600"
           : "bg-gray-200 dark:bg-gray-900"
       }`}
     >
-      <div className="flex flex-row  justify-between h-full">
-        <div className=" flex flex-row  space-x-3 ">
+      <div className="env-card-content ">
+        <div className="flex flex-row">
           <div className="w-1/12 mt-4">
             <span className="relative flex h-3 w-3">
               {template.containerID && (
@@ -134,9 +134,9 @@ function TemplateCard({
             )} */}
           </div>
         </div>
-
-        <Menu items={meunItems}></Menu>
       </div>
+
+      <Menu items={meunItems}></Menu>
     </div>
   );
 }

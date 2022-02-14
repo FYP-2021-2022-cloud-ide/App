@@ -1,5 +1,5 @@
 import { Dialog } from "@headlessui/react";
-import React, { createRef, useRef, useState } from "react";
+import React, { createRef, useEffect, useRef, useState } from "react";
 import ListBox, { Option } from "./ListBox";
 import Modal, { ModalProps } from "./Modal";
 import Toggle from "./Toggle";
@@ -13,8 +13,18 @@ export type Entry = {
   tooltip?: string;
   conditional?: (data: Data) => boolean; // return a boolean which determine whether it is shown
 } & (
-  | { type: "input"; defaultValue: string; placeholder?: string }
-  | { type: "textarea"; defaultValue: string; placeholder?: string }
+  | {
+      type: "input";
+      defaultValue: string;
+      placeholder?: string;
+      disabled?: boolean;
+    }
+  | {
+      type: "textarea";
+      defaultValue: string;
+      placeholder?: string;
+      disabled?: boolean;
+    }
   | { type: "listbox"; defaultValue: Option; options: Option[] }
   | { type: "toggle"; defaultValue: boolean }
 );
@@ -28,17 +38,20 @@ export type Section = {
 
 export type Props = ModalProps & {
   title: string;
+  size?: "sm" | "md" | "lg";
   formStructure: { [title: string]: Section };
   onChange?: (data: Data, id: string) => void;
   onEnter?: (data: Data) => void;
 };
 
 const Entry = ({
+  zIndex,
   entry,
   id,
   data,
   onChange,
 }: {
+  zIndex: number;
   entry: Entry;
   id: string;
   data: Data;
@@ -49,30 +62,63 @@ const Entry = ({
   }
   if (entry.type == "input") {
     return (
-      <div className="">
-        <p className="modal-form-text-base">{entry.text}</p>
+      <div className="" style={{ zIndex: zIndex }}>
+        <div className="flex flex-row space-x-2  items-center">
+          <p className="modal-form-text-base">{entry.text}</p>
+          {entry.tooltip && (
+            <div
+              className="tooltip tooltip-bottom tooltip-info"
+              data-tip={entry.tooltip}
+            >
+              <InformationCircleIcon className="tooltip-icon" />
+            </div>
+          )}
+        </div>
         <Input
           text={data[id] as string}
           placeholder={entry.placeholder}
+          disabled={entry.disabled}
           onChange={(text) => onChange(Object.assign(data, { [id]: text }), id)}
         ></Input>
       </div>
     );
   } else if (entry.type == "textarea") {
     return (
-      <div>
-        <p className="modal-form-text-base">{entry.text}</p>
+      <div style={{ zIndex: zIndex }}>
+        <div className="flex flex-row space-x-2  items-center">
+          <p className="modal-form-text-base">{entry.text}</p>
+          {entry.tooltip && (
+            <div
+              className="tooltip tooltip-bottom tooltip-info"
+              data-tip={entry.tooltip}
+            >
+              <InformationCircleIcon className="tooltip-icon" />
+            </div>
+          )}
+        </div>
+
         <TextArea
           text={data[id] as string}
           placeholder={entry.placeholder}
+          disabled={entry.disabled}
           onChange={(text) => onChange(Object.assign(data, { [id]: text }), id)}
         ></TextArea>
       </div>
     );
   } else if (entry.type == "listbox") {
     return (
-      <div className="modal-form-list-box">
-        <p className="modal-form-text-base">{entry.text}</p>
+      <div className="modal-form-list-box" style={{ zIndex: zIndex }}>
+        <div className="flex flex-row space-x-2 items-center">
+          <p className="modal-form-text-base">{entry.text}</p>
+          {entry.tooltip && (
+            <div
+              className="tooltip tooltip-bottom tooltip-info"
+              data-tip={entry.tooltip}
+            >
+              <InformationCircleIcon className="tooltip-icon" />
+            </div>
+          )}
+        </div>
         <ListBox
           initSelected={data[id] as Option}
           onChange={(option) =>
@@ -84,7 +130,7 @@ const Entry = ({
     );
   } else if (entry.type == "toggle") {
     return (
-      <div className="modal-form-toggle">
+      <div className="modal-form-toggle" style={{ zIndex: zIndex }}>
         <p className="modal-form-text-base">{entry.text}</p>
         {entry.tooltip && (
           <div
@@ -109,10 +155,12 @@ const Entry = ({
 const TextArea = ({
   text: _text,
   placeholder,
+  disabled = false,
   onChange,
 }: {
   text: string;
   placeholder: string;
+  disabled?: boolean;
   onChange: (text: string) => void;
 }) => {
   const [text, setText] = useState(_text);
@@ -125,6 +173,7 @@ const TextArea = ({
         setText(e.target.value);
         onChange(text);
       }}
+      disabled={disabled}
     ></textarea>
   );
 };
@@ -155,8 +204,9 @@ const Section = ({
         )}
         {React.isValidElement(section.entries)
           ? section.entries
-          : Object.keys(section.entries).map((id) => (
+          : Object.keys(section.entries).map((id, index) => (
               <Entry
+                zIndex={Object.keys(section.entries).length - index}
                 key={id}
                 entry={section.entries[id]}
                 id={id}
@@ -171,33 +221,38 @@ const Section = ({
 const Input = ({
   text: _text,
   placeholder,
+  disabled = false,
   onChange,
 }: {
   text: string;
   placeholder: string;
+  disabled?: boolean;
   onChange: (text: string) => void;
 }) => {
   const [text, setText] = useState(_text);
   return (
     <input
-      className="modal-form-input"
+      className={`modal-form-input ${
+        disabled ? "dark:text-gray-500 text-gray-300" : ""
+      }`}
       placeholder={placeholder}
       value={text}
       onChange={(e) => {
         setText(e.target.value);
         onChange(e.target.value);
       }}
+      disabled={disabled}
     ></input>
   );
 };
 
 const fromStructureToData = (structure: { [title: string]: Section }): Data => {
-  const data: Data = {};
-  Object.keys(structure).forEach((title) =>
-    Object.keys(structure[title].entries).forEach(
-      (entry) => (data[entry] = structure[title].entries[entry].defaultValue)
-    )
-  );
+  let data: Data = {};
+  Object.keys(structure).forEach((title) => {
+    Object.keys(structure[title].entries).forEach((entry) => {
+      data[entry] = structure[title].entries[entry].defaultValue;
+    });
+  });
   return data;
 };
 
@@ -210,18 +265,28 @@ const ModalForm = ({
   formStructure,
   onEnter,
   title,
+  size = "sm",
   onChange,
 }: Props) => {
-  const initData = fromStructureToData(formStructure);
   let ref = createRef<HTMLDivElement>();
-  const [data, setData] =
-    useState<{ [id: string]: boolean | string | Option }>(initData);
+  const [data, setData] = useState<{ [id: string]: boolean | string | Option }>(
+    fromStructureToData(formStructure)
+  );
+  const sizeMap = {
+    sm: "w-[500px]",
+    md: "w-[800px]",
+    lg: "w-[1000px]",
+  };
+
+  useEffect(() => {
+    setData(fromStructureToData(formStructure));
+  }, [formStructure]);
 
   const patchedOnClose = () => {
     if (onClose) {
       onClose();
     }
-    setData(initData);
+    setData(fromStructureToData(formStructure));
   };
   return (
     <Modal
@@ -231,7 +296,7 @@ const ModalForm = ({
       onOpen={onOpen}
       clickOutsideToClose={clickOutsideToClose}
     >
-      <div ref={ref} className="modal-form ">
+      <div ref={ref} className={`modal-form ${sizeMap[size]}`}>
         <div className="modal-form-content">
           <Dialog.Title as="h3" className="modal-form-title">
             {title}

@@ -1,12 +1,23 @@
 import { Disclosure, Transition } from "@headlessui/react";
-import { Fragment, useState, useEffect, useCallback } from "react";
-import { ReplyIcon } from "@heroicons/react/outline";
+import {
+  Fragment,
+  useState,
+  useEffect,
+  useCallback,
+  forwardRef,
+  useRef,
+} from "react";
+import { ChevronDoubleDownIcon, ReplyIcon } from "@heroicons/react/outline";
 import Modal from "../components/Modal";
 import NotificationSend from "../components/NotificationSend";
 import { useCnails } from "../contexts/cnails";
 import EmptyDiv from "../components/EmptyDiv";
 import { notificationAPI } from "../lib/api/notificationAPI";
-import { TrashIcon } from "@heroicons/react/solid";
+import {
+  ChevronDoubleUpIcon,
+  MailIcon,
+  TrashIcon,
+} from "@heroicons/react/solid";
 import DataTable, {
   PaginationComponentProps,
   TableColumn,
@@ -16,12 +27,18 @@ import { ActionType, Notification } from "../lib/cnails";
 import moment from "moment";
 import Loader from "../components/Loader";
 import myToast from "../components/CustomToast";
+import ModalForm from "../components/ModalForm";
+import { getMessageReplyFormStructure } from "../lib/forms";
 
 const MessageTable = () => {
-  const [selectedRows, setSelectedRows] = useState<any[]>([]);
+  const [selectedRows, setSelectedRows] = useState<Notification[]>([]);
   const { userId, notifications, fetchNotifications } = useCnails();
   const [pending, setPending] = useState(true);
-  const { removeNotification } = notificationAPI;
+  const [replyFormOpen, setReplyFormOpen] = useState<boolean>(false);
+  const [replyTarget, setReplyTarget] = useState<
+    { id: string; name: string; sub: string }[]
+  >([]);
+  const { removeNotification, sendNotification } = notificationAPI;
   useEffect(() => {
     async function temp() {
       await fetchNotifications(userId);
@@ -55,25 +72,51 @@ const MessageTable = () => {
       id: "Actions",
       name: "Actions",
       cell: (row) => (
-        <button
-          onClick={async () => {
-            const response = await removeNotification(userId, [row.id]);
-            if (response.success) {
-              // setNotifications(await fetchNotifications());
+        <div className="flex flex-row space-x-2">
+          <button
+            className="bg-gray-500 rounded p-1"
+            onClick={async () => {
+              const response = await removeNotification(userId, [row.id]);
+              if (response.success) {
+                setSelectedRows(selectedRows.filter((r) => r.id != row.id));
+                myToast.success(`A message has been removed.`);
+              }
               await fetchNotifications(userId);
-            }
-          }}
-        >
-          delete
-        </button>
+            }}
+          >
+            <TrashIcon className="w-5 h-5 text-white"></TrashIcon>
+          </button>
+          {row.allow_reply && (
+            <button
+              className="bg-gray-500 rounded p-1"
+              onClick={() => {
+                setReplyTarget([row.sender]);
+                setReplyFormOpen(true);
+              }}
+            >
+              <ReplyIcon className="w-5 h-5 text-white" />
+            </button>
+          )}
+        </div>
       ),
     },
   ];
 
-  const handleChange = useCallback(({ selectedRows }) => {
-    // You can set state or dispatch with something like Redux so we can use the retrieved data
-    setSelectedRows(selectedRows);
-  }, []);
+  const handleChange = useCallback(
+    ({ selectedRows: newSelectedRows }) => {
+      if (newSelectedRows) {
+        let set1 = new Set(selectedRows);
+        let set2 = new Set(newSelectedRows);
+        if (
+          set1.size != set2.size ||
+          !selectedRows.every((value) => set2.has(value))
+        ) {
+          setSelectedRows(newSelectedRows);
+        }
+      }
+    },
+    [selectedRows]
+  );
 
   const options = [10, 15, 20, 30];
 
@@ -88,10 +131,10 @@ const MessageTable = () => {
     const top = rowsPerPage * (currentPage - 1) + 1;
     const bottom = Math.min(rowsPerPage + top - 1, rowCount);
     return (
-      <div className="flex flex-row bg-gray-100 dark:bg-gray-700 rounded-b-md p-2 justify-between items-center text-gray-700 dark:text-gray-300">
-        <div>
+      <div className="flex flex-row bg-gray-100 dark:bg-gray-700 rounded-b-md p-2 justify-between items-center text-gray-700 dark:text-gray-300  border-t-[1px] border-[#D5D6D8] dark:border-[#2F3947]">
+        <div className="flex flex-row items-center space-x-2">
           {selectedRows.length != 0 && (
-            <>
+            <div>
               <p className="text-gray-700 dark:text-gray-300 text-xs">
                 Selecting {selectedRows.length} of {rowCount}
               </p>
@@ -99,12 +142,12 @@ const MessageTable = () => {
                 <button
                   className="bg-gray-500 rounded p-1"
                   onClick={async () => {
-                    console.log(selectedRows.map((r) => r.id));
                     const response = await removeNotification(
                       userId,
                       selectedRows.map((r) => r.id)
                     );
                     if (response.success) {
+                      setSelectedRows([]);
                       myToast.success(
                         `${selectedRows.length} messages has been removed.`
                       );
@@ -115,7 +158,7 @@ const MessageTable = () => {
                   <TrashIcon className="w-5 h-5 text-white"></TrashIcon>
                 </button>
               </div>
-            </>
+            </div>
           )}
         </div>
         <div className="flex flex-row items-center space-x-2 text-sm">
@@ -137,13 +180,13 @@ const MessageTable = () => {
           <p>
             {top}-{bottom} of {rowCount}
           </p>
-          <div className="btn-group border-0 outline-none ">
+          <div className="btn-group border-0 outline-none border-none ">
             <button
               disabled={currentPage == 1}
               onClick={() => {
                 onChangePage(1, rowCount);
               }}
-              className="btn btn-xs bg-gray-400 dark:bg-gray-900 dark:hover:bg-gray-800 border-0 outline-none"
+              className="btn btn-xs bg-gray-400 dark:bg-gray-900 dark:hover:bg-gray-800 border-0 outline-none "
             >
               {"|<"}
             </button>
@@ -180,30 +223,42 @@ const MessageTable = () => {
     );
   };
 
+  const ExpandedComponent = ({ data }: { data: Notification }) => (
+    <div className="flex flex-row bg-gray-50 dark:bg-gray-600 p-2 space-x-2">
+      <div className="flex flex-col items-center space-y-2">
+        <ChevronDoubleDownIcon className="min-w-[16px] min-h-[16px]  w-4 h-4 dark:text-gray-400 text-gray-400"></ChevronDoubleDownIcon>
+        <div className="w-[2px] rounded h-full bg-gray-400 dark:bg-gray-500"></div>
+        <ChevronDoubleUpIcon className="min-w-[16px] min-h-[16px] w-4 h-4 dark:text-gray-400 text-gray-400 "></ChevronDoubleUpIcon>
+      </div>
+      {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
+      <div className="flex flex-col space-y-2 w-full">
+        <div>
+          <p className="text-xs text-gray-300 dark:text-gray-900">People</p>
+          <input
+            type="text"
+            disabled
+            value={data.sender.name}
+            className="w-full px-2 py-1 rounded text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-500"
+          ></input>
+        </div>
+        <div>
+          <p className="text-xs text-gray-300 dark:text-gray-900">Message</p>
+          <div className="px-2 py-1 w-full bg-gray-100 dark:bg-gray-500 text-gray-600 dark:text-gray-300 rounded">
+            <p className=" ">{data.body}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   createTheme(
-    "solarized",
+    "good",
     {
-      text: {
-        primary: "#268bd2",
-        secondary: "#2aa198",
-      },
       background: {
-        default: "#002b36",
-      },
-      context: {
-        background: "#cb4b16",
-        text: "#FFFFFF",
-      },
-      divider: {
-        default: "#073642",
-      },
-      action: {
-        button: "rgba(0,0,0,.54)",
-        hover: "rgba(0,0,0,.08)",
-        disabled: "rgba(0,0,0,.12)",
+        default: "transparent",
       },
     },
-    "dark"
+    "light"
   );
 
   return (
@@ -214,21 +269,63 @@ const MessageTable = () => {
         selectableRows
         onSelectedRowsChange={handleChange}
         defaultSortFieldId={"Time"}
+        expandableRows
         pagination
         paginationComponent={PaginationComponent}
         progressPending={pending}
-        progressComponent={<Loader />}
-        theme="solarized"
+        progressComponent={
+          <div className="bg-gray-300 dark:bg-gray-700 rounded-lg w-full h-64 flex items-center justify-center overflow-hidden">
+            <Loader />
+          </div>
+        }
+        expandOnRowClicked
+        expandableRowsHideExpander
+        onRowExpandToggled={() => {}}
+        theme="good"
+        selectableRowSelected={(row) => {
+          return selectedRows.map((n) => n.id).includes(row.id);
+        }}
+        expandableRowsComponent={ExpandedComponent}
         noDataComponent={
           <EmptyDiv message="You have no notifications."></EmptyDiv>
         }
       />
+      <button
+        className="bg-green-500 text-white px-2 rounded h-min"
+        onClick={async () => {
+          const response = await sendNotification(
+            "test",
+            "this is a test message. This button should be hidden. ",
+            userId,
+            userId,
+            Math.random() > 0.5
+          );
+          if (response.success) {
+            fetchNotifications(userId);
+          }
+        }}
+      >
+        Send test message
+      </button>
+      <ModalForm
+        isOpen={replyFormOpen}
+        setOpen={setReplyFormOpen}
+        title={"Reply Message"}
+        clickOutsideToClose
+        size="sm"
+        formStructure={getMessageReplyFormStructure(replyTarget)}
+        onEnter={(data) => {
+          setReplyFormOpen(false);
+        }}
+        onClose={() => {
+          setReplyTarget([]);
+        }}
+      ></ModalForm>
     </>
   );
 };
 
 export default function Messages() {
-  const cols = ["Sender", "Title", "Time", "Reply", "Delete"];
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [notificationsPerPage, setNotificationsPerPage] = useState(6);
@@ -244,20 +341,10 @@ export default function Messages() {
 
   return (
     <div className="px-10 mb-10">
-      <button
-        className="mx-2 w-fit rounded-md px-4 py-2 bg-green-500 hover:bg-green-600 text-base leading-6 font-medium text-white shadow-sm focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5"
-        onClick={async () => {
-          const response = await sendNotification(
-            "test",
-            "test body",
-            userId,
-            userId,
-            true
-          );
-        }}
-      >
-        send something to yourself (testing){" "}
-      </button>
+      <p className="text-3xl  font-bold mb-2 text-gray-600 dark:text-gray-300">
+        {" 📬 "} Messages
+      </p>
+
       <MessageTable></MessageTable>
     </div>
   );

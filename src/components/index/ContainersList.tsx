@@ -2,6 +2,8 @@ import CodeSpace from "./CodeSpace";
 import EmptyDiv from "../EmptyDiv";
 import { Container, ContainerInfo } from "../../lib/cnails";
 
+const defaultQuota = 5;
+
 type Props = {
   containerInfo: ContainerInfo;
   containers: Container[];
@@ -9,7 +11,10 @@ type Props = {
 
 const ContainersList = ({ containers, containerInfo }: Props) => {
   // var percentage = containerInfo.containersAlive/containerInfo.containersTotal * 100 ;
-  const quota = containerInfo.containersTotal;
+  const quota =
+    containerInfo.containersTotal == 0
+      ? defaultQuota
+      : containerInfo.containersTotal;
   if (containerInfo.containersAlive != containers.length) {
     console.error("container active number does not match");
   }

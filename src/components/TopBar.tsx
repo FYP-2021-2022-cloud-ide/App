@@ -43,7 +43,9 @@ const TopBar = ({ sub, name, email }: props) => {
           data-tip="Help and docs"
         >
           <Link href="/FAQ">
-            <QuestionMarkCircleIcon className="top-bar-icon"></QuestionMarkCircleIcon>
+            <a href="">
+              <QuestionMarkCircleIcon className="top-bar-icon"></QuestionMarkCircleIcon>
+            </a>
           </Link>
         </div>
         <div
