@@ -10,10 +10,7 @@ import { Course, Container, ContainerInfo } from "../lib/cnails";
 export default function Home() {
   // load once when page is rendered
   const [courses, setCourses] = useState<Course[]>();
-  const [containers, setContainers] = useState<Container[]>();
-  let [containerInfo, setContainerInfo] = useState<ContainerInfo>();
-  const { sub } = useCnails();
-  const { containerList } = containerAPI;
+  const { sub, containers, containerInfo } = useCnails();
   const { courseList } = generalAPI;
   // data fetching from API
   useEffect(() => {
@@ -34,16 +31,9 @@ export default function Home() {
         setCourses(courses);
       }
     };
-    const fetchContainers = async () => {
-      const response = await containerList(sub);
-      if (response.success) {
-        setContainers(response.containers);
-        setContainerInfo(response.containersInfo);
-      }
-    };
     fetchCourses();
-    fetchContainers();
   }, []);
+  console.log(containerInfo);
   return (
     <>
       {courses && containers && containerInfo ? (

@@ -231,23 +231,7 @@ const MessageTable = () => {
         <ChevronDoubleUpIcon className="min-w-[16px] min-h-[16px] w-4 h-4 dark:text-gray-400 text-gray-400 "></ChevronDoubleUpIcon>
       </div>
       {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
-      <div className="flex flex-col space-y-2 w-full">
-        <div>
-          <p className="text-xs text-gray-300 dark:text-gray-900">People</p>
-          <input
-            type="text"
-            disabled
-            value={data.sender.name}
-            className="w-full px-2 py-1 rounded text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-500"
-          ></input>
-        </div>
-        <div>
-          <p className="text-xs text-gray-300 dark:text-gray-900">Message</p>
-          <div className="px-2 py-1 w-full bg-gray-100 dark:bg-gray-500 text-gray-600 dark:text-gray-300 rounded">
-            <p className=" ">{data.body}</p>
-          </div>
-        </div>
-      </div>
+      <div className="">{data.body}</div>
     </div>
   );
 

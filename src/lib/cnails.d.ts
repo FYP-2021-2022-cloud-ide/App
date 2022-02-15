@@ -115,7 +115,14 @@ type CnailsContextState = {
   bio: string;
   isAdmin: boolean;
   notifications: Notification[],
+  containers: Container[],
+  containerInfo: ContainerInfo,
+  fetchContainers: (sub: string) => Promise<{
+    containers: Container[];
+    containersInfo: ContainerInfo;
+  }>,
   fetchNotifications: (userId: string) => Promise<Notification[]>,
+  containerQuota: number,
 };
 
 
