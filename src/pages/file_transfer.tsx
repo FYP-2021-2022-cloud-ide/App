@@ -65,21 +65,23 @@ async function updateTree(
         ) {
           // fetch data
           const response = await googleAPI.expandFolder(treeCopy.id, sub);
-          if (response.success){
-            const {loadedFiles: { files, folders },} = response;
+          if (response.success) {
+            const {
+              loadedFiles: { files, folders },
+            } = response;
             treeCopy.children = folders.map((child) => ({
-                id: child.id,
-                name: child.name,
-                path: prevPath + "/" + child.name,
-                closed: true,
-                children: [],
-                files: [],
-              }));
-              treeCopy.files = files.map((file) => ({
-                id: file.id,
-                name: file.name,
-                path: prevPath + "/" + file.name,
-                  }));
+              id: child.id,
+              name: child.name,
+              path: prevPath + "/" + child.name,
+              closed: true,
+              children: [],
+              files: [],
+            }));
+            treeCopy.files = files.map((file) => ({
+              id: file.id,
+              name: file.name,
+              path: prevPath + "/" + file.name,
+            }));
           }
         }
       }
@@ -657,7 +659,7 @@ export default function Cloud() {
             );
             const data = await listFolders(userId);
             progressRef1.current = "";
-            if (data.success) return convertTree(data.root);
+            if (data.success) return convertTree(data.tree);
             else alert(JSON.stringify(data.message));
           }}
           handleCloseAll={() => {
@@ -729,7 +731,7 @@ export default function Cloud() {
               node.data.filePath,
               node.droppable
             );
-            if (data != undefined &&data.success) {
+            if (data != undefined && data.success) {
               // console.log(res)
               var decodedByte = Buffer.from(data.file, "base64");
               var b = new Blob([decodedByte]);

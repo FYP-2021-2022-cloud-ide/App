@@ -205,7 +205,7 @@
 }
 
 .tooltip-info::before {
-  @apply bg-blue-100/50 dark:bg-blue-300/50 backdrop-blur-sm text-slate-700;
+  @apply bg-blue-100/50 dark:bg-blue-300/50 backdrop-blur-sm text-slate-700 dark:text-blue-100;
 }
 
 .tooltip-info::after {
@@ -301,32 +301,32 @@
 .env-card,
 .template-card,
 .sandbox-card {
-  @apply cursor-pointer border border-gray-200 dark:border-gray-700 shadow-sm rounded-lg bg-white dark:bg-gray-600 px-4 py-4 min-h-[9rem] h-36 flex flex-row items-start justify-between shrink;
+  @apply cursor-pointer border border-gray-200 dark:border-gray-700 shadow-sm rounded-lg bg-white dark:bg-gray-600 px-4 py-4 min-h-[9rem] h-36 flex flex-row items-start justify-between;
 }
 
 .env-card-content,
 .template-card-content,
 .sandbox-card-content {
-  @apply flex flex-col h-full shrink;
+  @apply flex flex-col h-full min-w-0;
 }
 
 .env-card-name,
 .template-card-name,
 .sandbox-card-name {
-  @apply font-semibold text-sm text-gray-600 dark:text-gray-300 text-left truncate;
+  @apply font-semibold max-w-full text-sm text-gray-600 dark:text-gray-300 text-left truncate;
 }
 
 .env-card-lib {
-  @apply font-medium text-xs text-gray-600 dark:text-gray-300 text-left truncate;
+  @apply font-medium max-w-full text-xs text-gray-600 dark:text-gray-300 text-left truncate;
 }
 
 .env-card-ref {
-  @apply font-medium text-xs text-gray-400 truncate;
+  @apply font-medium max-w-full text-xs text-gray-400 truncate;
 }
 
 .env-card-des,
 .sandbox-card-des {
-  @apply font-medium text-xs text-gray-400 truncate;
+  @apply font-medium max-w-full text-xs text-gray-400 truncate;
 }
 
 .empty-div {

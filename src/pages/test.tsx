@@ -1,16 +1,25 @@
-import { useEffect } from "react"
-import Layout from "../components/Layout"
+import { useEffect } from "react";
+import Layout from "../components/Layout";
+
+const Temp = () => {
+  return (
+    <div className="w-64 h-36 border ">
+      <div className="w-full flex flex-row justify-between">
+        <div className="flex flex-col w-full min-w-[0px]">
+          <div className="w-full">
+            <p className="truncate shrink ">
+              skfopsdjfisdjfiodjsfoiajsdifodoasjfojdsaifjiosjadfiojsdafijsidfjoidjsfhweiuhrieuwbjksdbfkjs
+            </p>
+          </div>
+        </div>
+        <div className="w-5 h-5 bg-black shrink-0"></div>
+      </div>
+    </div>
+  );
+};
 
 const test = () => {
-    useEffect(() => {
-        console.log("print")
-    })
-    return <div className=" bg-white h-full flex flex-col ">
-        <div className="h-10 bg-green-300 w-full"></div>
-        <div className="grow-1 bg-blue-300 w-full h-full p-10 overflow-scroll">
-            <div className="h-[2000px] w-96 bg-red-200"></div>
-        </div>
-    </div>
-}
+  return <Temp></Temp>;
+};
 
-export default test 
+export default test;

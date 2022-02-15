@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef } from "react";
-import Menu from "./CardMenu";
+import CardMenu from "./CardMenu";
 import Tilt from "react-parallax-tilt";
 import { Environment } from "../lib/cnails";
 
@@ -53,7 +53,7 @@ function EnvironmentCard({
           <div className="env-card-ref">{environment.imageId}</div>
           <div className="env-card-des">{environment.description}</div>
         </div>
-        <Menu
+        <CardMenu
           items={[
             {
               text: "Delete",
@@ -78,7 +78,7 @@ function EnvironmentCard({
               },
             },
           ]}
-        ></Menu>
+        ></CardMenu>
       </div>
     </Tilt>
   );

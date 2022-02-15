@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useCnails } from "../contexts/cnails";
-import { sandboxAPI } from "../lib//api/sandboxAPI";
+import { sandboxAPI } from "../lib/api/sandboxAPI";
 import { SandboxImage } from "../lib/cnails";
 import myToast from "../components/CustomToast";
 import ModalForm, { Section } from "../components/ModalForm";

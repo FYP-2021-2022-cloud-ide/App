@@ -43,6 +43,10 @@ function getEnvOptions(environments: Environment[]) {
 export const getCreateEnvironmentFormStructure = (
   environments: Environment[]
 ): FormStructure => {
+  const validName = getValidName(
+    environments.map((env) => env.environmentName),
+    "Environment"
+  );
   return {
     create_environment: {
       displayTitle: false,
@@ -53,32 +57,29 @@ export const getCreateEnvironmentFormStructure = (
           text: "Use predefined environment? ",
           description: "whether this environment is a predefined environment",
           tooltip:
-            "whether this environment is a predefined environment. You will be prompt to a temporary workspace where you can set up the environment",
+            "If you are not using a custom environment, you will be prompt to a temporary workspace where you can set up the environment.",
         },
         environment_choice: {
           type: "listbox",
           defaultValue: envChoices[0],
           text: "Pick the Programming Language",
-          description: "Pick the Programming Language",
           tooltip: "Pick the Programming Language",
           options: envChoices,
           conditional: (data) => {
             return data.is_predefined as boolean;
           },
         },
-        environment_name: {
+        name: {
           type: "input",
           defaultValue: "",
-          text: "Environment name",
-          placeholder: `e.g. ${getValidName(
-            environments.map((env) => env.environmentName),
-            "Environment"
-          )}`,
+          text: "Name",
+          placeholder: `e.g. ${validName}`,
+          emptyValue: validName,
         },
-        environment_description: {
+        description: {
           type: "textarea",
           defaultValue: "",
-          text: "Environment Description",
+          text: "Description",
         },
       },
     },
@@ -86,26 +87,92 @@ export const getCreateEnvironmentFormStructure = (
 };
 
 export const getUpdateEnvironmentFormStructure = (
+  sub: string,
   targetEnvironment: Environment,
   environments: Environment[]
 ): FormStructure => {
+  if (!targetEnvironment || environments.length == 0) {
+    return {};
+  }
+  const validName = getValidName(
+    environments.map((env) => env.environmentName),
+    "Environment",
+    true
+  );
   return {
     update_environment: {
       displayTitle: false,
       entries: {
-        environment_name: {
-          type: "input",
+        update_internal: {
+          type: "custom",
           defaultValue: "",
-          text: "Environment name",
-          placeholder: `e.g. ${getValidName(
-            environments.map((env) => env.environmentName),
-            "Environment"
-          )}`,
+          text: "Update internal",
+          tooltip: "Open a temp workspace for you to update the environment.",
+          node: (onChange, currentValue) => {
+            const { addTempContainer } = containerAPI;
+            return (
+              <div>
+                {currentValue != "" ? (
+                  <a
+                    className="text-xs text-blue-500 underline justify-center"
+                    href={
+                      "https://codespace.ust.dev/user/container/" +
+                      currentValue +
+                      "/"
+                    }
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Go to temp container
+                  </a>
+                ) : (
+                  <button
+                    className="btn btn-wide btn-sm dark:btn-primary"
+                    onClick={async (e) => {
+                      const btn = e.currentTarget;
+                      btn.classList.add("loading");
+                      btn.textContent = "Loading";
+                      const response = await addTempContainer(
+                        memory,
+                        CPU,
+                        targetEnvironment.imageId,
+                        sub,
+                        "root"
+                      );
+                      btn.classList.remove("loading");
+                      btn.textContent = "Click me";
+                      if (response.success) {
+                        const link =
+                          "https://codespace.ust.dev/user/container/" +
+                          response.containerID +
+                          "/";
+
+                        window.open(link);
+                        onChange(response.containerID);
+                      } else
+                        myToast.error(
+                          "fail to start temp container for this environment."
+                        );
+                    }}
+                  >
+                    Click me
+                  </button>
+                )}
+              </div>
+            );
+          },
         },
-        environment_description: {
+        name: {
+          type: "input",
+          defaultValue: targetEnvironment.environmentName,
+          text: "Name",
+          placeholder: `e.g. ${validName}`,
+          emptyValue: validName,
+        },
+        description: {
           type: "textarea",
-          defaultValue: "",
-          text: "Environment Description",
+          defaultValue: targetEnvironment.description,
+          text: "Description",
         },
       },
     },
@@ -116,6 +183,9 @@ export const getTemplateCreateFormStructure = (
   templates: Template[],
   environments: Environment[]
 ): FormStructure => {
+  if (environments.length == 0) {
+    return {};
+  }
   const envOptions = getEnvOptions(environments);
   if (envOptions.length == 0)
     throw new Error("there is no environment. The form should not be called");
@@ -182,6 +252,8 @@ export const getTemplateUpdateFormStructure = (
   templates: Template[],
   environments: Environment[]
 ): FormStructure => {
+  if (!TargetTemplate || templates.length == 0 || environments.length == 0)
+    return {};
   return {
     update_template: {
       entries: {

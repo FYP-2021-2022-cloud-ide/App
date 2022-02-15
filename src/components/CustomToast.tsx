@@ -40,10 +40,12 @@ const myToast = {
     myToast.onClickCallbacks[id] = onClick;
     return id;
   },
-  setTemplate: (text: string | JSX.Element, onClick?: () => void) => {
+
+  // the lasting time of custom toast is one hour
+  custom: (text: string | JSX.Element, icon: string, onClick?: () => void) => {
     const id = toast.success(text, {
-      icon: "🗂",
-      className: "toaster-set-template",
+      icon: icon,
+      className: "toaster-custom",
     });
     myToast.onClickCallbacks[id] = onClick;
 

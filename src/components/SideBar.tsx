@@ -15,8 +15,12 @@ const SideBar = () => {
   var pages = [
     { name: "Dashboard", link: "/", icon: HomeIcon },
     { name: "Notifications", link: "/messages", icon: AnnotationIcon },
-    { name: "Cloud", link: "/cloud", icon: CloudIcon },
-    { name: "Sandbox", link: "/sandbox", icon: CubeTransparentIcon },
+    { name: "File Transfer", link: "/file_transfer", icon: CloudIcon },
+    {
+      name: "Personal Workspace",
+      link: "/sandbox",
+      icon: CubeTransparentIcon,
+    },
     { name: "Admin", link: "/admin", icon: IdentificationIcon },
   ];
   const router = useRouter();
@@ -56,7 +60,7 @@ const SideBar = () => {
 
       {containers && containerInfo && containerQuota && (
         <div className="w-full flex flex-col space-y-2 text-xs text-gray-500 dark:text-gray-400 select-none mb-5 px-4">
-          <div className="">
+          {/* <div className="">
             <p>
               {containers.length}/{containerInfo.containersTotal} (All
               containers)
@@ -73,7 +77,7 @@ const SideBar = () => {
                 className={`current-run-bar-inner bg-green-300`}
               ></div>
             </div>
-          </div>
+          </div> */}
           <div className="">
             <p>
               {containers.length}/{containerQuota} (Quota)

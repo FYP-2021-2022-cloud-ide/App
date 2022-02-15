@@ -168,12 +168,12 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
             const oldClassName = t.className;
             t.className = `toaster ${t.className}`;
             if (oldClassName == "toaster-loading") t.duration = 60000;
-            if (oldClassName == "toaster-set-template") t.duration = 60 * 60000;
+            if (oldClassName == "toaster-custom") t.duration = 60 * 60000;
             return (
               <div
                 onClick={() => {
                   if (
-                    !["toaster-loading", "toaster-set-template"].includes(
+                    !["toaster-loading", "toaster-custom"].includes(
                       oldClassName
                     )
                   )

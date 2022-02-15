@@ -14,8 +14,8 @@ export type Props = {
 
 export default function CardMenu({ items }: Props) {
   return (
-    <div className="">
-      <Menu as="div" className="relative inline-block text-left">
+    <>
+      <Menu as="div" className="relative inline-block text-left shrink-0">
         <Menu.Button
           as="button"
           className="inline-flex justify-end w-full py-2 text-sm font-medium rounded-md "
@@ -68,6 +68,6 @@ export default function CardMenu({ items }: Props) {
           </Menu.Items>
         </Transition>
       </Menu>
-    </div>
+    </>
   );
 }

@@ -53,7 +53,7 @@ const SandboxImagesCard = ({
       >
         <div className="sandbox-card-content">
           {/* the indicator */}
-          <div className=" flex flex-row  space-x-7 ">
+          <div className=" flex flex-row ">
             <div className="w-1/12 mt-4">
               <span className="relative flex h-3 w-3">
                 {sandboxImage.sandboxesId && (
