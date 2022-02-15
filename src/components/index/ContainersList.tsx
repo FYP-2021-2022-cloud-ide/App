@@ -1,4 +1,4 @@
-import CodeSpace from "./CodeSpace";
+import CodeSpace from "./ContainerCard";
 import EmptyDiv from "../EmptyDiv";
 import { Container, ContainerInfo } from "../../lib/cnails";
 import { useCnails } from "../../contexts/cnails";
@@ -37,15 +37,25 @@ const ContainersList = ({ containers, containerInfo }: Props) => {
   };
 
   return (
-    <div className="flex flex-col justiy-start w-full font-bold ">
+    <div className=" w-full ">
       <Header />
       {containers.length == 0 ? (
         <EmptyDiv message="You have no active workspace."></EmptyDiv>
       ) : (
-        <div className="flex flex-wrap justify-start">
-          {containers.map((container, i) => (
-            <CodeSpace key={container.containerID} item={container}></CodeSpace>
-          ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+          {containers.map((container, i) => {
+            const { containerID, courseTitle, assignmentName, existedTime } =
+              container;
+            return (
+              <CodeSpace
+                key={containerID}
+                courseTitle={courseTitle}
+                containerName={assignmentName}
+                existedTime={existedTime}
+                containerID={containerID}
+              ></CodeSpace>
+            );
+          })}
         </div>
       )}
     </div>

@@ -19,10 +19,10 @@ import {
 } from "../../../../lib/api/api";
 import ModalForm, { Section } from "../../../../components/ModalForm";
 import { containerAPI } from "../../../../lib/api/containerAPI";
-import EnvironmentList from "../../../../components/course/instructor/EnvironmentList";
+import EnvironmentList from "../../../../components/EnvironmentList";
 import CourseBar from "../../../../components/course/CourseBar";
 import Breadcrumbs from "../../../../components/Breadcrumbs";
-import TemplateList from "../../../../components/course/instructor/Template/TemplateList";
+import TemplateList from "../../../../components/TemplateList";
 import {
   getCreateEnvironmentFormStructure,
   getTemplateCreateFormStructure,

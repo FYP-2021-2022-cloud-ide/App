@@ -1,7 +1,7 @@
-import React, { useRef } from "react";
-import Menu from "../../CardMenu";
+import React, { useEffect, useLayoutEffect, useRef } from "react";
+import Menu from "./CardMenu";
 import Tilt from "react-parallax-tilt";
-import { Environment } from "../../../lib/cnails";
+import { Environment } from "../lib/cnails";
 
 type Props = {
   environment: Environment;
@@ -30,6 +30,9 @@ function EnvironmentCard({
         }
       }
     }, 10);
+  useLayoutEffect(() => {
+    cleanStyle();
+  });
   return (
     <Tilt
       onLeave={cleanStyle}

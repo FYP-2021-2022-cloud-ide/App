@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { DocumentTextIcon } from "@heroicons/react/outline";
 import { PlusCircleIcon } from "@heroicons/react/solid";
-import { Option } from "../../../ListBox";
+import { Option } from "./ListBox";
 //testing
-import EmptyDiv from "../../../EmptyDiv";
-import ModalForm, { Section } from "../../../ModalForm";
-import myToast from "../../../CustomToast";
-import { Environment, Template } from "../../../../lib/cnails";
+import EmptyDiv from "./EmptyDiv";
+import ModalForm, { Section } from "./ModalForm";
+import myToast from "./CustomToast";
+import { Environment, Template } from "../lib/cnails";
 import TemplateCard from "./TemplateCard";
 
 export type Props = {

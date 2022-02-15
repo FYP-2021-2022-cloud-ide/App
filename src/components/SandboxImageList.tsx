@@ -42,7 +42,7 @@ const SandboxImageList = ({
         sandboxImages.length == 0 ? (
           <EmptyDiv message="You have no sandbox yet."></EmptyDiv>
         ) : (
-          <div className="env-grid grid-cols-2 lg:grid-cols-3">
+          <div className="env-grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {sandboxImages.map((sandboxImage) => (
               <SandboxImagesCard
                 key={sandboxImage.id}

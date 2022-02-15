@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import Menu, { MenuItem } from "../../../CardMenu";
-import { Template } from "../../../../lib/cnails";
-import myToast from "../../../CustomToast";
+import Menu, { MenuItem } from "./CardMenu";
+import { Template } from "../lib/cnails";
+import myToast from "./CustomToast";
 
 interface Props {
   template: Template;

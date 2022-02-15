@@ -10,7 +10,7 @@ import { Course, Container, ContainerInfo } from "../lib/cnails";
 export default function Home() {
   // load once when page is rendered
   const [courses, setCourses] = useState<Course[]>();
-  const { sub, containers, containerInfo } = useCnails();
+  const { sub, containers, containerInfo, fetchContainers } = useCnails();
   const { courseList } = generalAPI;
   // data fetching from API
   useEffect(() => {
@@ -32,6 +32,7 @@ export default function Home() {
       }
     };
     fetchCourses();
+    fetchContainers(sub);
   }, []);
   console.log(containerInfo);
   return (

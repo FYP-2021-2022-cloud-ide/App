@@ -28,7 +28,7 @@
   @apply min-h-[0px] outline-none border-none;
 }
 .current-run-title {
-  @apply text-xl text-gray-600 dark:text-gray-300;
+  @apply text-xl text-gray-600 dark:text-gray-300 font-bold;
 }
 
 .current-run-header {

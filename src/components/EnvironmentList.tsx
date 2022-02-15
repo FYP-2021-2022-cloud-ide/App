@@ -2,10 +2,10 @@ import EnvironmentCard from "./EnvironmentCard";
 import { CubeIcon } from "@heroicons/react/outline";
 import { PlusCircleIcon } from "@heroicons/react/solid";
 import React from "react";
-import EmptyDiv from "../../EmptyDiv";
-import { useCnails } from "../../../contexts/cnails";
+import EmptyDiv from "./EmptyDiv";
+import { useCnails } from "../contexts/cnails";
 import { useRouter } from "next/router";
-import { Environment } from "../../../lib/cnails";
+import { Environment } from "../lib/cnails";
 import _ from "lodash";
 
 export interface Props {
@@ -27,7 +27,6 @@ const EnvironmentList = ({
 }: Props) => {
   return (
     <div className="env-list-container">
-      <div onMouseLeave={() => {}}></div>
       <div className="env-list-header">
         <CubeIcon className="course-list-title-icon"></CubeIcon>
         <div className="env-grid-title">Environments</div>
