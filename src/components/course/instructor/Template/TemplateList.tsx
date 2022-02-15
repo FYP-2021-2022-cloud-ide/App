@@ -64,11 +64,11 @@ const TemplateList = ({
                   onDelete={() => {
                     if (onDelete) onDelete(template);
                   }}
-                  onToggle={(open) => {
+                  onToggle={() => {
                     if (onToggle) onToggle(template);
                   }}
-                  onUpdate={(environment) => {
-                    if (onUpdate) onUpdate(environment);
+                  onUpdate={(template) => {
+                    if (onUpdate) onUpdate(template);
                   }}
                   onToggleActivation={(active) => {
                     if (onToggleActivation)

@@ -49,7 +49,7 @@ export function ItemMenu({ item, type, root, setMkdirNameOpen }) {
                             <button className="w-full" onClick={async () => {
                                 setLoading(true)
                                 const res = await downloadFileToUser(userId, item.path, type)
-                                if (res != undefined) {
+                                if (res.success) {
                                     // console.log(res)
                                     var decodedByte = Buffer.from(res.file, 'base64')
                                     var b = new Blob([decodedByte]);

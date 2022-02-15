@@ -65,7 +65,9 @@ const SideBar = () => {
               <div
                 style={{
                   width: `${
-                    (containers.length / containerInfo.containersTotal) * 100
+                    (containers.length /
+                      Math.max(1, containerInfo.containersTotal)) *
+                    100
                   }%`,
                 }}
                 className={`current-run-bar-inner bg-green-300`}

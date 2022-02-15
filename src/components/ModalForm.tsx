@@ -27,8 +27,13 @@ export type Entry = {
     }
   | { type: "listbox"; defaultValue: Option; options: Option[] }
   | { type: "toggle"; defaultValue: boolean }
+  | {
+      type: "custom";
+      node: React.ReactNode;
+    }
 );
 
+// the key of a form structure will be the title
 export type Section = {
   children?: React.ReactNode; // support drop in react elements
   displayTitle?: boolean;
@@ -36,10 +41,12 @@ export type Section = {
   entries: { [id: string]: Entry };
 };
 
+export type FormStructure = { [title: string]: Section };
+
 export type Props = ModalProps & {
   title: string;
   size?: "sm" | "md" | "lg";
-  formStructure: { [title: string]: Section };
+  formStructure: FormStructure;
   onChange?: (data: Data, id: string) => void;
   onEnter?: (data: Data) => void;
 };
@@ -64,7 +71,7 @@ const Entry = ({
     return (
       <div className="" style={{ zIndex: zIndex }}>
         <div className="flex flex-row space-x-2  items-center">
-          <p className="modal-form-text-base">{entry.text}</p>
+          {entry.text && <p className="modal-form-text-base">{entry.text}</p>}
           {entry.tooltip && (
             <div
               className="tooltip tooltip-bottom tooltip-info"
@@ -86,7 +93,7 @@ const Entry = ({
     return (
       <div style={{ zIndex: zIndex }}>
         <div className="flex flex-row space-x-2  items-center">
-          <p className="modal-form-text-base">{entry.text}</p>
+          {entry.text && <p className="modal-form-text-base">{entry.text}</p>}
           {entry.tooltip && (
             <div
               className="tooltip tooltip-bottom tooltip-info"
@@ -109,7 +116,7 @@ const Entry = ({
     return (
       <div className="modal-form-list-box" style={{ zIndex: zIndex }}>
         <div className="flex flex-row space-x-2 items-center">
-          <p className="modal-form-text-base">{entry.text}</p>
+          {entry.text && <p className="modal-form-text-base">{entry.text}</p>}
           {entry.tooltip && (
             <div
               className="tooltip tooltip-bottom tooltip-info"
@@ -131,7 +138,7 @@ const Entry = ({
   } else if (entry.type == "toggle") {
     return (
       <div className="modal-form-toggle" style={{ zIndex: zIndex }}>
-        <p className="modal-form-text-base">{entry.text}</p>
+        {entry.text && <p className="modal-form-text-base">{entry.text}</p>}
         {entry.tooltip && (
           <div
             className="tooltip tooltip-bottom tooltip-info"
@@ -147,6 +154,23 @@ const Entry = ({
           }
           enabled={data[id] as boolean}
         ></Toggle>
+      </div>
+    );
+  } else if (entry.type == "custom") {
+    return (
+      <div>
+        {entry.text && <p className="modal-form-text-base">{entry.text}</p>}
+        <div className="flex flex-row space-x-2 items-center">
+          {entry.text && <p className="modal-form-text-base">{entry.text}</p>}
+          {entry.tooltip && (
+            <div
+              className="tooltip tooltip-bottom tooltip-info"
+              data-tip={entry.tooltip}
+            >
+              <InformationCircleIcon className="tooltip-icon" />
+            </div>
+          )}
+        </div>
       </div>
     );
   } else throw new Error("not such entry type in <ModalForm>");
@@ -186,13 +210,8 @@ const Section = ({
 }: {
   section: Section;
   title: string;
-  data: {
-    [id: string]: boolean | string | Option;
-  };
-  onChange: (
-    newValues: { [id: string]: boolean | string | Option },
-    id: string
-  ) => void; // return the new values of this sections
+  data: Data;
+  onChange: (newValues: Data, id: string) => void; // return the new values of this sections
 }) => {
   if (section.conditional) {
     if (!section.conditional(data)) return <></>;
@@ -246,11 +265,13 @@ const Input = ({
   );
 };
 
-const fromStructureToData = (structure: { [title: string]: Section }): Data => {
+const fromStructureToData = (structure: FormStructure): Data => {
   let data: Data = {};
   Object.keys(structure).forEach((title) => {
     Object.keys(structure[title].entries).forEach((entry) => {
-      data[entry] = structure[title].entries[entry].defaultValue;
+      if (structure[title].entries[entry].type != "custom")
+        //@ts-ignore
+        data[entry] = structure[title].entries[entry].defaultValue;
     });
   });
   return data;
@@ -269,9 +290,7 @@ const ModalForm = ({
   onChange,
 }: Props) => {
   let ref = createRef<HTMLDivElement>();
-  const [data, setData] = useState<{ [id: string]: boolean | string | Option }>(
-    fromStructureToData(formStructure)
-  );
+  const [data, setData] = useState<Data>(fromStructureToData(formStructure));
   const sizeMap = {
     sm: "w-[500px]",
     md: "w-[800px]",

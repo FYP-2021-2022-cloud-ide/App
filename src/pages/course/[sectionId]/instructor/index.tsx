@@ -29,7 +29,7 @@ import {
   getTemplateCreateFormStructure,
   getTemplateUpdateFormStructure,
   getUpdateEnvironmentFormStructure,
-  getValidEnvName,
+  getValidName,
 } from "../../../../lib/forms";
 import _ from "lodash";
 
@@ -179,6 +179,15 @@ const EnvironmentTemplateWrapper = ({
         ></EnvironmentList>
         <TemplateList
           templates={templates}
+          onClick={(template) => {
+            if (template.containerID) {
+              window.open(
+                "https://codespace.ust.dev/user/container/" +
+                template.containerID +
+                  "/"
+              );
+            }
+          }}
           onCreate={() => {
             if (environments.length == 0)
               myToast.warning(
@@ -209,15 +218,17 @@ const EnvironmentTemplateWrapper = ({
                   `Template Container cannot be removed. ${response.message}`
                 );
             } else {
+              const id = myToast.loading("Creating Template container...");
               const response = await addContainer(
                 template.imageId,
                 memory,
                 CPU,
                 sectionUserId,
                 template.id,
-                "student",
+                "root",
                 false
               );
+              myToast.dismiss(id);
               if (response.success) {
                 myToast.success("Template container is successfully created.");
               } else
@@ -269,7 +280,7 @@ const EnvironmentTemplateWrapper = ({
             const description = data.environment_descripiton as string;
             const response = await addEnvironment(
               [environment.value + ":" + environment.id],
-              name == "" ? getValidEnvName(environments) : name,
+              name == "" ? "bug" : name,
               description,
               sectionUserId
             );

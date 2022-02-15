@@ -1,4 +1,4 @@
-import { Section } from "../components/ModalForm";
+import { FormStructure, Section } from "../components/ModalForm";
 import { Environment, SandboxImage, Template } from "./cnails";
 
 import { Option } from "../components/ListBox"
@@ -34,7 +34,7 @@ function getEnvOptions(environments: Environment[]) {
     return options;
 }
 
-export const getCreateEnvironmentFormStructure = (environments: Environment[]): { [title: string]: Section } => {
+export const getCreateEnvironmentFormStructure = (environments: Environment[]): FormStructure => {
     return {
         create_environment: {
             displayTitle: false,
@@ -74,7 +74,7 @@ export const getCreateEnvironmentFormStructure = (environments: Environment[]): 
     }
 }
 
-export const getUpdateEnvironmentFormStructure = (targetEnvironment: Environment, environments: Environment[]): { [title: string]: Section } => {
+export const getUpdateEnvironmentFormStructure = (targetEnvironment: Environment, environments: Environment[]): FormStructure => {
     return {
         update_environment: {
             displayTitle: false,
@@ -95,7 +95,7 @@ export const getUpdateEnvironmentFormStructure = (targetEnvironment: Environment
     }
 }
 
-export const getTemplateCreateFormStructure = (templates: Template[], environments: Environment[]): { [title: string]: Section } => {
+export const getTemplateCreateFormStructure = (templates: Template[], environments: Environment[]): FormStructure => {
     const envOptions = getEnvOptions(environments)
     if (envOptions.length == 0)
         throw new Error("there is no environment. The form should not be called")
@@ -151,7 +151,7 @@ export const getTemplateCreateFormStructure = (templates: Template[], environmen
     }
 }
 
-export const getTemplateUpdateFormStructure = (TargetTemplate: Template, templates: Template[], environments: Environment[]): { [title: string]: Section } => {
+export const getTemplateUpdateFormStructure = (TargetTemplate: Template, templates: Template[], environments: Environment[]): FormStructure => {
     return {
         update_template: {
             entries: {
@@ -197,7 +197,7 @@ export const getTemplateUpdateFormStructure = (TargetTemplate: Template, templat
     }
 }
 
-export const getMessageReplyFormStructure = (targets: { id: string, sub: string, name: string }[]): { [title: string]: Section } => {
+export const getMessageReplyFormStructure = (targets: { id: string, sub: string, name: string }[]): FormStructure => {
     return {
         reply_message: {
             displayTitle: false,
@@ -218,7 +218,7 @@ export const getMessageReplyFormStructure = (targets: { id: string, sub: string,
     }
 }
 
-export const getCreateSandboxFormStructure = (sandboxes: SandboxImage[]): { [title: string]: Section } => {
+export const getCreateSandboxFormStructure = (sandboxes: SandboxImage[]): FormStructure => {
     return {
         create_sandbox: {
             displayTitle: false,
@@ -248,7 +248,7 @@ export const getCreateSandboxFormStructure = (sandboxes: SandboxImage[]): { [tit
     };
 }
 
-export const getUpdateSandboxFormStructure = (targetSandbox: SandboxImage, sandboxes: SandboxImage[]): { [title: string]: Section } => {
+export const getUpdateSandboxFormStructure = (targetSandbox: SandboxImage, sandboxes: SandboxImage[]): FormStructure => {
     return {
         update_section: {
             displayTitle: false,
