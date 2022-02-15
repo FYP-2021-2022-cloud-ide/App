@@ -40,7 +40,6 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
   const fetchNotifications = async (userId: string) => {
     const response = await listNotifications(userId);
     if (response.success) {
-      console.log(response.notifications);
       setNotifications(response.notifications);
       return response.notifications;
     } else console.log("[ ❌ ] : fail to fetch notifications ", response);
@@ -51,7 +50,6 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
     if (response.success) {
       setContainers(response.containers);
       setContainerInfo(response.containersInfo);
-      console.log(response);
       return {
         containers: response.containers,
         containersInfo: response.containersInfo,

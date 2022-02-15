@@ -9,6 +9,11 @@ import { containerAPI } from "../lib/api/containerAPI";
 import { useRouter } from "next/router";
 
 import { Option } from "../components/ListBox";
+import {
+  getCreateSandboxFormStructure,
+  getUpdateSandboxFormStructure,
+  getValidName,
+} from "../lib/forms";
 const registry = "143.89.223.188:5000";
 const rootImage = "143.89.223.188:5000/codeserver:latest";
 const CPU = 0.5;
@@ -36,23 +41,31 @@ async function fetchSandboxes(
 const SandboxWrapper = () => {
   const mount = useRef(false);
   const router = useRouter();
-  const { sub, userId } = useCnails();
+  const { sub, userId, fetchContainers } = useCnails();
   const [sandboxImages, setSandboxImages] = useState<SandboxImage[]>();
   const [createOpen, setCreateOpen] = useState(false);
   const [updateOpen, setUpdateOpen] = useState(false);
   const [udpateTarget, setUpdateTarget] = useState<SandboxImage>();
-  const { addSandboxImage, removeSandbox, removeSandboxImage,addSandbox } = sandboxAPI;
+  const {
+    addSandboxImage,
+    removeSandbox,
+    removeSandboxImage,
+    addSandbox,
+    updateSandboxImage,
+  } = sandboxAPI;
   const { addTempContainer } = containerAPI;
-  let fetch = (mount: boolean) =>
-    fetchSandboxes(
+  const fetch = async (mount: boolean) => {
+    await fetchSandboxes(
       userId,
       () => {
         myToast.error("sandboxes cannot be fetched for some reasons.");
       },
       (sandboxImages) => {
-        setSandboxImages(sandboxImages);
+        if (mount) setSandboxImages(sandboxImages);
       }
     );
+    await fetchContainers(sub);
+  };
   useEffect(() => {
     mount.current = true;
     fetch(mount.current);
@@ -63,54 +76,14 @@ const SandboxWrapper = () => {
 
   // if environments or templates has not fetch, don't need to go down
   if (!sandboxImages) return <></>;
-  const createFormStructure: { [title: string]: Section } = {
-    create_sandbox: {
-      displayTitle: false,
-      entries: {
-        environment_choice: {
-          type: "listbox",
-          defaultValue: envChoices[0],
-          text: "Pick the Programming Language",
-          description: "Pick the Programming Language",
-          tooltip: "Pick the Programming Language",
-          options: envChoices,
-        },
-        name: {
-          type: "input",
-          defaultValue: "",
-          placeholder: "e.g. Sandbox with C++",
-          text: "Name (Optional)",
-        },
-        description: {
-          type: "textarea",
-          defaultValue: "",
-          placeholder: "e.g. This sandbox is about ...",
-          text: "Description (Optional)",
-        },
-      },
-    },
-  };
+
+  const createFormStructure = getCreateSandboxFormStructure(sandboxImages);
 
   //one more button for just changing the  title / description, not calling tempContainer
-  const updateFormStructure: { [title: string]: Section } = {
-    update_section: {
-      displayTitle: false,
-      entries: {
-        name: {
-          type: "input",
-          defaultValue: udpateTarget?.title,
-          placeholder: "e.g. Sandbox with C++",
-          text: "Name (Optional)",
-        },
-        description: {
-          type: "textarea",
-          defaultValue: udpateTarget?.description,
-          placeholder: "e.g. This sandbox is about ...",
-          text: "Description (Optional)",
-        },
-      },
-    },
-  };
+  const updateFormStructure = getUpdateSandboxFormStructure(
+    udpateTarget,
+    sandboxImages
+  );
 
   return (
     <>
@@ -120,58 +93,63 @@ const SandboxWrapper = () => {
           setCreateOpen(true);
         }}
         onSandboxClick={(sandboxImage) => {
-            if (sandboxImage.sandboxesId) {
-              window.open(
-                "https://codespace.ust.dev/user/container/" + sandboxImage.sandboxesId + "/"
-              );
-            }
-          
-        }}
-        onSandboxDelete={async (sandboxImage) => {
-          console.log("delete sandbox image");
-          const response = await removeSandboxImage(sandboxImage.id, userId);
-          console.log(response);
-          if (response.success) {
-            myToast.success(
-              `Sandbox ${sandboxImage.title} is successfully removed.`
+          if (sandboxImage.sandboxesId) {
+            window.open(
+              "https://codespace.ust.dev/user/container/" +
+                sandboxImage.sandboxesId +
+                "/"
             );
           }
-          fetch(mount.current);
+        }}
+        onSandboxDelete={async (sandboxImage) => {
+          if (sandboxImage.sandboxesId) {
+            myToast.error(`The sandbox is still active. Fail to removed.`);
+            return;
+          }
+          const id = myToast.loading(`Removing a ${sandboxImage.title}...`);
+          const response = await removeSandboxImage(sandboxImage.id, userId);
+          myToast.dismiss(id);
+          if (response.success) {
+            myToast.success(
+              `Sandbox (${sandboxImage.title}) is successfully removed.`
+            );
+            fetch(mount.current);
+          } else {
+            myToast.error(`Fail to remove Sandbox (${sandboxImage.title}).`);
+          }
         }}
         onSandboxUpdate={(sandbox) => {
           setUpdateOpen(true);
           setUpdateTarget(sandbox);
         }}
-        onSandboxOpen={ async(sandboxImage) => {
-          const id = myToast.loading(
-            `Opening a sandbox....`
-          )
+        onSandboxStart={async (sandboxImage) => {
+          const id = myToast.loading(`Starting a sandbox....`);
           const response = await addSandbox(memory, CPU, sandboxImage.id);
-          
-            if (response.success) {
-              myToast.dismiss(id);
-              myToast.success(
-                `Sandbox ${sandboxImage.title} is successfully opened.`
-              );
-              fetch(mount.current);
-            } else {
-              myToast.error(
-                `Cannot open sandbox.`
-              )
-            }
+          myToast.dismiss(id);
+          if (response.success) {
+            myToast.success(
+              `Sandbox ${sandboxImage.title} is successfully started.`
+            );
+            fetch(mount.current);
+          } else {
+            myToast.error(`Cannot started sandbox.`);
+          }
         }}
-        onSandboxClose={async (sandboxImage) => {
-          const response = await removeSandbox(sandboxImage.sandboxesId, userId);
-            if (response.success) {
-              myToast.success(
-                `Sandbox ${sandboxImage.title} is successfully closed.`
-              );
-              fetch(mount.current);
-            } else {
-              myToast.error(
-                `Cannot close sandbox.`
-              );
-            }
+        onSandboxStop={async (sandboxImage) => {
+          const toastId = myToast.loading(`Stopping a sandbox...`);
+          const response = await removeSandbox(
+            sandboxImage.sandboxesId,
+            userId
+          );
+          myToast.dismiss(toastId);
+          if (response.success) {
+            myToast.success(
+              `Sandbox ${sandboxImage.title} is successfully stopped.`
+            );
+            fetch(mount.current);
+          } else {
+            myToast.error(`Cannot stop sandbox.`);
+          }
         }}
       ></SandboxImageList>
       {/* create form */}
@@ -182,7 +160,6 @@ const SandboxWrapper = () => {
         title="Create Sandbox"
         formStructure={createFormStructure}
         onEnter={async (data) => {
-          
           const environment = data.environment_choice as Option;
           // const toastId = myToast.loading("Creating the temporary contianer...");
           const response = await addSandboxImage(
@@ -191,13 +168,11 @@ const SandboxWrapper = () => {
             data.name as string,
             userId
           );
-          
+
           if (response.success) {
             const { sandboxImageId } = response;
-            myToast.success(
-              `Sandbox is successfully created.`
-            );
-            fetch(true);              
+            myToast.success(`Sandbox is successfully created.`);
+            fetch(mount.current);
           } else {
             // myToast.dismiss(toastId);
             myToast.error("Sandbox cannot be created for some reason.");
@@ -211,8 +186,28 @@ const SandboxWrapper = () => {
           setOpen={setUpdateOpen}
           title={"Update Sandbox"}
           formStructure={updateFormStructure}
-          onEnter={() => {
+          onEnter={async (data) => {
             // call some API here
+            const id = myToast.loading("Updating a sandbox...");
+            const { name, description } = data;
+            const response = await updateSandboxImage(
+              udpateTarget.id,
+              String(name) == ""
+                ? getValidName(
+                    sandboxImages.map((s) => s.title),
+                    "Sandbox",
+                    true
+                  )
+                : String(name),
+              String(description),
+              "",
+              userId
+            );
+            myToast.dismiss(id);
+            if (response.success) {
+              myToast.success("Sandbox is successfully updated.");
+              fetch(mount.current);
+            } else myToast.error("Fail to update the sandbox.");
           }}
         ></ModalForm>
       )}
@@ -222,7 +217,7 @@ const SandboxWrapper = () => {
 
 const Sandbox = () => {
   return (
-    <div className="flex flex-col font-bold px-8 w-full pt-10 h-full space-y-5">
+    <div className="flex flex-col font-bold px-8 w-full h-full space-y-5">
       <SandboxWrapper></SandboxWrapper>
     </div>
   );

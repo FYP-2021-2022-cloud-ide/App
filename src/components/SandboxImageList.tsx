@@ -10,8 +10,8 @@ export type Props = {
   onSandboxClick: (sandboxImage: SandboxImage) => void;
   onSandboxDelete: (sandboxImage: SandboxImage) => void;
   onSandboxUpdate: (sandboxImage: SandboxImage) => void;
-  onSandboxOpen : (sandboxImage: SandboxImage) => void;
-  onSandboxClose: (sandboxImage: SandboxImage) => void;
+  onSandboxStart: (sandboxImage: SandboxImage) => void;
+  onSandboxStop: (sandboxImage: SandboxImage) => void;
 };
 
 const SandboxImageList = ({
@@ -20,8 +20,8 @@ const SandboxImageList = ({
   onSandboxClick,
   onSandboxDelete,
   onSandboxUpdate,
-  onSandboxOpen,
-  onSandboxClose,
+  onSandboxStart,
+  onSandboxStop,
 }: Props) => {
   return (
     <div className="env-list-container">
@@ -56,11 +56,11 @@ const SandboxImageList = ({
                 onUpdate={(sandboxImage) => {
                   if (onSandboxUpdate) onSandboxUpdate(sandboxImage);
                 }}
-                onOpen={(sandboxImage) => {
-                  if (onSandboxOpen) onSandboxOpen(sandboxImage);
+                onStart={(sandboxImage) => {
+                  if (onSandboxStart) onSandboxStart(sandboxImage);
                 }}
-                onClose={(sandboxImage) => {
-                  if (onSandboxClose) onSandboxClose(sandboxImage);
+                onStop={(sandboxImage) => {
+                  if (onSandboxStop) onSandboxStop(sandboxImage);
                 }}
               ></SandboxImagesCard>
             ))}

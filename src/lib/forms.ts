@@ -1,5 +1,5 @@
 import { Section } from "../components/ModalForm";
-import { Environment, Template } from "./cnails";
+import { Environment, SandboxImage, Template } from "./cnails";
 
 import { Option } from "../components/ListBox"
 
@@ -13,10 +13,10 @@ const envChoices = [
     { value: "Java", id: `${registry}/codeserver:latest` },
 ];
 
-export const getValidEnvName = (environments: Environment[]): string => {
-    for (let i = environments.length + 1; ; i++) {
-        if (environments.every((env) => env.environmentName != `Environment ${i}`))
-            return `Environment ${i}`;
+export const getValidName = (names: string[], prefix: string, update: boolean = false): string => {
+    for (let i = names.length + (update ? 0 : 1); ; i++) {
+        if (names.every((name) => name != `${prefix} ${i}`))
+            return `${prefix} ${i}`;
     }
 };
 
@@ -62,7 +62,7 @@ export const getCreateEnvironmentFormStructure = (environments: Environment[]): 
                     type: "input",
                     defaultValue: "",
                     text: "Environment name",
-                    placeholder: `e.g. ${getValidEnvName(environments)}`,
+                    placeholder: `e.g. ${getValidName(environments.map(env => env.environmentName), "Environment")}`,
                 },
                 environment_description: {
                     type: "textarea",
@@ -83,7 +83,7 @@ export const getUpdateEnvironmentFormStructure = (targetEnvironment: Environment
                     type: "input",
                     defaultValue: "",
                     text: "Environment name",
-                    placeholder: `e.g. ${getValidEnvName(environments)}`,
+                    placeholder: `e.g. ${getValidName(environments.map(env => env.environmentName), "Environment")}`,
                 },
                 environment_description: {
                     type: "textarea",
@@ -113,11 +113,11 @@ export const getTemplateCreateFormStructure = (templates: Template[], environmen
                     type: "input",
                     defaultValue: "",
                     text: "Template name",
-                    placeholder: "e.g. Assignment 1",
+                    placeholder: `e.g. ${getValidName(templates.map(t => t.name), "Assignment Template")}`,
                 },
                 description: {
                     type: "textarea",
-                    placeholder: "e.g. Assignment 1 is about ...",
+                    placeholder: `e.g. ${getValidName(templates.map(t => t.name), "Assignment Template")} is about ...`,
                     defaultValue: "",
                     text: "Description (Optional)",
                 },
@@ -218,3 +218,54 @@ export const getMessageReplyFormStructure = (targets: { id: string, sub: string,
     }
 }
 
+export const getCreateSandboxFormStructure = (sandboxes: SandboxImage[]): { [title: string]: Section } => {
+    return {
+        create_sandbox: {
+            displayTitle: false,
+            entries: {
+                environment_choice: {
+                    type: "listbox",
+                    defaultValue: envChoices[0],
+                    text: "Pick the Programming Language",
+                    description: "Pick the Programming Language",
+                    tooltip: "Pick the Programming Language",
+                    options: envChoices,
+                },
+                name: {
+                    type: "input",
+                    defaultValue: "",
+                    placeholder: `e.g. ${getValidName(sandboxes.map(s => s.title), "Sandbox")}`,
+                    text: "Name (Optional)",
+                },
+                description: {
+                    type: "textarea",
+                    defaultValue: "",
+                    placeholder: "e.g. This sandbox is about ...",
+                    text: "Description (Optional)",
+                },
+            },
+        },
+    };
+}
+
+export const getUpdateSandboxFormStructure = (targetSandbox: SandboxImage, sandboxes: SandboxImage[]): { [title: string]: Section } => {
+    return {
+        update_section: {
+            displayTitle: false,
+            entries: {
+                name: {
+                    type: "input",
+                    defaultValue: targetSandbox?.title,
+                    placeholder: `e.g. ${getValidName(sandboxes.map(s => s.title), "Sandbox", true)}`,
+                    text: "Name (Optional)",
+                },
+                description: {
+                    type: "textarea",
+                    defaultValue: targetSandbox?.description,
+                    placeholder: "e.g. This sandbox is about ...",
+                    text: "Description (Optional)",
+                },
+            },
+        },
+    }
+} 

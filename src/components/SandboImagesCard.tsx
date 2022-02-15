@@ -9,20 +9,28 @@ type Props = {
   onClick?: (sandboxImage: SandboxImage) => void;
   onDelete?: (sandboxImage: SandboxImage) => void;
   onUpdate?: (sandboxImage: SandboxImage) => void;
-  onOpen?: (sandboxImage: SandboxImage) => void;
-  onClose?: (sandboxImage: SandboxImage) => void;
+  onStart?: (sandboxImage: SandboxImage) => void;
+  onStop?: (sandboxImage: SandboxImage) => void;
 };
 
-const SandboxImagesCard = ({ sandboxImage, onClick, onDelete, onUpdate,onClose,onOpen }: Props) => {
+const SandboxImagesCard = ({
+  sandboxImage,
+  onClick,
+  onDelete,
+  onUpdate,
+  onStop,
+  onStart,
+}: Props) => {
   return (
     <Tilt tiltMaxAngleX={4} tiltMaxAngleY={4} tiltReverse>
       <div
-        className="env-card"
+        className="sandbox-card"
         onClick={() => {
           if (onClick) onClick(sandboxImage);
         }}
       >
-        <div className="env-card-content">
+        <div className="sandbox-card-content">
+          {/* the indicator */}
           <div className=" flex flex-row  space-x-7 ">
             <div className="w-1/12 mt-4">
               <span className="relative flex h-3 w-3">
@@ -37,8 +45,8 @@ const SandboxImagesCard = ({ sandboxImage, onClick, onDelete, onUpdate,onClose,o
               </span>
             </div>
             <div className="   space-y-2 ">
-              <div className="env-card-name ">{sandboxImage.title}</div>
-              <div className="env-card-des">{sandboxImage.description}</div>
+              <div className="sandbox-card-name ">{sandboxImage.title}</div>
+              <div className="sandbox-card-des">{sandboxImage.description}</div>
             </div>
           </div>
         </div>
@@ -61,14 +69,18 @@ const SandboxImagesCard = ({ sandboxImage, onClick, onDelete, onUpdate,onClose,o
               },
             },
             {
-              text: sandboxImage.sandboxesId ? "Close" : "Open",
+              text: sandboxImage.sandboxesId ? "Stop" : "Start",
               onClick: sandboxImage.sandboxesId
-                ?()=>{ if (onClose) {
-                  onClose(sandboxImage);
-                }}
-                :()=>{if (onOpen) {
-                  onOpen(sandboxImage);
-                }}
+                ? () => {
+                    if (onStop) {
+                      onStop(sandboxImage);
+                    }
+                  }
+                : () => {
+                    if (onStart) {
+                      onStart(sandboxImage);
+                    }
+                  },
             },
           ]}
         />
