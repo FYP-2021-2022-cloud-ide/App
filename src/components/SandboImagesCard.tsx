@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import CardMenu from "./CardMenu";
 import Tilt from "react-parallax-tilt";
 
 import { SandboxImage } from "../lib/cnails";
+import { useLayoutEffect } from "react";
 
 type Props = {
   sandboxImage: SandboxImage;
@@ -21,8 +22,29 @@ const SandboxImagesCard = ({
   onStop,
   onStart,
 }: Props) => {
+  const ref = useRef<Tilt>();
+  const cleanStyle = () =>
+    setTimeout(() => {
+      if (ref.current) {
+        //@ts-ignore
+        let node = ref.current.wrapperEl.node as HTMLDivElement;
+        if (node.getAttribute("style") != "") {
+          node.setAttribute("style", "");
+          cleanStyle();
+        }
+      }
+    }, 10);
+  useLayoutEffect(() => {
+    cleanStyle();
+  });
   return (
-    <Tilt tiltMaxAngleX={4} tiltMaxAngleY={4} tiltReverse>
+    <Tilt
+      onLeave={cleanStyle}
+      ref={ref}
+      tiltMaxAngleX={4}
+      tiltMaxAngleY={4}
+      tiltReverse
+    >
       <div
         className="sandbox-card"
         onClick={() => {

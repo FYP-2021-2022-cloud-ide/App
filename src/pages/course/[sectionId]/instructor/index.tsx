@@ -23,7 +23,6 @@ import EnvironmentList from "../../../../components/course/instructor/Environmen
 import CourseBar from "../../../../components/course/CourseBar";
 import Breadcrumbs from "../../../../components/Breadcrumbs";
 import TemplateList from "../../../../components/course/instructor/Template/TemplateList";
-import { time } from "console";
 import {
   getCreateEnvironmentFormStructure,
   getTemplateCreateFormStructure,
@@ -183,7 +182,7 @@ const EnvironmentTemplateWrapper = ({
             if (template.containerID) {
               window.open(
                 "https://codespace.ust.dev/user/container/" +
-                template.containerID +
+                  template.containerID +
                   "/"
               );
             }

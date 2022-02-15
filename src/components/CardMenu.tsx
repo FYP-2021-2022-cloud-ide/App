@@ -16,7 +16,10 @@ export default function CardMenu({ items }: Props) {
   return (
     <div className="">
       <Menu as="div" className="relative inline-block text-left">
-        <Menu.Button className="inline-flex justify-end w-full py-2 text-sm font-medium rounded-md ">
+        <Menu.Button
+          as="button"
+          className="inline-flex justify-end w-full py-2 text-sm font-medium rounded-md "
+        >
           <MenuIcon className="w-5 h-5 hover:scale-110 transition text-gray-600 dark:text-gray-300 ease-in-out duration-300"></MenuIcon>
         </Menu.Button>
         <Transition

@@ -33,6 +33,7 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
   const [containers, setContainers] = useState<Container[]>();
   let [containerInfo, setContainerInfo] = useState<ContainerInfo>();
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  // simultaneous run quota
   const [containerQuota, setContainerQuota] = useState<number>(defaultQuota);
   const router = useRouter();
   const { listNotifications } = notificationAPI;

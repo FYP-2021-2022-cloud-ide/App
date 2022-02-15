@@ -58,7 +58,7 @@ const SideBar = () => {
         <div className="w-full flex flex-col space-y-2 text-xs text-gray-500 dark:text-gray-400 select-none mb-5 px-4">
           <div className="">
             <p>
-              {containers.length}/{containerInfo.containersTotal} (all
+              {containers.length}/{containerInfo.containersTotal} (All
               containers)
             </p>
             <div className="current-run-bar-outer">
@@ -84,7 +84,7 @@ const SideBar = () => {
                   width: `${(containers.length / containerQuota) * 100}%`,
                 }}
                 className={`current-run-bar-inner ${
-                  (containers.length / containerQuota) * 100 === 100
+                  (containers.length / containerQuota) * 100 >= 100
                     ? "bg-red-400"
                     : "bg-green-300"
                 }`}

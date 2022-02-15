@@ -40,8 +40,8 @@ async function fetchSandboxes(
 
 const SandboxWrapper = () => {
   const mount = useRef(false);
-  const router = useRouter();
-  const { sub, userId, fetchContainers } = useCnails();
+  const { sub, userId, fetchContainers, containerQuota, containers } =
+    useCnails();
   const [sandboxImages, setSandboxImages] = useState<SandboxImage[]>();
   const [createOpen, setCreateOpen] = useState(false);
   const [updateOpen, setUpdateOpen] = useState(false);
@@ -53,7 +53,7 @@ const SandboxWrapper = () => {
     addSandbox,
     updateSandboxImage,
   } = sandboxAPI;
-  const { addTempContainer } = containerAPI;
+  const { removeTempContainer } = containerAPI;
   const fetch = async (mount: boolean) => {
     await fetchSandboxes(
       userId,
@@ -81,6 +81,7 @@ const SandboxWrapper = () => {
 
   //one more button for just changing the  title / description, not calling tempContainer
   const updateFormStructure = getUpdateSandboxFormStructure(
+    sub,
     udpateTarget,
     sandboxImages
   );
@@ -123,6 +124,12 @@ const SandboxWrapper = () => {
           setUpdateTarget(sandbox);
         }}
         onSandboxStart={async (sandboxImage) => {
+          if (containers.length == containerQuota) {
+            myToast.error(
+              `You have met your simultaneous run quota. Fail to start sandbox.`
+            );
+            return;
+          }
           const id = myToast.loading(`Starting a sandbox....`);
           const response = await addSandbox(memory, CPU, sandboxImage.id);
           myToast.dismiss(id);
@@ -185,22 +192,33 @@ const SandboxWrapper = () => {
           isOpen={updateOpen}
           setOpen={setUpdateOpen}
           title={"Update Sandbox"}
+          clickOutsideToClose
           formStructure={updateFormStructure}
+          onClose={async (data, isEnter) => {
+            if (data.update_environment != "" && !isEnter) {
+              const containerId = data.update_environment;
+              // remove the temp container
+              const response = await removeTempContainer(containerId, sub);
+              if (response.success) {
+                console.log(
+                  "temp container is removed successfully.",
+                  containerId
+                );
+              } else {
+                console.log("Fail to remove temp container.", containerId);
+              }
+            }
+          }}
           onEnter={async (data) => {
             // call some API here
             const id = myToast.loading("Updating a sandbox...");
-            const { name, description } = data;
+            const { name, description, update_environment: containerId } = data;
+            console.log(data);
             const response = await updateSandboxImage(
               udpateTarget.id,
-              String(name) == ""
-                ? getValidName(
-                    sandboxImages.map((s) => s.title),
-                    "Sandbox",
-                    true
-                  )
-                : String(name),
-              String(description),
-              "",
+              name,
+              description,
+              containerId,
               userId
             );
             myToast.dismiss(id);

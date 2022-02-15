@@ -5,7 +5,8 @@ import Modal, { ModalProps } from "./Modal";
 import Toggle from "./Toggle";
 import { InformationCircleIcon } from "@heroicons/react/solid";
 
-export type Data = { [id: string]: boolean | string | Option };
+// export type Data = { [id: string]: boolean | string | Option  };
+export type Data = { [id: string]: any };
 
 export type Entry = {
   text?: string;
@@ -17,19 +18,25 @@ export type Entry = {
       type: "input";
       defaultValue: string;
       placeholder?: string;
+      emptyValue?: string; // when empty value is given, this value will be return on enter when the actual value is empty
       disabled?: boolean;
     }
   | {
       type: "textarea";
       defaultValue: string;
       placeholder?: string;
+      emptyValue?: string; // when empty value is given, this value will be return on enter when the actual value is empty
       disabled?: boolean;
     }
   | { type: "listbox"; defaultValue: Option; options: Option[] }
   | { type: "toggle"; defaultValue: boolean }
   | {
       type: "custom";
-      node: React.ReactNode;
+      defaultValue: any;
+      node: (
+        onChange: (newValue: any) => void,
+        currentValue: any
+      ) => React.ReactNode;
     }
 );
 
@@ -43,7 +50,12 @@ export type Section = {
 
 export type FormStructure = { [title: string]: Section };
 
-export type Props = ModalProps & {
+export type Props = {
+  isOpen: Boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  clickOutsideToClose?: boolean;
+  onOpen?: () => void;
+  onClose?: (data: Data, isEnter: boolean) => void;
   title: string;
   size?: "sm" | "md" | "lg";
   formStructure: FormStructure;
@@ -85,7 +97,12 @@ const Entry = ({
           text={data[id] as string}
           placeholder={entry.placeholder}
           disabled={entry.disabled}
-          onChange={(text) => onChange(Object.assign(data, { [id]: text }), id)}
+          onChange={(text) => {
+            if (text == "" && entry.emptyValue) {
+              text = entry.emptyValue;
+            }
+            onChange(Object.assign(data, { [id]: text }), id);
+          }}
         ></Input>
       </div>
     );
@@ -108,7 +125,12 @@ const Entry = ({
           text={data[id] as string}
           placeholder={entry.placeholder}
           disabled={entry.disabled}
-          onChange={(text) => onChange(Object.assign(data, { [id]: text }), id)}
+          onChange={(text) => {
+            if (text == "" && entry.emptyValue) {
+              text = entry.emptyValue;
+            }
+            onChange(Object.assign(data, { [id]: text }), id);
+          }}
         ></TextArea>
       </div>
     );
@@ -158,8 +180,7 @@ const Entry = ({
     );
   } else if (entry.type == "custom") {
     return (
-      <div>
-        {entry.text && <p className="modal-form-text-base">{entry.text}</p>}
+      <div style={{ zIndex: zIndex }}>
         <div className="flex flex-row space-x-2 items-center">
           {entry.text && <p className="modal-form-text-base">{entry.text}</p>}
           {entry.tooltip && (
@@ -171,6 +192,10 @@ const Entry = ({
             </div>
           )}
         </div>
+        {entry.node(
+          (newValue) => onChange(Object.assign(data, { [id]: newValue }), id),
+          data[id]
+        )}
       </div>
     );
   } else throw new Error("not such entry type in <ModalForm>");
@@ -269,9 +294,16 @@ const fromStructureToData = (structure: FormStructure): Data => {
   let data: Data = {};
   Object.keys(structure).forEach((title) => {
     Object.keys(structure[title].entries).forEach((entry) => {
-      if (structure[title].entries[entry].type != "custom")
-        //@ts-ignore
-        data[entry] = structure[title].entries[entry].defaultValue;
+      const type = structure[title].entries[entry].type;
+      //@ts-ignore
+      const emptyValue = structure[title].entries[entry].emptyValue;
+      if (
+        (type === "input" || type === "textarea") &&
+        structure[title].entries[entry].defaultValue == "" &&
+        emptyValue
+      ) {
+        data[entry] = emptyValue;
+      } else data[entry] = structure[title].entries[entry].defaultValue;
     });
   });
   return data;
@@ -301,9 +333,9 @@ const ModalForm = ({
     setData(fromStructureToData(formStructure));
   }, [formStructure]);
 
-  const patchedOnClose = () => {
+  const patchedOnClose = (isEnter: boolean = false) => {
     if (onClose) {
-      onClose();
+      onClose(data, isEnter);
     }
     setData(fromStructureToData(formStructure));
   };
@@ -351,7 +383,7 @@ const ModalForm = ({
                 if (onEnter) {
                   onEnter(data);
                   setOpen(false);
-                  patchedOnClose();
+                  patchedOnClose(true);
                 }
               }}
             >

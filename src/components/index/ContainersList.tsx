@@ -27,7 +27,7 @@ const ContainersList = ({ containers, containerInfo }: Props) => {
             <div
               style={{ width: `${percentage}%` }}
               className={`current-run-bar-inner ${
-                percentage === 100 ? "bg-red-400" : "bg-green-300"
+                percentage >= 100 ? "bg-red-400" : "bg-green-300"
               }`}
             ></div>
           </div>
