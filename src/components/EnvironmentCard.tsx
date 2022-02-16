@@ -48,9 +48,9 @@ function EnvironmentCard({
         }}
       >
         <div className="env-card-content">
-          <div className="env-card-name">{environment.environmentName}</div>
+          <div className="env-card-name">{environment.name}</div>
           <div className="env-card-lib">{environment.libraries}</div>
-          <div className="env-card-ref">{environment.imageId}</div>
+          {/* <div className="env-card-ref">{environment.imageId}</div> */}
           <div className="env-card-des">{environment.description}</div>
         </div>
         <CardMenu

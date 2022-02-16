@@ -1,5 +1,5 @@
 import Router, { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useCnails } from "../../../../contexts/cnails";
 import Loader from "../../../../components/Loader";
 import { generalAPI } from "../../../../lib/api/generalAPI";
@@ -11,6 +11,7 @@ import {
   SectionRole,
   Environment,
   Template,
+  InstructorContextState,
 } from "../../../../lib/cnails";
 import myToast from "../../../../components/CustomToast";
 import {
@@ -32,15 +33,60 @@ import {
 } from "../../../../lib/forms";
 import _ from "lodash";
 
-const registry = "143.89.223.188:5000";
 const rootImage = "143.89.223.188:5000/codeserver:latest";
 const CPU = 0.5;
 const memory = 400;
-const envChoices = [
-  { value: "C++/C", id: `${registry}/codeserver:latest` },
-  { value: "Python3", id: `${registry}/codeserver:latest` },
-  { value: "Java", id: `${registry}/codeserver:latest` },
-];
+
+const InstructorContext = React.createContext({} as InstructorContextState);
+export const useInstructor = () => useContext(InstructorContext);
+export const InstructorProvider = ({
+  children,
+  sectionId,
+}: {
+  children: JSX.Element;
+  sectionId: string;
+}) => {
+  const { sub, fetchContainers } = useCnails();
+  const [environments, setEnvironments] = useState<Environment[]>(null);
+  const [templates, setTemplates] = useState<Template[]>(null);
+  const fetch = () => {
+    fetchEnvironmentsAndTemplates(
+      sectionId,
+      sub,
+      () => {
+        myToast.error(
+          "environments or templates cannot be fetched for some reasons."
+        );
+      },
+      (environments, templates) => {
+        setEnvironments(
+          environments.map((e) => ({
+            ...e,
+            name: e.environmentName,
+          }))
+        );
+        setTemplates(templates);
+      }
+    );
+    fetchContainers(sub);
+  };
+
+  useEffect(() => {
+    fetch();
+  }, []);
+
+  return (
+    <InstructorContext.Provider
+      value={{
+        environments,
+        templates,
+        fetch,
+      }}
+    >
+      {children}
+    </InstructorContext.Provider>
+  );
+};
 
 async function fetchEnvironmentsAndTemplates(
   sectionId: string,
@@ -64,29 +110,29 @@ async function fetchEnvironmentsAndTemplates(
 }
 
 const EnvironmentTemplateWrapper = ({
-  sectionUserInfo: {
-    sectionCode,
-    sectionId,
-    sectionUserId,
-    courseCode,
-    courseTitle,
-    role,
-  },
+  sectionUserInfo: { sectionUserId },
 }: {
   sectionUserInfo: SectionUserInfo;
 }) => {
+  const router = useRouter();
+  const { sub } = useCnails();
+  const { environments, templates, fetch } = useInstructor();
   const [envCreateOpen, setEnvCreateOpen] = useState(false);
   const [envUpdateOpen, setEnvUpdateOpen] = useState(false);
   const [templateCreateOpen, setTemplateCreateOpen] = useState(false);
   const [templateUpdateOpen, setTemplateUpdateOpen] = useState(false);
   const [envUpdateTarget, setEnvUpdateTarget] = useState<Environment>(null);
+
   const [templateUpdateTarget, setTemplateUpdateTarget] =
     useState<Template>(null);
-  const { sub } = useCnails();
-  const [environments, setEnvironments] = useState<Environment[]>(null);
-  const [templates, setTemplates] = useState<Template[]>(null);
-  const { removeTemplate, addTemplate, activateTemplate, deactivateTemplate } =
-    templateAPI;
+
+  const {
+    removeTemplate,
+    addTemplate,
+    activateTemplate,
+    deactivateTemplate,
+    updateTemplate,
+  } = templateAPI;
   const {
     removeEnvironment,
     addEnvironment,
@@ -99,24 +145,6 @@ const EnvironmentTemplateWrapper = ({
     removeTempContainer,
     removeContainer,
   } = containerAPI;
-  const fetch = () =>
-    fetchEnvironmentsAndTemplates(
-      sectionId,
-      sub,
-      () => {
-        myToast.error(
-          "environments or templates cannot be fetched for some reasons."
-        );
-      },
-      (environments, templates) => {
-        setEnvironments(environments);
-        setTemplates(templates);
-      }
-    );
-
-  useEffect(() => {
-    fetch();
-  }, []);
 
   // if environments or templates has not fetch, don't need to go down
   if (!environments || !templates) return <></>;
@@ -133,6 +161,7 @@ const EnvironmentTemplateWrapper = ({
     environments
   );
   const templateUpdateFormStructure = getTemplateUpdateFormStructure(
+    sub,
     templateUpdateTarget,
     templates,
     environments
@@ -146,7 +175,10 @@ const EnvironmentTemplateWrapper = ({
           onEnvCreateBtnClick={() => {
             setEnvCreateOpen(true);
           }}
-          onEnvClick={(env) => {}}
+          onEnvClick={(env) => {
+            router.push(`${router.asPath}/${env.id}`);
+            // console.log(router.asPath);
+          }}
           onEnvDelete={async (env) => {
             function checkDeleteValid(env: Environment): boolean {
               for (let t of templates) {
@@ -166,7 +198,7 @@ const EnvironmentTemplateWrapper = ({
             }
             fetch();
           }}
-          onEnvHighlight={(env) => {
+          onEnvHighlight={() => {
             throw new Error("not implemented");
           }}
           onEnvUpdate={(env) => {
@@ -177,13 +209,8 @@ const EnvironmentTemplateWrapper = ({
         <TemplateList
           templates={templates}
           onClick={(template) => {
-            if (template.containerID) {
-              window.open(
-                "https://codespace.ust.dev/user/container/" +
-                  template.containerID +
-                  "/"
-              );
-            }
+            // go to details
+            router.push(`${router.asPath}/${template.id}`);
           }}
           onCreate={() => {
             if (environments.length == 0)
@@ -205,17 +232,26 @@ const EnvironmentTemplateWrapper = ({
             setTemplateUpdateOpen(true);
             setTemplateUpdateTarget(template);
           }}
+          onWorkspaceCardClick={(template) => {
+            if (template.containerID) {
+              window.open(
+                "https://codespace.ust.dev/user/container/" +
+                  template.containerID +
+                  "/"
+              );
+            }
+          }}
           onToggle={async (template) => {
             if (template.containerID) {
               const response = await removeContainer(template.containerID, sub);
               if (response.success) {
-                myToast.success("Template Container is successfully removed. ");
+                myToast.success("Template workspace is successfully removed. ");
               } else
                 myToast.error(
-                  `Template Container cannot be removed. ${response.message}`
+                  `Template workspace cannot be removed. ${response.message}`
                 );
             } else {
-              const id = myToast.loading("Creating Template container...");
+              const id = myToast.loading("Creating workspace...");
               const response = await addContainer(
                 template.imageId,
                 memory,
@@ -227,10 +263,10 @@ const EnvironmentTemplateWrapper = ({
               );
               myToast.dismiss(id);
               if (response.success) {
-                myToast.success("Template container is successfully created.");
+                myToast.success("Template workspace is successfully created.");
               } else
                 myToast.error(
-                  `Template Container cannot be created. ${response.message}`
+                  `Template workspace cannot be created. ${response.message}`
                 );
             }
             fetch();
@@ -423,51 +459,95 @@ const EnvironmentTemplateWrapper = ({
         setOpen={setTemplateCreateOpen}
         formStructure={templateCreateFormStructure}
         title="Create Template"
-        onChange={(data, id) => {
-          console.log(data);
-        }}
         onEnter={async (data) => {
-          const toastId = myToast.loading("Creating A temporary container...");
+          const toastId = myToast.loading("Creating A temporary workspace...");
+          var selectedEnv = data.environment;
           try {
             const response = await addTempContainer(
               memory,
               CPU,
-              rootImage,
+              selectedEnv.imageId,
               sub,
-              "root"
+              "student"
             );
-            console.log(response);
+            myToast.dismiss(toastId);
             if (response.success) {
-              let count = 10;
-              const id = setInterval(async () => {
-                console.log("adding template", 10 - count + 1);
-                const response2 = await addTemplate(
-                  data.name as string,
-                  data.description as string,
-                  sectionUserId,
-                  (data.environment as Option).id,
-                  "",
-                  response.containerID as string,
-                  false,
-                  data.is_exam as boolean,
-                  Number(data.time_limit),
-                  data.allow_notification as boolean
-                );
-                count--;
-                if (count == 0 || response2.success) {
-                  myToast.dismiss(toastId);
-                  clearInterval(id);
-                  if (response2.success) {
-                    console.log(response2);
-                    myToast.success(
-                      `Template (${response2.templateID}) is successfully created.`
-                    );
-                    fetch();
-                  }
-                }
-              }, 5000);
-            } else {
-              myToast.error("A temporary container cannot be created.");
+              const { containerID } = response;
+              const customToastId = myToast.custom(
+                <div className="flex flex-col space-y-2">
+                  <p>
+                    A temp workspace is created. Click the link to set up your
+                    workspace. After finish setup, click{" "}
+                    <span className="font-bold">Finish</span>.
+                  </p>
+                  <a
+                    className="btn btn-xs border-none"
+                    href={
+                      "https://codespace.ust.dev/user/container/" +
+                      containerID +
+                      "/"
+                    }
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Set up workspace
+                  </a>
+                  <div className="flex flex-row space-x-2">
+                    <button
+                      className="btn btn-xs bg-gray-500 text-white hover:bg-gray-400 dark:bg-gray-400 dark:hover:bg-gray-500 border-none"
+                      onClick={async () => {
+                        // cancel the build
+                        myToast.dismiss(customToastId);
+                        const response = await removeContainer(
+                          containerID,
+                          sub
+                        );
+                        if (response.success)
+                          console.log(
+                            "remove temporary workspace",
+                            containerID
+                          );
+                        else
+                          console.log(
+                            "fail to remove temporary workspace",
+                            response.message,
+                            containerID,
+                            sub
+                          );
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="btn btn-xs bg-green-500 text-white hover:bg-green-600 border-none "
+                      onClick={async () => {
+                        // build succeed
+                        myToast.dismiss(customToastId);
+                        const id = myToast.loading("Building your template...");
+                        const response = await addTemplate(
+                          data.name as string,
+                          data.description as string,
+                          sectionUserId,
+                          (data.environment as Option).id,
+                          "",
+                          containerID as string,
+                          false,
+                          data.is_exam as boolean,
+                          Number(data.time_limit),
+                          data.allow_notification as boolean
+                        );
+                        if (response.success) {
+                          fetch();
+                          myToast.dismiss(id);
+                        }
+                      }}
+                    >
+                      Finish
+                    </button>
+                  </div>
+                </div>,
+                "🗂"
+              );
             }
           } catch (error) {
             myToast.error(error.message);
@@ -487,6 +567,52 @@ const EnvironmentTemplateWrapper = ({
         setOpen={setTemplateUpdateOpen}
         formStructure={templateUpdateFormStructure}
         title="Update Template"
+        onClose={async (data, isEnter) => {
+          const { update_internal: containerId } = data;
+          if (containerId != "" && !isEnter) {
+            // remove the temp container
+            const response = await removeTempContainer(containerId, sub);
+            if (response.success)
+              console.log("temp container is successfully removed.");
+            else
+              console.error("fail to remove temp container", containerId, sub);
+            fetch();
+          }
+        }}
+        onEnter={async (data) => {
+          const id = myToast.loading("Updating the template...");
+          const {
+            name,
+            description,
+            update_internal: containerId,
+            allow_notification,
+            time_limit,
+            is_exam,
+          } = data;
+
+          const response = await updateTemplate(
+            templateUpdateTarget.id,
+            name,
+            description,
+            sectionUserId,
+            containerId,
+            is_exam,
+            time_limit,
+            allow_notification
+          );
+          myToast.dismiss(id);
+          if (response.success) {
+            myToast.success("Template is updated.");
+          } else {
+            myToast.error("Fail to update template.");
+            console.error(
+              response.message,
+              templateUpdateTarget.id,
+              containerId
+            );
+          }
+          fetch();
+        }}
       ></ModalForm>
     </>
   );
@@ -543,9 +669,11 @@ const Home = () => {
             courseTitle={sectionUserInfo.courseTitle}
             sectionCode={sectionUserInfo.sectionCode}
           ></CourseBar>
-          <EnvironmentTemplateWrapper
-            sectionUserInfo={sectionUserInfo}
-          ></EnvironmentTemplateWrapper>
+          <InstructorProvider sectionId={sectionId}>
+            <EnvironmentTemplateWrapper
+              sectionUserInfo={sectionUserInfo}
+            ></EnvironmentTemplateWrapper>
+          </InstructorProvider>
         </div>
       ) : (
         <Loader />

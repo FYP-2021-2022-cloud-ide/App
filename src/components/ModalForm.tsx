@@ -8,11 +8,14 @@ import { InformationCircleIcon } from "@heroicons/react/solid";
 // export type Data = { [id: string]: boolean | string | Option  };
 export type Data = { [id: string]: any };
 
+export type ValidationOutput = { ok: false; message: string } | { ok: true };
+
 export type Entry = {
   text?: string;
   description?: string;
   tooltip?: string;
   conditional?: (data: Data) => boolean; // return a boolean which determine whether it is shown
+  validate?: (data: Data) => ValidationOutput;
 } & (
   | {
       type: "input";
@@ -83,7 +86,9 @@ const Entry = ({
     return (
       <div className="" style={{ zIndex: zIndex }}>
         <div className="flex flex-row space-x-2  items-center">
-          {entry.text && <p className="modal-form-text-base">{entry.text}</p>}
+          {entry.text && (
+            <p className="modal-form-text-base capitalize">{entry.text}</p>
+          )}
           {entry.tooltip && (
             <div
               className="tooltip tooltip-bottom tooltip-info"
@@ -103,6 +108,10 @@ const Entry = ({
             }
             onChange(Object.assign(data, { [id]: text }), id);
           }}
+          validate={() => {
+            if (entry.validate) return entry.validate(data);
+            else return { ok: true, message: "" };
+          }}
         ></Input>
       </div>
     );
@@ -110,7 +119,9 @@ const Entry = ({
     return (
       <div style={{ zIndex: zIndex }}>
         <div className="flex flex-row space-x-2  items-center">
-          {entry.text && <p className="modal-form-text-base">{entry.text}</p>}
+          {entry.text && (
+            <p className="modal-form-text-base capitalize">{entry.text}</p>
+          )}
           {entry.tooltip && (
             <div
               className="tooltip tooltip-bottom tooltip-info"
@@ -138,7 +149,9 @@ const Entry = ({
     return (
       <div className="modal-form-list-box" style={{ zIndex: zIndex }}>
         <div className="flex flex-row space-x-2 items-center">
-          {entry.text && <p className="modal-form-text-base">{entry.text}</p>}
+          {entry.text && (
+            <p className="modal-form-text-base capitalize">{entry.text}</p>
+          )}
           {entry.tooltip && (
             <div
               className="tooltip tooltip-bottom tooltip-info"
@@ -160,7 +173,9 @@ const Entry = ({
   } else if (entry.type == "toggle") {
     return (
       <div className="modal-form-toggle" style={{ zIndex: zIndex }}>
-        {entry.text && <p className="modal-form-text-base">{entry.text}</p>}
+        {entry.text && (
+          <p className="modal-form-text-base capitalize">{entry.text}</p>
+        )}
         {entry.tooltip && (
           <div
             className="tooltip tooltip-bottom tooltip-info"
@@ -182,7 +197,9 @@ const Entry = ({
     return (
       <div style={{ zIndex: zIndex }}>
         <div className="flex flex-row space-x-2 items-center">
-          {entry.text && <p className="modal-form-text-base">{entry.text}</p>}
+          {entry.text && (
+            <p className="modal-form-text-base capitalize">{entry.text}</p>
+          )}
           {entry.tooltip && (
             <div
               className="tooltip tooltip-bottom tooltip-info"
@@ -267,26 +284,42 @@ const Input = ({
   placeholder,
   disabled = false,
   onChange,
+  validate,
 }: {
   text: string;
   placeholder: string;
   disabled?: boolean;
   onChange: (text: string) => void;
+  validate: () => ValidationOutput;
 }) => {
   const [text, setText] = useState(_text);
+  //@ts-ignore
+  const { ok, message } = validate();
   return (
-    <input
-      className={`modal-form-input ${
-        disabled ? "dark:text-gray-500 text-gray-300" : ""
+    <div
+      className={`w-full ${
+        ok ? "" : " tooltip-open tooltip tooltip-error tooltip-right"
       }`}
-      placeholder={placeholder}
-      value={text}
-      onChange={(e) => {
-        setText(e.target.value);
-        onChange(e.target.value);
-      }}
-      disabled={disabled}
-    ></input>
+      data-tip={message}
+    >
+      <input
+        className={`modal-form-input text-gray-500 dark:text-gray-300 ${
+          disabled ? "dark:text-gray-500 text-gray-300" : ""
+        } ${
+          ok
+            ? ""
+            : "border-red-400 border-2 bg-red-100 dark:bg-red-100  dark:border-red-400 dark:focus:outline-none text-gray-500 dark:text-gray-500"
+        }`}
+        placeholder={placeholder}
+        value={text}
+        data-tip={message}
+        onChange={(e) => {
+          setText(e.target.value);
+          onChange(e.target.value);
+        }}
+        disabled={disabled}
+      ></input>
+    </div>
   );
 };
 
@@ -339,6 +372,18 @@ const ModalForm = ({
     }
     setData(fromStructureToData(formStructure));
   };
+
+  const canProceed = (): boolean => {
+    return Object.keys(formStructure).every((sectionTitle) =>
+      Object.keys(formStructure[sectionTitle].entries).every((entryTitle) => {
+        if (formStructure[sectionTitle].entries[entryTitle].validate) {
+          return formStructure[sectionTitle].entries[entryTitle].validate(data)
+            .ok;
+        } else return true;
+      })
+    );
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -349,7 +394,7 @@ const ModalForm = ({
     >
       <div ref={ref} className={`modal-form ${sizeMap[size]}`}>
         <div className="modal-form-content">
-          <Dialog.Title as="h3" className="modal-form-title">
+          <Dialog.Title as="h3" className="modal-form-title capitalize">
             {title}
           </Dialog.Title>
           {Object.keys(formStructure).map((sectionTitle) => {
@@ -361,6 +406,7 @@ const ModalForm = ({
                 title={sectionTitle}
                 data={data}
                 onChange={(newData, id) => {
+                  console.log("on change");
                   setData(Object.assign({}, newData));
                   if (onChange) onChange(newData, id);
                 }}
@@ -378,7 +424,10 @@ const ModalForm = ({
               Cancel
             </button>
             <button
-              className="modal-form-btn-ok"
+              className={
+                canProceed() ? "modal-form-btn-ok" : "modal-form-btn-cancel"
+              }
+              disabled={!canProceed()}
               onClick={() => {
                 if (onEnter) {
                   onEnter(data);

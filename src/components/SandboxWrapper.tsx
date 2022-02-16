@@ -2,27 +2,17 @@ import React, { useEffect, useRef, useState } from "react";
 import { useCnails } from "../contexts/cnails";
 import { sandboxAPI } from "../lib/api/sandboxAPI";
 import { SandboxImage } from "../lib/cnails";
-import myToast from "../components/CustomToast";
-import ModalForm, { Section } from "../components/ModalForm";
-import SandboxImageList from "../components/SandboxImageList";
+import myToast from "./CustomToast";
+import ModalForm from "./ModalForm";
+import SandboxImageList from "./SandboxImageList";
 import { containerAPI } from "../lib/api/containerAPI";
-import { useRouter } from "next/router";
-
-import { Option } from "../components/ListBox";
+import { Option } from "./ListBox";
 import {
   getCreateSandboxFormStructure,
   getUpdateSandboxFormStructure,
-  getValidName,
 } from "../lib/forms";
-const registry = "143.89.223.188:5000";
-const rootImage = "143.89.223.188:5000/codeserver:latest";
 const CPU = 0.5;
 const memory = 400;
-const envChoices = [
-  { value: "C++/C", id: `${registry}/codeserver:latest` },
-  { value: "Python3", id: `${registry}/codeserver:latest` },
-  { value: "Java", id: `${registry}/codeserver:latest` },
-];
 
 async function fetchSandboxes(
   userId: string,
@@ -38,7 +28,7 @@ async function fetchSandboxes(
   }
 }
 
-const SandboxWrapper = () => {
+export const SandboxWrapper = () => {
   const mount = useRef(false);
   const { sub, userId, fetchContainers, containerQuota, containers } =
     useCnails();
@@ -232,13 +222,3 @@ const SandboxWrapper = () => {
     </>
   );
 };
-
-const Sandbox = () => {
-  return (
-    <div className="flex flex-col font-bold px-8 w-full h-full space-y-5">
-      <SandboxWrapper></SandboxWrapper>
-    </div>
-  );
-};
-
-export default Sandbox;

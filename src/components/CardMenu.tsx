@@ -31,8 +31,8 @@ export default function CardMenu({ items }: Props) {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <Menu.Items className="absolute z-[1] w-24 right-0 origin-top-right bg-white dark:bg-gray-900 dark:text-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none ">
-            <div className="px-1 py-1">
+          <Menu.Items className="absolute z-[1] right-0 origin-top-right bg-white dark:bg-gray-900 dark:text-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black dark:ring-gray-700 ring-opacity-5 focus:outline-none ">
+            <div className="p-1">
               {items
                 .filter((item) => {
                   if (!item.conditional) {
@@ -47,10 +47,8 @@ export default function CardMenu({ items }: Props) {
                       {({ active }) => (
                         <button
                           className={`${
-                            active
-                              ? "bg-gray-200 dark:bg-gray-800 font-semibold"
-                              : ""
-                          } text-left text-gray-900 dark:text-white group flex rounded-md items-center w-full px-2 py-2 text-sm`}
+                            active ? "bg-gray-200 dark:bg-gray-800" : ""
+                          } text-left text-gray-900 dark:text-white group flex rounded-md items-center w-full px-2 py-2 text-sm capitalize`}
                           onClick={(e) => {
                             e.stopPropagation();
                             if (item.onClick) {

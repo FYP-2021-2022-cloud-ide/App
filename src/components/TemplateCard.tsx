@@ -1,19 +1,75 @@
-import React, { useState } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import Menu, { MenuItem } from "./CardMenu";
 import { Template } from "../lib/cnails";
 import myToast from "./CustomToast";
+import Tilt from "react-parallax-tilt";
+
+export const useCleanTilt = () => {
+  const ref = useRef<Tilt>();
+  const cleanStyle = () =>
+    setTimeout(() => {
+      if (ref.current) {
+        //@ts-ignore
+        let node = ref.current.wrapperEl.node as HTMLDivElement;
+        if (node.getAttribute("style") != "") {
+          node.setAttribute("style", "");
+          cleanStyle();
+        }
+      }
+    }, 10);
+  useLayoutEffect(() => {
+    cleanStyle();
+  });
+  return { ref, cleanStyle };
+};
 
 interface Props {
   template: Template;
   onClick?: (template: Template) => void;
   onDelete?: (template: Template) => void;
   // return the newValue
-  onToggle?: (template: Template) => void;
+  onToggle?: (template: Template, open: boolean) => void;
   // return the new value
-  onToggleActivation?: (active: boolean) => void;
+  onToggleActivation?: (template: Template, active: boolean) => void;
   onToggleFreshSave?: (freshSave: boolean) => void;
+  onInspect?: (template: Template) => void;
+  onWorkspaceCardClick?: (template: Template) => void;
   onUpdate?: (template: Template) => void;
 }
+
+const EmbeddedWorkspaceCard = ({
+  template,
+  onClick,
+}: {
+  template: Template;
+  onClick: () => void;
+}) => {
+  return (
+    <div
+      className="rounded  bg-blue-200/20 dark:bg-black/30 p-2 flex flex-row space-x-2"
+      onClick={(e) => {
+        e.stopPropagation();
+        if (onClick) onClick();
+      }}
+    >
+      <span className="relative flex h-3 w-3">
+        {template.containerID && (
+          <span className="absolute animate-ping inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+        )}
+        <span
+          className={`relative inline-flex rounded-full h-3 w-3 ${
+            template.containerID ? "bg-green-400" : "bg-gray-400"
+          }`}
+        ></span>
+      </span>
+      <div className="env-card-content min-h-[32px]">
+        <p className="text-xs font-bold text-gray-700 dark:text-gray-300">
+          Workspace
+        </p>
+      </div>
+    </div>
+  );
+};
 
 function TemplateCard({
   template,
@@ -22,19 +78,21 @@ function TemplateCard({
   onDelete,
   onToggle,
   onToggleActivation,
+  onInspect,
+  onWorkspaceCardClick,
   onToggleFreshSave,
 }: Props) {
   let [useFreshSave, setUseFreshSave] = useState(false);
-
+  const { ref, cleanStyle } = useCleanTilt();
   var meunItems: MenuItem[] = [
     {
-      text: "delete",
+      text: "Delete",
       onClick: () => {
         if (onDelete) onDelete(template);
       },
     },
     {
-      text: "update",
+      text: "Update",
       onClick: () => {
         if (onUpdate) {
           onUpdate(template);
@@ -42,23 +100,29 @@ function TemplateCard({
       },
     },
     {
-      text: template.containerID ? "close" : "open",
+      text: template.containerID ? "Stop workspace" : "Start workspace",
       onClick: () => {
         if (onToggle) {
-          onToggle(template);
+          onToggle(template, !Boolean(template.containerID));
         }
       },
     },
     {
-      text: template.active ? "deactivate" : "activate",
+      text: template.active ? "Deactivate" : "Activate",
       onClick: () => {
         if (onToggleActivation) {
-          onToggleActivation(!Boolean(template.active));
+          onToggleActivation(template, !template.active);
         }
       },
     },
+    // {
+    //   text: "Inspect",
+    //   onClick: () => {
+    //     if (onInspect) onInspect(template);
+    //   },
+    // },
     {
-      text: "share link",
+      text: "Share link",
       onClick: () => {
         myToast.success("link to copied to clipboard.");
         navigator.clipboard.writeText(
@@ -66,78 +130,55 @@ function TemplateCard({
         );
       },
       conditional: () => {
-        return Boolean(template.active);
+        return template.active;
       },
     },
   ];
 
   return (
-    <div
-      onClick={() => {
-        if (onClick) onClick(template);
-      }}
-      className={`env-card ${
-        template.active
-          ? "bg-white dark:bg-gray-600"
-          : "bg-gray-200 dark:bg-gray-900"
-      }`}
+    <Tilt
+      onLeave={cleanStyle}
+      ref={ref}
+      tiltMaxAngleX={4}
+      tiltMaxAngleY={4}
+      tiltReverse
     >
-      <div className="env-card-content ">
-        <div className="flex flex-row">
-          <div className="w-1/12 mt-4">
-            <span className="relative flex h-3 w-3">
-              {template.containerID && (
-                <span className="absolute animate-ping inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-              )}
-              <span
-                className={`relative inline-flex rounded-full h-3 w-3 ${
-                  template.containerID ? "bg-green-400" : "bg-gray-400"
-                }`}
-              ></span>
-            </span>
-          </div>
-          <div className="flex flex-col h-full justify-between w-full">
+      <div
+        onClick={() => {
+          if (onClick) onClick(template);
+        }}
+        className={`env-card ${
+          template.active
+            ? "bg-white dark:bg-gray-600"
+            : "bg-gray-200 dark:bg-gray-900"
+        }`}
+      >
+        <div className="env-card-content justify-between w-full">
+          <div>
             <div>
-              <div className="font-semibold text-sm text-gray-600 dark:text-gray-300  text-left ">
+              <div className="font-semibold text-sm text-gray-600 dark:text-gray-300  whitespace-nowrap truncate">
                 {template.name}
               </div>
-              <div className="font-medium text-xs text-gray-400  ">
-                {template.imageId}
-              </div>
             </div>
-            <div className="font-medium text-xs text-gray-400 justify-self-end">
+            <div className="font-medium text-xs text-gray-400 line-clamp-3 ">
               {template.description}
             </div>
-            {/* {!template.isExam && (
-              <div>
-                <div className="flex flex-row font-medium mt-4 dark:text-gray-300">
-                  <span>Use fresh new save</span>
-                  <span>
-                    <InformationCircleIcon
-                      data-for="messageTip"
-                      data-tip
-                      className="w-6 h-6"
-                    ></InformationCircleIcon>
-                  </span>
-                </div>
-                <Toggle
-                  text={""}
-                  enabled={useFreshSave}
-                  onChange={() => setUseFreshSave(!useFreshSave)}
-                />
-              </div>
-            )}
-            {template.isExam && (
-              <div className="badge border-0 dark:bg-gray-300 dark:text-gray-600">
-                Exam
-              </div>
-            )} */}
           </div>
+          {template.containerID && (
+            <EmbeddedWorkspaceCard
+              template={template}
+              onClick={() => {
+                if (onWorkspaceCardClick) {
+                  onWorkspaceCardClick(template);
+                }
+              }}
+            />
+          )}
         </div>
-      </div>
 
-      <Menu items={meunItems}></Menu>
-    </div>
+        <Menu items={meunItems}></Menu>
+      </div>
+    </Tilt>
   );
 }
 

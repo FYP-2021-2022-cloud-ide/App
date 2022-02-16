@@ -23,7 +23,7 @@ const MoreButton = ({ onClick }: { onClick: () => void }) => {
 const NotificationBtn = ({ num }: { num: number }) => {
   return (
     <div
-      className="tooltip tooltip-bottom tooltip-primary flex item-center"
+      className="tooltip tooltip-bottom tooltip-info flex item-center"
       data-tip="Notification"
     >
       <Popover.Button className="indicator">

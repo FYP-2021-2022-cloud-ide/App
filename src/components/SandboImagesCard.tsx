@@ -51,10 +51,10 @@ const SandboxImagesCard = ({
           if (onClick) onClick(sandboxImage);
         }}
       >
-        <div className="sandbox-card-content">
-          {/* the indicator */}
-          <div className=" flex flex-row ">
-            <div className="w-1/12 mt-4">
+        <div className="sandbox-card-content grow">
+          <div className=" flex flex-row items-start space-x-2 ">
+            {/* the indicator */}
+            <div className="mt-2">
               <span className="relative flex h-3 w-3">
                 {sandboxImage.sandboxesId && (
                   <span className="absolute animate-ping inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
@@ -66,7 +66,7 @@ const SandboxImagesCard = ({
                 ></span>
               </span>
             </div>
-            <div className="   space-y-2 ">
+            <div className=" ">
               <div className="sandbox-card-name ">{sandboxImage.title}</div>
               <div className="sandbox-card-des">{sandboxImage.description}</div>
             </div>

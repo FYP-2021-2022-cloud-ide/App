@@ -26,8 +26,8 @@ const SandboxImageList = ({
   return (
     <div className="env-list-container">
       <div className="env-list-header">
-        <CubeTransparentIcon className="course-list-title-icon"></CubeTransparentIcon>
-        <div className="env-grid-title">Sandboxes</div>
+        {/* <CubeTransparentIcon className="course-list-title-icon"></CubeTransparentIcon> */}
+        <div className="env-grid-title">Personal Workspaces</div>
         <button
           onClick={() => {
             if (onCreateBtnClick) onCreateBtnClick();
@@ -40,30 +40,32 @@ const SandboxImageList = ({
       {
         // generate the sandbox cards
         sandboxImages.length == 0 ? (
-          <EmptyDiv message="You have no sandbox yet."></EmptyDiv>
+          <EmptyDiv message="You have no peronal workspaces."></EmptyDiv>
         ) : (
           <div className="env-grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {sandboxImages.map((sandboxImage) => (
-              <SandboxImagesCard
-                key={sandboxImage.id}
-                sandboxImage={sandboxImage}
-                onClick={(sandboxImage) => {
-                  if (onSandboxClick) onSandboxClick(sandboxImage);
-                }}
-                onDelete={(sandboxImage) => {
-                  if (onSandboxDelete) onSandboxDelete(sandboxImage);
-                }}
-                onUpdate={(sandboxImage) => {
-                  if (onSandboxUpdate) onSandboxUpdate(sandboxImage);
-                }}
-                onStart={(sandboxImage) => {
-                  if (onSandboxStart) onSandboxStart(sandboxImage);
-                }}
-                onStop={(sandboxImage) => {
-                  if (onSandboxStop) onSandboxStop(sandboxImage);
-                }}
-              ></SandboxImagesCard>
-            ))}
+            {sandboxImages
+              .sort((a, b) => a.title.localeCompare(b.title))
+              .map((sandboxImage) => (
+                <SandboxImagesCard
+                  key={sandboxImage.id}
+                  sandboxImage={sandboxImage}
+                  onClick={(sandboxImage) => {
+                    if (onSandboxClick) onSandboxClick(sandboxImage);
+                  }}
+                  onDelete={(sandboxImage) => {
+                    if (onSandboxDelete) onSandboxDelete(sandboxImage);
+                  }}
+                  onUpdate={(sandboxImage) => {
+                    if (onSandboxUpdate) onSandboxUpdate(sandboxImage);
+                  }}
+                  onStart={(sandboxImage) => {
+                    if (onSandboxStart) onSandboxStart(sandboxImage);
+                  }}
+                  onStop={(sandboxImage) => {
+                    if (onSandboxStop) onSandboxStop(sandboxImage);
+                  }}
+                ></SandboxImagesCard>
+              ))}
           </div>
         )
       }

@@ -32,8 +32,7 @@ function getEnvOptions(environments: Environment[]) {
   for (let i = 0; i < environments.length; i++) {
     options.push({
       id: environments[i].id,
-      value:
-        environments[i].environmentName + " (" + environments[i].imageId + ")",
+      value: environments[i].name,
       imageId: environments[i].imageId,
     } as Option);
   }
@@ -44,7 +43,7 @@ export const getCreateEnvironmentFormStructure = (
   environments: Environment[]
 ): FormStructure => {
   const validName = getValidName(
-    environments.map((env) => env.environmentName),
+    environments.map((env) => env.name),
     "Environment"
   );
   return {
@@ -63,7 +62,6 @@ export const getCreateEnvironmentFormStructure = (
           type: "listbox",
           defaultValue: envChoices[0],
           text: "Pick the Programming Language",
-          tooltip: "Pick the Programming Language",
           options: envChoices,
           conditional: (data) => {
             return data.is_predefined as boolean;
@@ -75,6 +73,11 @@ export const getCreateEnvironmentFormStructure = (
           text: "Name",
           placeholder: `e.g. ${validName}`,
           emptyValue: validName,
+          validate: (data) => {
+            if (environments.map((e) => e.name).includes(data.name))
+              return { ok: false, message: "Name crash" };
+            else return { ok: true };
+          },
         },
         description: {
           type: "textarea",
@@ -95,7 +98,7 @@ export const getUpdateEnvironmentFormStructure = (
     return {};
   }
   const validName = getValidName(
-    environments.map((env) => env.environmentName),
+    environments.map((env) => env.name),
     "Environment",
     true
   );
@@ -123,7 +126,7 @@ export const getUpdateEnvironmentFormStructure = (
                     target="_blank"
                     rel="noreferrer"
                   >
-                    Go to temp container
+                    Go to temp workspace
                   </a>
                 ) : (
                   <button
@@ -164,10 +167,20 @@ export const getUpdateEnvironmentFormStructure = (
         },
         name: {
           type: "input",
-          defaultValue: targetEnvironment.environmentName,
+          defaultValue: targetEnvironment.name,
           text: "Name",
           placeholder: `e.g. ${validName}`,
           emptyValue: validName,
+          validate: (data) => {
+            if (
+              environments
+                .map((e) => e.name)
+                .filter((n) => n != targetEnvironment.name)
+                .includes(data.name)
+            )
+              return { ok: false, message: "Name crash" };
+            else return { ok: true };
+          },
         },
         description: {
           type: "textarea",
@@ -189,6 +202,10 @@ export const getTemplateCreateFormStructure = (
   const envOptions = getEnvOptions(environments);
   if (envOptions.length == 0)
     throw new Error("there is no environment. The form should not be called");
+  const validName = getValidName(
+    templates.map((t) => t.name),
+    "Assignment Template"
+  );
   return {
     create_template: {
       entries: {
@@ -196,24 +213,23 @@ export const getTemplateCreateFormStructure = (
           text: "Environment",
           type: "listbox",
           options: envOptions,
-          tooltip: "Pick an environment which has been defined in the course.",
           defaultValue: envOptions[0],
         },
         name: {
           type: "input",
           defaultValue: "",
-          text: "Template name",
-          placeholder: `e.g. ${getValidName(
-            templates.map((t) => t.name),
-            "Assignment Template"
-          )}`,
+          text: "Name (Optional)",
+          placeholder: `e.g. ${validName}`,
+          emptyValue: validName,
+          validate: (data) => {
+            if (templates.map((t) => t.name).includes(data.name))
+              return { ok: false, message: "Name crash" };
+            else return { ok: true };
+          },
         },
         description: {
           type: "textarea",
-          placeholder: `e.g. ${getValidName(
-            templates.map((t) => t.name),
-            "Assignment Template"
-          )} is about ...`,
+          placeholder: `e.g. ${validName} is about ...`,
           defaultValue: "",
           text: "Description (Optional)",
         },
@@ -223,15 +239,14 @@ export const getTemplateCreateFormStructure = (
           text: "Can students send question to You? ",
           description: "Can students send question to You?",
           tooltip:
-            "Student can send comment to you by highlighting the code, useful for real-time interaction in tutorials.",
+            "Student can send comment to you by highlighting the code, useful for real-time interaction in tutorials and laboraries.",
         },
         is_exam: {
           type: "toggle",
           defaultValue: false,
           text: "Is it an Exam? ",
-          description: "whether this assignment is an exam",
           tooltip:
-            "Whether this assignment is an exam. The environment would be restricted to simple editors without compliers.",
+            "You can restrict the time span of the container if the template is for an exam.",
         },
         time_limit: {
           type: "input",
@@ -248,24 +263,99 @@ export const getTemplateCreateFormStructure = (
 };
 
 export const getTemplateUpdateFormStructure = (
-  TargetTemplate: Template,
+  sub: string,
+  targetTemplate: Template,
   templates: Template[],
   environments: Environment[]
 ): FormStructure => {
-  if (!TargetTemplate || templates.length == 0 || environments.length == 0)
+  if (!targetTemplate || templates.length == 0 || environments.length == 0)
     return {};
+  const validName = getValidName(
+    templates.map((t) => t.name),
+    "Assignment Template"
+  );
   return {
     update_template: {
       entries: {
+        update_internal: {
+          type: "custom",
+          defaultValue: "",
+          text: "Update internal",
+          tooltip: "Open a temp workspace for you to update the template.",
+          node: (onChange, currentValue) => {
+            const { addTempContainer } = containerAPI;
+            return (
+              <div>
+                {currentValue != "" ? (
+                  <a
+                    className="text-xs text-blue-500 underline justify-center"
+                    href={
+                      "https://codespace.ust.dev/user/container/" +
+                      currentValue +
+                      "/"
+                    }
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Go to temp workspace
+                  </a>
+                ) : (
+                  <button
+                    className="btn btn-wide btn-sm dark:btn-primary"
+                    onClick={async (e) => {
+                      const btn = e.currentTarget;
+                      btn.classList.add("loading");
+                      btn.textContent = "Loading";
+                      const response = await addTempContainer(
+                        memory,
+                        CPU,
+                        targetTemplate.imageId,
+                        sub,
+                        "root"
+                      );
+                      btn.classList.remove("loading");
+                      btn.textContent = "Click me";
+                      if (response.success) {
+                        const link =
+                          "https://codespace.ust.dev/user/container/" +
+                          response.containerID +
+                          "/";
+
+                        window.open(link);
+                        onChange(response.containerID);
+                      } else
+                        myToast.error(
+                          "fail to start temp container for this template."
+                        );
+                    }}
+                  >
+                    Click me
+                  </button>
+                )}
+              </div>
+            );
+          },
+        },
         name: {
           type: "input",
           defaultValue: "",
-          text: "Template name",
-          placeholder: "e.g. Assignment 1",
+          text: "Name (Optional)",
+          placeholder: `e.g. ${validName}`,
+          emptyValue: validName,
+          validate: (data) => {
+            if (
+              templates
+                .map((t) => t.name)
+                .filter((n) => n != targetTemplate.name)
+                .includes(data.name)
+            )
+              return { ok: false, message: "Name crash" };
+            else return { ok: true };
+          },
         },
         description: {
           type: "textarea",
-          placeholder: "e.g. Assignment 1 is about ...",
+          placeholder: "e.g. The assignment is about ...",
           defaultValue: "",
           text: "Description (Optional)",
         },
@@ -337,16 +427,20 @@ export const getCreateSandboxFormStructure = (
           type: "listbox",
           defaultValue: envChoices[0],
           text: "Pick the Programming Language",
-          description: "Pick the Programming Language",
-          tooltip: "Pick the Programming Language",
           options: envChoices,
         },
         name: {
           type: "input",
           defaultValue: "",
           placeholder: `e.g. ${validName}`,
+          tooltip: "test",
           emptyValue: validName,
           text: "Name (Optional)",
+          validate: (data) => {
+            if (sandboxes.map((s) => s.title).includes(data.name))
+              return { ok: false, message: "Name crash" };
+            return { ok: true };
+          },
         },
         description: {
           type: "textarea",
@@ -394,7 +488,7 @@ export const getUpdateSandboxFormStructure = (
                     target="_blank"
                     rel="noreferrer"
                   >
-                    Go to temp container
+                    Go to temp workspace
                   </a>
                 ) : (
                   <button
@@ -439,6 +533,16 @@ export const getUpdateSandboxFormStructure = (
           placeholder: `e.g. ${validName}`,
           emptyValue: validName,
           text: "Name (Optional)",
+          validate: (data) => {
+            if (
+              sandboxes
+                .map((s) => s.title)
+                .filter((n) => n != targetSandbox.title)
+                .includes(data.name)
+            )
+              return { ok: false, message: "Name crash" };
+            return { ok: true };
+          },
         },
         description: {
           type: "textarea",

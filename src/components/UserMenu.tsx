@@ -11,13 +11,12 @@ interface UserMenuProps {
 }
 
 export default function UserMenu({ sub, name, email }: UserMenuProps) {
-  const { isDark } = useTheme();
   return (
-    <div className={`w-fit  text-right top-16 ${isDark && "dark"}`}>
+    <div className={`w-fit  text-right top-16 `}>
       <Menu as="div" className="relative text-left">
         <div
           data-tip="User menu"
-          className="tooltip tooltip-primary tooltip-bottom"
+          className="tooltip tooltip-info tooltip-bottom"
         >
           <Menu.Button className="justify-center text-sm font-medium rounded-md hover:scale-105 transition ease-in-out duration-200 dark:text-gray-300">
             {sub}
@@ -41,33 +40,7 @@ export default function UserMenu({ sub, name, email }: UserMenuProps) {
                 {email}
               </div>
             </div>
-            <div className="px-1 py-1">
-              {/* <Menu.Item>
-                {({ active }) => (
-                  <button
-                    className={`${
-                      active ? 'bg-gray-200 dark:font-semibold dark:bg-gray-500' : ''
-                    } text-[#775FBD] dark:text-gray-300 group flex rounded-md items-center w-full px-2 py-2 text-sm`}
-                  >
-                    Profile
-                  </button>
-                )}
-              </Menu.Item> */}
-              <Menu.Item>
-                {({ active }) => (
-                  <Link href="/settings">
-                    <button
-                      className={`${
-                        active
-                          ? "bg-gray-200 dark:bg-gray-500 dark:font-semibold"
-                          : ""
-                      } text-[#775FBD] dark:text-gray-300 group flex rounded-md items-center w-full px-2 py-2 text-sm`}
-                    >
-                      Settings
-                    </button>
-                  </Link>
-                )}
-              </Menu.Item>
+            <div className="p-1">
               <Menu.Item>
                 {({ active }) => (
                   <div

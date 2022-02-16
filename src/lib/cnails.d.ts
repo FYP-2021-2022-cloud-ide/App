@@ -17,7 +17,8 @@ export type {
   ContainerList,
   Notification,
   ActionType,
-  CnailsContextState
+  CnailsContextState,
+  InstructorContextState
 };
 
 type SectionRole = "INSTRUCTOR" | "STUDENT";
@@ -26,7 +27,7 @@ type Environment = {
   id: string;
   imageId: string;
   libraries: string;
-  environmentName: string;
+  name: string;
   description: string;
 };
 
@@ -124,6 +125,12 @@ type CnailsContextState = {
   fetchNotifications: (userId: string) => Promise<Notification[]>,
   containerQuota: number,
 };
+
+type InstructorContextState = {
+  environments: Environment[],
+  templates: Template[],
+  fetch: () => void,
+}
 
 
 export type ActionType = "delete" | "reply";

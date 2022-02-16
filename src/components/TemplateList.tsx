@@ -1,11 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { DocumentTextIcon } from "@heroicons/react/outline";
 import { PlusCircleIcon } from "@heroicons/react/solid";
-import { Option } from "./ListBox";
 //testing
 import EmptyDiv from "./EmptyDiv";
-import ModalForm, { Section } from "./ModalForm";
-import myToast from "./CustomToast";
 import { Environment, Template } from "../lib/cnails";
 import TemplateCard from "./TemplateCard";
 
@@ -17,8 +14,10 @@ export type Props = {
   onClick?: (template: Template) => void;
   onDelete?: (template: Template) => void;
   onUpdate?: (template: Template) => void;
-  onToggle?: (template: Template) => void;
-  onToggleActivation?: (template: Template, open: boolean) => void;
+  onToggle?: (template: Template, open: boolean) => void;
+  onWorkspaceCardClick?: (template: Template) => void;
+  onInspect?: (template: Template) => void;
+  onToggleActivation?: (template: Template, active: boolean) => void;
 };
 
 const TemplateList = ({
@@ -30,10 +29,10 @@ const TemplateList = ({
   onDelete,
   onToggle,
   onToggleActivation,
+  onWorkspaceCardClick,
+  onInspect,
   onUpdate,
 }: Props) => {
-  let ref = React.createRef<HTMLDivElement>();
-
   return (
     <div className="flex flex-col w-full">
       <div className="course-list-title">
@@ -64,13 +63,19 @@ const TemplateList = ({
                   onDelete={() => {
                     if (onDelete) onDelete(template);
                   }}
-                  onToggle={() => {
-                    if (onToggle) onToggle(template);
+                  onToggle={(template, open) => {
+                    if (onToggle) onToggle(template, open);
                   }}
                   onUpdate={(template) => {
                     if (onUpdate) onUpdate(template);
                   }}
-                  onToggleActivation={(active) => {
+                  onWorkspaceCardClick={(template) => {
+                    if (onWorkspaceCardClick) onWorkspaceCardClick(template);
+                  }}
+                  onInspect={(template) => {
+                    if (onInspect) onInspect(template);
+                  }}
+                  onToggleActivation={(template, active) => {
                     if (onToggleActivation)
                       onToggleActivation(template, active);
                   }}

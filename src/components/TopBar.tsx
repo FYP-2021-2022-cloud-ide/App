@@ -39,17 +39,17 @@ const TopBar = ({ sub, name, email }: props) => {
         <UserMenu sub={sub} name={name} email={email}></UserMenu>
         <NotiStack />
         <div
-          className="tooltip tooltip-bottom tooltip-primary"
+          className="tooltip tooltip-bottom tooltip-info"
           data-tip="Help and docs"
         >
-          <Link href="/FAQ">
-            <a href="">
+          <Link href="">
+            <a href="https://brenkysbwim.gitbook.io/cnails/" target="_blank">
               <QuestionMarkCircleIcon className="top-bar-icon"></QuestionMarkCircleIcon>
             </a>
           </Link>
         </div>
         <div
-          className="tooltip tooltip-bottom tooltip-bottom-left tooltip-primary"
+          className="tooltip tooltip-bottom tooltip-bottom-left tooltip-info"
           data-tip="Change theme"
         >
           {isDark ? (

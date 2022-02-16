@@ -2,14 +2,23 @@ import CodeSpace from "./ContainerCard";
 import EmptyDiv from "../EmptyDiv";
 import { Container, ContainerInfo } from "../../lib/cnails";
 import { useCnails } from "../../contexts/cnails";
+import { useEffect } from "react";
 
 type Props = {
   containerInfo: ContainerInfo;
   containers: Container[];
 };
 
-const ContainersList = ({ containers, containerInfo }: Props) => {
-  const { containerQuota } = useCnails();
+const ContainersList = () => {
+  const { sub, containers, containerInfo, fetchContainers, containerQuota } =
+    useCnails();
+  useEffect(() => {
+    fetchContainers(sub);
+  }, []);
+
+  // don't need to go down
+  if (!containers || !containerInfo || !containerQuota) return <></>;
+
   if (containerInfo.containersAlive != containers.length) {
     console.error("container active number does not match");
   }
@@ -18,8 +27,8 @@ const ContainersList = ({ containers, containerInfo }: Props) => {
   const Header = () => {
     return (
       <div className="current-run-header">
-        <div className="current-run-title">Current Run</div>
-        <div className="flex flex-col justify-between w-3/5">
+        <div className="current-run-title">Current Running Containers</div>
+        <div className="flex flex-col justify-between w-32">
           <div className="current-run-percentage">
             {containers.length}/{containerQuota}
           </div>

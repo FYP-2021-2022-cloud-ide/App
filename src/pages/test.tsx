@@ -3,18 +3,9 @@ import Layout from "../components/Layout";
 
 const Temp = () => {
   return (
-    <div className="w-64 h-36 border ">
-      <div className="w-full flex flex-row justify-between">
-        <div className="flex flex-col w-full min-w-[0px]">
-          <div className="w-full">
-            <p className="truncate shrink ">
-              skfopsdjfisdjfiodjsfoiajsdifodoasjfojdsaifjiosjadfiojsdafijsidfjoidjsfhweiuhrieuwbjksdbfkjs
-            </p>
-          </div>
-        </div>
-        <div className="w-5 h-5 bg-black shrink-0"></div>
-      </div>
-    </div>
+    <button className="btn btn-xs bg-gray-500 text-white hover:bg-gray-400 dark:bg-gray-400 dark:hover:bg-gray-500 border-none">
+      soemthing
+    </button>
   );
 };
 

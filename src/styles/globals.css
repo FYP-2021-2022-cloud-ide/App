@@ -28,11 +28,11 @@
   @apply min-h-[0px] outline-none border-none;
 }
 .current-run-title {
-  @apply text-xl text-gray-600 dark:text-gray-300 font-bold;
+  @apply text-xl text-gray-600 dark:text-gray-300 font-bold whitespace-nowrap;
 }
 
 .current-run-header {
-  @apply flex flex-row  max-w-xs justify-between mb-6;
+  @apply flex flex-row space-x-3 mb-2;
 }
 
 .current-run-percentage {
@@ -162,7 +162,7 @@
 }
 
 .modal-form-input {
-  @apply border dark:border-0 focus:outline-none dark:bg-gray-700 p-1 px-3 w-full text-gray-500 dark:text-gray-300 flex-row space-x-2  text-left rounded-md shadow-lg;
+  @apply border dark:border-0 focus:outline-none dark:bg-gray-700 p-1 px-3 w-full flex-row space-x-2  text-left rounded-md shadow-lg;
 }
 
 .modal-form-list-box {
@@ -189,7 +189,7 @@
 }
 
 .tooltip::before {
-  @apply shadow-lg z-10;
+  @apply shadow-lg z-10 text-xs;
 }
 
 .tooltip::after {
@@ -210,6 +210,10 @@
 
 .tooltip-info::after {
   @apply border-b-blue-100/50 dark:border-b-blue-300/50;
+}
+
+.tooltip-error:before {
+  @apply text-xs bg-red-300 text-red-700;
 }
 
 .course-list-title-add {
@@ -289,7 +293,7 @@
 .env-grid,
 .template-grid,
 .sandbox-grid {
-  @apply grid grid-cols-1 gap-4 lg:grid-cols-2 flex-1;
+  @apply grid grid-cols-1 gap-4 lg:grid-cols-2;
 }
 
 .env-grid-title,
@@ -299,9 +303,12 @@
 }
 
 .env-card,
-.template-card,
+.template-card {
+  @apply cursor-pointer border border-gray-200 dark:border-gray-700 shadow-sm rounded-lg bg-white dark:bg-gray-600 px-4 py-4 min-h-[9rem] h-48 flex flex-row items-start justify-between;
+}
+
 .sandbox-card {
-  @apply cursor-pointer border border-gray-200 dark:border-gray-700 shadow-sm rounded-lg bg-white dark:bg-gray-600 px-4 py-4 min-h-[9rem] h-36 flex flex-row items-start justify-between;
+  @apply cursor-pointer border border-gray-200 dark:border-gray-700 shadow-sm rounded-lg bg-white dark:bg-gray-600 px-4 py-4 min-h-[9rem] h-32 flex flex-row items-start justify-between;
 }
 
 .env-card-content,
@@ -326,7 +333,7 @@
 
 .env-card-des,
 .sandbox-card-des {
-  @apply font-medium max-w-full text-xs text-gray-400 truncate;
+  @apply font-medium max-w-full text-xs text-gray-400 line-clamp-3;
 }
 
 .empty-div {
