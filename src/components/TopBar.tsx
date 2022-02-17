@@ -39,12 +39,13 @@ const TopBar = ({ sub, name, email }: props) => {
         <UserMenu sub={sub} name={name} email={email}></UserMenu>
         <NotiStack />
         <Link href="">
-          <a
-            href="https://brenkysbwim.gitbook.io/cnails/"
-            target="_blank"
-            title="Help and docs"
-          >
-            <QuestionMarkCircleIcon className="top-bar-icon"></QuestionMarkCircleIcon>
+          <a href="" title="Help and docs">
+            <QuestionMarkCircleIcon
+              className="top-bar-icon"
+              onClick={() => {
+                window.open("https://brenkysbwim.gitbook.io/cnails/");
+              }}
+            ></QuestionMarkCircleIcon>
           </a>
         </Link>
         <div title="Change Theme">

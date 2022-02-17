@@ -346,7 +346,9 @@
 }
 
 .env-card-des,
-.sandbox-card-des {
+.sandbox-card-des,
+.template-card-des,
+.workspace-card-des {
   @apply font-medium max-w-full text-xs text-gray-400 line-clamp-4 whitespace-pre-line;
 }
 

@@ -200,9 +200,7 @@ function TemplateCard({
                 <span className="font-bold">{environments[belong].name}</span>
               </div>
             )}
-            <pre className=" text-xs text-gray-400 line-clamp-4 ">
-              {template.description}
-            </pre>
+            <p className="template-card-des">{template.description}</p>
           </div>
           {template.containerID && (
             <EmbeddedWorkspaceCard
