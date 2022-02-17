@@ -2,6 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef } from "react";
 import CardMenu from "./CardMenu";
 import Tilt from "react-parallax-tilt";
 import { Environment } from "../lib/cnails";
+import { useCleanTilt } from "./TemplateCard";
 
 type Props = {
   environment: Environment;
@@ -9,6 +10,7 @@ type Props = {
   onDelete?: (environment: Environment) => void;
   onUpdate?: (environment: Environment) => void;
   onHighlight?: (environment: Environment) => void;
+  zIndex?: number;
 };
 
 function EnvironmentCard({
@@ -17,22 +19,38 @@ function EnvironmentCard({
   onDelete,
   onUpdate,
   onHighlight,
+  zIndex,
 }: Props) {
-  const ref = useRef<Tilt>();
-  const cleanStyle = () =>
-    setTimeout(() => {
-      if (ref.current) {
-        //@ts-ignore
-        let node = ref.current.wrapperEl.node as HTMLDivElement;
-        if (node.getAttribute("style") != "") {
-          node.setAttribute("style", "");
-          cleanStyle();
+  const { ref, cleanStyle } = useCleanTilt(
+    zIndex ? `z-index : ${zIndex};` : ""
+  );
+  const menuItems = [];
+  if (onDelete)
+    menuItems.push({
+      text: "Delete",
+      onClick: () => {
+        if (onDelete) {
+          onDelete(environment);
         }
-      }
-    }, 10);
-  useLayoutEffect(() => {
-    cleanStyle();
-  });
+      },
+    });
+  if (onUpdate)
+    menuItems.push({
+      text: "Update",
+      onClick: () => {
+        if (onUpdate) {
+          onUpdate(environment);
+        }
+      },
+    });
+  if (onHighlight)
+    menuItems.push({
+      text: "Highlight templates",
+      onClick: () => {
+        if (onHighlight) onHighlight(environment);
+      },
+    });
+
   return (
     <Tilt
       onLeave={cleanStyle}
@@ -51,34 +69,9 @@ function EnvironmentCard({
           <div className="env-card-name">{environment.name}</div>
           <div className="env-card-lib">{environment.libraries}</div>
           {/* <div className="env-card-ref">{environment.imageId}</div> */}
-          <div className="env-card-des">{environment.description}</div>
+          <p className="env-card-des">{environment.description}</p>
         </div>
-        <CardMenu
-          items={[
-            {
-              text: "Delete",
-              onClick: () => {
-                if (onDelete) {
-                  onDelete(environment);
-                }
-              },
-            },
-            {
-              text: "Update",
-              onClick: () => {
-                if (onUpdate) {
-                  onUpdate(environment);
-                }
-              },
-            },
-            {
-              text: "Highlight templates",
-              onClick: () => {
-                if (onHighlight) onHighlight(environment);
-              },
-            },
-          ]}
-        ></CardMenu>
+        <CardMenu items={menuItems}></CardMenu>
       </div>
     </Tilt>
   );

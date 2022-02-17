@@ -68,7 +68,7 @@ const CoursesList = () => {
                 : 1;
             else return 0;
           })
-          .map((course: Course) => {
+          .map((course, index) => {
             var link =
               "/course/" +
               course.sectionID +
@@ -79,6 +79,7 @@ const CoursesList = () => {
                 key={course.sectionID}
                 link={link}
                 course={course}
+                zIndex={courses.length - index}
               ></CourseCard>
             );
           })}

@@ -1,5 +1,5 @@
 import Router, { useRouter } from "next/router";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { useCnails } from "../../../../contexts/cnails";
 import Loader from "../../../../components/Loader";
 import { generalAPI } from "../../../../lib/api/generalAPI";
@@ -21,21 +21,34 @@ import {
 import ModalForm, { Section } from "../../../../components/ModalForm";
 import { containerAPI } from "../../../../lib/api/containerAPI";
 import EnvironmentList from "../../../../components/EnvironmentList";
-import CourseBar from "../../../../components/course/CourseBar";
+import CourseBar from "../../../../components/CourseBar";
 import Breadcrumbs from "../../../../components/Breadcrumbs";
 import TemplateList from "../../../../components/TemplateList";
 import {
   getCreateEnvironmentFormStructure,
-  getTemplateCreateFormStructure,
-  getTemplateUpdateFormStructure,
+  getCreateTemplateFormStructure,
+  getUpdateTemplateFormStructure,
   getUpdateEnvironmentFormStructure,
-  getValidName,
 } from "../../../../lib/forms";
 import _ from "lodash";
 
 const rootImage = "143.89.223.188:5000/codeserver:latest";
 const CPU = 0.5;
 const memory = 400;
+
+// Returning a new object reference guarantees that a before-and-after
+//   equivalence check will always be false, resulting in a re-render, even
+//   when multiple calls to forceUpdate are batched.
+
+export function useForceUpdate(): () => void {
+  const [, dispatch] = useState<{}>(Object.create(null));
+
+  // Turn dispatch(required_parameter) into dispatch().
+  const memoizedDispatch = useCallback((): void => {
+    dispatch(Object.create(null));
+  }, [dispatch]);
+  return memoizedDispatch;
+}
 
 const InstructorContext = React.createContext({} as InstructorContextState);
 export const useInstructor = () => useContext(InstructorContext);
@@ -49,6 +62,8 @@ export const InstructorProvider = ({
   const { sub, fetchContainers } = useCnails();
   const [environments, setEnvironments] = useState<Environment[]>(null);
   const [templates, setTemplates] = useState<Template[]>(null);
+  const [highlightedEnv, setHighlightedEnv] = useState<Environment>(null);
+
   const fetch = () => {
     fetchEnvironmentsAndTemplates(
       sectionUserInfo.sectionId,
@@ -74,6 +89,7 @@ export const InstructorProvider = ({
             assignment_config_id: t.assignment_config_id,
             storage: t.storage,
             containerID: t.containerID,
+            environment_id: t.environment_id,
             active: t.active,
             isExam: t.isExam,
             timeLimit: t.timeLimit,
@@ -98,6 +114,8 @@ export const InstructorProvider = ({
         templates,
         fetch,
         sectionUserInfo,
+        highlightedEnv,
+        setHighlightedEnv,
       }}
     >
       {children}
@@ -129,7 +147,8 @@ async function fetchEnvironmentsAndTemplates(
 const EnvironmentTemplateWrapper = () => {
   const router = useRouter();
   const { sub } = useCnails();
-  const { environments, templates, fetch, sectionUserInfo } = useInstructor();
+  const { environments, templates, fetch, sectionUserInfo, setHighlightedEnv } =
+    useInstructor();
   const { sectionUserId } = sectionUserInfo;
   const [envCreateOpen, setEnvCreateOpen] = useState(false);
   const [envUpdateOpen, setEnvUpdateOpen] = useState(false);
@@ -138,6 +157,7 @@ const EnvironmentTemplateWrapper = () => {
   const [envUpdateTarget, setEnvUpdateTarget] = useState<Environment>(null);
   const [templateUpdateTarget, setTemplateUpdateTarget] =
     useState<Template>(null);
+  const forceUpdate = useForceUpdate();
 
   const {
     removeTemplate,
@@ -169,11 +189,11 @@ const EnvironmentTemplateWrapper = () => {
     envUpdateTarget,
     environments
   );
-  const templateCreateFormStructure = getTemplateCreateFormStructure(
+  const templateCreateFormStructure = getCreateTemplateFormStructure(
     templates,
     environments
   );
-  const templateUpdateFormStructure = getTemplateUpdateFormStructure(
+  const templateUpdateFormStructure = getUpdateTemplateFormStructure(
     sub,
     templateUpdateTarget,
     templates,
@@ -193,15 +213,16 @@ const EnvironmentTemplateWrapper = () => {
             // console.log(router.asPath);
           }}
           onEnvDelete={async (env) => {
-            function checkDeleteValid(env: Environment): boolean {
-              for (let t of templates) {
-                if (t.imageId == env.imageId) {
-                  return false;
-                }
-              }
-              return true;
-            }
-            if (checkDeleteValid(env)) {
+            const l = templates.filter(
+              (t) => t.environment_id === env.id
+            ).length;
+            if (l != 0) {
+              myToast.error(
+                `Fail to removed environment. ${l} template${
+                  l > 1 ? "s are" : " is"
+                } still using ${env.name}.`
+              );
+            } else {
               const response = await removeEnvironment(env.id, sectionUserId);
               if (response.success) {
                 myToast.success(
@@ -211,12 +232,15 @@ const EnvironmentTemplateWrapper = () => {
             }
             fetch();
           }}
-          onEnvHighlight={() => {
-            throw new Error("not implemented");
-          }}
           onEnvUpdate={(env) => {
             setEnvUpdateOpen(true);
             setEnvUpdateTarget(env);
+          }}
+          onEnvHighlight={(env) => {
+            if (templates.some((t) => t.environment_id === env.id)) {
+              setHighlightedEnv(env);
+              forceUpdate();
+            } else myToast.warning(`No template is using ${env.name}.`);
           }}
         ></EnvironmentList>
         <TemplateList
@@ -258,49 +282,62 @@ const EnvironmentTemplateWrapper = () => {
             if (template.containerID) {
               const response = await removeContainer(template.containerID, sub);
               if (response.success) {
-                myToast.success("Template workspace is successfully removed. ");
+                myToast.success("Template workspace is successfully stopped. ");
               } else
                 myToast.error(
-                  `Template workspace cannot be removed. ${response.message}`
+                  `Template workspace cannot be stopped. ${response.message}`
                 );
             } else {
-              const id = myToast.loading("Creating workspace...");
+              const id = myToast.loading("Starting workspace...");
               const response = await addContainer(
                 template.imageId,
                 memory,
                 CPU,
                 sectionUserId,
                 template.id,
-                "root",
+                "student",
                 false
               );
               myToast.dismiss(id);
               if (response.success) {
-                myToast.success("Template workspace is successfully created.");
+                myToast.success("Template workspace is successfully started.");
               } else
                 myToast.error(
-                  `Template workspace cannot be created. ${response.message}`
+                  `Template workspace cannot be started. ${response.message}`
                 );
             }
             fetch();
           }}
           onToggleActivation={async (template) => {
-            if (template.active) {
+            if (!template.active) {
+              const id = myToast.loading(`Publishing the ${template.name}...`);
               const response = await activateTemplate(
-                template.containerID,
+                template.id,
                 sectionUserId
               );
+              myToast.dismiss(id);
               if (response.success) {
-                myToast.success("Template is activated.");
+                myToast.success(`${template.name} is published.`);
+              } else {
+                myToast.error(
+                  `${template.name} cannot be published. ${response.message}.`
+                );
               }
             } else {
+              const id = myToast.loading(
+                `Unpublishing the ${template.name}...`
+              );
               const response = await deactivateTemplate(
-                template.containerID,
+                template.id,
                 sectionUserId
               );
+              myToast.dismiss(id);
               if (response.success) {
-                myToast.success("Template is deactivated.");
-              }
+                myToast.success(`${template.name} is unpublished.`);
+              } else
+                myToast.error(
+                  `${template.name} cannot be unpublished. ${response.message}.`
+                );
             }
             fetch();
           }}
@@ -318,6 +355,7 @@ const EnvironmentTemplateWrapper = () => {
         onEnter={async (data) => {
           // console.log(data);
           const { environment_choice: environment, name, description } = data;
+          const id = myToast.loading("Creating the environment...");
           if (data.is_predefined) {
             const response = await addEnvironment(
               [environment.value + ":" + environment.id],
@@ -325,17 +363,18 @@ const EnvironmentTemplateWrapper = () => {
               description,
               sectionUserId
             );
-
+            myToast.dismiss(id);
             if (response.success) {
               const { environmentID } = response;
               myToast.success(
                 `Environment (${environmentID}) is successfully created.`
               );
               fetch();
+            } else {
+              myToast.error(`Fail to create environment. ${response.message}`);
             }
           }
           if (!data.is_predefined) {
-            const id = myToast.loading("Creating the environment...");
             try {
               const response = await addTempContainer(
                 memory,
@@ -577,9 +616,12 @@ const EnvironmentTemplateWrapper = () => {
           environments.length != 0 &&
           templates.length != 0
         }
-        // clickOutsideToClose
+        clickOutsideToClose
         setOpen={setTemplateUpdateOpen}
         formStructure={templateUpdateFormStructure}
+        onChange={(data, id) => {
+          console.log(data, id);
+        }}
         title="Update Template"
         onClose={async (data, isEnter) => {
           const { update_internal: containerId } = data;
@@ -641,7 +683,6 @@ const Home = () => {
   const { sub } = useCnails();
   const fetchSectionUserInfo = async () => {
     const response = await getSectionUserInfo(sectionId, sub); //
-    console.log(response);
 
     if (response.success) {
       const { courseName, role, sectionUserID } = response;
@@ -666,7 +707,7 @@ const Home = () => {
   return (
     <div className="w-full">
       {sectionUserInfo ? (
-        <div className="flex flex-col font-bold px-8 w-full text-gray-600 space-y-4">
+        <div className="flex flex-col  px-8 w-full space-y-4">
           <Breadcrumbs
             elements={[
               {
@@ -674,7 +715,7 @@ const Home = () => {
                 path: "/",
               },
               {
-                name: sectionUserInfo.courseCode,
+                name: `${sectionUserInfo.courseCode} (${sectionUserInfo.sectionCode})`,
                 path: `/course/${sectionId}/instructor`,
               },
             ]}

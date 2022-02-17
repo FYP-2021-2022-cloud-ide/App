@@ -1,30 +1,42 @@
-import React, { useLayoutEffect, useRef, useState } from "react";
+import React, {
+  Fragment,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import Menu, { MenuItem } from "./CardMenu";
 import { Template } from "../lib/cnails";
 import myToast from "./CustomToast";
 import Tilt from "react-parallax-tilt";
+import { EyeIcon, EyeOffIcon } from "@heroicons/react/solid";
+import { useInstructor } from "../pages/course/[sectionId]/instructor";
 
-export const useCleanTilt = () => {
+export const useCleanTilt = (preserve: string = "") => {
   const ref = useRef<Tilt>();
-  const cleanStyle = () =>
-    setTimeout(() => {
+  const cleanStyle = () => {
+    const id = setTimeout(() => {
       if (ref.current) {
         //@ts-ignore
         let node = ref.current.wrapperEl.node as HTMLDivElement;
-        if (node.getAttribute("style") != "") {
-          node.setAttribute("style", "");
+        if (node.getAttribute("style") != preserve) {
+          node.setAttribute("style", preserve);
           cleanStyle();
         }
       }
     }, 10);
+    return id;
+  };
   useLayoutEffect(() => {
-    cleanStyle();
+    const id = cleanStyle();
+    return () => clearTimeout(id);
   });
   return { ref, cleanStyle };
 };
 
 interface Props {
   template: Template;
+  highlighted?: Boolean;
   onClick?: (template: Template) => void;
   onDelete?: (template: Template) => void;
   // return the newValue
@@ -35,6 +47,7 @@ interface Props {
   onInspect?: (template: Template) => void;
   onWorkspaceCardClick?: (template: Template) => void;
   onUpdate?: (template: Template) => void;
+  zIndex?: number;
 }
 
 const EmbeddedWorkspaceCard = ({
@@ -73,6 +86,7 @@ const EmbeddedWorkspaceCard = ({
 
 function TemplateCard({
   template,
+  highlighted: _highlighted = false,
   onClick,
   onUpdate,
   onDelete,
@@ -81,47 +95,57 @@ function TemplateCard({
   onInspect,
   onWorkspaceCardClick,
   onToggleFreshSave,
+  zIndex,
 }: Props) {
-  let [useFreshSave, setUseFreshSave] = useState(false);
-  const { ref, cleanStyle } = useCleanTilt();
-  var meunItems: MenuItem[] = [
-    {
+  const [useFreshSave, setUseFreshSave] = useState(false);
+  const { environments, highlightedEnv, setHighlightedEnv } = useInstructor();
+  const { ref, cleanStyle } = useCleanTilt(
+    zIndex ? `z-index : ${zIndex};` : ""
+  );
+  const belong = environments.findIndex(
+    (e) => e.id === template.environment_id
+  );
+  var meunItems: MenuItem[] = [];
+  if (onDelete)
+    meunItems.push({
       text: "Delete",
       onClick: () => {
-        if (onDelete) onDelete(template);
+        onDelete(template);
       },
-    },
-    {
+    });
+  if (onUpdate)
+    meunItems.push({
       text: "Update",
       onClick: () => {
-        if (onUpdate) {
-          onUpdate(template);
-        }
+        onUpdate(template);
       },
-    },
-    {
+    });
+  if (onToggle)
+    meunItems.push({
       text: template.containerID ? "Stop workspace" : "Start workspace",
       onClick: () => {
         if (onToggle) {
           onToggle(template, !Boolean(template.containerID));
         }
       },
-    },
-    {
-      text: template.active ? "Deactivate" : "Activate",
+    });
+  // if (onInspect)
+  //   meunItems.push({
+  //     text: "Inspect",
+  //     onClick: () => {
+  //       onInspect(template);
+  //     },
+  //   });
+  if (onToggleActivation) {
+    meunItems.push({
+      text: template.active ? "Unpublish" : "Publish",
       onClick: () => {
-        if (onToggleActivation) {
-          onToggleActivation(template, !template.active);
-        }
+        onToggleActivation(template, !template.active);
       },
-    },
-    // {
-    //   text: "Inspect",
-    //   onClick: () => {
-    //     if (onInspect) onInspect(template);
-    //   },
-    // },
-    {
+    });
+  }
+  if (template.active)
+    meunItems.push({
       text: "Share link",
       onClick: () => {
         myToast.success("link to copied to clipboard.");
@@ -129,11 +153,19 @@ function TemplateCard({
           "https://codespace.ust.dev/quickAssignmentInit/" + template.id
         );
       },
-      conditional: () => {
-        return template.active;
-      },
-    },
-  ];
+    });
+
+  useEffect(() => {
+    if (highlightedEnv && highlightedEnv.id === template.environment_id) {
+      // setHighlighted(false);
+      const id = setTimeout(() => {
+        setHighlightedEnv(null);
+      }, 1000);
+      return () => {
+        clearTimeout(id);
+      };
+    }
+  });
 
   return (
     <Tilt
@@ -147,10 +179,12 @@ function TemplateCard({
         onClick={() => {
           if (onClick) onClick(template);
         }}
-        className={`template-card ${
-          template.active
-            ? "bg-white dark:bg-gray-600"
-            : "bg-gray-200 dark:bg-gray-900"
+        className={`template-card  transition-all duration-300 ease-in ${
+          highlightedEnv && highlightedEnv.id === template.environment_id
+            ? "bg-yellow-300/80 shadow-yellow-300 shadow-xl"
+            : template.active
+            ? "bg-white dark:bg-gray-600 shadow-sm"
+            : "bg-gray-200 dark:bg-gray-900 shadow-sm"
         }`}
       >
         <div className="env-card-content justify-between w-full">
@@ -160,9 +194,15 @@ function TemplateCard({
                 {template.name}
               </div>
             </div>
-            <div className="font-medium text-xs text-gray-400 line-clamp-3 ">
+            {belong != -1 && (
+              <div className="text-2xs text-gray-600 dark:text-gray-300 truncate">
+                using{" "}
+                <span className="font-bold">{environments[belong].name}</span>
+              </div>
+            )}
+            <pre className=" text-xs text-gray-400 line-clamp-4 ">
               {template.description}
-            </div>
+            </pre>
           </div>
           {template.containerID && (
             <EmbeddedWorkspaceCard
@@ -176,7 +216,20 @@ function TemplateCard({
           )}
         </div>
 
-        <Menu items={meunItems}></Menu>
+        <div className="flex flex-col justify-between h-full items-center">
+          <Menu items={meunItems}></Menu>
+          <div className="flex flex-col">
+            {template.active ? (
+              <div title="The template is published.">
+                <EyeIcon className="w-5 h-5 text-gray-400 "></EyeIcon>
+              </div>
+            ) : (
+              <div title="The template is not published.">
+                <EyeOffIcon className="w-5 h-5 text-gray-400 "></EyeOffIcon>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </Tilt>
   );

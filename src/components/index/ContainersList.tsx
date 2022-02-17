@@ -49,7 +49,7 @@ const ContainersList = () => {
           <EmptyDiv message="You have no active workspace."></EmptyDiv>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
-            {containers.map((container, i) => {
+            {containers.sort().map((container, i) => {
               const { containerID, courseTitle, assignmentName, existedTime } =
                 container;
               return (
@@ -59,6 +59,7 @@ const ContainersList = () => {
                   containerName={assignmentName}
                   existedTime={existedTime}
                   containerID={containerID}
+                  zIndex={containers.length - i}
                 ></CodeSpace>
               );
             })}

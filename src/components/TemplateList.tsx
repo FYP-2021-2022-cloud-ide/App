@@ -10,6 +10,7 @@ export type Props = {
   templates: Template[];
   environments: Environment[];
   sectionUserID: string;
+  highlightedEnv?: Environment;
   onCreate?: () => void;
   onClick?: (template: Template) => void;
   onDelete?: (template: Template) => void;
@@ -22,8 +23,7 @@ export type Props = {
 
 const TemplateList = ({
   templates,
-  sectionUserID,
-  environments,
+  highlightedEnv,
   onClick,
   onCreate,
   onDelete,
@@ -52,36 +52,44 @@ const TemplateList = ({
           <EmptyDiv message="There is no template for this course yet." />
         ) : (
           <div className="template-grid">
-            {templates.map((template: Template) => {
-              return (
-                <TemplateCard
-                  key={template.id}
-                  template={template}
-                  onClick={() => {
-                    if (onClick) onClick(template);
-                  }}
-                  onDelete={() => {
-                    if (onDelete) onDelete(template);
-                  }}
-                  onToggle={(template, open) => {
-                    if (onToggle) onToggle(template, open);
-                  }}
-                  onUpdate={(template) => {
-                    if (onUpdate) onUpdate(template);
-                  }}
-                  onWorkspaceCardClick={(template) => {
-                    if (onWorkspaceCardClick) onWorkspaceCardClick(template);
-                  }}
-                  onInspect={(template) => {
-                    if (onInspect) onInspect(template);
-                  }}
-                  onToggleActivation={(template, active) => {
-                    if (onToggleActivation)
-                      onToggleActivation(template, active);
-                  }}
-                ></TemplateCard>
-              );
-            })}
+            {templates
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((template, index) => {
+                const highlighted = Boolean(
+                  highlightedEnv &&
+                    template.environment_id === highlightedEnv.id
+                );
+                return (
+                  <TemplateCard
+                    key={template.id}
+                    highlighted={highlighted}
+                    template={template}
+                    onClick={() => {
+                      if (onClick) onClick(template);
+                    }}
+                    onDelete={() => {
+                      if (onDelete) onDelete(template);
+                    }}
+                    onToggle={(template, open) => {
+                      if (onToggle) onToggle(template, open);
+                    }}
+                    onUpdate={(template) => {
+                      if (onUpdate) onUpdate(template);
+                    }}
+                    onWorkspaceCardClick={(template) => {
+                      if (onWorkspaceCardClick) onWorkspaceCardClick(template);
+                    }}
+                    onInspect={(template) => {
+                      if (onInspect) onInspect(template);
+                    }}
+                    onToggleActivation={(template, active) => {
+                      if (onToggleActivation)
+                        onToggleActivation(template, active);
+                    }}
+                    zIndex={templates.length - index}
+                  ></TemplateCard>
+                );
+              })}
           </div>
         )
       }

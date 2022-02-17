@@ -1,5 +1,5 @@
 import { Menu, Transition } from "@headlessui/react";
-import { Fragment, MouseEventHandler } from "react";
+import { Fragment, MouseEventHandler, useEffect, useRef } from "react";
 import { MenuIcon } from "@heroicons/react/outline";
 
 export type MenuItem = {
@@ -16,11 +16,8 @@ export default function CardMenu({ items }: Props) {
   return (
     <>
       <Menu as="div" className="relative inline-block text-left shrink-0">
-        <Menu.Button
-          as="button"
-          className="inline-flex justify-end w-full py-2 text-sm font-medium rounded-md "
-        >
-          <MenuIcon className="w-5 h-5 hover:scale-110 transition text-gray-600 dark:text-gray-300 ease-in-out duration-300"></MenuIcon>
+        <Menu.Button className="inline-flex justify-end w-full py-2 text-sm font-medium rounded-md ">
+          <MenuIcon className="w-5 h-5 hover:scale-110 transition text-gray-600 dark:text-gray-300 ease-in-out duration-300 "></MenuIcon>
         </Menu.Button>
         <Transition
           as={Fragment}
@@ -31,7 +28,7 @@ export default function CardMenu({ items }: Props) {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <Menu.Items className="absolute z-[1] right-0 origin-top-right bg-white dark:bg-gray-900 dark:text-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black dark:ring-gray-700 ring-opacity-5 focus:outline-none ">
+          <Menu.Items className="absolute right-0 origin-top-right bg-white dark:bg-gray-900 dark:text-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black dark:ring-gray-700 ring-opacity-5 focus:outline-none ">
             <div className="p-1">
               {items
                 .filter((item) => {

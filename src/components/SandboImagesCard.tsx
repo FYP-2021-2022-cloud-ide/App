@@ -4,6 +4,7 @@ import Tilt from "react-parallax-tilt";
 
 import { SandboxImage } from "../lib/cnails";
 import { useLayoutEffect } from "react";
+import { useCleanTilt } from "./TemplateCard";
 
 type Props = {
   sandboxImage: SandboxImage;
@@ -12,6 +13,7 @@ type Props = {
   onUpdate?: (sandboxImage: SandboxImage) => void;
   onStart?: (sandboxImage: SandboxImage) => void;
   onStop?: (sandboxImage: SandboxImage) => void;
+  zIndex?: number;
 };
 
 const SandboxImagesCard = ({
@@ -21,22 +23,11 @@ const SandboxImagesCard = ({
   onUpdate,
   onStop,
   onStart,
+  zIndex,
 }: Props) => {
-  const ref = useRef<Tilt>();
-  const cleanStyle = () =>
-    setTimeout(() => {
-      if (ref.current) {
-        //@ts-ignore
-        let node = ref.current.wrapperEl.node as HTMLDivElement;
-        if (node.getAttribute("style") != "") {
-          node.setAttribute("style", "");
-          cleanStyle();
-        }
-      }
-    }, 10);
-  useLayoutEffect(() => {
-    cleanStyle();
-  });
+  const { ref, cleanStyle } = useCleanTilt(
+    zIndex ? `z-index : ${zIndex};` : ""
+  );
   return (
     <Tilt
       onLeave={cleanStyle}
@@ -46,7 +37,9 @@ const SandboxImagesCard = ({
       tiltReverse
     >
       <div
-        className="sandbox-card"
+        className={`sandbox-card ${
+          sandboxImage.sandboxesId ? "cursor-pointer" : ""
+        } `}
         onClick={() => {
           if (onClick) onClick(sandboxImage);
         }}

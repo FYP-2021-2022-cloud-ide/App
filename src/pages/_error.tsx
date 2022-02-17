@@ -29,7 +29,6 @@ const Error = ({
           onClick={() => {
             // report the issue
             myToast.success("You message has been sent.");
-            console.log(text);
           }}
           disabled={text == ""}
         >

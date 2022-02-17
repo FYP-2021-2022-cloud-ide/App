@@ -40,7 +40,7 @@ const SandboxImageList = ({
       <div className="sandbox-grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {sandboxImages
           .sort((a, b) => a.title.localeCompare(b.title))
-          .map((sandboxImage) => (
+          .map((sandboxImage, index) => (
             <SandboxImagesCard
               key={sandboxImage.id}
               sandboxImage={sandboxImage}
@@ -59,10 +59,11 @@ const SandboxImageList = ({
               onStop={(sandboxImage) => {
                 if (onSandboxStop) onSandboxStop(sandboxImage);
               }}
+              zIndex={sandboxImages.length - index}
             ></SandboxImagesCard>
           ))}
         <div
-          className="h-full min-h-[32px] w-full rounded border-4 border-dashed border-gray-500 text-gray-500 flex justify-center items-center bg-transparent cursor-pointer"
+          className="h-full min-h-[32px] w-full rounded border-4 border-dashed border-gray-300 dark:border-gray-500 text-gray-300 dark:text-gray-500 flex justify-center items-center bg-transparent cursor-pointer"
           onClick={() => {
             if (onCreateBtnClick) onCreateBtnClick();
           }}

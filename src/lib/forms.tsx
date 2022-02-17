@@ -192,7 +192,7 @@ export const getUpdateEnvironmentFormStructure = (
   };
 };
 
-export const getTemplateCreateFormStructure = (
+export const getCreateTemplateFormStructure = (
   templates: Template[],
   environments: Environment[]
 ): FormStructure => {
@@ -244,7 +244,7 @@ export const getTemplateCreateFormStructure = (
         is_exam: {
           type: "toggle",
           defaultValue: false,
-          text: "Is it an Exam? ",
+          text: "Exam mode",
           tooltip:
             "You can restrict the time span of the container if the template is for an exam.",
         },
@@ -262,7 +262,7 @@ export const getTemplateCreateFormStructure = (
   };
 };
 
-export const getTemplateUpdateFormStructure = (
+export const getUpdateTemplateFormStructure = (
   sub: string,
   targetTemplate: Template,
   templates: Template[],
@@ -338,7 +338,7 @@ export const getTemplateUpdateFormStructure = (
         },
         name: {
           type: "input",
-          defaultValue: "",
+          defaultValue: targetTemplate.name,
           text: "Name (Optional)",
           placeholder: `e.g. ${validName}`,
           emptyValue: validName,
@@ -356,12 +356,12 @@ export const getTemplateUpdateFormStructure = (
         description: {
           type: "textarea",
           placeholder: "e.g. The assignment is about ...",
-          defaultValue: "",
+          defaultValue: targetTemplate.description,
           text: "Description (Optional)",
         },
         allow_notification: {
           type: "toggle",
-          defaultValue: false,
+          defaultValue: targetTemplate.allow_notification,
           text: "Can students send question to You? ",
           description: "Can students send question to You?",
           tooltip:
@@ -369,15 +369,15 @@ export const getTemplateUpdateFormStructure = (
         },
         is_exam: {
           type: "toggle",
-          defaultValue: false,
-          text: "Is it an Exam? ",
+          defaultValue: targetTemplate.isExam,
+          text: "Exam mode",
           description: "whether this assignment is an exam",
           tooltip:
             "Whether this assignment is an exam. The environment would be restricted to simple editors without compliers.",
         },
         time_limit: {
           type: "input",
-          defaultValue: "60",
+          defaultValue: String(targetTemplate.timeLimit),
           text: "Time Limit(in minutes) ",
           description: "Time Limit of the exam",
           conditional: (data) => {

@@ -1,12 +1,14 @@
 import React, { useLayoutEffect, useRef } from "react";
 import { LogoutIcon, ClockIcon } from "@heroicons/react/outline";
 import Tilt from "react-parallax-tilt";
+import { useCleanTilt } from "../TemplateCard";
 
 type Props = {
   courseTitle: string;
   containerName: string;
   existedTime: string;
   containerID: string;
+  zIndex?: number;
 };
 
 function ContainerCard({
@@ -14,22 +16,11 @@ function ContainerCard({
   containerName,
   existedTime,
   containerID,
+  zIndex,
 }: Props) {
-  const ref = useRef<Tilt>();
-  const cleanStyle = () =>
-    setTimeout(() => {
-      if (ref.current) {
-        //@ts-ignore
-        let node = ref.current.wrapperEl.node as HTMLDivElement;
-        if (node.getAttribute("style") != "") {
-          node.setAttribute("style", "");
-          cleanStyle();
-        }
-      }
-    }, 10);
-  useLayoutEffect(() => {
-    cleanStyle();
-  });
+  const { ref, cleanStyle } = useCleanTilt(
+    zIndex ? `z-index : ${zIndex};` : ""
+  );
   return (
     <Tilt
       onLeave={cleanStyle}

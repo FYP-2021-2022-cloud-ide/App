@@ -67,6 +67,7 @@ export type Props = {
     tree: NodeModel<CustomData>[],
     options: DropOptions<CustomData>
   ) => boolean | void;
+  nothingText?: string;
 };
 
 const Progress = React.forwardRef((_, ref: any) => {
@@ -115,6 +116,7 @@ const FTree = React.forwardRef(
       download,
       onClick,
       progressRef,
+      nothingText = "No files",
     }: Props,
     ref: React.MutableRefObject<TreeMethods>
   ) => {
@@ -157,7 +159,6 @@ const FTree = React.forwardRef(
       getFilesAndReset();
     }, []);
 
-    console.log(disabled);
     if (disabled) {
       return (
         <div className="file-tree-wrapper">
@@ -215,9 +216,7 @@ const FTree = React.forwardRef(
               // webkitdirectory=""
               {...getInputProps()}
             />
-            {treeData.length == 0 && (
-              <p className="file-tree-root-nothing-text">no files</p>
-            )}
+
             <Tree
               ref={ref}
               tree={treeData}
@@ -318,7 +317,7 @@ const FTree = React.forwardRef(
               }}
               classes={{
                 root: `file-tree-root ${
-                  treeData.length == 0 && "file-tree-root-nothing"
+                  treeData.length == 0 ? "file-tree-root-nothing" : ""
                 } `,
                 draggingSource: "opacity-30 ",
                 dropTarget: "bg-gray-200 dark:bg-gray-500",
@@ -334,6 +333,9 @@ const FTree = React.forwardRef(
                 <Placeholder node={node} depth={depth} />
               )}
             ></Tree>
+            {treeData.length == 0 && (
+              <p className="file-tree-root-nothing-text">{nothingText}</p>
+            )}
           </div>
         </div>
       </div>

@@ -11,10 +11,10 @@ import _ from "lodash";
 export interface Props {
   environments: Environment[];
   onEnvCreateBtnClick: () => void;
-  onEnvClick: (environment: Environment) => void;
-  onEnvDelete: (environment: Environment) => void;
-  onEnvUpdate: (environment: Environment) => void;
-  onEnvHighlight: (environment: Environment) => void;
+  onEnvClick?: (environment: Environment) => void;
+  onEnvDelete?: (environment: Environment) => void;
+  onEnvUpdate?: (environment: Environment) => void;
+  onEnvHighlight?: (environment: Environment) => void;
 }
 
 const EnvironmentList = ({
@@ -44,26 +44,29 @@ const EnvironmentList = ({
           <EmptyDiv message="There is no environment for this course yet." />
         ) : (
           <div className="env-grid">
-            {environments.map((environment) => {
-              return (
-                <EnvironmentCard
-                  key={environment.id}
-                  environment={environment}
-                  onClick={(environment) => {
-                    if (onEnvClick) onEnvClick(environment);
-                  }}
-                  onDelete={(environment) => {
-                    if (onEnvDelete) onEnvDelete(environment);
-                  }}
-                  onUpdate={(environment) => {
-                    if (onEnvUpdate) onEnvUpdate(environment);
-                  }}
-                  onHighlight={(environment) => {
-                    if (onEnvHighlight) onEnvHighlight(environment);
-                  }}
-                ></EnvironmentCard>
-              );
-            })}
+            {environments
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((environment, index) => {
+                return (
+                  <EnvironmentCard
+                    key={environment.id}
+                    environment={environment}
+                    onClick={(environment) => {
+                      if (onEnvClick) onEnvClick(environment);
+                    }}
+                    onDelete={(environment) => {
+                      if (onEnvDelete) onEnvDelete(environment);
+                    }}
+                    onUpdate={(environment) => {
+                      if (onEnvUpdate) onEnvUpdate(environment);
+                    }}
+                    onHighlight={(environment) => {
+                      if (onEnvHighlight) onEnvHighlight(environment);
+                    }}
+                    zIndex={environments.length - index}
+                  ></EnvironmentCard>
+                );
+              })}
           </div>
         )
       }

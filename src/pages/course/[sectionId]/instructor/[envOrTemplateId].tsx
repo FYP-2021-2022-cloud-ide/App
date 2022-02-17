@@ -15,14 +15,15 @@ import {
   Environment,
   SectionRole,
   SectionUserInfo,
+  StudentWorkspace,
   Template,
 } from "../../../../lib/cnails";
-import workspaceData from "../../../../lib/workspace-data.json";
+import workspaceData from "../../../../fake_data/example_student_workspace.json";
 
 const generateExampleData = (num: number): StudentWorkspace[] => {
   let result: StudentWorkspace[] = [];
   let temp = {
-    "0": "NOT_STARTED",
+    "0": "NOT_STARTED_BEFORE",
     "1": "OFF",
     "2": "ON",
   };
@@ -39,20 +40,13 @@ const generateExampleData = (num: number): StudentWorkspace[] => {
   return result;
 };
 
-type StudentWorkspace = {
-  status: "NOT_STARTED" | "ON" | "OFF";
-  workspaceId: string;
-  student: {
-    name: string;
-    sub: string;
-  };
-};
-
 const TemplateBoard = ({ template }: { template: Template }) => {
   const [data, setData] = useState<StudentWorkspace[]>();
 
   async function fetch() {
-    setData(generateExampleData(Math.ceil(Math.random() * 200)));
+    setData(
+      generateExampleData(template.active ? Math.ceil(Math.random() * 200) : 0)
+    );
   }
   useEffect(() => {
     fetch();
@@ -70,7 +64,9 @@ const TemplateBoard = ({ template }: { template: Template }) => {
         return (
           <div className="flex flex-col space-y-1">
             <p>{row.student.name}</p>
-            <p className="text-2xs">@{row.student.sub}</p>
+            <p className="text-2xs text-blue-500 dark:text-blue-400">
+              @{row.student.sub}
+            </p>
           </div>
         );
       },
@@ -84,7 +80,23 @@ const TemplateBoard = ({ template }: { template: Template }) => {
       id: "Status",
       name: "Workspace status",
       cell: (row) => {
-        return <p>{row.status}</p>;
+        return (
+          <div className="flex flex-row space-x-2 items-center">
+            {row.status != "NOT_STARTED_BEFORE" && (
+              <span className="relative flex h-3 w-3">
+                {row.status == "ON" && (
+                  <span className="absolute animate-ping inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                )}
+                <span
+                  className={`relative inline-flex rounded-full h-3 w-3 ${
+                    row.status == "ON" ? "bg-green-400" : "bg-gray-400"
+                  }`}
+                ></span>
+              </span>
+            )}
+            <p>{row.status}</p>
+          </div>
+        );
       },
     },
     {
@@ -195,20 +207,23 @@ const TemplateBoard = ({ template }: { template: Template }) => {
 
   if (!data) return <></>;
   return (
-    <div className="flex flex-row space-x-2 mb-10">
-      <DataTable
-        columns={columns}
-        defaultSortAsc
-        defaultSortFieldId={"student"}
-        data={data}
-        theme="good"
-        paginationComponent={PaginationComponent}
-        pagination
-        noDataComponent={
-          <EmptyDiv message="No student have workspace for this template."></EmptyDiv>
-        }
-      ></DataTable>
-    </div>
+    <>
+      {data.length == 0 ? (
+        <EmptyDiv message="No student have workspace for this template."></EmptyDiv>
+      ) : (
+        <div className="mb-10">
+          <DataTable
+            columns={columns}
+            defaultSortAsc
+            defaultSortFieldId={"student"}
+            data={data}
+            theme="good"
+            paginationComponent={PaginationComponent}
+            pagination
+          ></DataTable>
+        </div>
+      )}
+    </>
   );
 };
 
@@ -227,7 +242,7 @@ const Wrapper = () => {
   environments[0].name;
   return (
     <div className="w-full">
-      <div className="flex flex-col font-bold px-10 w-full text-gray-600 space-y-4">
+      <div className="flex flex-col px-10 w-full text-gray-600 space-y-4 mb-10">
         <Breadcrumbs
           elements={[
             {
@@ -235,7 +250,7 @@ const Wrapper = () => {
               path: "/",
             },
             {
-              name: sectionUserInfo.courseCode,
+              name: `${sectionUserInfo.courseCode} (${sectionUserInfo.sectionCode})`,
               path: `/course/${sectionId}/instructor`,
             },
             {
@@ -247,11 +262,13 @@ const Wrapper = () => {
             },
           ]}
         />
+        {index1 != -1 && (
+          <EnvBoard environment={environments[index1]}></EnvBoard>
+        )}
+        {index2 != -1 && (
+          <TemplateBoard template={templates[index2]}></TemplateBoard>
+        )}
       </div>
-      {index1 != -1 && <EnvBoard environment={environments[index1]}></EnvBoard>}
-      {index2 != -1 && (
-        <TemplateBoard template={templates[index2]}></TemplateBoard>
-      )}
     </div>
   );
 };

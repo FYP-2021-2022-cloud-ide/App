@@ -64,15 +64,15 @@
 }
 
 .file-tree-root {
-  @apply relative p-3 w-full bg-gray-100 overflow-scroll hide-scroll  rounded dark:bg-gray-600 text-gray-700 dark:text-gray-200 h-full;
+  @apply relative p-3 w-full bg-gray-100 overflow-scroll hide-scroll  rounded dark:bg-gray-900 text-gray-700 dark:text-gray-200 h-full;
 }
 
 .file-tree-root-nothing {
-  @apply border-8 border-dashed border-gray-400 dark:border-gray-800 hover:bg-gray-200 dark:hover:bg-gray-500;
+  @apply border-8 border-dashed border-gray-400 dark:border-black hover:bg-gray-200 dark:hover:bg-white/5;
 }
 
 .file-tree-root-nothing-text {
-  @apply absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl text-gray-400 dark:text-gray-800 font-bold select-none;
+  @apply absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl text-gray-400 dark:text-gray-600 font-bold select-none;
 }
 
 .error-page-status-code {
@@ -132,12 +132,12 @@
 
 .course-dialog-modal,
 .modal-form {
-  @apply max-h-[70vh] inline-block z-10 max-w-[1000px] p-6 my-8 overflow-visible text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl text-[#415A6E];
+  @apply max-h-[70vh] inline-block z-10 max-w-[1000px] py-6 px-10 overflow-y-scroll overflow-x-visible text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl text-[#415A6E];
 }
 
 .course-dialog-content,
 .modal-form-content {
-  @apply h-full overflow-y-visible  px-2 py-2 overflow-x-visible flex flex-col space-y-2;
+  @apply h-full  px-2 py-2 flex flex-col space-y-2;
 }
 
 .course-dialog-title,
@@ -193,7 +193,7 @@
 }
 
 .tooltip::before {
-  @apply shadow-lg z-10 text-xs;
+  @apply shadow-lg z-10 text-xs max-w-[250px];
 }
 
 .tooltip::after {
@@ -299,6 +299,10 @@
   @apply grid grid-cols-1 gap-4 lg:grid-cols-2;
 }
 
+.workspace-grid {
+  @apply grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4;
+}
+
 .sandbox-grid {
   @apply grid grid-cols-1 gap-8 lg:grid-cols-2;
 }
@@ -314,11 +318,11 @@
 }
 
 .template-card {
-  @apply cursor-pointer border border-gray-200 dark:border-gray-700 shadow-sm rounded-lg bg-white dark:bg-gray-600 px-4 py-4 min-h-[9rem] h-48 flex flex-row items-start justify-between;
+  @apply cursor-pointer border border-gray-200 dark:border-gray-700 rounded-lg  px-4 py-4 min-h-[9rem] h-48 flex flex-row items-start justify-between;
 }
 
 .sandbox-card {
-  @apply cursor-pointer border border-gray-200 dark:border-gray-700 shadow-sm rounded-lg bg-white dark:bg-gray-600 px-4 py-4 min-h-[9rem] h-32 flex flex-row items-start justify-between;
+  @apply border border-gray-200 dark:border-gray-700 shadow-sm rounded-lg bg-white dark:bg-gray-600 px-4 py-4 min-h-[9rem] h-32 flex flex-row items-start justify-between;
 }
 
 .env-card-content,
@@ -343,7 +347,7 @@
 
 .env-card-des,
 .sandbox-card-des {
-  @apply font-medium max-w-full text-xs text-gray-400 line-clamp-3;
+  @apply font-medium max-w-full text-xs text-gray-400 line-clamp-4 whitespace-pre-line;
 }
 
 .empty-div {
@@ -352,4 +356,34 @@
 
 .empty-div-text {
   @apply text-gray-400 dark:text-gray-300 font-bold m-auto object-center select-none;
+}
+
+.shiver {
+  animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+@keyframes shake {
+  10%,
+  90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+
+  20%,
+  80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%,
+  50%,
+  70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  40%,
+  60% {
+    transform: translate3d(4px, 0, 0);
+  }
 }

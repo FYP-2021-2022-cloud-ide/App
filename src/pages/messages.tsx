@@ -242,39 +242,42 @@ const MessageTable = () => {
     "light"
   );
 
+  if (pending) {
+    return (
+      <div className="bg-gray-300 dark:bg-gray-700 rounded-lg w-full h-64 flex items-center justify-center overflow-hidden">
+        <Loader />
+      </div>
+    );
+  }
+
   return (
     <>
-      <DataTable
-        columns={columns}
-        data={notifications}
-        selectableRows
-        onSelectedRowsChange={handleChange}
-        defaultSortAsc={false}
-        defaultSortFieldId={"Time"}
-        expandableRows
-        pagination
-        expandableRowExpanded={(row) => {
-          return target != null && row.id == target;
-        }}
-        paginationComponent={PaginationComponent}
-        progressPending={pending}
-        progressComponent={
-          <div className="bg-gray-300 dark:bg-gray-700 rounded-lg w-full h-64 flex items-center justify-center overflow-hidden">
-            <Loader />
-          </div>
-        }
-        expandOnRowClicked
-        expandableRowsHideExpander
-        onRowExpandToggled={() => {}}
-        theme="good"
-        selectableRowSelected={(row) => {
-          return selectedRows.map((n) => n.id).includes(row.id);
-        }}
-        expandableRowsComponent={ExpandedComponent}
-        noDataComponent={
-          <EmptyDiv message="You have no notifications."></EmptyDiv>
-        }
-      />
+      {notifications.length == 0 ? (
+        <EmptyDiv message="You have no notifications."></EmptyDiv>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={notifications}
+          selectableRows
+          onSelectedRowsChange={handleChange}
+          defaultSortAsc
+          defaultSortFieldId={"Time"}
+          expandableRows
+          pagination
+          expandableRowExpanded={(row) => {
+            return target != null && row.id == target;
+          }}
+          paginationComponent={PaginationComponent}
+          expandOnRowClicked
+          expandableRowsHideExpander
+          onRowExpandToggled={() => {}}
+          theme="good"
+          selectableRowSelected={(row) => {
+            return selectedRows.map((n) => n.id).includes(row.id);
+          }}
+          expandableRowsComponent={ExpandedComponent}
+        />
+      )}
       <button
         className="bg-green-500 text-white px-2 rounded h-min"
         onClick={async () => {

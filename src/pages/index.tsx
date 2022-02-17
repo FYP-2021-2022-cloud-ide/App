@@ -22,7 +22,7 @@ export default function Home() {
                 "focus:outline-none focus:ring-2 ring-offset-2 ring-offset-blue-400 dark:ring-offset-slate-800 ring-white dark:ring-slate-700 ring-opacity-60",
                 selected
                   ? "bg-white dark:bg-slate-900 shadow"
-                  : "text-blue-100 hover:bg-white/[0.12] hover:text-white"
+                  : "text-blue-100 hover:bg-white/[0.12] dark:hover:bg-white/[0.05] hover:text-white"
               )
             }
           >
@@ -35,7 +35,7 @@ export default function Home() {
                 "focus:outline-none focus:ring-2 ring-offset-2 ring-offset-blue-400 dark:ring-offset-slate-800 ring-white dark:ring-slate-700 ring-opacity-60",
                 selected
                   ? "bg-white dark:bg-slate-900 shadow"
-                  : "text-blue-100 hover:bg-white/[0.12] hover:text-white"
+                  : "text-blue-100 hover:bg-white/[0.12] dark:hover:bg-white/[0.05] hover:text-white"
               )
             }
           >

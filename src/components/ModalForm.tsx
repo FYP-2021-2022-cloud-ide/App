@@ -237,7 +237,7 @@ const TextArea = ({
       value={text}
       onChange={(e) => {
         setText(e.target.value);
-        onChange(text);
+        onChange(e.target.value);
       }}
       disabled={disabled}
     ></textarea>
@@ -296,19 +296,14 @@ const Input = ({
   //@ts-ignore
   const { ok, message } = validate();
   return (
-    <div
-      className={`w-full ${
-        ok ? "" : " tooltip-open tooltip tooltip-error tooltip-right"
-      }`}
-      data-tip={message}
-    >
+    <div>
       <input
         className={`modal-form-input text-gray-500 dark:text-gray-300 ${
           disabled ? "dark:text-gray-500 text-gray-300" : ""
         } ${
           ok
             ? ""
-            : "border-red-400 border-2 bg-red-100 dark:bg-red-100  dark:border-red-400 dark:focus:outline-none text-gray-500 dark:text-gray-500"
+            : "border-red-400 border-2 bg-red-100 dark:bg-red-100  dark:border-red-400 dark:focus:outline-none text-gray-500 dark:text-gray-500 ring-2 ring-red-400"
         }`}
         placeholder={placeholder}
         value={text}
@@ -319,6 +314,9 @@ const Input = ({
         }}
         disabled={disabled}
       ></input>
+      {!ok && (
+        <p className="text-red-400 text-xs mt-1 ml-2 shiver"> {message}</p>
+      )}
     </div>
   );
 };
@@ -355,11 +353,12 @@ const ModalForm = ({
   onChange,
 }: Props) => {
   let ref = createRef<HTMLDivElement>();
+  let okBtnRef = createRef<HTMLButtonElement>();
   const [data, setData] = useState<Data>(fromStructureToData(formStructure));
   const sizeMap = {
-    sm: "w-[500px]",
-    md: "w-[800px]",
-    lg: "w-[1000px]",
+    sm: "w-[550px]",
+    md: "w-[850px]",
+    lg: "w-[1100px]",
   };
 
   useEffect(() => {
@@ -383,6 +382,7 @@ const ModalForm = ({
       })
     );
   };
+  // size = "lg";
 
   return (
     <Modal
@@ -392,7 +392,7 @@ const ModalForm = ({
       onOpen={onOpen}
       clickOutsideToClose={clickOutsideToClose}
     >
-      <div ref={ref} className={`modal-form ${sizeMap[size]}`}>
+      <div ref={ref} className={`modal-form ${sizeMap[size]} hide-scroll `}>
         <div className="modal-form-content">
           <Dialog.Title as="h3" className="modal-form-title capitalize">
             {title}
@@ -413,7 +413,7 @@ const ModalForm = ({
               ></Section>
             );
           })}
-          <div className="modal-form-btn-row">
+          <div className="modal-form-btn-row pt-4">
             <button
               className="modal-form-btn-cancel"
               onClick={() => {
@@ -435,6 +435,7 @@ const ModalForm = ({
                   patchedOnClose(true);
                 }
               }}
+              ref={okBtnRef}
             >
               OK
             </button>

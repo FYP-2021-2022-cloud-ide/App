@@ -19,8 +19,8 @@ export type {
   ActionType,
   CnailsContextState,
   InstructorContextState,
-  CoursesContextState,
-  SandboxesContextState
+  Workspace,
+  StudentWorkspace
 };
 
 type SectionRole = "INSTRUCTOR" | "STUDENT";
@@ -40,7 +40,8 @@ type Template = {
   imageId: string;
   assignment_config_id: string;
   storage: string;
-  containerID: string;
+  containerID?: string;
+  environment_id: string;
   active: boolean;
   isExam: boolean;
   timeLimit: number;
@@ -84,6 +85,8 @@ type Container = {
   existedTime: string;
   containerID: string;
 };
+
+type Workspace = Template;
 
 /**
  * container info is actually the quota info
@@ -132,9 +135,19 @@ type InstructorContextState = {
   environments: Environment[],
   templates: Template[],
   fetch: () => void,
-  sectionUserInfo: SectionUserInfo
+  sectionUserInfo: SectionUserInfo,
+  highlightedEnv: Environment,
+  setHighlightedEnv: React.Dispatch<React.SetStateAction<Environment>>,
 }
 
+type StudentWorkspace = {
+  status: "NOT_STARTED_BEFORE" | "ON" | "OFF";
+  workspaceId: string;
+  student: {
+    name: string;
+    sub: string;
+  };
+};
 
 
 export type ActionType = "delete" | "reply";

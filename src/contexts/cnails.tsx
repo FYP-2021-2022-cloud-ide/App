@@ -191,9 +191,9 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
                     return (
                       <div className="toaster-content">
                         {icon}
-                        <p className="toaster-text">
+                        <div className="toaster-text">
                           {(message as JSX.Element).props.children}
-                        </p>
+                        </div>
                       </div>
                     );
                   }}

@@ -11,9 +11,10 @@ const generalAPI = {
     darkMode: boolean,
     bio: string
   ): Promise<SuccessStringResponse> => {
-    var res = await fetch("/api/updateUserData?sub=" + sub, {
+    var res = await fetch("/api/updateUserData", {
       method: "POST",
       body: JSON.stringify({
+        sub:sub,
         darkMode: darkMode,
         bio: bio,
       }),
