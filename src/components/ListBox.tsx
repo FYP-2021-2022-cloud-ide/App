@@ -4,7 +4,7 @@ import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
 import React from "react";
 
 export interface ListBoxProps {
-  environments: Option[];
+  options: Option[];
   initSelected: Option;
   onChange?: (newValve: Option) => void;
 }
@@ -14,7 +14,7 @@ export interface Option {
   id: string;
 }
 
-function ListBox({ environments, initSelected, onChange }: ListBoxProps) {
+function ListBox({ options, initSelected, onChange }: ListBoxProps) {
   const [selected, setSelected] = useState(initSelected);
 
   return (
@@ -45,9 +45,9 @@ function ListBox({ environments, initSelected, onChange }: ListBoxProps) {
             leaveTo="opacity-0"
           >
             <Listbox.Options className="listbox-options">
-              {environments.map((environment, environmentIndex) => (
+              {options.map((option, index) => (
                 <Listbox.Option
-                  key={environmentIndex}
+                  key={index}
                   className={({ active }) =>
                     `${
                       active
@@ -56,7 +56,7 @@ function ListBox({ environments, initSelected, onChange }: ListBoxProps) {
                     }
                           cursor-default select-none relative py-2 pl-10 pr-4`
                   }
-                  value={environment}
+                  value={option}
                 >
                   {({ selected, active }) => (
                     <>
@@ -65,16 +65,11 @@ function ListBox({ environments, initSelected, onChange }: ListBoxProps) {
                           selected ? "font-medium" : "font-normal"
                         } block truncate`}
                       >
-                        {environment.value}
+                        {option.value}
                       </span>
                       {selected ? (
                         <span
-                          className={`${
-                            active
-                              ? "text-amber-600 dark:text-white"
-                              : "text-amber-600 dark:text-white"
-                          }
-                                absolute inset-y-0 left-0 flex items-center pl-3`}
+                          className={` absolute inset-y-0 left-0 flex items-center pl-3`}
                         >
                           <CheckIcon className="w-5 h-5" aria-hidden="true" />
                         </span>

@@ -129,7 +129,7 @@ export const SandboxWrapper = () => {
             );
             fetch(mount.current);
           } else {
-            myToast.error(`Cannot started sandbox.`);
+            myToast.error(`Cannot started sandbox. ${response.message}`);
           }
         }}
         onSandboxStop={async (sandboxImage) => {
@@ -145,7 +145,7 @@ export const SandboxWrapper = () => {
             );
             fetch(mount.current);
           } else {
-            myToast.error(`Cannot stop sandbox.`);
+            myToast.error(`Cannot stop sandbox. ${response.message}`);
           }
         }}
       ></SandboxImageList>
@@ -172,7 +172,7 @@ export const SandboxWrapper = () => {
             fetch(mount.current);
           } else {
             // myToast.dismiss(toastId);
-            myToast.error("Sandbox cannot be created for some reason.");
+            myToast.error(`Sandbox cannot be created. ${response.message}`);
           }
         }}
       ></ModalForm>

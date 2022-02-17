@@ -147,7 +147,7 @@ function TemplateCard({
         onClick={() => {
           if (onClick) onClick(template);
         }}
-        className={`env-card ${
+        className={`template-card ${
           template.active
             ? "bg-white dark:bg-gray-600"
             : "bg-gray-200 dark:bg-gray-900"

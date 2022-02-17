@@ -41,17 +41,17 @@ const InstructorContext = React.createContext({} as InstructorContextState);
 export const useInstructor = () => useContext(InstructorContext);
 export const InstructorProvider = ({
   children,
-  sectionId,
+  sectionUserInfo,
 }: {
   children: JSX.Element;
-  sectionId: string;
+  sectionUserInfo: SectionUserInfo;
 }) => {
   const { sub, fetchContainers } = useCnails();
   const [environments, setEnvironments] = useState<Environment[]>(null);
   const [templates, setTemplates] = useState<Template[]>(null);
   const fetch = () => {
     fetchEnvironmentsAndTemplates(
-      sectionId,
+      sectionUserInfo.sectionId,
       sub,
       () => {
         myToast.error(
@@ -65,7 +65,21 @@ export const InstructorProvider = ({
             name: e.environmentName,
           }))
         );
-        setTemplates(templates);
+        setTemplates(
+          templates.map((t) => ({
+            id: t.id,
+            name: t.name,
+            description: t.description,
+            imageId: t.imageId,
+            assignment_config_id: t.assignment_config_id,
+            storage: t.storage,
+            containerID: t.containerID,
+            active: t.active,
+            isExam: t.isExam,
+            timeLimit: t.timeLimit,
+            allow_notification: t.allow_notification,
+          }))
+        );
       }
     );
     fetchContainers(sub);
@@ -75,12 +89,15 @@ export const InstructorProvider = ({
     fetch();
   }, []);
 
+  if (!environments || !templates || !sectionUserInfo) return <></>;
+
   return (
     <InstructorContext.Provider
       value={{
         environments,
         templates,
         fetch,
+        sectionUserInfo,
       }}
     >
       {children}
@@ -109,20 +126,16 @@ async function fetchEnvironmentsAndTemplates(
   }
 }
 
-const EnvironmentTemplateWrapper = ({
-  sectionUserInfo: { sectionUserId },
-}: {
-  sectionUserInfo: SectionUserInfo;
-}) => {
+const EnvironmentTemplateWrapper = () => {
   const router = useRouter();
   const { sub } = useCnails();
-  const { environments, templates, fetch } = useInstructor();
+  const { environments, templates, fetch, sectionUserInfo } = useInstructor();
+  const { sectionUserId } = sectionUserInfo;
   const [envCreateOpen, setEnvCreateOpen] = useState(false);
   const [envUpdateOpen, setEnvUpdateOpen] = useState(false);
   const [templateCreateOpen, setTemplateCreateOpen] = useState(false);
   const [templateUpdateOpen, setTemplateUpdateOpen] = useState(false);
   const [envUpdateTarget, setEnvUpdateTarget] = useState<Environment>(null);
-
   const [templateUpdateTarget, setTemplateUpdateTarget] =
     useState<Template>(null);
 
@@ -176,7 +189,7 @@ const EnvironmentTemplateWrapper = ({
             setEnvCreateOpen(true);
           }}
           onEnvClick={(env) => {
-            router.push(`${router.asPath}/${env.id}`);
+            // router.push(`${router.asPath}/${env.id}`);
             // console.log(router.asPath);
           }}
           onEnvDelete={async (env) => {
@@ -471,6 +484,7 @@ const EnvironmentTemplateWrapper = ({
               "student"
             );
             myToast.dismiss(toastId);
+            console.log(response);
             if (response.success) {
               const { containerID } = response;
               const customToastId = myToast.custom(
@@ -625,7 +639,7 @@ const Home = () => {
   const [sectionUserInfo, setSectionUserInfo] = useState<SectionUserInfo>(null);
   const { getSectionUserInfo } = generalAPI;
   const { sub } = useCnails();
-  const fetchSectionInfo = async () => {
+  const fetchSectionUserInfo = async () => {
     const response = await getSectionUserInfo(sectionId, sub); //
     console.log(response);
 
@@ -640,12 +654,14 @@ const Home = () => {
         sub: sub,
       });
     } else {
-      Router.push("/");
+      router.push("/");
     }
   };
   useEffect(() => {
-    fetchSectionInfo();
+    fetchSectionUserInfo();
   }, []);
+
+  if (!sectionUserInfo) return <></>;
 
   return (
     <div className="w-full">
@@ -669,10 +685,8 @@ const Home = () => {
             courseTitle={sectionUserInfo.courseTitle}
             sectionCode={sectionUserInfo.sectionCode}
           ></CourseBar>
-          <InstructorProvider sectionId={sectionId}>
-            <EnvironmentTemplateWrapper
-              sectionUserInfo={sectionUserInfo}
-            ></EnvironmentTemplateWrapper>
+          <InstructorProvider sectionUserInfo={sectionUserInfo}>
+            <EnvironmentTemplateWrapper></EnvironmentTemplateWrapper>
           </InstructorProvider>
         </div>
       ) : (

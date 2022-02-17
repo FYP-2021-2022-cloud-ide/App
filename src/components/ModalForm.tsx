@@ -166,7 +166,7 @@ const Entry = ({
           onChange={(option) =>
             onChange(Object.assign(data, { [id]: option }), id)
           }
-          environments={entry.options}
+          options={entry.options}
         />
       </div>
     );

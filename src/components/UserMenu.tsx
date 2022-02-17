@@ -14,14 +14,12 @@ export default function UserMenu({ sub, name, email }: UserMenuProps) {
   return (
     <div className={`w-fit  text-right top-16 `}>
       <Menu as="div" className="relative text-left">
-        <div
-          data-tip="User menu"
-          className="tooltip tooltip-info tooltip-bottom"
+        <Menu.Button
+          title="User menu"
+          className="justify-center text-sm font-medium rounded-md hover:scale-105 transition ease-in-out duration-200 dark:text-gray-300"
         >
-          <Menu.Button className="justify-center text-sm font-medium rounded-md hover:scale-105 transition ease-in-out duration-200 dark:text-gray-300">
-            {sub}
-          </Menu.Button>
-        </div>
+          {sub}
+        </Menu.Button>
         <Transition
           as={Fragment}
           enter="transition ease-out duration-100"

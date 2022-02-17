@@ -8,19 +8,23 @@
 @tailwind utilities;
 
 .rdt_TableRow {
-  @apply bg-gray-100 dark:bg-gray-700  text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600  !important;
+  @apply bg-gray-100 dark:bg-black/50   text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-black/20 border-[#D5D6D8] dark:border-[#2F3947] !important;
+}
+
+.rdt_pagination {
+  @apply text-gray-700 dark:text-gray-300  border-t-[1px] border-[#D5D6D8] dark:border-[#2F3947] border-b border-l border-r;
 }
 
 .rdt_Table {
-  @apply bg-transparent shadow-lg !important;
+  @apply bg-transparent shadow-lg  border-t border-l border-r  rounded-t-md  border-[#D5D6D8] dark:border-[#2F3947] !important;
 }
 
 .rdt_TableHead {
-  @apply rounded-t-md overflow-hidden bg-transparent !important;
+  @apply rounded-t-md overflow-hidden bg-transparent border-b-0 dark:border-b border-[#D5D6D8] dark:border-[#2F3947] !important;
 }
 
 .rdt_TableHeadRow {
-  @apply bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 overflow-hidden !important;
+  @apply bg-gray-100 dark:bg-black/50  text-gray-700 dark:text-gray-300 overflow-hidden !important;
 }
 
 .select {
@@ -291,9 +295,12 @@
 }
 
 .env-grid,
-.template-grid,
-.sandbox-grid {
+.template-grid {
   @apply grid grid-cols-1 gap-4 lg:grid-cols-2;
+}
+
+.sandbox-grid {
+  @apply grid grid-cols-1 gap-8 lg:grid-cols-2;
 }
 
 .env-grid-title,
@@ -302,7 +309,10 @@
   @apply text-lg font-bold;
 }
 
-.env-card,
+.env-card {
+  @apply border border-gray-200 dark:border-gray-700 shadow-sm rounded-lg bg-white dark:bg-gray-600 px-4 py-4 min-h-[9rem] h-48 flex flex-row items-start justify-between;
+}
+
 .template-card {
   @apply cursor-pointer border border-gray-200 dark:border-gray-700 shadow-sm rounded-lg bg-white dark:bg-gray-600 px-4 py-4 min-h-[9rem] h-48 flex flex-row items-start justify-between;
 }

@@ -12,14 +12,15 @@ import { useCnails } from "../contexts/cnails";
 import Logo from "./Logo";
 import { Fragment } from "react";
 const SideBar = () => {
+  const { isAdmin, containerInfo, containerQuota, containers } = useCnails();
+  const router = useRouter();
   var pages = [
     { name: "Dashboard", link: "/", icon: HomeIcon },
     { name: "Notifications", link: "/messages", icon: AnnotationIcon },
     { name: "File Transfer", link: "/file_transfer", icon: CloudIcon },
-    { name: "Admin", link: "/admin", icon: IdentificationIcon },
+    // { name: "Admin", link: "/admin", icon: IdentificationIcon },
   ];
-  const router = useRouter();
-  const { isAdmin, containerInfo, containerQuota, containers } = useCnails();
+  if (!isAdmin) pages = pages.filter((page) => page.link != "/admin");
   return (
     <div className="sidebar-container justify-between">
       <div>
@@ -32,8 +33,6 @@ const SideBar = () => {
         <div className="sidebar-btn-col">
           {pages.map((page, index) => {
             const isActive = router.pathname === page.link;
-            if (page.name == "Admin" && !isAdmin)
-              return <Fragment key={index}></Fragment>;
             return (
               <Link key={page.link} href={page.link}>
                 <a

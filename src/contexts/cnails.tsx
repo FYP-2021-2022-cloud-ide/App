@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect, useRef } from "react";
 import { getMessaging, MessagePayload, onMessage } from "firebase/messaging";
 import { firebaseCloudMessaging } from "../lib/webpush";
 import { Toast, ToastBar, Toaster } from "react-hot-toast";
-import myToast from "../components/CustomToast";
+import myToast, { loadingTime } from "../components/CustomToast";
 import {
   CnailsContextState,
   Container,
@@ -13,7 +13,7 @@ import { useRouter } from "next/router";
 import { notificationAPI } from "../lib/api/notificationAPI";
 import { containerAPI } from "../lib/api/containerAPI";
 
-const defaultQuota = 5;
+export const defaultQuota = 5;
 
 interface CnailsProviderProps {
   children: JSX.Element;
@@ -133,6 +133,7 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
       const { sub, userId, semesterId } = await fetchCookies();
       await initMessage(sub, userId, semesterId);
       await fetchContainers(sub);
+      await fetchNotifications(userId);
     }
     init();
   }, []);
@@ -167,7 +168,7 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
           {(t: Toast) => {
             const oldClassName = t.className;
             t.className = `toaster ${t.className}`;
-            if (oldClassName == "toaster-loading") t.duration = 60000;
+            if (oldClassName == "toaster-loading") t.duration = loadingTime;
             if (oldClassName == "toaster-custom") t.duration = 60 * 60000;
             return (
               <div

@@ -4,11 +4,6 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../lib/fetchAppSession';
 
 import { SuccessStringResponse } from "../../lib/api/api";
-type Data = {
-  success: boolean
-  message:string
-}
-
 
 
 import {grpcClient}from '../../lib/grpcClient'
@@ -19,16 +14,17 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SuccessStringResponse>
   ) 
-{
+{console.log("in1")
+console.log(req.body)
   var client = grpcClient()
-    const{sub}=req.query;
-    const { darkMode, bio} = JSON.parse(req.body);//console.log(body)
+    const {sub, darkMode, bio} = JSON.parse(req.body);
+    
 
     var docReq = new UpdateUserDataRequest();
     docReq.setSessionKey(fetchAppSession(req));
     docReq.setSub(sub as string);
-    docReq.setDarkmode(darkMode);
-    docReq.setBio(bio);
+    docReq.setDarkmode(darkMode as boolean);
+    docReq.setBio(bio as string);
     try{
         client.updateUserData(docReq, function(err, GoLangResponse: SuccessStringReply) {
         if(!GoLangResponse.getSuccess()){
@@ -45,7 +41,7 @@ export default async function handler(
     catch(error) {
         res.json({
           success: false,
-          message: error
+          message: error,
         });
         res.status(405).end();
     }

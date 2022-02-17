@@ -43,9 +43,9 @@ const CoursesList = () => {
   return (
     <div className="flex flex-col ">
       <div className="flex flex-row items-center space-x-2 mb-2 justify-between w-full">
-        <div className=" text-gray-600 dark:text-gray-300 font-bold text-xl ">
+        {/* <div className=" text-gray-600 dark:text-gray-300 font-bold text-xl ">
           Courses
-        </div>
+        </div> */}
 
         {/* <select
           name=""

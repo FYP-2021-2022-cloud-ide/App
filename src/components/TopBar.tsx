@@ -38,20 +38,16 @@ const TopBar = ({ sub, name, email }: props) => {
       <div className="flex flex-row items-center text-gray-500 justify-end gap-x-4">
         <UserMenu sub={sub} name={name} email={email}></UserMenu>
         <NotiStack />
-        <div
-          className="tooltip tooltip-bottom tooltip-info"
-          data-tip="Help and docs"
-        >
-          <Link href="">
-            <a href="https://brenkysbwim.gitbook.io/cnails/" target="_blank">
-              <QuestionMarkCircleIcon className="top-bar-icon"></QuestionMarkCircleIcon>
-            </a>
-          </Link>
-        </div>
-        <div
-          className="tooltip tooltip-bottom tooltip-bottom-left tooltip-info"
-          data-tip="Change theme"
-        >
+        <Link href="">
+          <a
+            href="https://brenkysbwim.gitbook.io/cnails/"
+            target="_blank"
+            title="Help and docs"
+          >
+            <QuestionMarkCircleIcon className="top-bar-icon"></QuestionMarkCircleIcon>
+          </a>
+        </Link>
+        <div title="Change Theme">
           {isDark ? (
             <SunIcon
               className="top-bar-icon top-bar-icon-sun"

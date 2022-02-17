@@ -18,7 +18,9 @@ export type {
   Notification,
   ActionType,
   CnailsContextState,
-  InstructorContextState
+  InstructorContextState,
+  CoursesContextState,
+  SandboxesContextState
 };
 
 type SectionRole = "INSTRUCTOR" | "STUDENT";
@@ -130,7 +132,9 @@ type InstructorContextState = {
   environments: Environment[],
   templates: Template[],
   fetch: () => void,
+  sectionUserInfo: SectionUserInfo
 }
+
 
 
 export type ActionType = "delete" | "reply";

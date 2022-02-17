@@ -1,36 +1,27 @@
-import { Disclosure, Transition } from "@headlessui/react";
-import {
-  Fragment,
-  useState,
-  useEffect,
-  useCallback,
-  forwardRef,
-  useRef,
-} from "react";
-import { ChevronDoubleDownIcon, ReplyIcon } from "@heroicons/react/outline";
-import Modal from "../components/Modal";
-import NotificationSend from "../components/NotificationSend";
+import { useState, useEffect, useCallback } from "react";
+import { ReplyIcon } from "@heroicons/react/outline";
 import { useCnails } from "../contexts/cnails";
 import EmptyDiv from "../components/EmptyDiv";
 import { notificationAPI } from "../lib/api/notificationAPI";
-import {
-  ChevronDoubleUpIcon,
-  MailIcon,
-  TrashIcon,
-} from "@heroicons/react/solid";
+import { TrashIcon } from "@heroicons/react/solid";
 import DataTable, {
   PaginationComponentProps,
   TableColumn,
   createTheme,
 } from "react-data-table-component";
-import { ActionType, Notification } from "../lib/cnails";
+import { Notification } from "../lib/cnails";
 import moment from "moment";
 import Loader from "../components/Loader";
 import myToast from "../components/CustomToast";
 import ModalForm from "../components/ModalForm";
 import { getMessageReplyFormStructure } from "../lib/forms";
+import React from "react";
+import { useRouter } from "next/router";
 
 const MessageTable = () => {
+  const router = useRouter();
+  const target = router.query.id;
+
   const [selectedRows, setSelectedRows] = useState<Notification[]>([]);
   const { userId, notifications, fetchNotifications } = useCnails();
   const [pending, setPending] = useState(true);
@@ -118,9 +109,18 @@ const MessageTable = () => {
     [selectedRows]
   );
 
-  const options = [10, 15, 20, 30];
+  const options = [15, 20, 30, 50];
 
-  const PaginationComponent = (props: PaginationComponentProps) => {
+  const PaginationComponent = (
+    props: PaginationComponentProps & {
+      selectedRows: Notification[];
+      userId: string;
+      removeNotification: any;
+      setSelectedRows: any;
+      fetchNotifications: any;
+      options: number[];
+    }
+  ) => {
     const {
       onChangeRowsPerPage,
       rowCount,
@@ -130,8 +130,11 @@ const MessageTable = () => {
     } = props;
     const top = rowsPerPage * (currentPage - 1) + 1;
     const bottom = Math.min(rowsPerPage + top - 1, rowCount);
+    useEffect(() => {
+      onChangeRowsPerPage(15, currentPage);
+    }, []);
     return (
-      <div className="flex flex-row bg-gray-100 dark:bg-gray-700 rounded-b-md p-2 justify-between items-center text-gray-700 dark:text-gray-300  border-t-[1px] border-[#D5D6D8] dark:border-[#2F3947]">
+      <div className="flex flex-row bg-gray-100 dark:bg-black/50 rounded-b-md p-2 justify-between items-center rdt_pagination">
         <div className="flex flex-row items-center space-x-2">
           {selectedRows.length != 0 && (
             <div>
@@ -186,7 +189,7 @@ const MessageTable = () => {
               onClick={() => {
                 onChangePage(1, rowCount);
               }}
-              className="btn btn-xs bg-gray-400 dark:bg-gray-900 dark:hover:bg-gray-800 border-0 outline-none "
+              className="btn btn-xs bg-gray-400 dark:bg-gray-800 dark:hover:bg-white/20 border-0 outline-none "
             >
               {"|<"}
             </button>
@@ -195,7 +198,7 @@ const MessageTable = () => {
               onClick={() => {
                 onChangePage(currentPage - 1, rowCount);
               }}
-              className="btn btn-xs bg-gray-400 dark:bg-gray-900 dark:hover:bg-gray-800 border-0 outline-none"
+              className="btn btn-xs bg-gray-400 dark:bg-gray-800 dark:hover:bg-white/20 border-0 outline-none"
             >
               {"<"}
             </button>
@@ -204,7 +207,7 @@ const MessageTable = () => {
               onClick={() => {
                 onChangePage(currentPage + 1, rowCount);
               }}
-              className="btn btn-xs bg-gray-400 dark:bg-gray-900 dark:hover:bg-gray-800 border-0 outline-none"
+              className="btn btn-xs bg-gray-400 dark:bg-gray-800 dark:hover:bg-white/20 border-0 outline-none"
             >
               {">"}
             </button>
@@ -213,7 +216,7 @@ const MessageTable = () => {
               onClick={() => {
                 onChangePage(Math.ceil(rowCount / rowsPerPage), rowCount);
               }}
-              className="btn btn-xs bg-gray-400 dark:bg-gray-900 dark:hover:bg-gray-800 border-0 outline-none"
+              className="btn btn-xs bg-gray-400 dark:bg-gray-800 dark:hover:bg-white/20 border-0 outline-none"
             >
               {">|"}
             </button>
@@ -224,14 +227,8 @@ const MessageTable = () => {
   };
 
   const ExpandedComponent = ({ data }: { data: Notification }) => (
-    <div className="flex flex-row bg-gray-50 dark:bg-gray-600 p-2 space-x-2">
-      <div className="flex flex-col items-center space-y-2">
-        <ChevronDoubleDownIcon className="min-w-[16px] min-h-[16px]  w-4 h-4 dark:text-gray-400 text-gray-400"></ChevronDoubleDownIcon>
-        <div className="w-[2px] rounded h-full bg-gray-400 dark:bg-gray-500"></div>
-        <ChevronDoubleUpIcon className="min-w-[16px] min-h-[16px] w-4 h-4 dark:text-gray-400 text-gray-400 "></ChevronDoubleUpIcon>
-      </div>
-      {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
-      <div className="">{data.body}</div>
+    <div className=" bg-gray-50 dark:bg-black/10 p-2 dark:text-gray-300">
+      <p className="">{data.body}</p>
     </div>
   );
 
@@ -252,9 +249,13 @@ const MessageTable = () => {
         data={notifications}
         selectableRows
         onSelectedRowsChange={handleChange}
+        defaultSortAsc={false}
         defaultSortFieldId={"Time"}
         expandableRows
         pagination
+        expandableRowExpanded={(row) => {
+          return target != null && row.id == target;
+        }}
         paginationComponent={PaginationComponent}
         progressPending={pending}
         progressComponent={
@@ -279,7 +280,9 @@ const MessageTable = () => {
         onClick={async () => {
           const response = await sendNotification(
             "test",
-            "this is a test message. This button should be hidden. ",
+            "this is a test message. This button should be hidden. ".repeat(
+              Math.ceil(Math.random() * 10)
+            ),
             userId,
             userId,
             Math.random() > 0.5
