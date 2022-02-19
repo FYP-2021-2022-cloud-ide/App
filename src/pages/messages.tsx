@@ -183,7 +183,7 @@ const MessageTable = () => {
           <p>
             {top}-{bottom} of {rowCount}
           </p>
-          <div className="btn-group border-0 outline-none border-none ">
+          <div className="btn-group border-0 outline-none border-none flex-nowrap">
             <button
               disabled={currentPage == 1}
               onClick={() => {

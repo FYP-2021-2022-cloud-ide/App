@@ -406,7 +406,6 @@ const ModalForm = ({
                 title={sectionTitle}
                 data={data}
                 onChange={(newData, id) => {
-                  console.log("on change");
                   setData(Object.assign({}, newData));
                   if (onChange) onChange(newData, id);
                 }}

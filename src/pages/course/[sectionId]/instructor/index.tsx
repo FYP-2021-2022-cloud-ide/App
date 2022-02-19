@@ -512,7 +512,7 @@ const EnvironmentTemplateWrapper = () => {
         formStructure={templateCreateFormStructure}
         title="Create Template"
         onEnter={async (data) => {
-          const toastId = myToast.loading("Creating A temporary workspace...");
+          const toastId = myToast.loading("Creating a temporary workspace...");
           var selectedEnv = data.environment;
           try {
             const response = await addTempContainer(

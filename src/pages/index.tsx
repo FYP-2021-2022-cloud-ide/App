@@ -14,7 +14,7 @@ export default function Home() {
     <div className="flex flex-col mx-6 space-y-4">
       <ContainersList></ContainersList>
       <Tab.Group>
-        <Tab.List className="flex p-1 space-x-1 bg-blue-900/20 rounded-xl w-96">
+        <Tab.List className="flex p-1 space-x-1 bg-blue-900/20 rounded-xl w-full max-w-[24rem]">
           <Tab
             className={({ selected }) =>
               classNames(

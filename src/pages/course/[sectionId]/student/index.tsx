@@ -62,7 +62,7 @@ const Home = () => {
     }
   };
   useEffect(() => {
-    fetchSectionUserInfo();
+    fetchSectionUserInfo()
     if (sectionId!=undefined)
       fetchWorkspaces();
   }, []);

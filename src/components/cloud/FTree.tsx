@@ -152,7 +152,7 @@ const FTree = React.forwardRef(
           // console.log("data is different, rerender...")
           setTreeData(data);
         }
-      } else console.log("data is undefined");
+      } else console.error("Tree data is undefined");
     }
 
     useEffect(() => {

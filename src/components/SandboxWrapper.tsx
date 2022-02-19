@@ -94,19 +94,19 @@ export const SandboxWrapper = () => {
         }}
         onSandboxDelete={async (sandboxImage) => {
           if (sandboxImage.sandboxesId) {
-            myToast.error(`The sandbox is still active. Fail to removed.`);
+            myToast.error(`The workspace is still active. Fail to removed.`);
             return;
           }
-          const id = myToast.loading(`Removing a ${sandboxImage.title}...`);
+          const id = myToast.loading(`Removing ${sandboxImage.title}...`);
           const response = await removeSandboxImage(sandboxImage.id, userId);
           myToast.dismiss(id);
           if (response.success) {
             myToast.success(
-              `Sandbox (${sandboxImage.title}) is successfully removed.`
+              `Workspace (${sandboxImage.title}) is successfully removed.`
             );
             fetch(mount.current);
           } else {
-            myToast.error(`Fail to remove Sandbox (${sandboxImage.title}).`);
+            myToast.error(`Fail to remove workspace (${sandboxImage.title}).`);
           }
         }}
         onSandboxUpdate={(sandbox) => {
@@ -116,24 +116,24 @@ export const SandboxWrapper = () => {
         onSandboxStart={async (sandboxImage) => {
           if (containers.length == containerQuota) {
             myToast.error(
-              `You have met your simultaneous run quota. Fail to start sandbox.`
+              `You have met your simultaneous run quota. Fail to start workspace.`
             );
             return;
           }
-          const id = myToast.loading(`Starting a sandbox....`);
+          const id = myToast.loading(`Starting a workspace....`);
           const response = await addSandbox(memory, CPU, sandboxImage.id);
           myToast.dismiss(id);
           if (response.success) {
             myToast.success(
-              `Sandbox ${sandboxImage.title} is successfully started.`
+              `Workspace ${sandboxImage.title} is successfully started.`
             );
             fetch(mount.current);
           } else {
-            myToast.error(`Cannot started sandbox. ${response.message}`);
+            myToast.error(`Cannot started workspace. ${response.message}`);
           }
         }}
         onSandboxStop={async (sandboxImage) => {
-          const toastId = myToast.loading(`Stopping a sandbox...`);
+          const toastId = myToast.loading(`Stopping a workspace...`);
           const response = await removeSandbox(
             sandboxImage.sandboxesId,
             userId
@@ -141,11 +141,11 @@ export const SandboxWrapper = () => {
           myToast.dismiss(toastId);
           if (response.success) {
             myToast.success(
-              `Sandbox ${sandboxImage.title} is successfully stopped.`
+              `Workspace ${sandboxImage.title} is successfully stopped.`
             );
             fetch(mount.current);
           } else {
-            myToast.error(`Cannot stop sandbox. ${response.message}`);
+            myToast.error(`Cannot stop workspace. ${response.message}`);
           }
         }}
       ></SandboxImageList>
@@ -154,7 +154,7 @@ export const SandboxWrapper = () => {
         isOpen={createOpen}
         setOpen={setCreateOpen}
         clickOutsideToClose
-        title="Create Sandbox"
+        title="Create Personal Workspace"
         formStructure={createFormStructure}
         onEnter={async (data) => {
           const environment = data.environment_choice as Option;
@@ -168,11 +168,11 @@ export const SandboxWrapper = () => {
 
           if (response.success) {
             const { sandboxImageId } = response;
-            myToast.success(`Sandbox is successfully created.`);
+            myToast.success(`Workspace is successfully created.`);
             fetch(mount.current);
           } else {
             // myToast.dismiss(toastId);
-            myToast.error(`Sandbox cannot be created. ${response.message}`);
+            myToast.error(`Workspace cannot be created. ${response.message}`);
           }
         }}
       ></ModalForm>
@@ -181,7 +181,7 @@ export const SandboxWrapper = () => {
         <ModalForm
           isOpen={updateOpen}
           setOpen={setUpdateOpen}
-          title={"Update Sandbox"}
+          title={"Update Workspace"}
           clickOutsideToClose
           formStructure={updateFormStructure}
           onClose={async (data, isEnter) => {
@@ -201,7 +201,7 @@ export const SandboxWrapper = () => {
           }}
           onEnter={async (data) => {
             // call some API here
-            const id = myToast.loading("Updating a sandbox...");
+            const id = myToast.loading("Updating a workspace...");
             const { name, description, update_environment: containerId } = data;
             console.log(data);
             const response = await updateSandboxImage(
@@ -213,9 +213,9 @@ export const SandboxWrapper = () => {
             );
             myToast.dismiss(id);
             if (response.success) {
-              myToast.success("Sandbox is successfully updated.");
+              myToast.success("workspace is successfully updated.");
               fetch(mount.current);
-            } else myToast.error("Fail to update the sandbox.");
+            } else myToast.error("Fail to update the workspace.");
           }}
         ></ModalForm>
       )}

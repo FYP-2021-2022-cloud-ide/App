@@ -11,6 +11,7 @@ import Breadcrumbs from "../../../../components/Breadcrumbs";
 import EmptyDiv from "../../../../components/EmptyDiv";
 import { useCnails } from "../../../../contexts/cnails";
 import { generalAPI } from "../../../../lib/api/generalAPI";
+import { templateAPI } from "../../../../lib/api/templateAPI";
 import {
   Environment,
   SectionRole,
@@ -42,11 +43,29 @@ const generateExampleData = (num: number): StudentWorkspace[] => {
 
 const TemplateBoard = ({ template }: { template: Template }) => {
   const [data, setData] = useState<StudentWorkspace[]>();
+  const { sectionUserInfo } = useInstructor();
+  const { getTemplateStudentWorkspace } = templateAPI;
 
   async function fetch() {
-    setData(
-      generateExampleData(template.active ? Math.ceil(Math.random() * 200) : 0)
+    // setData(
+    //   generateExampleData(template.active ? Math.ceil(Math.random() * 200) : 0)
+    // );
+    const response = await getTemplateStudentWorkspace(
+      template.id,
+      sectionUserInfo.sectionUserId
     );
+    if (response.success) {
+      setData(
+        response.studentWorkspaces.map((w) => ({
+          status: w.status as "ON" | "OFF",
+          workspaceId: w.workspaceId,
+          student: {
+            name: w.student.name,
+            sub: w.student.sub,
+          },
+        }))
+      );
+    }
   }
   useEffect(() => {
     fetch();
@@ -152,7 +171,7 @@ const TemplateBoard = ({ template }: { template: Template }) => {
           <p>
             {top}-{bottom} of {rowCount}
           </p>
-          <div className="btn-group border-0 outline-none border-none ">
+          <div className="btn-group border-0 outline-none border-none flex-nowrap">
             <button
               disabled={currentPage == 1}
               onClick={() => {
@@ -205,7 +224,7 @@ const TemplateBoard = ({ template }: { template: Template }) => {
     "light"
   );
 
-  if (!data) return <></>;
+  if (!data) return <EmptyDiv message=""></EmptyDiv>;
   return (
     <>
       {data.length == 0 ? (

@@ -43,7 +43,7 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
     if (response.success) {
       setNotifications(response.notifications);
       return response.notifications;
-    } else console.log("[ ❌ ] : fail to fetch notifications ", response);
+    } else console.error("[ ❌ ] : fail to fetch notifications ", response);
   };
 
   const fetchContainers = async (sub: string) => {
@@ -56,7 +56,10 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
         containersInfo: response.containersInfo,
       };
     } else
-      console.log("[ ❌ ] : fail to fetch containers' information ", response);
+      console.error(
+        "[ ❌ ] : fail to fetch containers' information ",
+        response
+      );
   };
 
   async function fetchCookies() {

@@ -15,14 +15,7 @@ export default async  function handler(
 {
     var client = grpcClient()
     const {templateId, section_user_id} = JSON.parse(req.body);
-    // if (section_user_id != undefined){
-    //     {/* @ts-ignore */}
-    // if(!(await checkInSectionBySectionUserId(req.oidc.user.sub, section_user_id))|| !(await checkRoleBySectionUserId(req.oidc.user.sub, section_user_id, "instructor")))
-    // {res.json(unauthorized());return}
-    // }else{
-    //     res.json(unauthorized())
-    //     return
-    // }
+
     var docReq = new TemplateIdRequest();
     docReq.setSessionKey(fetchAppSession(req));
     docReq.setTemplateid(templateId);

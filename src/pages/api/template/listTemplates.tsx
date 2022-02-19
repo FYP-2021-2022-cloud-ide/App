@@ -27,11 +27,8 @@ export default async function handler(
       docReq,
       function (err, GoLangResponse: ListTemplatesReply) {
         var templates = GoLangResponse.getTemplatesList();
-        console.log(GoLangResponse.getMessage())
         let success = GoLangResponse.getSuccess();
         if (success){
-
-       
           res.json({
             success: success,
             message: GoLangResponse.getMessage(),
@@ -53,7 +50,9 @@ export default async function handler(
                 };
               }) || [],
           }); }
-        else {throw new Error("internal server error");}
+        else {
+          throw new Error("internal server error " +GoLangResponse.getMessage() );
+        }
         res.status(200).end();
       }
     );

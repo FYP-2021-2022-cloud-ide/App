@@ -63,7 +63,7 @@ const SandboxImageList = ({
             ></SandboxImagesCard>
           ))}
         <div
-          className="h-full min-h-[32px] w-full rounded border-4 border-dashed border-gray-300 dark:border-gray-500 text-gray-300 dark:text-gray-500 flex justify-center items-center bg-transparent cursor-pointer"
+          className="h-full min-h-[8rem] w-full rounded border-4 border-dashed border-gray-300 dark:border-gray-500 text-gray-300 dark:text-gray-500 flex justify-center items-center bg-transparent cursor-pointer"
           onClick={() => {
             if (onCreateBtnClick) onCreateBtnClick();
           }}

@@ -417,7 +417,7 @@ export const getCreateSandboxFormStructure = (
 ): FormStructure => {
   const validName = getValidName(
     sandboxes.map((s) => s.title),
-    "Sandbox"
+    "Personal workspace"
   );
   return {
     create_sandbox: {
@@ -433,7 +433,6 @@ export const getCreateSandboxFormStructure = (
           type: "input",
           defaultValue: "",
           placeholder: `e.g. ${validName}`,
-          tooltip: "test",
           emptyValue: validName,
           text: "Name (Optional)",
           validate: (data) => {
@@ -445,7 +444,7 @@ export const getCreateSandboxFormStructure = (
         description: {
           type: "textarea",
           defaultValue: "",
-          placeholder: "e.g. This sandbox is about ...",
+          placeholder: "e.g. This workspace is about ...",
           text: "Description (Optional)",
         },
       },
@@ -460,7 +459,7 @@ export const getUpdateSandboxFormStructure = (
 ): FormStructure => {
   const validName = getValidName(
     sandboxes.map((s) => s.title),
-    "Sandbox",
+    "Personal workspace",
     true
   );
   return {
@@ -472,7 +471,7 @@ export const getUpdateSandboxFormStructure = (
           text: "Update Environment",
           defaultValue: "",
           tooltip:
-            "If you need to update the environment of your sandbox, click the button below. You will be prompt to a temporary environment to set up your sandbox.",
+            "If you need to update the environment of your workspace, click the button below. You will be prompt to a temporary environment to set up your workspace.",
           node: (onChange, currentValue) => {
             const { addTempContainer } = containerAPI;
             return (
@@ -516,7 +515,7 @@ export const getUpdateSandboxFormStructure = (
                         onChange(response.containerID);
                       } else
                         myToast.error(
-                          "fail to start temp container for this sandbox."
+                          "fail to start temp container for this workspace."
                         );
                     }}
                   >
@@ -547,7 +546,7 @@ export const getUpdateSandboxFormStructure = (
         description: {
           type: "textarea",
           defaultValue: targetSandbox?.description,
-          placeholder: "e.g. This sandbox is about ...",
+          placeholder: "e.g. This workspace is about ...",
           text: "Description (Optional)",
         },
       },

@@ -29,11 +29,13 @@ function ContainerCard({
       tiltMaxAngleY={4}
       tiltReverse
     >
-      <a
-        target="_blank"
-        rel="noreferrer"
-        href={"https://codespace.ust.dev/user/container/" + containerID + "/"}
-        className="flex flex-col h-full justify-between
+      <div
+        onClick={() =>
+          window.open(
+            "https://codespace.ust.dev/user/container/" + containerID + "/"
+          )
+        }
+        className="flex flex-col h-full min-h-[8rem] justify-between
         rounded-xl border-gray-200 dark:border-gray-700 border min-w-max transition-all ease-in-out duration-300 p-4 bg-white dark:bg-gray-600"
       >
         <div className="flex flex-row  space-x-4 items-start ">
@@ -62,7 +64,7 @@ function ContainerCard({
               : existedTime.split(".")[0] + "s"}
           </div>
         </div>
-      </a>
+      </div>
     </Tilt>
   );
 }
