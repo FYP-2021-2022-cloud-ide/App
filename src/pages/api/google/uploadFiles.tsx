@@ -9,7 +9,7 @@ export default async function handler(
     req: NextApiRequest, 
     res:NextApiResponse<SuccessStringResponse>) {
     const {sub,  filePath,parentId,fileType} = JSON.parse(req.body)
-    var client = grpcClient()
+    var client = grpcClient
     var docReq = new UploadRequest();
     docReq.setSessionKey(fetchAppSession(req));
     docReq.setSub(sub)

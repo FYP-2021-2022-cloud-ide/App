@@ -11,7 +11,7 @@ export default async function handler(
     req: NextApiRequest, 
     res:NextApiResponse<SuccessStringResponse>) {
     const {sub,  fileId, fileName,filePath,fileType} = JSON.parse(req.body)
-    var client = grpcClient()
+    var client = grpcClient
     var docReq = new DownloadRequest();
     docReq.setSessionKey(fetchAppSession(req));
     docReq.setSub(sub)

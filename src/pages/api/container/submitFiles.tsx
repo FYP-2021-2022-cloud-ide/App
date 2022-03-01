@@ -10,7 +10,7 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<SuccessStringResponse>
   ) {
-    var client = grpcClient()
+    var client = grpcClient
     
     var body = JSON.parse(req.body);console.log(body)
     var docReq = new SubmitFilesRequest();

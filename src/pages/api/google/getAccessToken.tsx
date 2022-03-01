@@ -9,7 +9,7 @@ export default function handler(
     res:NextApiResponse<SuccessStringResponse>) {
 
     const {code, sub} = JSON.parse(req.body)
-    var client = grpcClient()
+    var client = grpcClient
     var docReq = new CodeRequest();
     docReq.setSessionKey(fetchAppSession(req));
     docReq.setCode(code)

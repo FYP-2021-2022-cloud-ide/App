@@ -2,18 +2,21 @@ import { getMessaging, getToken } from "firebase/messaging";
 import * as firebase from 'firebase/app'
 import localforage from 'localforage'
 
+import { generalAPI } from "../lib/api/generalAPI";
 const firebaseCloudMessaging = {
   tokenInlocalforage: async () => {
     return localforage.getItem('fcm_token')
   },
 
   init: async function () {
-
+    const {getEnv} = generalAPI;
+    var res = await getEnv()
+    var {FirebaseApiKey,FirebaseProjectId,FirebaseMessagingSenderId,FirebaseAppId}=res
     firebase.initializeApp({
-        apiKey: "AIzaSyBeaQh0WK8j7SF_1vjkm7JFR4a9zXUBWho",
-        projectId: "cnails-524ee",
-        messagingSenderId: "724781215995",
-        appId: "1:724781215995:web:e539d1a943aee7851ec05e"
+        apiKey: FirebaseApiKey,
+        projectId:FirebaseProjectId,
+        messagingSenderId:FirebaseMessagingSenderId,
+        appId:FirebaseAppId
     })
 
     try {

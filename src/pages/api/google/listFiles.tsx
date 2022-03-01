@@ -11,7 +11,7 @@ export default async function handler(
     res:NextApiResponse<GoogleDriveListResponse>) {
     console.log("inside list file")
     const {folderId, sub} = JSON.parse(req.body)
-    var client = grpcClient()
+    var client = grpcClient
     var docReq = new ListFilesRequest();
     docReq.setSessionKey(fetchAppSession(req));
     docReq.setFolderid(folderId)

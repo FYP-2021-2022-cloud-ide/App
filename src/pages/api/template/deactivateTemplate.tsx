@@ -13,7 +13,7 @@ export default async  function handler(
   res: NextApiResponse<SuccessStringResponse>
   ) 
 {
-    var client = grpcClient()
+    var client = grpcClient
     const {templateId, section_user_id} = JSON.parse(req.body);
 
     var docReq = new TemplateIdRequest();

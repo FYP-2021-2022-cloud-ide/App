@@ -15,7 +15,7 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<SuccessStringResponse>
 ) {
-  var client = grpcClient();
+  var client = grpcClient
   const { semesterId, registrationToken, userId } = JSON.parse(req.body);
   console.log(req.body);
   var docReq = new UpdateSubscriptionRequest();

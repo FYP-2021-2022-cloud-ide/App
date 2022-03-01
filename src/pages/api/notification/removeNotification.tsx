@@ -14,7 +14,7 @@ export default function handler(
   res: NextApiResponse<SuccessStringResponse>
   ) 
 {
-    var client = grpcClient()
+    var client = grpcClient
     const {userId, notificationIds} = JSON.parse(req.body);
     // console.log(notificationIds)
     var docReq = new RemoveNotificationRequest();

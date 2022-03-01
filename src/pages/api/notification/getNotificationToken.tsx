@@ -14,7 +14,7 @@ export default function handler(
   res: NextApiResponse<NotificationTokenResponse>
   ) 
 {
-    var client = grpcClient()
+    var client = grpcClient
 
     var body = JSON.parse(req.body);
     var docReq = new SubRequest();

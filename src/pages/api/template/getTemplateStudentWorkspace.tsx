@@ -13,9 +13,9 @@ export default async  function handler(
   res: NextApiResponse<TemplateGetStudentWorkspaceResponse>
   ) 
 {
-    var client = grpcClient()
+    var client = grpcClient
     const {templateId, section_user_id} = JSON.parse(req.body);
-console.log(templateId, section_user_id)
+// console.log(templateId, section_user_id)
     var docReq = new TemplateIdRequest();
     docReq.setSessionKey(fetchAppSession(req));
     docReq.setTemplateid(templateId);

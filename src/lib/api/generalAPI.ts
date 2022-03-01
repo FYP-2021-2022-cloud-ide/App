@@ -48,6 +48,17 @@ const generalAPI = {
     );
     return res.json();
   },
+  
+  getEnv: async (
+  ): Promise<any> => {
+    var res = await fetch(
+      "/api/getEnv",
+      {
+        method: "GET",
+      }
+    );
+    return res.json();
+  },
 };
 
 export { generalAPI };

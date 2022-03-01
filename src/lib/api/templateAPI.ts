@@ -1,6 +1,7 @@
 import { 
   TemplateListResponse ,
   TemplateAddResponse,
+  TemplateGetStudentWorkspaceResponse,
   SuccessStringResponse
 } from "./api";
 
@@ -101,6 +102,19 @@ const templateAPI = {
     templateId: string,
      section_user_id: string): Promise<SuccessStringResponse>  => {
     var res = await fetch("/api/template/removeTemplate", {
+      method: "POST",
+      body: JSON.stringify({
+        templateId: templateId,
+        section_user_id: section_user_id,
+      }),
+    });
+    return res.json();
+  },
+
+  getTemplateStudentWorkspace: async (
+    templateId: string,
+     section_user_id: string): Promise<TemplateGetStudentWorkspaceResponse>  => {
+    var res = await fetch("/api/template/getTemplateStudentWorkspace", {
       method: "POST",
       body: JSON.stringify({
         templateId: templateId,

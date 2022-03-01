@@ -66,9 +66,9 @@ app.prepare().then(() => {
     auth({
       issuerBaseURL: 'https://cas.ust.hk/cas/oidc',
       baseURL: 'https://codespace.ust.dev',
-      clientID: '20008',
-      clientSecret: 'YatwZXDyx52gz644DFn8ZsheigCaz5GPRuT48I7n',
-      secret: 'thisisasddfvsdavsadfgvdsvdsgdfstest',
+      clientID: process.env.OAUTH_CLIENT_ID!,
+      clientSecret:process.env.OAUTH_CLIENT_SECRET!,
+      secret: process.env.OAUTH_SECRET!,
       authorizationParams: {
         response_type: 'code',
         scope: 'openid profile email'
@@ -124,7 +124,7 @@ app.prepare().then(() => {
           // @ts-ignore
           req.appSession!.userIdentity = additionalUserClaims.data;
           const { sub, name, email } = additionalUserClaims.data;
-          var client = grpcClient()
+          var client = grpcClient
           // console.log(client)
           var docReq = new GetUserDataRequest()
           docReq.setSessionKey(session.id_token)
@@ -143,19 +143,19 @@ app.prepare().then(() => {
             })
           }).then((value) => {
             //@ts-ignore
-            res.cookie('userId', value.userId, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `${process.env.HOSTNAME}` });
+            res.cookie('userId', value.userId, { maxAge: SESSION_VALID_FOR, httpOnly: true, domain: `${process.env.HOSTNAME}` });
             //@ts-ignore
-            res.cookie('role', value.role, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `${process.env.HOSTNAME}` });
+            res.cookie('role', value.role, { maxAge: SESSION_VALID_FOR, httpOnly: true, domain: `${process.env.HOSTNAME}` });
             //@ts-ignore
-            res.cookie('semesterId', value.semesterId, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `${process.env.HOSTNAME}` });
+            res.cookie('semesterId', value.semesterId, { maxAge: SESSION_VALID_FOR, httpOnly: true, domain: `${process.env.HOSTNAME}` });
             //@ts-ignore
-            res.cookie('darkMode', value.darkMode, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `${process.env.HOSTNAME}` });
+            res.cookie('darkMode', value.darkMode, { maxAge: SESSION_VALID_FOR, httpOnly: true, domain: `${process.env.HOSTNAME}` });
             //@ts-ignore
-            res.cookie('bio', value.bio, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `${process.env.HOSTNAME}` });
+            res.cookie('bio', value.bio, { maxAge: SESSION_VALID_FOR, httpOnly: true, domain: `${process.env.HOSTNAME}` });
           })
-          res.cookie('sub', sub, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `${process.env.HOSTNAME}` });
-          res.cookie('name', name, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `${process.env.HOSTNAME}` });
-          res.cookie('email', email, { maxAge: SESSION_VALID_FOR, httpOnly: false, domain: `${process.env.HOSTNAME}` });
+          res.cookie('sub', sub, { maxAge: SESSION_VALID_FOR, httpOnly: true, domain: `${process.env.HOSTNAME}` });
+          res.cookie('name', name, { maxAge: SESSION_VALID_FOR, httpOnly: true, domain: `${process.env.HOSTNAME}` });
+          res.cookie('email', email, { maxAge: SESSION_VALID_FOR, httpOnly: true, domain: `${process.env.HOSTNAME}` });
         } catch (error) {
           throw error
         }
@@ -188,7 +188,7 @@ app.prepare().then(() => {
 
 
 
-  // authentication logout 
+  // // authentication logout 
   server.all('/logout', async function (req: Request, res: Response) {
     console.log('logout inside')
     res.oidc!.logout({ returnTo: '/' });
@@ -201,43 +201,17 @@ app.prepare().then(() => {
     });
   });
 
-  // server.all('/course/:sectionId/:role', async function (req: Request, res: Response) {
-  //   try {
-  //     console.log('inside role checking')
-  //     const response = await fetch("http://auth:8181/v1/data/section_role/section_id", {
-  //       body: JSON.stringify({
-  //         input: {
-  //           itsc: req.oidc.user!.sub,
-  //           path: [req.params.sectionId, req.params.role]
-  //         }
-  //       }),
-  //       headers: {
-  //         Authorization: `Bearer ${process.env.OPASECRET}`,
-  //         "Content-Type": "application/json"
-  //       },
-  //       method: "POST"
-  //     })
-  //     const { result: { allow } } = await response.json()
-  //     if (allow) {
-  //       return handle(req, res);
-  //     } else {
-  //       res.redirect('/')
-  //     }
-  //   } catch (error) {
-  //     console.log(error)
-  //     res.redirect('/')
-  //   }
-  // })
-
   // grpc api route 
   server.all('/quickAssignmentInit/:templateID', async function (req: Request, res: Response) {
     try {
-      var client = grpcClient()
+      var client = grpcClient
       var docReq = new InstantAddContainerRequest();
+      const { appSession } = parse(req.headers.cookie!)
+      const key = crypto.createHmac('sha1', process.env.SESSIONSECRET!).update(appSession).digest().toString('base64');
       docReq.setSub(req.oidc.user!.sub)
       docReq.setTemplateId(req.params.templateID)
+      docReq.setSessionKey(key)
       client.instantAddContainer(docReq, function (err, GoLangResponse: AddContainerReply) {
-        // console.log(err,GoLangResponse.getMessage())
         if (!GoLangResponse.getSuccess()) {
           console.log(GoLangResponse.getMessage())
           res.redirect('/')
@@ -252,13 +226,13 @@ app.prepare().then(() => {
     }
   })
 
-  // grpc api route 
+  // // grpc api route 
   server.all('/user/container/:id/*', async function (req: Request, res: Response) {
-    // req.url = req.url.replace('/user/container/' + req.params.id + '/', '');
-    // req.header('User-Agent')
+    //   // req.url = req.url.replace('/user/container/' + req.params.id + '/', '');
+    //   // req.header('User-Agent')
 
     try {
-      var client = grpcClient()
+      var client = grpcClient
       var docReq = new CheckHaveContainerRequest();
       const { appSession } = parse(req.headers.cookie!)
       const key = crypto.createHmac('sha1', process.env.SESSIONSECRET!).update(appSession).digest().toString('base64');
@@ -275,8 +249,7 @@ app.prepare().then(() => {
           // req.url = req.params.id
           proxy.web(req, res, { target: 'http://traefik.codespace.ust.dev' })
         } else {
-          console.log(GoLangResponse.getMessage())
-          console.log("unauthenticated")
+          console.error(GoLangResponse.getMessage())
           res.redirect(`/`)
         }
       })
@@ -292,6 +265,9 @@ app.prepare().then(() => {
   server.all('*', requiresAuth(), (req, res) => {
     return handle(req, res);
   })
+  // server.all('*', (req, res) => {
+  //   return handle(req, res);
+  // })
 
 
   httpServer.listen(port, (err?: any) => {

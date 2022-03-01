@@ -14,7 +14,7 @@ export default function handler(
   res: NextApiResponse<NotificationSendResponse>
   ) 
 {
-    var client = grpcClient()
+    var client = grpcClient
     const {title, body, sender, receiver, allowReply} = JSON.parse(req.body);
     var docReq = new SendNotificationRequest();
     docReq.setSessionKey(fetchAppSession(req));

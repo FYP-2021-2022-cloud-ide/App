@@ -15,7 +15,7 @@ export default async function handler(
   res: NextApiResponse<SectionUserInfoResponse>
   ) 
 {
-    var client = grpcClient()
+    var client = grpcClient
     const {sectionid, sub} = req.query
   
     var docReq = new SectionAndSubRequest();

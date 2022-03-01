@@ -14,7 +14,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<EnvironmentAddResponse>
 ) {
-  var client = grpcClient();
+  var client = grpcClient
   const { name, section_user_id, containerId, description } = JSON.parse(
     req.body
   );

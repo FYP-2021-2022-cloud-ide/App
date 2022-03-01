@@ -15,7 +15,7 @@ export default function handler(
   console.log('inside auth')
   var docReq = new EmptyRequest();
   docReq.setSessionKey(fetchAppSession(req));
-  var client = grpcClient()
+  var client = grpcClient
   try{
     client.googleOAuth(docReq, function(err, GoLangResponse: SuccessStringReply) {
       console.log(err)

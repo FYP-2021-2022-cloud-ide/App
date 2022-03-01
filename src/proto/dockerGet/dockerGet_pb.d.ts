@@ -924,6 +924,93 @@ export namespace AddTemplateReply {
     }
 }
 
+export class TemplateGetStudentWorkspaceReply extends jspb.Message { 
+    getSuccess(): boolean;
+    setSuccess(value: boolean): TemplateGetStudentWorkspaceReply;
+    getMessage(): string;
+    setMessage(value: string): TemplateGetStudentWorkspaceReply;
+    clearStudentworkspacesList(): void;
+    getStudentworkspacesList(): Array<TemplateGetStudentWorkspaceReply.StudentWorkspace>;
+    setStudentworkspacesList(value: Array<TemplateGetStudentWorkspaceReply.StudentWorkspace>): TemplateGetStudentWorkspaceReply;
+    addStudentworkspaces(value?: TemplateGetStudentWorkspaceReply.StudentWorkspace, index?: number): TemplateGetStudentWorkspaceReply.StudentWorkspace;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): TemplateGetStudentWorkspaceReply.AsObject;
+    static toObject(includeInstance: boolean, msg: TemplateGetStudentWorkspaceReply): TemplateGetStudentWorkspaceReply.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: TemplateGetStudentWorkspaceReply, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): TemplateGetStudentWorkspaceReply;
+    static deserializeBinaryFromReader(message: TemplateGetStudentWorkspaceReply, reader: jspb.BinaryReader): TemplateGetStudentWorkspaceReply;
+}
+
+export namespace TemplateGetStudentWorkspaceReply {
+    export type AsObject = {
+        success: boolean,
+        message: string,
+        studentworkspacesList: Array<TemplateGetStudentWorkspaceReply.StudentWorkspace.AsObject>,
+    }
+
+
+    export class StudentWorkspace extends jspb.Message { 
+        getStatus(): string;
+        setStatus(value: string): StudentWorkspace;
+        getWorkspaceid(): string;
+        setWorkspaceid(value: string): StudentWorkspace;
+
+        hasStudent(): boolean;
+        clearStudent(): void;
+        getStudent(): TemplateGetStudentWorkspaceReply.StudentWorkspace.Student | undefined;
+        setStudent(value?: TemplateGetStudentWorkspaceReply.StudentWorkspace.Student): StudentWorkspace;
+
+        serializeBinary(): Uint8Array;
+        toObject(includeInstance?: boolean): StudentWorkspace.AsObject;
+        static toObject(includeInstance: boolean, msg: StudentWorkspace): StudentWorkspace.AsObject;
+        static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+        static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+        static serializeBinaryToWriter(message: StudentWorkspace, writer: jspb.BinaryWriter): void;
+        static deserializeBinary(bytes: Uint8Array): StudentWorkspace;
+        static deserializeBinaryFromReader(message: StudentWorkspace, reader: jspb.BinaryReader): StudentWorkspace;
+    }
+
+    export namespace StudentWorkspace {
+        export type AsObject = {
+            status: string,
+            workspaceid: string,
+            student?: TemplateGetStudentWorkspaceReply.StudentWorkspace.Student.AsObject,
+        }
+
+
+        export class Student extends jspb.Message { 
+            getName(): string;
+            setName(value: string): Student;
+            getSub(): string;
+            setSub(value: string): Student;
+            getUserid(): string;
+            setUserid(value: string): Student;
+
+            serializeBinary(): Uint8Array;
+            toObject(includeInstance?: boolean): Student.AsObject;
+            static toObject(includeInstance: boolean, msg: Student): Student.AsObject;
+            static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+            static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+            static serializeBinaryToWriter(message: Student, writer: jspb.BinaryWriter): void;
+            static deserializeBinary(bytes: Uint8Array): Student;
+            static deserializeBinaryFromReader(message: Student, reader: jspb.BinaryReader): Student;
+        }
+
+        export namespace Student {
+            export type AsObject = {
+                name: string,
+                sub: string,
+                userid: string,
+            }
+        }
+
+    }
+
+}
+
 export class AddEnvironmentRequest extends jspb.Message { 
     getSessionKey(): string;
     setSessionKey(value: string): AddEnvironmentRequest;

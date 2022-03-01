@@ -16,7 +16,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<EnvironmentListResponse>
 ) {
-  var client = grpcClient();
+  var client = grpcClient
   const { sectionid, sub } = req.query;
 
   var docReq = new SectionAndSubRequest();

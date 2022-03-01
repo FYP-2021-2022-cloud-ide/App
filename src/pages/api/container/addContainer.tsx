@@ -12,7 +12,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ContainerAddResponse>
 ) {
-  var client = grpcClient();
+  var client = grpcClient;
 
   const {
     imageName,

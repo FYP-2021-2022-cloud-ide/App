@@ -10,7 +10,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<TemplateAddResponse>
   ) {
-    var client = grpcClient()
+    var client = grpcClient
     const {templateName, section_user_id, assignment_config_id,environment_id, containerId, description, active, isExam, timeLimit,allow_notification} = JSON.parse(req.body);
 
     var docReq = new AddTemplateRequest();

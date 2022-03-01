@@ -12,7 +12,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SuccessStringResponse>
   ) {
-    var client = grpcClient()
+    var client = grpcClient
     const{envId, name, section_user_id, containerId, description} = JSON.parse(req.body);
 
 

@@ -15,6 +15,7 @@ export type {
   Template,
   TemplateListResponse,
   TemplateAddResponse,
+  TemplateGetStudentWorkspaceResponse,
   Container,
   ContainerListResponse,
   ContainerAddResponse,
@@ -29,6 +30,7 @@ export type {
   LocalFilesListResponse,
   FetchCookieResponse,
   GetUserDataResponse,
+  
 };
 type SectionRole = "instructor" | "student";
 type SuccessStringResponse = {
@@ -117,6 +119,28 @@ type TemplateAddResponse =
       success: false;
       message: string;
     };
+
+type StudentWorkspace = {
+  // status: "NOT_STARTED_BEFORE" | "ON" | "OFF";
+  status:string;
+  workspaceId: string;
+  student: {
+    name: string;
+    sub: string;
+    userId:string;
+  };
+};
+
+type TemplateGetStudentWorkspaceResponse =
+| {
+    success: true;
+    message: string;
+    studentWorkspaces: StudentWorkspace[];
+  }
+| {
+    success: false;
+    message: string;
+};
 
 type ContainerInfo = {
   containersAlive: number | undefined;

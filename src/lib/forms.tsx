@@ -5,14 +5,15 @@ import { Option } from "../components/ListBox";
 import { containerAPI } from "./api/containerAPI";
 import myToast from "../components/CustomToast";
 
-const registry = "143.89.223.188:5000";
-const rootImage = "143.89.223.188:5000/codeserver:latest";
-const CPU = 0.5;
-const memory = 400;
+const registry = process.env.NEXT_PUBLIC_REGISTRY;
+// console.log(registry)
+const rootImage = `${registry}/codeserver:latest`;
+const CPU = 1;
+const memory = 600;
 const envChoices = [
-  { value: "C++/C", id: `${registry}/codeserver:latest` },
-  { value: "Python3", id: `${registry}/codeserver:latest` },
-  { value: "Java", id: `${registry}/codeserver:latest` },
+  { value: "C++/C", id: `${registry}/cpp:latest` },
+  { value: "Python3", id: `${registry}/python3:latest` },
+  { value: "Java", id: `${registry}/java:latest` },
 ];
 
 export const getValidName = (

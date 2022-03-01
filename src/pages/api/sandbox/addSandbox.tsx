@@ -13,7 +13,7 @@ export default function handler(
   res: NextApiResponse<SandboxAddResponse>
   ) 
 {
-    var client = grpcClient()
+    var client = grpcClient
 
     const {memLimit, numCPU, sandboxImageId} = JSON.parse(req.body);
     var docReq = new AddSandBoxRequest();

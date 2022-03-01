@@ -14,7 +14,7 @@ export default function handler(
   res: NextApiResponse<ContainerAddResponse>
   ) 
 {
-    var client = grpcClient()
+    var client = grpcClient
 
     const { sub} = req.query
     const {memLimit, numCPU, imageName, accessRight} = JSON.parse(req.body);

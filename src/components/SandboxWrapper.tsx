@@ -11,8 +11,8 @@ import {
   getCreateSandboxFormStructure,
   getUpdateSandboxFormStructure,
 } from "../lib/forms";
-const CPU = 0.5;
-const memory = 400;
+const CPU =1;
+const memory = 600;
 
 async function fetchSandboxes(
   userId: string,

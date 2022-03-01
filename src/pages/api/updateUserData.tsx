@@ -16,7 +16,7 @@ export default async function handler(
   ) 
 {console.log("in1")
 console.log(req.body)
-  var client = grpcClient()
+  var client = grpcClient
     const {sub, darkMode, bio} = JSON.parse(req.body);
     
 

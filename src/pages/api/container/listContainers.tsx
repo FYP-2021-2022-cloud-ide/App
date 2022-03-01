@@ -11,7 +11,7 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<ContainerListResponse>
   ) {
-    var client = grpcClient()
+    var client = grpcClient
     const { sub } = req.query;
 
     var docReq = new SubRequest();

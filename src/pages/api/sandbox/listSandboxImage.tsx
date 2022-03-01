@@ -14,7 +14,7 @@ export default function handler(
   res: NextApiResponse<SandboxImageListResponse>
   ) 
 {
-    var client = grpcClient()
+    var client = grpcClient
 
     const {userId} = req.query! 
     var docReq = new ListSandBoxImageRequest();

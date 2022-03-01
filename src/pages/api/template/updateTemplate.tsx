@@ -12,7 +12,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SuccessStringResponse>
   ) {
-    var client = grpcClient()
+    var client = grpcClient
     const {templateId, templateName, section_user_id, containerId, description, isExam, timeLimit,allow_notification} = JSON.parse(req.body);
 
     var docReq = new UpdateTemplateRequest();

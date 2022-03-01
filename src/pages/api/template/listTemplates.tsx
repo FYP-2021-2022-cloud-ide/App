@@ -16,7 +16,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<TemplateListResponse>
 ) {
-  var client = grpcClient();
+  var client = grpcClient
   var docReq = new SectionAndSubRequest();
   const { sub, sectionid } = req.query;
   docReq.setSessionKey(fetchAppSession(req));

@@ -31,10 +31,10 @@ import {
   getUpdateEnvironmentFormStructure,
 } from "../../../../lib/forms";
 import _ from "lodash";
-
-const rootImage = "143.89.223.188:5000/codeserver:latest";
-const CPU = 0.5;
-const memory = 400;
+const registry =process.env.NEXT_PUBLIC_REGISTRY;
+const rootImage =  `${registry}/codeserver:latest`;
+const CPU = 1;
+const memory = 600;
 
 // Returning a new object reference guarantees that a before-and-after
 //   equivalence check will always be false, resulting in a re-render, even
@@ -694,9 +694,14 @@ const Home = () => {
         sectionUserId: sectionUserID,
         sub: sub,
       });
+      //restrict the student to access instructor page
+      if (role.toUpperCase() as SectionRole!="INSTRUCTOR"){
+        router.push("/");
+      }
     } else {
       router.push("/");
     }
+    
   };
   useEffect(() => {
     fetchSectionUserInfo();

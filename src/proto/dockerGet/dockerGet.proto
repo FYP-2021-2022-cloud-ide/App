@@ -31,6 +31,7 @@ service Docker {
   rpc activateTemplate(TemplateIdRequest)returns(SuccessStringReply){}
   rpc deactivateTemplate(TemplateIdRequest)returns(SuccessStringReply){}
   rpc removeTemplate(TemplateIdRequest)returns(SuccessStringReply){}
+  rpc getTemplateStudentWorkspace(TemplateIdRequest)returns(TemplateGetStudentWorkspaceReply){}
 
   rpc addEnvironment(AddEnvironmentRequest)returns(AddEnvironmentReply){}
   rpc updateEnvironment(UpdateEnvironmentRequest)returns(SuccessStringReply){}
@@ -269,7 +270,21 @@ message AddTemplateReply {
 	string message=2;
 	string templateID=3;
 }
-
+message TemplateGetStudentWorkspaceReply {
+	bool success=1;
+	string message=2;
+  message StudentWorkspace {
+    string status=1;
+    string workspaceId=2;
+    message Student {
+      string name=1;
+      string sub=2;
+      string userId=3;
+    }
+    Student student=3;
+  }
+	repeated StudentWorkspace StudentWorkspaces=3;
+}
 
 
 

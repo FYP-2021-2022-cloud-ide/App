@@ -488,6 +488,17 @@ function deserialize_dockerGet_SuccessStringReply(buffer_arg) {
   return dockerGet_pb.SuccessStringReply.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_dockerGet_TemplateGetStudentWorkspaceReply(arg) {
+  if (!(arg instanceof dockerGet_pb.TemplateGetStudentWorkspaceReply)) {
+    throw new Error('Expected argument of type dockerGet.TemplateGetStudentWorkspaceReply');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_dockerGet_TemplateGetStudentWorkspaceReply(buffer_arg) {
+  return dockerGet_pb.TemplateGetStudentWorkspaceReply.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_dockerGet_TemplateIdRequest(arg) {
   if (!(arg instanceof dockerGet_pb.TemplateIdRequest)) {
     throw new Error('Expected argument of type dockerGet.TemplateIdRequest');
@@ -764,6 +775,17 @@ var DockerService = exports.DockerService = {
     requestDeserialize: deserialize_dockerGet_TemplateIdRequest,
     responseSerialize: serialize_dockerGet_SuccessStringReply,
     responseDeserialize: deserialize_dockerGet_SuccessStringReply,
+  },
+  getTemplateStudentWorkspace: {
+    path: '/dockerGet.Docker/getTemplateStudentWorkspace',
+    requestStream: false,
+    responseStream: false,
+    requestType: dockerGet_pb.TemplateIdRequest,
+    responseType: dockerGet_pb.TemplateGetStudentWorkspaceReply,
+    requestSerialize: serialize_dockerGet_TemplateIdRequest,
+    requestDeserialize: deserialize_dockerGet_TemplateIdRequest,
+    responseSerialize: serialize_dockerGet_TemplateGetStudentWorkspaceReply,
+    responseDeserialize: deserialize_dockerGet_TemplateGetStudentWorkspaceReply,
   },
   addEnvironment: {
     path: '/dockerGet.Docker/addEnvironment',

@@ -14,7 +14,7 @@ export default function handler(
   res: NextApiResponse<SuccessStringResponse>
   ) 
 {
-    var client = grpcClient()
+    var client = grpcClient
 
     const { sub} = req.query
     const {containerId} = JSON.parse(req.body);

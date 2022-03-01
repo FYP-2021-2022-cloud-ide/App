@@ -15,7 +15,7 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<NotificationListResponse>
 ) {
-  var client = grpcClient();
+  var client = grpcClient
   const { userId } = req.query!;
   var docReq = new UserIdRequest();
   docReq.setSessionKey(fetchAppSession(req));
