@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../../lib/fetchAppSession';
-import { SuccessStringResponse } from "../../../lib/api/api";
+import { SuccessStringResponse  ,nodeError} from "../../../lib/api/api";
 
 import {grpcClient}from '../../../lib/grpcClient'
 import {  SuccessStringReply,TemplateIdRequest  } from '../../../proto/dockerGet/dockerGet_pb';
@@ -23,12 +23,12 @@ export default async function handler(
     docReq.setSectionUserId(section_user_id)
     try{
       client.removeTemplate(docReq, function(err, GoLangResponse: SuccessStringReply) {
-        if(!GoLangResponse.getSuccess()){
-          console.log(GoLangResponse.getMessage())
-        }
         res.json({ 
           success:GoLangResponse.getSuccess(),
-          message : GoLangResponse.getMessage(), 
+          error:{
+              status: GoLangResponse.getError().getStatus(),
+              error: GoLangResponse.getError().getError(),
+          } ,
         });
         res.status(200).end();
       })
@@ -36,7 +36,7 @@ export default async function handler(
     catch(error) {
         res.json({
           success: false,
-          message: error
+          error:nodeError(error) ,
         });
         res.status(405).end();
     }

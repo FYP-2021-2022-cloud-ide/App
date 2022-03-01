@@ -6,7 +6,7 @@ import path from 'path';
 import dirTree, { DirectoryTree } from "directory-tree"
 
 
-import { LocalFilesListResponse } from "../../../lib/api/api";
+import { LocalFilesListResponse  ,nodeError,emptyError} from "../../../lib/api/api";
 
 export const config = {
     api: {
@@ -35,7 +35,7 @@ export default async function handler(
     } catch (error) {
         res.json({
             success:false,
-            message:error
+            error:nodeError(error) ,
           });
         res.status(405).end();
     }
@@ -69,7 +69,7 @@ export default async function handler(
         console.log("return data")
         res.json({
             success: true,
-            message: "upload successful",
+            error:emptyError,
             tree: tree2,
         });
 
@@ -77,7 +77,7 @@ export default async function handler(
     } catch (error) {
         res.json({
             success:false,
-            message:error
+            error:nodeError(error) ,
           });
         res.status(405).end();
     }

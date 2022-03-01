@@ -5,7 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import fs from 'fs/promises'
 import dirTree, { DirectoryTree } from 'directory-tree';
 
-import { LocalFilesListResponse } from "../../../lib/api/api";
+import { LocalFilesListResponse  ,nodeError,emptyError} from "../../../lib/api/api";
 
 export default async function handler(
     req: NextApiRequest,
@@ -27,14 +27,14 @@ export default async function handler(
             tree = dirTree("/volumes/" + userId + "/persist")
             res.json({
                 success: true,
-                message: "",
+                error:emptyError,
                 tree: tree
             });
             res.status(200).end();
         } catch (error) {
             res.json({
                 success:false,
-                message:error
+                error:nodeError(error) ,
               });
             res.status(405).end();
         }
@@ -46,14 +46,14 @@ export default async function handler(
             tree = dirTree("/volumes/" + userId + "/persist")
             res.json({
                 success: false,
-                message: error,
+                error:nodeError(error) ,
                 tree: tree
             });
             res.status(405).end();
         } catch (error) {
             res.json({
                 success:false,
-                message:error
+                error:nodeError(error) ,
               });
             res.status(405).end();
         }

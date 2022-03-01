@@ -285,7 +285,7 @@ const EnvironmentTemplateWrapper = () => {
                 myToast.success("Template workspace is successfully stopped. ");
               } else
                 myToast.error(
-                  `Template workspace cannot be stopped. ${response.message}`
+                  `Template workspace cannot be stopped. ${response.error.status}`
                 );
             } else {
               const id = myToast.loading("Starting workspace...");
@@ -303,7 +303,7 @@ const EnvironmentTemplateWrapper = () => {
                 myToast.success("Template workspace is successfully started.");
               } else
                 myToast.error(
-                  `Template workspace cannot be started. ${response.message}`
+                  `Template workspace cannot be started. ${response.error.status}`
                 );
             }
             fetch();
@@ -320,7 +320,7 @@ const EnvironmentTemplateWrapper = () => {
                 myToast.success(`${template.name} is published.`);
               } else {
                 myToast.error(
-                  `${template.name} cannot be published. ${response.message}.`
+                  `${template.name} cannot be published. ${response.error.status}.`
                 );
               }
             } else {
@@ -336,7 +336,7 @@ const EnvironmentTemplateWrapper = () => {
                 myToast.success(`${template.name} is unpublished.`);
               } else
                 myToast.error(
-                  `${template.name} cannot be unpublished. ${response.message}.`
+                  `${template.name} cannot be unpublished. ${response.error.status}.`
                 );
             }
             fetch();
@@ -371,7 +371,7 @@ const EnvironmentTemplateWrapper = () => {
               );
               fetch();
             } else {
-              myToast.error(`Fail to create environment. ${response.message}`);
+              myToast.error(`Fail to create environment. ${response.error.status}`);
             }
           }
           if (!data.is_predefined) {
@@ -420,7 +420,7 @@ const EnvironmentTemplateWrapper = () => {
                           else
                             console.log(
                               "fail to remove temp container",
-                              response.message,
+                              response.error.status,
                               containerID,
                               sub
                             );
@@ -497,7 +497,7 @@ const EnvironmentTemplateWrapper = () => {
             myToast.success("Environment is updated.");
           } else {
             myToast.error("Fail to update environment.");
-            console.log(response.message, containerId, sectionUserId);
+            console.log(response.error.status, containerId, sectionUserId);
           }
           fetch();
         }}
@@ -563,7 +563,7 @@ const EnvironmentTemplateWrapper = () => {
                         else
                           console.log(
                             "fail to remove temporary workspace",
-                            response.message,
+                            response.error.status,
                             containerID,
                             sub
                           );
@@ -662,7 +662,7 @@ const EnvironmentTemplateWrapper = () => {
           } else {
             myToast.error("Fail to update template.");
             console.error(
-              response.message,
+              response.error.status,
               templateUpdateTarget.id,
               containerId
             );

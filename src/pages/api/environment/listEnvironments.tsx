@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 //remember to set the ownership after adding new api
 import type { NextApiRequest, NextApiResponse } from "next";
-import { EnvironmentListResponse } from "../../../lib/api/api";
+import { EnvironmentListResponse ,nodeError } from "../../../lib/api/api";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 
 
@@ -29,12 +29,12 @@ export default async function handler(
       docReq,
       function (err, GoLangResponse: ListEnvironmentsReply) {
         var envs = GoLangResponse.getEnvironmentsList();
-        if (!GoLangResponse.getSuccess()) {
-          console.log(GoLangResponse.getMessage());
-        }
         res.json({
           success: GoLangResponse.getSuccess(),
-          message: GoLangResponse.getMessage(),
+          error:{
+              status: GoLangResponse.getError().getStatus(),
+              error: GoLangResponse.getError().getError(),
+          } ,
           environments: envs.map((env) => {
             return {
               id: env.getId(),
@@ -51,7 +51,7 @@ export default async function handler(
   } catch (error) {
     res.json({
       success:false,
-      message:error
+      error:nodeError(error) ,
     });
     res.status(405).end();
   }

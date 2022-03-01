@@ -3,7 +3,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../../lib/fetchAppSession';
 
-import { ContainerAddResponse } from "../../../lib/api/api";
+import { ContainerAddResponse, nodeError} from "../../../lib/api/api";
 
 
 import {grpcClient}from '../../../lib/grpcClient'
@@ -27,13 +27,13 @@ export default function handler(
     docReq.setSub(sub as string)
     try{
         client.addTempContainer(docReq, function(err, GoLangResponse: AddTempContainerReply) {
-            console.log(GoLangResponse)
-            if(!GoLangResponse.getSuccess()){
-                console.log(GoLangResponse.getMessage())
-            }
+           
             res.json({
                 success : GoLangResponse.getSuccess(),
-                message: GoLangResponse.getMessage(),
+                error:{
+                    status: GoLangResponse.getError().getStatus(),
+                    error: GoLangResponse.getError().getError(),
+                } ,
                 containerID: GoLangResponse.getTempcontainerid()
             })
             res.status(200).end();
@@ -43,7 +43,7 @@ export default function handler(
     catch(error) {
         res.json({
             success:false,
-            message:error
+            error:nodeError(error),
           });
         res.status(405).end();
     }

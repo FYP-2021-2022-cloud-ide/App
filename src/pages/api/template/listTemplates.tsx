@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 //remember to set the ownership after adding new api
 import type { NextApiRequest, NextApiResponse } from "next";
-import { TemplateListResponse } from "../../../lib/api/api";
+import { TemplateListResponse ,nodeError} from "../../../lib/api/api";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 
 import { grpcClient } from "../../../lib/grpcClient";
@@ -27,11 +27,12 @@ export default async function handler(
       docReq,
       function (err, GoLangResponse: ListTemplatesReply) {
         var templates = GoLangResponse.getTemplatesList();
-        let success = GoLangResponse.getSuccess();
-        if (success){
           res.json({
-            success: success,
-            message: GoLangResponse.getMessage(),
+            success: GoLangResponse.getSuccess(),
+            error:{
+                status: GoLangResponse.getError().getStatus(),
+                error: GoLangResponse.getError().getError(),
+            } ,
             templates:
               templates.map((t) => {
                 return {
@@ -49,17 +50,14 @@ export default async function handler(
                   containerID: t.getContaineridList()[0],
                 };
               }) || [],
-          }); }
-        else {
-          throw new Error("internal server error " +GoLangResponse.getMessage() );
-        }
-        res.status(200).end();
+          }); 
+          res.status(200).end();
       }
     );
   } catch (error) {
     res.json({
       success: false,
-      message: error
+      error:nodeError(error) ,
     });
     res.status(405).end();
   }

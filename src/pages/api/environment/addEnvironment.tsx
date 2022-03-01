@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../../lib/fetchAppSession';
 import {grpcClient}from '../../../lib/grpcClient'
 
-import { EnvironmentAddResponse } from "../../../lib/api/api";
+import { EnvironmentAddResponse ,nodeError} from "../../../lib/api/api";
 
 import {  AddEnvironmentReply,  AddEnvironmentRequest } from '../../../proto/dockerGet/dockerGet_pb';
 
@@ -24,12 +24,13 @@ export default async function handler(
     docReq.setDescription(description)
     try{
       client.addEnvironment(docReq, function(err, GoLangResponse: AddEnvironmentReply) {
-        if(!GoLangResponse.getSuccess()){
-          console.log(GoLangResponse.getMessage())
-        }
+
         res.json({ 
           success:GoLangResponse.getSuccess(),
-          message : GoLangResponse.getMessage(), 
+          error:{
+              status: GoLangResponse.getError().getStatus(),
+              error: GoLangResponse.getError().getError(),
+          } ,
           environmentID: GoLangResponse.getEnvironmentid(),
         });
         res.status(200).end();
@@ -38,7 +39,7 @@ export default async function handler(
     catch(error) {
         res.json({
           success:false,
-          message:error
+          error:nodeError(error) ,
         });
         res.status(405).end();
     }

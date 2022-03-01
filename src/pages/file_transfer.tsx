@@ -315,7 +315,7 @@ export default function Cloud() {
             progressRef1.current = "";
             if (data.success) return undefined;
             else {
-              alert(data.message);
+              alert(data.error.status);
               return undefined;
             }
           }}
@@ -338,7 +338,7 @@ export default function Cloud() {
             progressRef1.current = "";
             console.log(data);
             if (data.success) return convertTree(data.tree);
-            else alert(JSON.stringify(data.message));
+            else alert(JSON.stringify(data.error.status));
           }}
           handleMoveFromAnotherTree={async (_treeData, dropTarget) => {
             let target: string = "";
@@ -362,7 +362,7 @@ export default function Cloud() {
             const data = await listFolders(userId);
             progressRef1.current = "";
             if (data.success) return convertTree(data.tree);
-            else alert(JSON.stringify(data.message));
+            else alert(JSON.stringify(data.error.status));
           }}
           handleCloseAll={() => {
             ref1.current.closeAll();
@@ -384,7 +384,7 @@ export default function Cloud() {
             const data = await listFolders(userId);
             progressRef1.current = "";
             if (data.success) return convertTree(data.tree);
-            else alert(JSON.stringify(data.message));
+            else alert(JSON.stringify(data.error.status));
           }}
           createFolder={async function (
             node: NodeModel<CustomData>,
@@ -399,7 +399,7 @@ export default function Cloud() {
             const data = await makeFolder(userId, target);
             progressRef1.current = "";
             if (data.success) return convertTree(data.tree);
-            else alert(data.message);
+            else alert(data.error.status);
           }}
           remove={async function (
             node: NodeModel<CustomData>
@@ -408,7 +408,7 @@ export default function Cloud() {
             const data = await removeFile(userId, node.data.filePath);
             progressRef1.current = "";
             if (data.success) return convertTree(data.tree);
-            else alert(data.message);
+            else alert(data.error.status);
           }}
           edit={async function (
             node: NodeModel<CustomData>,
@@ -422,7 +422,7 @@ export default function Cloud() {
             );
             progressRef1.current = "";
             if (data.success) return convertTree(data.tree);
-            else alert(data.message);
+            else alert(data.error.status);
           }}
           download={async function (
             node: NodeModel<CustomData>

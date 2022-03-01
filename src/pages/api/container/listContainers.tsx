@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../../lib/fetchAppSession';
 import {grpcClient}from '../../../lib/grpcClient'
 import {  ListContainerReply,  SubRequest } from '../../../proto/dockerGet/dockerGet_pb';
-import { ContainerListResponse } from "../../../lib/api/api";
+import { ContainerListResponse,nodeError } from "../../../lib/api/api";
 
 
 
@@ -20,15 +20,15 @@ export default function handler(
     
     try{
       client.listContainers(docReq, function(err, GoLangResponse: ListContainerReply) {
-        if(!GoLangResponse.getSuccess()){
-          console.log(GoLangResponse.getMessage())
-        }
         var containersInfo =GoLangResponse.getContainerinfo();
         var containers = GoLangResponse.getContainersList();
         var tempContainers = GoLangResponse.getTempcontainersList();
         res.json({ 
           success : GoLangResponse.getSuccess(),
-          message: GoLangResponse.getMessage(),
+          error:{
+              status: GoLangResponse.getError().getStatus(),
+              error: GoLangResponse.getError().getError(),
+          } ,
           containersInfo: {
               containersAlive: containersInfo?.getContainersalive(),
               containersTotal: containersInfo?.getContainerstotal(),
@@ -56,7 +56,7 @@ export default function handler(
     catch(error) {
         res.json({
           success:false,
-          message:error
+          error:nodeError(error) ,
         });
         res.status(405).end();
     }

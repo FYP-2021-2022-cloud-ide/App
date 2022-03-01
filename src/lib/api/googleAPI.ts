@@ -47,19 +47,8 @@ const googleAPI = {
                 sub
             })
         })
-        const content = await response.json()
-        if(!content.success){
-            console.log(content.message)
-            return ({
-                success: false,
-                message: content.message,
-            })
-        }
-        return {
-            success: true,
-            message: "",
-            loadedFiles: content.loadedFiles
-        }
+        return response.json()
+        
     },
     downloadFiles: async (
         sub, 

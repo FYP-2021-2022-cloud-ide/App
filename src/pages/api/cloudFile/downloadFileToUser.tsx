@@ -4,7 +4,7 @@ import fs from 'fs';
 
 import JSZip from 'jszip'
 
-import { LocalFilesDownloadToUserResponse } from "../../../lib/api/api";
+import { LocalFilesDownloadToUserResponse ,nodeError,emptyError} from "../../../lib/api/api";
 
 
 export default async function handler(
@@ -37,7 +37,7 @@ export default async function handler(
       // console.log(fileName,base64)
       res.json({
         success:true,
-        message:"",
+        error:emptyError,
         fileName:fileName,
         file:base64
       });
@@ -46,7 +46,7 @@ export default async function handler(
     catch(error) {
         res.json({
           success:false,
-          message:error
+          error:nodeError(error) ,
         });
         res.status(405).end();
     }

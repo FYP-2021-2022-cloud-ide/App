@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 
-import { EnvironmentAddResponse } from "../../../lib/api/api";
+import { EnvironmentAddResponse ,nodeError} from "../../../lib/api/api";
 
 import {
   AddEnvironmentReply,
@@ -36,12 +36,12 @@ export default async function handler(
     client.buildEnvironment(
       docReq,
       function (err, GoLangResponse: AddEnvironmentReply) {
-        if (!GoLangResponse.getSuccess()) {
-          console.log(GoLangResponse.getMessage());
-        }
         res.json({
           success: GoLangResponse.getSuccess(),
-          message: GoLangResponse.getMessage(),
+          error:{
+              status: GoLangResponse.getError().getStatus(),
+              error: GoLangResponse.getError().getError(),
+          } ,
           environmentID: GoLangResponse.getEnvironmentid(),
         });
         res.status(200).end();
@@ -50,7 +50,7 @@ export default async function handler(
   } catch (error) {
     res.json({
       success:false,
-      message:error
+      error:nodeError(error) ,
     });
     res.status(405).end();
   }

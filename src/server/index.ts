@@ -213,7 +213,7 @@ app.prepare().then(() => {
       docReq.setSessionKey(key)
       client.instantAddContainer(docReq, function (err, GoLangResponse: AddContainerReply) {
         if (!GoLangResponse.getSuccess()) {
-          console.log(GoLangResponse.getMessage())
+          console.log(GoLangResponse.getError().getError())
           res.redirect('/')
         } else {
           res.redirect(`/user/container/${GoLangResponse.getContainerid()}/`)
@@ -249,7 +249,7 @@ app.prepare().then(() => {
           // req.url = req.params.id
           proxy.web(req, res, { target: 'http://traefik.codespace.ust.dev' })
         } else {
-          console.error(GoLangResponse.getMessage())
+          console.error(GoLangResponse.getError().getError())
           res.redirect(`/`)
         }
       })

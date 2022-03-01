@@ -3,7 +3,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../lib/fetchAppSession';
 
-import { GetUserDataResponse } from "../../lib/api/api";
+import { GetUserDataResponse  ,nodeError} from "../../lib/api/api";
 
 import {grpcClient}from '../../lib/grpcClient'
 import { GetUserDataReply, GetUserDataRequest } from '../../proto/dockerGet/dockerGet_pb';
@@ -23,13 +23,12 @@ export default async function handler(
     docReq.setSub(sub as string);
     try{
         client.getUserData(docReq, function(err, GoLangResponse: GetUserDataReply) {
-        if(!GoLangResponse.getSuccess()){
-            console.log(GoLangResponse.getMessage())
-        }
-
         res.json({
             success: GoLangResponse.getSuccess(),
-            message:GoLangResponse.getMessage(),
+            error:{
+                status: GoLangResponse.getError().getStatus(),
+                error: GoLangResponse.getError().getError(),
+            } ,
             userId: GoLangResponse.getUserid(),
             role:GoLangResponse.getRole(),
             semesterId: GoLangResponse.getSemesterid(),
@@ -43,7 +42,7 @@ export default async function handler(
         //@ts-ignore
         res.json({
           success:false,
-          message:error
+          error:nodeError(error) ,
         });
         res.status(405).end();
     }

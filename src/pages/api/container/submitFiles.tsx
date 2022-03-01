@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../../lib/fetchAppSession';
 import {grpcClient}from '../../../lib/grpcClient'
 
-import { SuccessStringResponse } from "../../../lib/api/api";
+import { SuccessStringResponse ,nodeError } from "../../../lib/api/api";
 import {  SuccessStringReply,SubmitFilesRequest  } from '../../../proto/dockerGet/dockerGet_pb';
 
 export default function handler(
@@ -18,12 +18,13 @@ export default function handler(
     docReq.setContainerid(body.containerId);
     try{
       client.submitFiles(docReq, function(err, GoLangResponse: SuccessStringReply) {
-        if(!GoLangResponse.getSuccess()){
-          console.log(GoLangResponse.getMessage())
-        }
+
         res.json({ 
           success:GoLangResponse.getSuccess(),
-          message : GoLangResponse.getMessage(), 
+          error:{
+              status: GoLangResponse.getError().getStatus(),
+              error: GoLangResponse.getError().getError(),
+          } ,
         });
         res.status(200).end();
       })
@@ -31,7 +32,7 @@ export default function handler(
     catch(error) {
         res.json({
           success:false,
-          message:error
+          error:nodeError(error) ,
         });
         res.status(405).end();
     }

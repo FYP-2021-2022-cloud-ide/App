@@ -117,7 +117,7 @@ const Home = () => {
                   myToast.success("Workspace is successfully started.");
                 } else
                   myToast.error(
-                    `Workspace cannot be started. ${response.message}`
+                    `Workspace cannot be started. ${response.error.status}`
                   );
               } else {
                 const response = await removeContainer(
@@ -128,7 +128,7 @@ const Home = () => {
                   myToast.success("Workspace is successfully stopped.");
                 } else
                   myToast.error(
-                    `Workspace cannot be stopped. ${response.message}`
+                    `Workspace cannot be stopped. ${response.error.status}`
                   );
               }
             }}

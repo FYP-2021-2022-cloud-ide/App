@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../../lib/fetchAppSession';
 import {grpcClient}from '../../../lib/grpcClient'
 
-import { SuccessStringResponse } from "../../../lib/api/api";
+import { SuccessStringResponse,nodeError } from "../../../lib/api/api";
 import {  SuccessStringReply,  CodeRequest } from '../../../proto/dockerGet/dockerGet_pb';
 export default function handler(
     req: NextApiRequest, 
@@ -15,16 +15,19 @@ export default function handler(
     docReq.setCode(code)
     docReq.setSub(sub)
     try{
-        client.requestAccessToken(docReq,(error ,GolangResponse: SuccessStringReply)=>{
+        client.requestAccessToken(docReq,(error ,GoLangResponse: SuccessStringReply)=>{
             res.json({
-                success: GolangResponse.getSuccess(),
-                message: GolangResponse.getMessage()
+                success: GoLangResponse.getSuccess(),
+                error:{
+                    status: GoLangResponse.getError().getStatus(),
+                    error: GoLangResponse.getError().getError(),
+                } ,
             })
         })
     }catch(error) {
         res.status(405).json({
           success: false,
-          message: error as string
+          error:nodeError(error) ,
         });
     }
 }

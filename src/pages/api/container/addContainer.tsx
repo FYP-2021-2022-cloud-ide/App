@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { grpcClient } from "../../../lib/grpcClient";
-import { ContainerAddResponse } from "../../../lib/api/api";
+import { ContainerAddResponse,nodeError } from "../../../lib/api/api";
 import {
   AddContainerReply,
   AddContainerRequest,
@@ -37,22 +37,21 @@ export default async function handler(
     client.addContainer(
       docReq,
       function (err, GoLangResponse: AddContainerReply) {
-        if (!GoLangResponse.getSuccess()) {
-          console.log(GoLangResponse.getMessage());
-        }
         res.json({
           success: GoLangResponse.getSuccess(),
-          message: GoLangResponse.getMessage(),
+          error:{
+              status: GoLangResponse.getError().getStatus(),
+              error: GoLangResponse.getError().getError(),
+          } ,
           containerID: GoLangResponse.getContainerid(),
         });
         res.status(200).end();
       }
     );
   } catch (error) {
-    console.log(error);
     res.json({
       success:false,
-      message:error
+      error:nodeError(error),
     });
     res.status(405).end();
   }

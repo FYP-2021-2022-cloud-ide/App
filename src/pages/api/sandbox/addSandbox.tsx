@@ -2,7 +2,7 @@
 //remember to set the ownership after adding new api
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../../lib/fetchAppSession';
-import { SandboxAddResponse } from "../../../lib/api/api";
+import { SandboxAddResponse ,nodeError} from "../../../lib/api/api";
 
 
 import {grpcClient}from '../../../lib/grpcClient'
@@ -23,13 +23,13 @@ export default function handler(
     docReq.setSandboximageid(sandboxImageId);
     try{
         client.addSandbox(docReq, function(err, GoLangResponse: AddSandBoxReply) {
-            console.log(GoLangResponse)
-            if(!GoLangResponse.getSuccess()){
-                console.log(GoLangResponse.getMessage())
-            }
+
             res.json({
                 success : GoLangResponse.getSuccess(),
-                message: GoLangResponse.getMessage(),
+                error:{
+                    status: GoLangResponse.getError().getStatus(),
+                    error: GoLangResponse.getError().getError(),
+                } ,
                 sandboxId: GoLangResponse.getSandboxid()
             })
             res.status(200).end();
@@ -39,7 +39,7 @@ export default function handler(
     catch(error) {
         res.json({
             success: false,
-            message: error
+            error:nodeError(error) ,
           });
         res.status(405).end();
     }

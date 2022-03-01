@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import dirTree from 'directory-tree'
 
 
-import { LocalFilesListResponse } from "../../../lib/api/api";
+import { LocalFilesListResponse ,nodeError,emptyError} from "../../../lib/api/api";
 
 
 export default function handler(
@@ -18,7 +18,7 @@ export default function handler(
         const tree = dirTree("/volumes/" + userId + "/persist")
         res.json({
             success: true,
-            message: "",
+            error:emptyError,
             tree: tree
         });
 
@@ -27,7 +27,7 @@ export default function handler(
     catch (error) {
         res.json({
             success:false,
-            message:error
+            error:nodeError(error) ,
           });
         res.status(405).end();
     }

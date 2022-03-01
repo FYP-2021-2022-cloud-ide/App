@@ -3,7 +3,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../../lib/fetchAppSession';
 
-import { SandboxImageListResponse } from "../../../lib/api/api";
+import { SandboxImageListResponse ,nodeError} from "../../../lib/api/api";
 
 
 import {grpcClient}from '../../../lib/grpcClient'
@@ -22,13 +22,12 @@ export default function handler(
     docReq.setUserid(userId as string)
     try{
         client.listSandboxImage(docReq, function(err, GoLangResponse: ListSandBoxImageReply) {
-            console.log(GoLangResponse)
-            if(!GoLangResponse.getSuccess()){
-                console.log(GoLangResponse.getMessage())
-            }
             res.json({
                 success : GoLangResponse.getSuccess(),
-                message: GoLangResponse.getMessage(),
+                error:{
+                    status: GoLangResponse.getError().getStatus(),
+                    error: GoLangResponse.getError().getError(),
+                } ,
                 sandboxImages: GoLangResponse.getSandboximagesList().map((sandbox)=>(
                     {
                         id: sandbox.getId(),
@@ -46,7 +45,7 @@ export default function handler(
     catch(error) {
         res.json({
             success: false,
-            message: error
+            error:nodeError(error) ,
           });
         res.status(405).end();
     }

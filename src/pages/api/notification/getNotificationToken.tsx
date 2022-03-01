@@ -3,7 +3,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../../lib/fetchAppSession';
 
-import { NotificationTokenResponse } from "../../../lib/api/api";
+import { NotificationTokenResponse ,nodeError} from "../../../lib/api/api";
 
 
 import {grpcClient}from '../../../lib/grpcClient'
@@ -22,13 +22,13 @@ export default function handler(
     docReq.setSub(body.sub);
     try{
         client.getNotificationToken(docReq, function(err, GoLangResponse: GetNotificationTokenReply) {
-            console.log(GoLangResponse)
-            if(!GoLangResponse.getSuccess()){
-                console.log(GoLangResponse.getMessage())
-            }
+
             res.json({
                 success : GoLangResponse.getSuccess(),
-                message: GoLangResponse.getMessage(),
+                error:{
+                    status: GoLangResponse.getError().getStatus(),
+                    error: GoLangResponse.getError().getError(),
+                } ,
                 notification_token: GoLangResponse.getNotificationToken()
             })
             res.status(200).end();
@@ -38,7 +38,7 @@ export default function handler(
     catch(error) {
         res.json({
             success: false,
-            message: error
+            error:nodeError(error) ,
           });
         res.status(405).end();
     }

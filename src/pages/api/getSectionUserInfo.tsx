@@ -3,7 +3,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../lib/fetchAppSession';
 
-import { SectionUserInfoResponse,SectionRole } from "../../lib/api/api";
+import { SectionUserInfoResponse,SectionRole ,nodeError } from "../../lib/api/api";
 
 
 
@@ -23,14 +23,13 @@ export default async function handler(
     docReq.setSub(sub as string);
     docReq.setSectionid(sectionid as string);
     try{
-        client.getSectionInfo(docReq, function(err, GoLangResponse: GetSectionInfoReply) {
-        if(!GoLangResponse.getSuccess()){
-            console.log(GoLangResponse.getMessage())
-        }
-        
+        client.getSectionInfo(docReq, function(err, GoLangResponse: GetSectionInfoReply) {        
         res.json({
             success : GoLangResponse.getSuccess(),
-            message: GoLangResponse.getMessage(),
+            error:{
+                status: GoLangResponse.getError().getStatus(),
+                error: GoLangResponse.getError().getError(),
+            } ,
             sectionUserID : GoLangResponse.getSectionuserid(),
             courseName: GoLangResponse.getCoursename(),
             role:GoLangResponse.getRole() as SectionRole,
@@ -41,7 +40,7 @@ export default async function handler(
     catch(error) {
         res.json({
             success: false,
-            message: error
+            error:nodeError(error) ,
           });
         res.status(405).end();
     }

@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../../lib/fetchAppSession';
 import {grpcClient}from '../../../lib/grpcClient'
 
-import { SuccessStringResponse } from "../../../lib/api/api";
+import { SuccessStringResponse ,nodeError} from "../../../lib/api/api";
 import {  SuccessStringReply,  DownloadRequest } from '../../../proto/dockerGet/dockerGet_pb';
 const DOWNLOAD_DIR = "/tmp"
 
@@ -20,11 +20,14 @@ export default async function handler(
     docReq.setFilepath(filePath)
     docReq.setFiletype(fileType)
     try{
-        client.googleDownloadFiles(docReq,(error ,GolangResponse: SuccessStringReply)=>{
+        client.googleDownloadFiles(docReq,(error ,GoLangResponse: SuccessStringReply)=>{
 
             res.json({
-                success: GolangResponse.getSuccess(),
-                message: GolangResponse.getMessage(),
+                success: GoLangResponse.getSuccess(),
+                error:{
+                    status: GoLangResponse.getError().getStatus(),
+                    error: GoLangResponse.getError().getError(),
+                } ,
             })
 
 
@@ -33,7 +36,7 @@ export default async function handler(
     }catch(error) {
         res.status(405).json({
             success: false,
-            message: error,
+            error:nodeError(error) ,
         });
     }
 

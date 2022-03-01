@@ -3,7 +3,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { fetchAppSession } from '../../lib/fetchAppSession';
 
-import { SuccessStringResponse } from "../../lib/api/api";
+import { SuccessStringResponse ,nodeError} from "../../lib/api/api";
 
 
 import {grpcClient}from '../../lib/grpcClient'
@@ -27,13 +27,13 @@ console.log(req.body)
     docReq.setBio(bio as string);
     try{
         client.updateUserData(docReq, function(err, GoLangResponse: SuccessStringReply) {
-        if(!GoLangResponse.getSuccess()){
-            console.log(GoLangResponse.getMessage())
-        }
-        
+       
         res.json({
             success : GoLangResponse.getSuccess(),
-            message: GoLangResponse.getMessage(),
+            error:{
+                status: GoLangResponse.getError().getStatus(),
+                error: GoLangResponse.getError().getError(),
+            } ,
         })
         res.status(200).end();
         })
@@ -41,7 +41,7 @@ console.log(req.body)
     catch(error) {
         res.json({
           success: false,
-          message: error,
+          error:nodeError(error) ,
         });
         res.status(405).end();
     }

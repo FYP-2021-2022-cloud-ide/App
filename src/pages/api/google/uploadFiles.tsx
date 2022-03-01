@@ -2,7 +2,7 @@ import { fetchAppSession } from '../../../lib/fetchAppSession';
 import {grpcClient}from '../../../lib/grpcClient'
 
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { SuccessStringResponse } from "../../../lib/api/api";
+import { SuccessStringResponse ,nodeError} from "../../../lib/api/api";
 import {  SuccessStringReply,  UploadRequest } from '../../../proto/dockerGet/dockerGet_pb';
 
 export default async function handler(
@@ -17,10 +17,13 @@ export default async function handler(
     docReq.setParentid(parentId)
     docReq.setFiletype(fileType)
     try{
-        client.googleUploadFiles(docReq,(error ,GolangResponse: SuccessStringReply)=>{
+        client.googleUploadFiles(docReq,(error ,GoLangResponse: SuccessStringReply)=>{
             res.json({
-                success: GolangResponse.getSuccess(),
-                message: GolangResponse.getMessage(),
+                success: GoLangResponse.getSuccess(),
+                error:{
+                    status: GoLangResponse.getError().getStatus(),
+                    error: GoLangResponse.getError().getError(),
+                } ,
             })
 
 
@@ -29,7 +32,7 @@ export default async function handler(
     }catch(error) {
         res.status(405).json({
             success: false,
-            message: error,
+            error:nodeError(error) ,
         });
     }
 }

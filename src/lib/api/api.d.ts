@@ -9,22 +9,29 @@ export type {
   SectionUserInfoResponse,
   SectionRole,
   CourseListResponse,
+  
   Environment,
   EnvironmentListResponse,
   EnvironmentAddResponse,
+
   Template,
   TemplateListResponse,
   TemplateAddResponse,
   TemplateGetStudentWorkspaceResponse,
+
   Container,
   ContainerListResponse,
   ContainerAddResponse,
+
   SandboxAddResponse,
   SandboxImageAddResponse,
   SandboxImageListResponse,
+
   NotificationListResponse,
   NotificationSendResponse,
   NotificationTokenResponse,
+
+  GoogleOAuthReponse,
   GoogleDriveListResponse,
   LocalFilesDownloadToUserResponse,
   LocalFilesListResponse,
@@ -35,19 +42,37 @@ export type {
 type SectionRole = "instructor" | "student";
 type SuccessStringResponse = {
   success: boolean;
-  message: string;
+  error: Error;
 };
+const emptyError:Error={
+  status: "",
+  error: "",
+  
+}
 
+const nodeError=(err):Error=>{
+  return {
+      status: "TODO",
+      error: err.error,
+  } 
+}
+export {nodeError,emptyError}
+
+
+type Error = {
+  status: string;
+  error: string;
+};
 type SectionUserInfoResponse =
   | {
       success: true;
-      message: string;
+      error: Error
       courseName: string;
       // role: "instructor" | "student";
       role: SectionRole;
       sectionUserID: string;
     }
-  | { success: false; message: string };
+  | { success: false; error: Error };
 
 type Course = {
   sectionID: string;
@@ -58,8 +83,8 @@ type Course = {
   lastUpdateTime: string;
 };
 type CourseListResponse =
-  | { success: true; message: string; courses: Course[] }
-  | { success: false; message: string };
+  | { success: true; error: Error; courses: Course[] }
+  | { success: false; error: Error };
 
 type Environment = {
   id: string;
@@ -69,18 +94,18 @@ type Environment = {
   description: string;
 };
 type EnvironmentListResponse =
-  | { success: true; message: string; environments: Environment[] }
-  | { success: false; message: string };
+  | { success: true; error: Error; environments: Environment[] }
+  | { success: false; error: Error };
 
 type EnvironmentAddResponse =
   | {
       success: true;
-      message: string;
+      error: Error;
       environmentID: string;
     }
   | {
       success: false;
-      message: string;
+      error: Error;
     };
 
 type Template = {
@@ -101,23 +126,23 @@ type Template = {
 type TemplateListResponse =
   | {
       success: true;
-      message: string;
+      error: Error;
       templates: Template[];
     }
   | {
       success: false;
-      message: string;
+      error: Error;
     };
 
 type TemplateAddResponse =
   | {
       success: true;
-      message: string;
+      error: Error;
       templateID: string;
     }
   | {
       success: false;
-      message: string;
+      error: Error;
     };
 
 type StudentWorkspace = {
@@ -134,12 +159,12 @@ type StudentWorkspace = {
 type TemplateGetStudentWorkspaceResponse =
 | {
     success: true;
-    message: string;
+    error: Error;
     studentWorkspaces: StudentWorkspace[];
   }
 | {
     success: false;
-    message: string;
+    error: Error;
 };
 
 type ContainerInfo = {
@@ -157,24 +182,24 @@ type Container = {
 type ContainerListResponse =
   | {
       success: true;
-      message: string;
+      error: Error;
       containersInfo: ContainerInfo;
       containers: Container[];
       tempContainers: Container[];
     }
   | {
       success: false;
-      message: string;
+      error: Error;
     };
 type ContainerAddResponse =
   | {
       success: true;
-      message: string;
+      error: Error;
       containerID: string;
     }
   | {
       success: false;
-      message: string;
+      error: Error;
     };
 
 type SandboxImage = {
@@ -188,34 +213,34 @@ type SandboxImage = {
 type SandboxAddResponse =
   | {
       success: true;
-      message: string;
+      error: Error;
       sandboxId: string;
     }
   | {
       success: false;
-      message: string;
+      error: Error;
     };
 
 type SandboxImageListResponse =
   | {
       success: true;
-      message: string;
+      error: Error;
       sandboxImages: SandboxImage[];
     }
   | {
       success: false;
-      message: string;
+      error: Error;
     };
 
 type SandboxImageAddResponse =
   | {
       success: true;
-      message: string;
+      error: Error;
       sandboxImageId: string;
     }
   | {
       success: false;
-      message: string;
+      error: Error;
     };
 
 type Notification = {
@@ -234,33 +259,33 @@ type Notification_Sender = {
 type NotificationListResponse =
   | {
       success: true;
-      message: string;
+      error: Error;
       notifications: Notification[] | null;
     }
   | {
       success: false;
-      message: string;
+      error: Error;
     };
 type NotificationSendResponse =
   | {
       success: true;
-      message: string;
+      error: Error;
       notificationId: string;
     }
   | {
       success: false;
-      message: string;
+      error: Error;
     };
 
 type NotificationTokenResponse =
   | {
       success: true;
-      message: string;
+      error: Error;
       notification_token: string;
     }
   | {
       success: false;
-      message: string;
+      error: Error;
     };
 
 type GooogleDrive_File = {
@@ -275,43 +300,55 @@ type GooogleDrive_LoadedFiles = {
   folders: GooogleDrive_Folder[];
   files: GooogleDrive_File[];
 };
+type GoogleOAuthReponse =
+  | {
+      success: true;
+      error: Error;
+      authURL:string;
+    }
+  | {
+      success: false;
+      error: Error;
+    };
+
+
 type GoogleDriveListResponse =
   | {
       success: true;
-      message: string;
+      error: Error;
       loadedFiles: GooogleDrive_LoadedFiles;
     }
   | {
       success: false;
-      message: string;
+      error: Error;
     };
 
 type LocalFilesDownloadToUserResponse =
   | {
       success: true;
-      message: string;
+      error: Error;
       fileName: string;
       file: string;
     }
   | {
       success: false;
-      message: string;
+      error: Error;
     };
 
 type LocalFilesListResponse =
   | {
       success: true;
-      message: string;
+      error: Error;
       tree: directoryTree.DirectoryTree;
     }
   | {
       success: false;
-      message: string;
+      error: Error;
       tree: directoryTree.DirectoryTree;
     }
   | {
       success: false;
-      message: string;
+      error: Error;
     };
 
 type FetchCookieResponse = {
@@ -327,7 +364,7 @@ type FetchCookieResponse = {
 type GetUserDataResponse =
   | {
       success: true;
-      message: string;
+      error: Error;
       userId: string;
       role: string;
       semesterId: string;
@@ -336,5 +373,5 @@ type GetUserDataResponse =
     }
   | {
       success: false;
-      message: string;
+      error: Error;
     };

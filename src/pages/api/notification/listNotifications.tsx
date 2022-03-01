@@ -3,7 +3,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 
-import { NotificationListResponse } from "../../../lib//api/api";
+import { NotificationListResponse  ,nodeError} from "../../../lib//api/api";
 
 import { grpcClient } from "../../../lib/grpcClient";
 import {
@@ -24,13 +24,14 @@ export default function handler(
     client.listNotifications(
       docReq,
       function (err, GoLangResponse: ListNotificationsReply) {
-        if (!GoLangResponse.getSuccess()) {
-          console.log(GoLangResponse.getMessage());
-        }
+
         var nts = GoLangResponse.getNotificationsList();
         res.json({
           success: GoLangResponse.getSuccess(),
-          message: GoLangResponse.getMessage(),
+          error:{
+              status: GoLangResponse.getError().getStatus(),
+              error: GoLangResponse.getError().getError(),
+          } ,
           notifications: nts.map((nt) => {
             var sender = nt.getSender();
             return {
@@ -53,7 +54,7 @@ export default function handler(
   } catch (error) {
     res.json({
       success: false,
-      message: error,
+      error:nodeError(error) ,
     });
     res.status(405).end();
   }

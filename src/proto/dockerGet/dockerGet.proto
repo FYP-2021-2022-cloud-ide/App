@@ -58,11 +58,16 @@ service Docker {
   rpc updateNotificationToken(UpdateNotificationTokenRequest)returns(SuccessStringReply){}
   rpc updateSubscription(UpdateSubscriptionRequest)returns(SuccessStringReply){}
 
-  rpc googleOAuth(EmptyRequest)returns(SuccessStringReply){}
+  rpc googleOAuth(EmptyRequest)returns(GoogleOAuthReply){}
   rpc requestAccessToken(CodeRequest)returns(SuccessStringReply){}
   rpc googleListFile(ListFilesRequest)returns(ChildrenReply){}
   rpc googleDownloadFiles(DownloadRequest)returns(SuccessStringReply){}
   rpc googleUploadFiles(UploadRequest)returns(SuccessStringReply){}
+}
+
+message Error{
+  string status = 1;
+  string error = 2;
 }
 
 message ListFilesRequest{
@@ -79,7 +84,7 @@ message ChildrenReply{
   repeated child files = 1;
   repeated child folders = 2;
   bool success = 3;
-  string message = 4;
+  Error error = 4;
 }
 
 message CodeRequest{
@@ -95,7 +100,7 @@ message UserIdRequest {
 
 message ListNotificationsReply {
   bool success = 1;
-  string message = 2;
+  Error error =2;
   message Notification{
     string id = 1;
     string title = 2;
@@ -119,7 +124,7 @@ message EmptyRequest {
 
 message ListContainerReply{
   bool success=1;
-  string message = 4;
+  Error error = 4;
  	message ContainersInfo{
     int64 containersAlive =1;
     int64 containersTotal=2;
@@ -138,7 +143,7 @@ message ListContainerReply{
 
 message ListCoursesReply {
 	bool success = 1;
-  string message = 2;
+  Error error = 2;
   message Course {
     string sectionID = 1;
     string courseCode = 2;
@@ -152,7 +157,7 @@ message ListCoursesReply {
 
 message GetSectionInfoReply{
   bool success = 1;
-  string message = 2;
+  Error error = 2;
   string sectionUserID=3;
   string courseName=4;
   string role=5;
@@ -160,7 +165,7 @@ message GetSectionInfoReply{
 
 message ListEnvironmentsReply{
   bool success=1;
-  string message = 4;
+  Error error = 4;
   message Environment {
     string id =1;
     string imageId   =2;
@@ -173,7 +178,7 @@ message ListEnvironmentsReply{
 
 message ListTemplatesReply{
   bool success=1;
-  string message = 4;
+  Error error = 4;
   message Template {
     string id =1;
     string name   =2;
@@ -211,7 +216,7 @@ message InstantAddContainerRequest {
 
 message AddContainerReply {
 	bool success=1;
-	string message=2;
+	Error error=2;
 	string containerID=3;
 }
 message RemoveContainerRequest {
@@ -226,7 +231,7 @@ message SubmitFilesRequest{
 }
 message ContainerTimeReply{
   bool success=1;
-	string message=2;
+	Error error=2;
   bool is_exam=3;
   string time_limit=4;
   string created_at=5;
@@ -267,12 +272,12 @@ message TemplateIdRequest{
 
 message AddTemplateReply {
 	bool success=1;
-	string message=2;
+	Error error=2;
 	string templateID=3;
 }
 message TemplateGetStudentWorkspaceReply {
 	bool success=1;
-	string message=2;
+	Error error=2;
   message StudentWorkspace {
     string status=1;
     string workspaceId=2;
@@ -297,7 +302,7 @@ message AddEnvironmentRequest{
 }
 message AddEnvironmentReply {
 	bool success=1;
-	string message=2;
+	Error error=2;
 	string environmentID=3;
 }
 
@@ -355,15 +360,15 @@ message SectionRequest{
 
 message SuccessStringReply{
   bool success=1;
-	string message=2;
+	Error error =2;
 }
 
 message StringReply {
-  string message = 1;
+  Error error = 1;
 }
 
 message ListReply {
-  repeated string message = 1;
+  repeated Error error = 1;
 }
 
 message GetUserDataRequest{
@@ -373,7 +378,7 @@ message GetUserDataRequest{
 }
 message GetUserDataReply{
   bool success = 1;
-  string message = 2;
+  Error error = 2;
   string userId = 3;
   string role=7;
   string semesterId = 4;
@@ -389,7 +394,7 @@ message UpdateUserDataRequest{
 
 message GetNotificationTokenReply{
   bool success = 1;
-  string message = 2;
+  Error error = 2;
   string notification_token = 3;
 }
 
@@ -403,7 +408,7 @@ message SendNotificationRequest{
 }
 message SendNotificationReply{
   bool success=1;
-  string message =2;
+  Error error =2;
   string notification_Id=3;
 }
 
@@ -424,6 +429,11 @@ message UpdateSubscriptionRequest{
   string userId = 1;
   string token = 2;
   string semesterId = 3;
+}
+message GoogleOAuthReply{
+  bool success=1;
+  Error error =2;
+  string authURL=3;
 }
 
 message DownloadRequest{
@@ -453,7 +463,7 @@ message AddTempContainerRequest{
 }
 message AddTempContainerReply{
   bool success=1;
-  string message =2;
+  Error error =2;
   string tempContainerId=3;
 }
 
@@ -476,7 +486,7 @@ message AddSandBoxImageRequest{
 
 message AddSandBoxImageReply{
   bool success=1;
-  string message =2;
+  Error error =2;
   string sandBoxImageId=3;
 }
 message UpdateSandBoxImageRequest{
@@ -498,7 +508,7 @@ message ListSandBoxImageRequest{
 }
 message ListSandBoxImageReply{
   bool success=1;
-  string message = 4;
+  Error error = 4;
   message SandBoxImage {
     string id =1;
     string title   =2;
@@ -518,7 +528,7 @@ message AddSandBoxRequest{
 }
 message AddSandBoxReply{
   bool success=1;
-  string message =2;
+  Error error =2;
   string sandBoxId=3;
 }
 message SandBoxIdRequest{

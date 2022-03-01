@@ -129,7 +129,7 @@ export const SandboxWrapper = () => {
             );
             fetch(mount.current);
           } else {
-            myToast.error(`Cannot started workspace. ${response.message}`);
+            myToast.error(`Cannot started workspace. ${response.error.status}`);
           }
         }}
         onSandboxStop={async (sandboxImage) => {
@@ -145,7 +145,7 @@ export const SandboxWrapper = () => {
             );
             fetch(mount.current);
           } else {
-            myToast.error(`Cannot stop workspace. ${response.message}`);
+            myToast.error(`Cannot stop workspace. ${response.error.status}`);
           }
         }}
       ></SandboxImageList>
@@ -172,7 +172,7 @@ export const SandboxWrapper = () => {
             fetch(mount.current);
           } else {
             // myToast.dismiss(toastId);
-            myToast.error(`Workspace cannot be created. ${response.message}`);
+            myToast.error(`Workspace cannot be created. ${response.error.status}`);
           }
         }}
       ></ModalForm>

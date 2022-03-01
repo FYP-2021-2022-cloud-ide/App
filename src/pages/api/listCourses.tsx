@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { fetchAppSession } from "../../lib/fetchAppSession";
 
-import { CourseListResponse } from "../../lib/api/api";
+import { CourseListResponse ,nodeError} from "../../lib/api/api";
 
 import { grpcClient } from "../../lib/grpcClient";
 import {
@@ -24,13 +24,14 @@ export default function handler(
     client.listCourses(
       docReq,
       function (err, GoLangResponse: ListCoursesReply) {
-        if (!GoLangResponse.getSuccess()) {
-          console.log(GoLangResponse.getMessage());
-        }
+
         var courses = GoLangResponse.getCoursesList();
         res.json({
           success: GoLangResponse.getSuccess(),
-          message: GoLangResponse.getMessage(),
+          error:{
+              status: GoLangResponse.getError().getStatus(),
+              error: GoLangResponse.getError().getError(),
+          } ,
           courses:
             courses.map((course) => {
               return {
@@ -51,7 +52,7 @@ export default function handler(
   } catch (error) {
     res.json({
       success: false,
-      message: error,
+      error:nodeError(error) ,
     });
     res.status(405).end();
   }
