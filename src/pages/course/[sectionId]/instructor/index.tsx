@@ -34,7 +34,7 @@ import _ from "lodash";
 const registry =process.env.NEXT_PUBLIC_REGISTRY;
 const rootImage =  `${registry}/codeserver:latest`;
 const CPU = 1;
-const memory = 600;
+const memory = 800;
 
 // Returning a new object reference guarantees that a before-and-after
 //   equivalence check will always be false, resulting in a re-render, even

@@ -9,7 +9,7 @@ const registry = process.env.NEXT_PUBLIC_REGISTRY;
 // console.log(registry)
 const rootImage = `${registry}/codeserver:latest`;
 const CPU = 1;
-const memory = 600;
+const memory = 800;
 const envChoices = [
   { value: "C++/C", id: `${registry}/cpp:latest` },
   { value: "Python3", id: `${registry}/python3:latest` },
