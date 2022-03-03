@@ -33,13 +33,26 @@ const TopBar = ({ sub, name, email }: props) => {
   };
 
   return (
-    <div className="flex flex-row z-[10] justify-end  items-center p-5">
+    <div
+      className="flex flex-row z-[10] justify-end  items-center p-5"
+      id="topbar"
+    >
       {/* <SearchBar /> */}
       <div className="flex flex-row items-center text-gray-500 justify-end gap-x-4">
-        <UserMenu sub={sub} name={name} email={email}></UserMenu>
+        <UserMenu
+          sub={sub}
+          name={name}
+          email={email}
+          items={[
+            {
+              text: "Sign Out",
+              href: "/logout",
+            },
+          ]}
+        ></UserMenu>
         <NotiStack />
         <Link href="">
-          <a href="" title="Help and docs">
+          <a id="help_doc_btn" title="Help and docs">
             <QuestionMarkCircleIcon
               className="top-bar-icon"
               onClick={() => {
@@ -48,7 +61,7 @@ const TopBar = ({ sub, name, email }: props) => {
             ></QuestionMarkCircleIcon>
           </a>
         </Link>
-        <div title="Change Theme">
+        <div id="change_theme_btn" title="Change Theme">
           {isDark ? (
             <SunIcon
               className="top-bar-icon top-bar-icon-sun"

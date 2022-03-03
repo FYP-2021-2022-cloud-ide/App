@@ -8,9 +8,14 @@ interface UserMenuProps {
   sub: string;
   name: string;
   email: string;
+  items: {
+    text: string;
+    onClick?: () => void; // onclick or href should have either one
+    href?: string;
+  }[];
 }
 
-export default function UserMenu({ sub, name, email }: UserMenuProps) {
+export default function UserMenu({ sub, name, email, items }: UserMenuProps) {
   return (
     <div className={`w-fit  text-right top-16 `}>
       <Menu as="div" className="relative text-left">
@@ -31,29 +36,42 @@ export default function UserMenu({ sub, name, email }: UserMenuProps) {
         >
           <Menu.Items className="absolute right-0 w-72 mt-2 origin-top-right bg-white dark:bg-gray-600 divide-y divide-gray-100 dark:divide-gray-500 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
             <div className="p-4">
-              <div className="font-semibold text-gray-700 dark:text-gray-300 ">
+              <div
+                id="username"
+                className="font-semibold text-gray-700 dark:text-gray-300 "
+              >
                 {name}
               </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400">
+              <div
+                id="user_email"
+                className="text-xs text-gray-500 dark:text-gray-400"
+              >
                 {email}
               </div>
             </div>
             <div className="p-1">
-              <Menu.Item>
-                {({ active }) => (
-                  <div
-                    className={`${
-                      active
-                        ? "bg-gray-200 dark:bg-gray-500 dark:font-semibold"
-                        : ""
-                    } text-[#775FBD] dark:text-gray-300 group flex rounded-md items-center w-full px-2 py-2 text-sm`}
-                  >
-                    <Link href="/logout">
-                      <a className="w-full">Sign Out</a>
-                    </Link>
-                  </div>
-                )}
-              </Menu.Item>
+              {items.map((item) => {
+                return (
+                  <Menu.Item key={item.text}>
+                    {({ active }) => (
+                      <div
+                        className={`${
+                          active
+                            ? "bg-gray-200 dark:bg-gray-500 dark:font-semibold"
+                            : ""
+                        } text-[#775FBD] dark:text-gray-300 group flex rounded-md items-center w-full px-2 py-2 text-sm`}
+                        onClick={() => {
+                          if (item.onClick) item.onClick();
+                        }}
+                      >
+                        <Link href={item.href}>
+                          <a className="w-full">{item.text}</a>
+                        </Link>
+                      </div>
+                    )}
+                  </Menu.Item>
+                );
+              })}
             </div>
           </Menu.Items>
         </Transition>

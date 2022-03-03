@@ -18,6 +18,7 @@ const Layout = ({ children }: LayoutProps) => {
       className={`flex flex-row w-full justify-start h-fit min-h-[600px] ${
         isDark && "dark"
       }`}
+      id="layout"
     >
       <Head>
         <title>Cnails</title>
@@ -31,7 +32,9 @@ const Layout = ({ children }: LayoutProps) => {
       <div className="flex flex-col bg-white dark:bg-gray-800 w-full  z-10 ">
         <TopBar sub={sub} name={name} email={email}></TopBar>
 
-        <div className=" w-full grow">{children}</div>
+        <div className=" w-full grow" id="page-content">
+          {children}
+        </div>
       </div>
     </div>
   );

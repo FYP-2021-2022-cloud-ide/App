@@ -11,7 +11,7 @@ import {
   getCreateSandboxFormStructure,
   getUpdateSandboxFormStructure,
 } from "../lib/forms";
-const CPU =1;
+const CPU = 1;
 const memory = 600;
 
 async function fetchSandboxes(
@@ -19,6 +19,9 @@ async function fetchSandboxes(
   onFailCallBack?: () => void,
   onSuccessCallBack?: (sandboxes: SandboxImage[]) => void
 ) {
+  if (!userId) {
+    throw new Error("user id is undefined ");
+  }
   const { listSandboxImage } = sandboxAPI;
   const response = await listSandboxImage(userId);
   if (!response.success && onFailCallBack) {
@@ -158,21 +161,23 @@ export const SandboxWrapper = () => {
         formStructure={createFormStructure}
         onEnter={async (data) => {
           const environment = data.environment_choice as Option;
-          // const toastId = myToast.loading("Creating the temporary contianer...");
+          const toastId = myToast.loading("Creating a personal workspace...");
           const response = await addSandboxImage(
             data.description as string,
             environment.id,
             data.name as string,
             userId
           );
-
+          myToast.dismiss(toastId);
           if (response.success) {
             const { sandboxImageId } = response;
             myToast.success(`Workspace is successfully created.`);
             fetch(mount.current);
           } else {
             // myToast.dismiss(toastId);
-            myToast.error(`Workspace cannot be created. ${response.error.status}`);
+            myToast.error(
+              `Workspace cannot be created. ${response.error.status}`
+            );
           }
         }}
       ></ModalForm>

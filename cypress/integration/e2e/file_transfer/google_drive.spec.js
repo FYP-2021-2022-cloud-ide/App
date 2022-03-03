@@ -2,9 +2,9 @@
 
 describe("google drive test", () => {
 
-    before()
+    before(() => { })
 
-    beforeEach()
+    beforeEach(() => { })
 
     it("show login button if not login", () => {
 

@@ -22,7 +22,7 @@ const SideBar = () => {
   ];
   if (!isAdmin) pages = pages.filter((page) => page.link != "/admin");
   return (
-    <div className="sidebar-container justify-between">
+    <div className="sidebar-container justify-between" id="sidebar">
       <div>
         <Link href="/">
           <a href="">
@@ -55,7 +55,7 @@ const SideBar = () => {
       {containers && containerInfo && containerQuota && (
         <div className="w-full flex flex-col space-y-2 text-xs text-gray-500 dark:text-gray-400 select-none mb-5 px-4">
           <div className="">
-            <p>
+            <p id="current-run-percentage">
               {containers.length}/{containerQuota} (Quota)
             </p>
             <div className="current-run-bar-outer">

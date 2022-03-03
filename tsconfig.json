@@ -27,6 +27,7 @@
     "jsx": "preserve",
     "lib": ["dom", "es2017"],
     "module": "esnext",
+    "types": ["cypress"],
     "moduleResolution": "node",
     // "noEmit": false,
     // "noFallthroughCasesInSwitch": true,

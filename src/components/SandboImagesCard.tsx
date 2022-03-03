@@ -53,6 +53,7 @@ const SandboxImagesCard = ({
                   <span className="absolute animate-ping inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                 )}
                 <span
+                  id="indicator"
                   className={`relative inline-flex rounded-full h-3 w-3 ${
                     sandboxImage.sandboxesId ? "bg-green-400" : "bg-gray-400"
                   }`}

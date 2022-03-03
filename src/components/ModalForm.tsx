@@ -84,7 +84,7 @@ const Entry = ({
   }
   if (entry.type == "input") {
     return (
-      <div className="" style={{ zIndex: zIndex }}>
+      <div className="" style={{ zIndex: zIndex }} id={id}>
         <div className="flex flex-row space-x-2  items-center">
           {entry.text && (
             <p className="modal-form-text-base capitalize">{entry.text}</p>
@@ -117,7 +117,7 @@ const Entry = ({
     );
   } else if (entry.type == "textarea") {
     return (
-      <div style={{ zIndex: zIndex }}>
+      <div style={{ zIndex: zIndex }} id={id}>
         <div className="flex flex-row space-x-2  items-center">
           {entry.text && (
             <p className="modal-form-text-base capitalize">{entry.text}</p>
@@ -147,7 +147,7 @@ const Entry = ({
     );
   } else if (entry.type == "listbox") {
     return (
-      <div className="modal-form-list-box" style={{ zIndex: zIndex }}>
+      <div className="modal-form-list-box" style={{ zIndex: zIndex }} id={id}>
         <div className="flex flex-row space-x-2 items-center">
           {entry.text && (
             <p className="modal-form-text-base capitalize">{entry.text}</p>
@@ -172,7 +172,7 @@ const Entry = ({
     );
   } else if (entry.type == "toggle") {
     return (
-      <div className="modal-form-toggle" style={{ zIndex: zIndex }}>
+      <div className="modal-form-toggle" style={{ zIndex: zIndex }} id={id}>
         {entry.text && (
           <p className="modal-form-text-base capitalize">{entry.text}</p>
         )}
@@ -195,7 +195,7 @@ const Entry = ({
     );
   } else if (entry.type == "custom") {
     return (
-      <div style={{ zIndex: zIndex }}>
+      <div style={{ zIndex: zIndex }} id={id}>
         <div className="flex flex-row space-x-2 items-center">
           {entry.text && (
             <p className="modal-form-text-base capitalize">{entry.text}</p>
@@ -259,7 +259,7 @@ const Section = ({
     if (!section.conditional(data)) return <></>;
   } else
     return (
-      <>
+      <div className="flex flex-col space-y-3" id={title}>
         {title && section.displayTitle && (
           <div className="font-medium mt-4 dark:text-gray-300">{title}</div>
         )}
@@ -275,7 +275,7 @@ const Section = ({
                 onChange={(newData) => onChange(newData, id)}
               ></Entry>
             ))}
-      </>
+      </div>
     );
 };
 
@@ -307,7 +307,6 @@ const Input = ({
         }`}
         placeholder={placeholder}
         value={text}
-        data-tip={message}
         onChange={(e) => {
           setText(e.target.value);
           onChange(e.target.value);

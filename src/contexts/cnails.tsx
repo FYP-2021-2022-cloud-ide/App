@@ -12,6 +12,8 @@ import {
 import { useRouter } from "next/router";
 import { notificationAPI } from "../lib/api/notificationAPI";
 import { containerAPI } from "../lib/api/containerAPI";
+import Cookies from "js-cookie";
+import { FetchCookieResponse } from "../lib/api/api";
 
 export const defaultQuota = 5;
 
@@ -63,31 +65,37 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
   };
 
   async function fetchCookies() {
-    const cookies = await fetch(`/api/fetchCookies`, {
-      method: "GET",
-    });
-    const cookiesContent = await cookies.json();
-
-    const { sub, name, email, userId, semesterId, bio, role } = cookiesContent;
-    if (userId == "") {
-      throw new Error("user id is null ");
+    const response = (await (
+      await fetch(`/api/fetchCookies`, {
+        method: "GET",
+      })
+    ).json()) as FetchCookieResponse;
+    if (response.success) {
+      const { sub, name, email, userId, semesterId, bio, role } =
+        response.cookies;
+      if (!userId) {
+        throw new Error("user id is null ");
+      }
+      setSub(sub);
+      setName(name);
+      setEmail(email);
+      setUserId(userId);
+      setSemesterId(semesterId);
+      setBio(bio);
+      setIsAdmin(role == "admin");
+      return {
+        sub,
+        name,
+        email,
+        userId,
+        semesterId,
+        bio,
+        role,
+      };
+    } else {
+      throw new Error("cookies cannot be fetched");
+      myToast.error("cookies cannot be fetched for some reasons.");
     }
-    setSub(sub);
-    setName(name);
-    setEmail(email);
-    setUserId(userId);
-    setSemesterId(semesterId);
-    setBio(bio);
-    if (role == "admin") setIsAdmin(true);
-    return {
-      sub,
-      name,
-      email,
-      userId,
-      semesterId,
-      bio,
-      role,
-    };
   }
 
   async function initMessage(sub: string, userId: string, semesterId: string) {

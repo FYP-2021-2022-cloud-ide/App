@@ -50,4 +50,8 @@ describe("instructor templates test", () => {
 
     })
 
+    it("cannot rmeove a template when the workspace is started", () => {
+
+    })
+
 })

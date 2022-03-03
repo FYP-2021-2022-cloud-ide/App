@@ -25,7 +25,7 @@ const ContainersList = () => {
       <div className="current-run-header">
         <div className="current-run-title">Current Running Containers</div>
         <div className="flex flex-col justify-between w-32">
-          <div className="current-run-percentage">
+          <div className="current-run-percentage" id="current-run-percentage">
             {numContainers}/{quota}
           </div>
           <div className="current-run-bar-outer">
@@ -48,7 +48,10 @@ const ContainersList = () => {
         (containers.length == 0 ? (
           <EmptyDiv message="You have no active workspace."></EmptyDiv>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+          <div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5"
+            id="container-list-grid"
+          >
             {containers.sort().map((container, i) => {
               const { containerID, courseTitle, assignmentName, existedTime } =
                 container;
