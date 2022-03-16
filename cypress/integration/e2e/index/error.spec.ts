@@ -13,7 +13,20 @@ describe("Error test", () => {
     cy.login(cookies);
     cy.visit(hostname);
   });
-  beforeEach(() => {});
+  beforeEach(() => {
+    Cypress.Cookies.preserveOnce(
+      "appSession",
+      "sub",
+      "email",
+      "userId",
+      "bio",
+      "darkMode",
+      "role",
+      "semesterId",
+      "name"
+    );
+  });
+
   it("visit the wrong url", () => {
     //visit https://codepsace.ust.dev/test_error
     cy.request({ url: "/test_error", failOnStatusCode: false })

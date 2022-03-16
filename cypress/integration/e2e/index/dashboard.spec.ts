@@ -10,14 +10,23 @@ describe("dashboard test", () => {
   });
 
   before(() => {
-    cy.login(cookies);
+    cy.login();
     cy.visit(hostname);
   });
 
   beforeEach(() => {
-    Cypress.Cookies.preserveOnce("appSession", "sub", "email");
+    Cypress.Cookies.preserveOnce(
+      "appSession",
+      "sub",
+      "email",
+      "userId",
+      "bio",
+      "darkMode",
+      "role",
+      "semesterId",
+      "name"
+    );
     cy.visit(hostname);
-    cy.wait(3000);
   });
 
   after(() => {});
@@ -109,9 +118,10 @@ describe("dashboard test", () => {
     // click personal workspace
     cy.get("#page-content").within(() => {
       cy.get("button").contains("Personal Workspaces").click();
+      cy.get("#sandbox-grid").should("exist");
       cy.get("button").contains("Courses").click();
+      cy.get("#course-grid").should("exist");
     });
-    // click courses
   });
 });
 

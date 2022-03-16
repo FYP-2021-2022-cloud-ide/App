@@ -22,7 +22,29 @@ import "./commands";
 declare global {
   namespace Cypress {
     interface Chainable {
-      login(cookies: string);
+      login();
+      preserveCookies();
+
+      interceptMenuBtn(
+        text: string,
+        intercept?: { api: string; alias: string }
+      );
+
+      // personal_workspace.spec.ts
+      getPersonalWorkspaceCard(
+        name: string
+      ): Cypress.Chainable<JQuery<HTMLElement>>;
+      visitPersonalWorkspace();
+      createPersonalWorkspace(): Cypress.Chainable<JQuery<HTMLElement>>;
+      removePersonalWorkspace(name: string);
+      removeAllPersonalWorkspaces();
+      updatePersonalWorkspace(
+        name: string,
+        newData: {
+          name: string;
+          description: string;
+        }
+      ): Cypress.Chainable<JQuery<HTMLElement>>;
     }
   }
 }
