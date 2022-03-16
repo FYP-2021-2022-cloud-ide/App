@@ -14,6 +14,7 @@ type Props = {
   onStart?: (sandboxImage: SandboxImage) => void;
   onStop?: (sandboxImage: SandboxImage) => void;
   zIndex?: number;
+  id: string;
 };
 
 const SandboxImagesCard = ({
@@ -24,6 +25,7 @@ const SandboxImagesCard = ({
   onStop,
   onStart,
   zIndex,
+  id,
 }: Props) => {
   const { ref, cleanStyle } = useCleanTilt(
     zIndex ? `z-index : ${zIndex};` : ""
@@ -37,6 +39,7 @@ const SandboxImagesCard = ({
       tiltReverse
     >
       <div
+        id={id}
         className={`sandbox-card ${
           sandboxImage.sandboxesId ? "cursor-pointer" : ""
         } `}
@@ -61,8 +64,12 @@ const SandboxImagesCard = ({
               </span>
             </div>
             <div className=" ">
-              <div className="sandbox-card-name ">{sandboxImage.title}</div>
-              <div className="sandbox-card-des">{sandboxImage.description}</div>
+              <p id="sandbox-name" className="sandbox-card-name ">
+                {sandboxImage.title}
+              </p>
+              <p id="sandbox-description" className="sandbox-card-des">
+                {sandboxImage.description}
+              </p>
             </div>
           </div>
         </div>

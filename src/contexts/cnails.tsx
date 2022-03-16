@@ -15,7 +15,7 @@ import { containerAPI } from "../lib/api/containerAPI";
 import Cookies from "js-cookie";
 import { FetchCookieResponse } from "../lib/api/api";
 
-export const defaultQuota = 5;
+const defaultQuota = 5;
 
 interface CnailsProviderProps {
   children: JSX.Element;

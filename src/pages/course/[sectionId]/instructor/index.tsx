@@ -33,7 +33,7 @@ import {
 import _ from "lodash";
 const registry =process.env.NEXT_PUBLIC_REGISTRY;
 const rootImage =  `${registry}/codeserver:latest`;
-const CPU = 1;
+const CPU = 0.5;
 const memory = 800;
 
 // Returning a new object reference guarantees that a before-and-after
@@ -474,7 +474,7 @@ const EnvironmentTemplateWrapper = () => {
           const { update_internal: containerId } = data;
           if (containerId != "" && !isEnter) {
             // remove the temp container
-            const response = await removeContainer(containerId, sub);
+            const response = await removeTempContainer(containerId, sub);
             if (response.success)
               console.log("temp container is successfully removed.");
             else

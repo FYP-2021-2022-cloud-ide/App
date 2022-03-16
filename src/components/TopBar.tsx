@@ -62,7 +62,7 @@ const TopBar = ({ sub, name, email }: props) => {
           </a>
         </Link>
         <div id="change_theme_btn" title="Change Theme">
-          {isDark ? (
+          {!isDark ? (
             <SunIcon
               className="top-bar-icon top-bar-icon-sun"
               onClick={() => setDark(!isDark)}

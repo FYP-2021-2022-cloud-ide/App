@@ -1,35 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { NodeModel } from "@minoru/react-dnd-treeview";
-import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/solid";
+import FolderArrow from "./FolderArrow";
 import { TypeIcon } from "./TypeIcon";
 import { Dialog, Transition } from "@headlessui/react";
 import { DropEvent, FileRejection, useDropzone } from "react-dropzone";
 import path from "path";
-
-export function useComponentVisible(initialIsVisible: boolean) {
-  const [isComponentVisible, setIsComponentVisible] =
-    useState(initialIsVisible);
-  const ref = useRef<HTMLDivElement>(null);
-
-  const handleClickOutside = (event: Event) => {
-    if (ref.current && !ref.current.contains(event.target as Node)) {
-      setIsComponentVisible(false);
-    }
-  };
-
-  useEffect(() => {
-    // document.addEventListener('keydown', handleHideDropdown, true);
-    document.addEventListener("contextmenu", handleClickOutside, true);
-    document.addEventListener("click", handleClickOutside, true);
-    return () => {
-      // document.removeEventListener('keydown', handleHideDropdown, true);
-      document.removeEventListener("contextmenu", handleClickOutside, true);
-      document.removeEventListener("click", handleClickOutside, true);
-    };
-  });
-
-  return { ref, isComponentVisible, setIsComponentVisible };
-}
+import useComponentVisible from "./useComponentVisible";
 
 export type CustomData = {
   fileType?: string;
@@ -39,16 +15,29 @@ export type CustomData = {
 };
 
 type Props = {
+  /**
+   * the data of this node
+   */
   node: NodeModel<CustomData>;
   depth: number;
+  /**
+   * whether this node is open
+   */
   isOpen: boolean;
+  /**
+   * handle dropping of files into this node
+   * @param
+   */
   handleDrop?: <T extends File>(
     acceptedFiles: T[],
     fileRejections: FileRejection[],
     event: DropEvent,
     node?: NodeModel<CustomData>
   ) => Promise<NodeModel<CustomData>[]>;
-  onToggle: (id: NodeModel["id"]) => void;
+  /**
+   * This is called when the folder arrow is clicked
+   */
+  onToggle: (id: NodeModel<CustomData>) => Promise<void>;
   getFilesAndReset: (data?: NodeModel<CustomData>[]) => Promise<void>;
   createFolder?: (
     node: NodeModel<CustomData>,
@@ -62,12 +51,22 @@ type Props = {
     newName: string
   ) => Promise<NodeModel<CustomData>[]>;
   download?: (node: NodeModel<CustomData>) => Promise<void>;
+  /**
+   * This is called when file button is clicked.
+   */
   onClick?: (
-    node: NodeModel<CustomData>
+    node: NodeModel<CustomData>,
+    event: React.MouseEvent
   ) => Promise<void> | Promise<NodeModel<CustomData>[]> | Promise<boolean>;
   onDragStart?: (node: NodeModel<CustomData>) => Promise<void>;
   onDragEnd?: (node: NodeModel<CustomData>) => Promise<void>;
-  convertor?: (data: any) => NodeModel<CustomData>[];
+  /**
+   * this will be called when right click on node
+   */
+  onContextMenu?: (
+    node: NodeModel<CustomData>,
+    event: React.MouseEvent
+  ) => Promise<void>;
 };
 
 const CustomNode: React.FC<Props> = (props) => {
@@ -84,6 +83,7 @@ const CustomNode: React.FC<Props> = (props) => {
     onClick,
     onDragStart,
     onDragEnd,
+    onContextMenu,
     node,
   } = props;
   const [menuLocation, setMenuLocation] = useState([0, 0]);
@@ -103,7 +103,9 @@ const CustomNode: React.FC<Props> = (props) => {
     onDragEnter: () => {
       setDragOver(true);
     },
-    onDragLeave: () => setDragOver(false),
+    onDragLeave: () => {
+      setDragOver(false);
+    },
     onDrop: async (acceptedFiles, fileRejections, event) => {
       setDragOver(false);
       if (handleDrop) {
@@ -118,12 +120,13 @@ const CustomNode: React.FC<Props> = (props) => {
     },
   });
 
-  const handleToggle = async (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleToggle = async (event: React.MouseEvent) => {
+    console.log("arrow is click , handle toggle");
+    event.stopPropagation();
     // nodeOpenRef.current[node.id] = !nodeOpenRef.current[node.id]
-    props.onToggle(node.id);
+    props.onToggle(node);
     if (onClick) {
-      const result = await onClick(node);
+      const result = await onClick(node, event);
       if (result == true || typeof result == "object") {
         if (result == true) {
           await getFilesAndReset();
@@ -171,13 +174,42 @@ const CustomNode: React.FC<Props> = (props) => {
     await download(node);
   };
 
+  const Leading = ({
+    depth,
+    droppable,
+  }: {
+    depth: number;
+    droppable: boolean;
+  }) => {
+    if (depth == 0 && !droppable)
+      return <div className="w-[24px] h-[24px] min-w-[24px]"></div>;
+    return (
+      <>
+        {Array(depth)
+          .fill(0)
+          .map((i, index) => {
+            return (
+              <div
+                key={index}
+                className="w-[24px] h-[24px] relative min-w-[24px]"
+              >
+                <div className="absolute h-full w-[1px] bg-gray-400 left-[50%]"></div>
+              </div>
+            );
+          })}
+      </>
+    );
+  };
+
   return (
-    <div className="" {...getRootProps({})}>
+    <>
       <button
+        {...getRootProps()}
         ref={thisRef}
-        onClick={async () => {
+        onClick={async (event: React.MouseEvent) => {
+          console.log("button is clicked");
           if (onClick) {
-            const result = await onClick(node);
+            const result = await onClick(node, event);
             if (result == true || typeof result == "object") {
               if (result == true) {
                 await getFilesAndReset();
@@ -199,60 +231,31 @@ const CustomNode: React.FC<Props> = (props) => {
           dragOver && "bg-blue-200 dark:bg-gray-500"
         }`}
         // draggable={false}
-        onContextMenu={(e: any) => {
+        onContextMenu={(e: React.MouseEvent) => {
           e.preventDefault();
-          if (
-            duplicate ||
-            createFolder ||
-            remove ||
-            getInfo ||
-            download ||
-            edit
-          ) {
-            setIsComponentVisible(true);
-          }
-          setMenuLocation([e.clientX, e.clientY]);
+          e.stopPropagation();
+          onContextMenu(node, e);
+          // if (
+          //   duplicate ||
+          //   createFolder ||
+          //   remove ||
+          //   getInfo ||
+          //   download ||
+          //   edit
+          // ) {
+          //   setIsComponentVisible(true);
+          // }
+          // setMenuLocation([e.clientX, e.clientY]);
         }}
         draggable
       >
         <input {...getInputProps()} />
-        {Array(props.depth)
-          .fill(0)
-          .map((i, index) => {
-            return (
-              <div
-                key={index}
-                className="w-[24px] h-[24px] relative min-w-[24px]"
-              >
-                <div className="absolute h-full w-[1px] bg-gray-400 left-[50%]"></div>
-              </div>
-            );
-          })}
-        {(props.depth == 0 && node.droppable && (
-          <div className="w-[24px] h-[24px] min-w-[24px] relative">
-            {props.isOpen ? (
-              <ChevronDownIcon onClick={handleToggle} className="openArrow" />
-            ) : (
-              <ChevronRightIcon onClick={handleToggle} className="openArrow" />
-            )}
-          </div>
-        )) ||
-          (props.depth == 0 && !node.droppable && (
-            <div className="w-[24px] h-[24px] min-w-[24px]"></div>
-          )) ||
-          (props.depth != 0 && node.droppable && (
-            <div className="w-[24px] h-[24px] min-w-[24px] relative">
-              {props.isOpen ? (
-                <ChevronDownIcon onClick={handleToggle} className="openArrow" />
-              ) : (
-                <ChevronRightIcon
-                  onClick={handleToggle}
-                  className="openArrow"
-                />
-              )}
-            </div>
-          ))}
-        {!droppable && <div className=""></div>}
+        <Leading depth={props.depth} droppable={node.droppable}></Leading>
+        <FolderArrow
+          open={props.isOpen}
+          droppable={node.droppable}
+          handleToggle={handleToggle}
+        ></FolderArrow>
         <TypeIcon
           className={`w-6 h-6 text-gray-600 `}
           fileName={data?.fileName}
@@ -447,7 +450,7 @@ const CustomNode: React.FC<Props> = (props) => {
           </div>
         </Dialog>
       </Transition>
-    </div>
+    </>
   );
 };
 

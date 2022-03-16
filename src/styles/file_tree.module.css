@@ -1,0 +1,33 @@
+.wrapper {
+  @apply w-full h-full rounded max-h-full flex flex-col space-y-5;
+}
+
+.root {
+  -ms-overflow-style: none;
+  scrollbar-width: 20px;
+  @apply relative p-3 w-full bg-gray-200 overflow-scroll rounded  text-gray-700 h-full;
+}
+
+:global(.dark) .root {
+  @apply bg-gray-900 text-gray-200;
+}
+
+.root::-webkit-scrollbar {
+  display: none;
+}
+
+.root-nothing {
+  @apply border-8 border-dashed border-gray-400 hover:bg-gray-200;
+}
+
+:global(.dark) .root-nothing {
+  @apply border-black hover:bg-white/5;
+}
+
+.root-nothing-text {
+  @apply absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl text-gray-400  font-bold select-none text-center;
+}
+
+:global(.dark) .root-nothing-text {
+  @apply text-gray-600;
+}

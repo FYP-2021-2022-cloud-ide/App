@@ -20,7 +20,7 @@ const WorkspacesList = ({ workspaces, onClick, onToggleStart }: props) => {
       {workspaces?.length == 0 ? (
         <EmptyDiv message="There is no published assignments yet."></EmptyDiv>
       ) : (
-        <div className="workspace-grid">
+        <div id="workspace-grid" className="workspace-grid">
           {workspaces
             .sort((a, b) => a.name.localeCompare(b.name))
             .map((workspace, index) => {

@@ -1,21 +1,30 @@
+/**
+ * file upload stages :
+ * 1. user drop a file to upload on browser
+ * 2. browser prepare the files
+ * 3. browser call the API to upload files
+ * 4. get the response from API
+ */
+
 import { DropEvent, FileRejection, useDropzone } from "react-dropzone";
 import {
   DragLayerMonitorProps,
   NodeModel,
   Tree,
-  getDescendants,
   DropOptions,
   TreeMethods,
-  useOpenIdsHelper,
 } from "@minoru/react-dnd-treeview";
 import CustomNode, { CustomData } from "./CustomNode";
+import useComponentVisible from "./useComponentVisible";
 import { CustomDragPreview } from "./CustomDragPreview";
 import { Placeholder } from "./placeholder";
 import { useState, useEffect, useRef } from "react";
 import React from "react";
+import styles from "../../styles/file_tree.module.css";
+import classNames from "../../lib/classnames";
+import { Dialog, Transition } from "@headlessui/react";
 
 export type Props = {
-  disabled?: boolean;
   handleDropzone?: <T extends File>(
     acceptedFiles: T[],
     fileRejections: FileRejection[],
@@ -23,9 +32,13 @@ export type Props = {
     node?: NodeModel<CustomData>
   ) => Promise<NodeModel<CustomData>[]>;
   rootId?: string | number;
-  // this callback will be called on drop but is called before react dropzone prepare the files
+  /**
+   * this callback will be called on drop but is called before react dropzone prepare the files. This callback is called before stage 2.
+   */
   fastDropCallback?: () => void;
-  //  will only be called in the target tree if cross-tree moving
+  /**
+   *  will only be called in the target tree if cross-tree moving
+   */
   handleMoveWithinTree?: (
     newTreeData: NodeModel<CustomData>[],
     options: DropOptions<CustomData>
@@ -37,6 +50,11 @@ export type Props = {
   ) => Promise<NodeModel<CustomData>[]>;
   handleOpenAll?: () => void;
   handleCloseAll?: () => void;
+
+  /**
+   * the source of files in the tree. This function will be wrapped by a function `getFilesAndReset`.
+   * The function is called on component mount or specific call
+   */
   getFiles: () => Promise<NodeModel<CustomData>[]>;
   createFolder?: (
     node: NodeModel<CustomData>,
@@ -68,8 +86,15 @@ export type Props = {
     options: DropOptions<CustomData>
   ) => boolean | void;
   nothingText?: string;
+  getNodeActions?: (
+    node: NodeModel<CustomData>
+  ) => { text: string; onClick: () => void }[];
+  rootActions?: { text: string; onClick: () => void }[];
 };
 
+/**
+ * this is a progress text component
+ */
 const Progress = React.forwardRef((_, ref: any) => {
   const [progress, setProgress] = useState<any>(ref.current);
   useEffect(() => {
@@ -79,24 +104,28 @@ const Progress = React.forwardRef((_, ref: any) => {
   });
   return (
     <>
-      {
-        // progress == 100 ? <p className="text-gray-600 text-sm dark:text-gray-300">Transferring files in the backend...</p> :
-        //     <p className="text-sm text-gray-600 dark:text-gray-300" style={{ display: progress == 0 ? "none" : "block" }}>Uploading files...</p>
-        // <div className="w-36 bg-gray-300 dark:bg-white h-2 rounded overflow-hidden" style={{ display: progress == 0 ? "none" : "block" }}>
-        //     <div className={`bg-green-400 h-full`} style={{ width: `${progress}%` }}></div>
-        // </div>
-        progress && (
-          <p className="text-gray-600 text-sm dark:text-gray-300">{progress}</p>
-        )
-      }
+      {progress && (
+        <p
+          id="progress-text"
+          className="text-gray-600 text-sm dark:text-gray-300"
+        >
+          {progress}
+        </p>
+      )}
     </>
   );
 });
 
+/**
+ * this type is for exporting a ref to the FTree component
+ */
+export type MyTreeMethods = TreeMethods & {
+  getFilesAndReset(data?: NodeModel<CustomData>[]): Promise<void>;
+};
+
 const FTree = React.forwardRef(
   (
     {
-      disabled = false,
       fastDropCallback,
       rootId,
       canDrop,
@@ -116,9 +145,11 @@ const FTree = React.forwardRef(
       download,
       onClick,
       progressRef,
-      nothingText = "No files",
+      nothingText = "Click or drop files to upload",
+      getNodeActions,
+      rootActions,
     }: Props,
-    ref: React.MutableRefObject<TreeMethods>
+    ref: React.MutableRefObject<MyTreeMethods>
   ) => {
     const [treeData, setTreeData] = useState<NodeModel<CustomData>[]>(
       [] as NodeModel<CustomData>[]
@@ -126,7 +157,6 @@ const FTree = React.forwardRef(
     const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
       noClick: treeData.length != 0,
       onDrop: async (acceptedFiles, fileRejections, event) => {
-        console.log("drop files 2");
         if (handleDropzone) {
           // console.log(treeData.length && treeData.length == 0)
           const data = await handleDropzone(
@@ -140,13 +170,23 @@ const FTree = React.forwardRef(
     });
     const lastActiveNodeRef = useRef<string>();
     const nodeOpenRef = useRef<string[]>();
+    const {
+      ref: menuRef,
+      isComponentVisible: isMenuVisible,
+      setIsComponentVisible: setIsMenuVisible,
+    } = useComponentVisible(false);
+    const [menuLocation, setMenuLocation] = useState([0, 0]);
+    const [menuItems, setMenuItems] = useState<
+      { text: string; onClick: () => void }[]
+    >([]);
 
     async function getFilesAndReset(data?: NodeModel<CustomData>[]) {
+      console.log("get files");
       if (!data) {
         data = await getFiles();
       }
       if (data != undefined) {
-        if (JSON.stringify(treeData) == JSON.stringify(data)) {
+        if (JSON.stringify(treeData) === JSON.stringify(data)) {
           // console.log("data is the same, rerender omitted ")
         } else {
           // console.log("data is different, rerender...")
@@ -158,24 +198,21 @@ const FTree = React.forwardRef(
     useEffect(() => {
       getFilesAndReset();
     }, []);
+    useEffect(() => {
+      ref.current = {
+        ...ref.current,
+        getFilesAndReset,
+      };
+      console.log("rerender");
+    });
 
-    if (disabled) {
+    const ButtonGroups = () => {
       return (
-        <div className="file-tree-wrapper">
-          <div className="file-tree-root file-tree-root-nothing">
-            <p className="file-tree-root-nothing-text">Disabled</p>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="file-tree-wrapper">
-        <div className="flex flex-row items-center ">
+        <>
           {handleOpenAll ? (
             <button
               disabled={treeData.length == 0}
-              className="bg-gray-500 text-white px-4 h-5 text-xs rounded-md hover:bg-gray-600 mr-5"
+              className="bg-gray-500 text-white px-4 h-5 text-xs rounded-md hover:bg-gray-600 mr-5 capitalize"
               onClick={() => {
                 ref.current.openAll();
                 nodeOpenRef.current = treeData
@@ -191,7 +228,7 @@ const FTree = React.forwardRef(
           {handleCloseAll ? (
             <button
               disabled={treeData.length == 0}
-              className="bg-gray-500 text-white px-4 h-5 text-xs rounded-md hover:bg-gray-600 mr-5"
+              className="bg-gray-500 text-white px-4 h-5 text-xs rounded-md hover:bg-gray-600 mr-5 capitalize"
               onClick={() => {
                 ref.current.closeAll();
                 nodeOpenRef.current = [];
@@ -200,11 +237,29 @@ const FTree = React.forwardRef(
               close all
             </button>
           ) : (
+            // a dummy div as padding
             <div className="h-5 w-0"></div>
           )}
+        </>
+      );
+    };
+
+    return (
+      <div
+        className={classNames(styles, "wrapper")}
+        onContextMenu={(event: React.MouseEvent) => {
+          event.preventDefault();
+          event.stopPropagation();
+          setIsMenuVisible(true);
+          setMenuLocation([event.clientX, event.clientY]);
+          setMenuItems(rootActions);
+        }}
+      >
+        <div className="flex flex-row items-center ">
+          <ButtonGroups></ButtonGroups>
           <Progress ref={progressRef} />
         </div>
-        <div className="h-full" onDrop={fastDropCallback}>
+        <div className="h-full " onDrop={fastDropCallback}>
           <div
             {...getRootProps()}
             className="h-full  min-h-[300px] max-h-[80vh] relative"
@@ -267,7 +322,8 @@ const FTree = React.forwardRef(
                     // ui isopen
                     isOpen={isOpen}
                     handleDrop={handleDropzone}
-                    onToggle={(id) => {
+                    onToggle={async (node) => {
+                      const { id } = node;
                       lastActiveNodeRef.current = id as string;
                       if (nodeOpenRef.current == undefined) {
                         nodeOpenRef.current = [];
@@ -285,7 +341,6 @@ const FTree = React.forwardRef(
                         nodeOpenRef.current.push(id as string);
                         ref.current.open(nodeOpenRef.current);
                       }
-                      // console.log("now : ", nodeOpenRef.current)
                     }}
                     download={download}
                     onClick={
@@ -294,6 +349,11 @@ const FTree = React.forwardRef(
                         return onClick(treeData, node);
                       })
                     }
+                    onContextMenu={async (node, event) => {
+                      setIsMenuVisible(true);
+                      setMenuLocation([event.clientX, event.clientY]);
+                      setMenuItems(getNodeActions(node));
+                    }}
                     onDragStart={
                       onDragStart &&
                       ((node) => {
@@ -316,11 +376,13 @@ const FTree = React.forwardRef(
                 );
               }}
               classes={{
-                root: `file-tree-root ${
-                  treeData.length == 0 ? "file-tree-root-nothing" : ""
-                } `,
+                root: classNames(
+                  styles,
+                  "root",
+                  treeData.length == 0 ? "root-nothing" : ""
+                ),
                 draggingSource: "opacity-30 ",
-                dropTarget: "bg-gray-200 dark:bg-gray-500",
+                dropTarget: "bg-blue-200/50 dark:bg-white/10",
                 listItem: "",
               }}
               dragPreviewRender={(
@@ -334,10 +396,52 @@ const FTree = React.forwardRef(
               )}
             ></Tree>
             {treeData.length == 0 && (
-              <p className="file-tree-root-nothing-text">{nothingText}</p>
+              <p className={classNames(styles, "root-nothing-text")}>
+                {nothingText}
+              </p>
             )}
           </div>
         </div>
+        <Transition
+          show={isMenuVisible}
+          enter="transition-opacity duration-75"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="transition-opacity duration-150"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <Dialog
+            ref={menuRef}
+            onClose={() => {
+              setIsMenuVisible(false);
+            }}
+            style={{
+              left: menuLocation[0] + "px",
+              top: menuLocation[1] + "px",
+            }}
+            className="z-10 shadow-lg rounded-md left-[100%] absolute bg-white p-2 dark:bg-gray-700 text-gray-600 dark:text-gray-200 w-fit"
+          >
+            <div className="flex flex-col">
+              {menuItems
+                .sort((a, b) => a.text.localeCompare(b.text))
+                .map((i) => {
+                  return (
+                    <button
+                      key={i.text}
+                      onClick={() => {
+                        setIsMenuVisible(false);
+                        i.onClick();
+                      }}
+                      className="hover:bg-gray-200 dark:hover:bg-gray-500 rounded  px-2 text-left whitespace-nowrap capitalize"
+                    >
+                      {i.text}
+                    </button>
+                  );
+                })}
+            </div>
+          </Dialog>
+        </Transition>
       </div>
     );
   }

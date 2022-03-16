@@ -40,7 +40,7 @@ function WorkspaceCard({ workspace, onClick, onToggleStart, zIndex }: Props) {
         className="env-card"
       >
         <div className="flex flex-row min-w-0 space-x-2">
-          <span className="relative flex h-3 w-3 mt-3">
+          <span className="relative flex h-2 w-3">
             {workspace.containerID && (
               <span className="absolute animate-ping inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
             )}
@@ -52,7 +52,7 @@ function WorkspaceCard({ workspace, onClick, onToggleStart, zIndex }: Props) {
           </span>
           <div className="env-card-content justify-between w-full">
             <div>
-              <div className="env-card-name">{workspace.name}</div>
+              <div className="env-card-name mt-2">{workspace.name}</div>
               <div className=" text-xs text-gray-600 dark:text-gray-300 line-clamp-3">
                 {workspace.description}
               </div>

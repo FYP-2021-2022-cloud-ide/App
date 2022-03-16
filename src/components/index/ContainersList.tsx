@@ -1,7 +1,7 @@
 import CodeSpace from "./ContainerCard";
 import EmptyDiv from "../EmptyDiv";
 import { Container, ContainerInfo } from "../../lib/cnails";
-import { defaultQuota, useCnails } from "../../contexts/cnails";
+import { useCnails } from "../../contexts/cnails";
 import { useEffect } from "react";
 
 type Props = {
@@ -10,23 +10,23 @@ type Props = {
 };
 
 const ContainersList = () => {
-  const { sub, containers, fetchContainers, containerQuota } = useCnails();
+  const { sub, containers, containerInfo, fetchContainers, containerQuota } =
+    useCnails();
   useEffect(() => {
     fetchContainers(sub);
   }, []);
+  const numActiveContainers = containerInfo ? containerInfo.containersAlive : 0;
+  const quota = containerQuota;
 
-  const numContainers = containers ? containers.length : 0;
-  const quota = containerQuota ? containerQuota : defaultQuota;
+  var percentage = (numActiveContainers / quota) * 100;
 
-  var percentage = (numContainers / quota) * 100;
-
-  const Header = () => {
-    return (
+  return (
+    <div className=" w-full ">
       <div className="current-run-header">
         <div className="current-run-title">Current Running Containers</div>
         <div className="flex flex-col justify-between w-32">
           <div className="current-run-percentage" id="current-run-percentage">
-            {numContainers}/{quota}
+            {numActiveContainers}/{quota}
           </div>
           <div className="current-run-bar-outer">
             <div
@@ -38,12 +38,6 @@ const ContainersList = () => {
           </div>
         </div>
       </div>
-    );
-  };
-
-  return (
-    <div className=" w-full ">
-      <Header />
       {containers &&
         (containers.length == 0 ? (
           <EmptyDiv message="You have no active workspace."></EmptyDiv>
