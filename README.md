@@ -16,6 +16,12 @@
 
 # Cypress
 
+
+
+https://user-images.githubusercontent.com/43137033/156647940-25911b41-f8fa-41db-831a-c9c2b31b245c.mp4
+
+
+
 Cypress is responsible for the unit testing, integration testing and end-to-end testing. The source code of test is kept under the `cypress` folder with `cypress.json` as the configuration file in the project root.
 
 Runnning all the test at once is time-consuming, most of the time tests are only ran when needed. Using this command `npx cypress run --spec <filepath>`.
