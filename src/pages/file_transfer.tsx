@@ -15,8 +15,9 @@ import {
   convertGoogleTree,
   convertDirectoryTree,
 } from "../lib/file_transfer_helper";
-import { Dialog, Transition } from "@headlessui/react";
 import myToast from "../components/CustomToast";
+import ModalForm, { Props as ModalFormProps } from "../components/ModalForm";
+import directoryTree from "directory-tree";
 
 export default function Page() {
   const { userId, sub } = useCnails();
@@ -44,9 +45,6 @@ export default function Page() {
     };
     fetchRoot(sub);
   }, []);
-  useEffect(() => {
-    console.log(ref1.current);
-  });
 
   let ref1 = useRef<MyTreeMethods>();
   let ref2 = useRef<MyTreeMethods>();
@@ -60,10 +58,21 @@ export default function Page() {
    * the ref to the node which is currently under node actions
    */
   const targetNodeRef = useRef<NodeModel<CustomData>>();
-  const [showCreateFolderPopup, setShowCreateFolderPopup] =
+
+  // for modal form
+  const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] =
     useState<boolean>(false);
-  const folderNameInputRef = React.createRef<HTMLInputElement>();
-  const fileNameInputRef = React.createRef<HTMLInputElement>();
+  const [isEditNameModalOpen, setIsEditNameModalOpen] =
+    useState<boolean>(false);
+
+  const rerenderPersonalVolume = async (data: directoryTree.DirectoryTree) => {
+    await ref1.current.getFilesAndRerender(convertDirectoryTree(data));
+  };
+
+  const rerenderRemoteStorage = async (data: GoogleFolder) => {
+    await ref2.current.getFilesAndRerender(convertGoogleTree(data));
+  };
+
   return (
     <>
       <div className="grid grid-cols-2 text-black max-h-screen h-full min-h-fit gap-6 px-10 mb-10 bottom-0 w-full">
@@ -169,12 +178,6 @@ export default function Page() {
               if (data.success) return convertDirectoryTree(data.tree);
               else alert(JSON.stringify(data.error.status));
             }}
-            handleCloseAll={() => {
-              ref1.current.closeAll();
-            }}
-            handleOpenAll={() => {
-              ref1.current.openAll();
-            }}
             onDragStart={async (_treeData, node) => {
               draggingRef.current = {
                 tree: "tree 1",
@@ -192,67 +195,6 @@ export default function Page() {
                 console.log(data.tree);
                 return convertDirectoryTree(data.tree);
               } else alert(JSON.stringify(data.error.status));
-            }}
-            createFolder={async function (
-              node: NodeModel<CustomData>,
-              name: string
-            ): Promise<NodeModel<CustomData>[]> {
-              const target = `${
-                node.droppable
-                  ? node.data.filePath
-                  : path.dirname(node.data.filePath)
-              }/${name}`;
-              progressRef1.current = status.loading;
-              const data = await makeFolder(userId, target);
-              progressRef1.current = "";
-              if (data.success) return convertDirectoryTree(data.tree);
-              else alert(data.error.status);
-            }}
-            remove={async function (
-              node: NodeModel<CustomData>
-            ): Promise<NodeModel<CustomData>[]> {
-              progressRef1.current = status.loading;
-              const data = await removeFile(userId, node.data.filePath);
-              progressRef1.current = "";
-              if (data.success) return convertDirectoryTree(data.tree);
-              else alert(data.error.status);
-            }}
-            edit={async function (
-              node: NodeModel<CustomData>,
-              newName: string
-            ): Promise<NodeModel<CustomData>[]> {
-              progressRef1.current = status.loading;
-              const data = await moveFile(
-                userId,
-                node.data.filePath,
-                `${path.dirname(node.data.filePath)}/${newName}`
-              );
-              progressRef1.current = "";
-              if (data.success) return convertDirectoryTree(data.tree);
-              else alert(data.error.status);
-            }}
-            download={async function (
-              node: NodeModel<CustomData>
-            ): Promise<void> {
-              progressRef1.current = status.loading;
-              const data = await downloadFileToUser(
-                userId,
-                node.data.filePath,
-                node.droppable
-              );
-              if (data != undefined && data.success) {
-                // console.log(res)
-                var decodedByte = Buffer.from(data.file, "base64");
-                var b = new Blob([decodedByte]);
-                async function downloadFileURL(file: Blob, fileName: string) {
-                  var link = document.createElement("a");
-                  link.href = URL.createObjectURL(file);
-                  link.download = fileName;
-                  link.click();
-                }
-                await downloadFileURL(b, data.fileName);
-              }
-              progressRef1.current = "";
             }}
             progressRef={progressRef1}
             canDrop={(_tree, { dragSource, dropTarget }) => {
@@ -272,22 +214,75 @@ export default function Page() {
               return true;
             }}
             getNodeActions={(node) => {
+              targetNodeRef.current = node;
               return [
-                {
-                  text: "duplicate",
-                  onClick: () => {},
-                },
+                // {
+                //   text: "duplicate",
+                //   onClick: () => {},
+                // },
                 {
                   text: "delete",
-                  onClick: () => {},
+                  onClick: async () => {
+                    progressRef1.current = status.loading;
+                    const response = await removeFile(
+                      userId,
+                      node.data.filePath
+                    );
+                    progressRef1.current = "";
+                    if (response.success) rerenderPersonalVolume(response.tree);
+                    else alert(response.error.status);
+                  },
                 },
+                {
+                  text: "download",
+                  onClick: async () => {
+                    progressRef1.current = status.loading;
+                    const data = await downloadFileToUser(
+                      userId,
+                      node.data.filePath,
+                      node.droppable
+                    );
+                    if (data != undefined && data.success) {
+                      // console.log(res)
+                      var decodedByte = Buffer.from(data.file, "base64");
+                      var b = new Blob([decodedByte]);
+                      async function downloadFileURL(
+                        file: Blob,
+                        fileName: string
+                      ) {
+                        var link = document.createElement("a");
+                        link.href = URL.createObjectURL(file);
+                        link.download = fileName;
+                        link.click();
+                      }
+                      await downloadFileURL(b, data.fileName);
+                    }
+                    progressRef1.current = "";
+                  },
+                },
+                {
+                  text: "edit",
+                  onClick: async () => {
+                    setIsEditNameModalOpen(true);
+                  },
+                },
+                {
+                  text: "create folder",
+                  onClick: () => {
+                    setIsCreateFolderModalOpen(true);
+                  },
+                },
+                // {
+                //   text: "get info",
+                //   onClick: () => {},
+                // },
               ];
             }}
             rootActions={[
               {
                 text: "create folder",
                 onClick: () => {
-                  setShowCreateFolderPopup(true);
+                  setIsCreateFolderModalOpen(true);
                 },
               },
             ]}
@@ -366,30 +361,30 @@ export default function Page() {
                 console.log(filesRef.current);
                 return convertGoogleTree(filesRef.current);
               }}
-              onClick={async (treeData, node) => {
-                if (
-                  node.droppable &&
-                  getFolderById(filesRef.current, String(node.id)).children
-                    .length == 0
-                ) {
-                  progressRef2.current = status.loading;
-                  const response = await googleAPI.expandFolder(node.id, sub);
-                  const newItems = await expandGoogleFolder(
-                    filesRef.current,
-                    {
-                      id: String(node.id),
-                      name: node.text,
-                      path: node.data.filePath,
-                      closed: false,
-                    },
-                    sub
-                  );
+              showGlobalActionButtons={false}
+              // onClick={async (treeData, node) => {
+              //   if (
+              //     node.droppable &&
+              //     getFolderById(filesRef.current, String(node.id)).children
+              //       .length == 0
+              //   ) {
+              //     progressRef2.current = status.loading;
+              //     filesRef.current = await expandGoogleFolder(
+              //       filesRef.current,
+              //       {
+              //         id: String(node.id),
+              //         name: node.text,
+              //         path: node.data.filePath,
+              //         closed: false,
+              //       },
+              //       sub
+              //     );
 
-                  progressRef2.current = "";
-                  return convertGoogleTree(filesRef.current);
-                }
-                return treeData;
-              }}
+              //     progressRef2.current = "";
+              //     return convertGoogleTree(filesRef.current);
+              //   }
+              //   return treeData;
+              // }}
               onDragStart={async (_treeData, node) => {
                 draggingRef.current = {
                   tree: "tree 2",
@@ -411,72 +406,83 @@ export default function Page() {
           )}
         </div>
       </div>
-      <Transition
-        show={showCreateFolderPopup}
-        enter="transition duration-100 ease-out"
-        enterFrom="transform scale-95 opacity-0"
-        enterTo="transform scale-100 opacity-100"
-        leave="transition duration-75 ease-out"
-        leaveFrom="transform scale-100 opacity-100"
-        leaveTo="transform scale-95 opacity-0"
-      >
-        <Dialog
-          onClose={() => {
-            setShowCreateFolderPopup(false);
-          }}
-          initialFocus={folderNameInputRef}
-          className={``}
-        >
-          <Dialog.Overlay className="fixed inset-0 bg-black opacity-30 z-[50] " />
-          <div className="p-3 z-[100] absolute shadow-lg top-1/2 left-1/2 rounded-lg -translate-x-1/2 -translate-y-1/2  inset-0 overflow-y-auto bg-white dark:bg-gray-600 w-fit h-fit">
-            <p className="text-gray-600 dark:text-gray-300 capitalize">
-              folder name :
-            </p>
-            <input
-              className="outline-none px-2 bg-white border border-gray-400 dark:border-gray-800 rounded mr-3 w-96 dark:bg-gray-700 dark:text-white text-gray-600"
-              ref={folderNameInputRef}
-            />
-            <button
-              className="bg-green-400 text-white px-2 rounded"
-              onClick={async () => {
-                setShowCreateFolderPopup(false);
-                const node = targetNodeRef.current;
-                const folderName = folderNameInputRef.current.value;
-                if (folderName == "") {
-                  myToast.error(
-                    "Fail to create folder because folder name is empty."
-                  );
-                  return;
-                }
-                let folderPath: string;
-                if (!node) {
-                  // this is a root action
-                  folderPath = `/volumes/${userId}/persist/${folderName}`;
-                }
-                if (node && node.droppable) {
-                  folderPath = `${node.data.filePath}/${folderName}`;
-                }
-                if (node && !node.droppable) {
-                  folderPath = `${path.dirname(
-                    node.data.fileName
-                  )}/${folderName}`;
-                }
+      {/* create folder modal form  */}
+      <ModalForm
+        isOpen={isCreateFolderModalOpen}
+        setOpen={setIsCreateFolderModalOpen}
+        title="create folder"
+        clickOutsideToClose
+        formStructure={{
+          create_folder: {
+            entries: {
+              name: {
+                type: "input",
+                label: "folder name",
+                defaultValue: "",
+              },
+            },
+          },
+        }}
+        onEnter={async (data) => {
+          const node = targetNodeRef.current;
+          const folderName = data.name;
+          if (folderName == "") {
+            myToast.error(
+              "Fail to create folder because folder name is empty."
+            );
+            return;
+          }
+          let folderPath: string;
+          if (!node) {
+            // this is a root action
+            folderPath = `/volumes/${userId}/persist/${folderName}`;
+          }
+          if (node && node.droppable) {
+            folderPath = `${node.data.filePath}/${folderName}`;
+          }
+          if (node && !node.droppable) {
+            folderPath = `${path.dirname(node.data.filePath)}/${folderName}`;
+          }
+          progressRef1.current = status.loading;
+          const response = await makeFolder(userId, folderPath);
+          progressRef1.current = "";
+          targetNodeRef.current = null;
+          if (response.success) rerenderPersonalVolume(response.tree);
+          else alert(response.error.status);
+        }}
+      ></ModalForm>
 
-                progressRef1.current = status.loading;
-                const response = await makeFolder(userId, folderPath);
-                progressRef1.current = "";
-                if (response.success)
-                  await ref1.current.getFilesAndReset(
-                    convertDirectoryTree(response.tree)
-                  );
-                else alert(response.error.status);
-              }}
-            >
-              OK
-            </button>
-          </div>
-        </Dialog>
-      </Transition>
+      {targetNodeRef.current && (
+        <ModalForm
+          isOpen={isEditNameModalOpen}
+          setOpen={setIsEditNameModalOpen}
+          clickOutsideToClose
+          title="Edit Name"
+          formStructure={{
+            edit_name: {
+              entries: {
+                name: {
+                  type: "input",
+                  defaultValue: targetNodeRef.current.text,
+                },
+              },
+            },
+          }}
+          onEnter={async (data) => {
+            const node = targetNodeRef.current;
+            const newName = data.name;
+            progressRef1.current = status.loading;
+            const response = await moveFile(
+              userId,
+              node.data.filePath,
+              `${path.dirname(node.data.filePath)}/${newName}`
+            );
+            progressRef1.current = "";
+            if (response.success) rerenderPersonalVolume(response.tree);
+            else alert(response.error.status);
+          }}
+        ></ModalForm>
+      )}
     </>
   );
 }

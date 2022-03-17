@@ -4,6 +4,7 @@
  * 2. browser prepare the files
  * 3. browser call the API to upload files
  * 4. get the response from API
+ *
  */
 
 import { DropEvent, FileRejection, useDropzone } from "react-dropzone";
@@ -22,74 +23,102 @@ import { useState, useEffect, useRef } from "react";
 import React from "react";
 import styles from "../../styles/file_tree.module.css";
 import classNames from "../../lib/classnames";
-import { Dialog, Transition } from "@headlessui/react";
+import ContextMenu, { MenuItem } from "./ContextMenu";
+import _ from "lodash";
 
 export type Props = {
+  /**
+   * this function is for dnd upload files. The div wrappering the tree view is a dropzone. Each button of file is also a dropzone.
+   * `node` is passed as parameter if the upload target is a node. Otherwise, `node`  will be undefined.
+   */
   handleDropzone?: <T extends File>(
     acceptedFiles: T[],
     fileRejections: FileRejection[],
     event: DropEvent,
     node?: NodeModel<CustomData>
   ) => Promise<NodeModel<CustomData>[]>;
+  /**
+   * a custom root id. If this is undefined, rootId is 0.
+   * The root id is the parent of files in the first layer. Therefore, it make sense to set this as the root directory path.
+   */
   rootId?: string | number;
   /**
    * this callback will be called on drop but is called before react dropzone prepare the files. This callback is called before stage 2.
    */
   fastDropCallback?: () => void;
   /**
-   *  will only be called in the target tree if cross-tree moving
+   *  will only be called in the target tree if in-tree moving
    */
   handleMoveWithinTree?: (
     newTreeData: NodeModel<CustomData>[],
     options: DropOptions<CustomData>
   ) => Promise<NodeModel<CustomData>[]>;
-  // by default the tree does not know the existence of another tree, so we need to handle the logic outside the tree
+  /**
+   * by default the tree does not know the existence of another tree, so we need to handle the logic outside the tree
+   */
   handleMoveFromAnotherTree?: (
     treeData: NodeModel<CustomData>[],
     dropTarget: NodeModel<CustomData>
   ) => Promise<NodeModel<CustomData>[]>;
-  handleOpenAll?: () => void;
-  handleCloseAll?: () => void;
-
   /**
-   * the source of files in the tree. This function will be wrapped by a function `getFilesAndReset`.
-   * The function is called on component mount or specific call
+   * The source of files in the tree. This function will be wrapped by a function `getFilesAndRerender`.
+   * The function is called on component mount or specific call.
    */
   getFiles: () => Promise<NodeModel<CustomData>[]>;
-  createFolder?: (
-    node: NodeModel<CustomData>,
-    name: string
-  ) => Promise<NodeModel<CustomData>[]>;
-  duplicate?: (node: NodeModel<CustomData>) => Promise<NodeModel<CustomData>[]>;
-  getInfo?: (node: NodeModel<CustomData>) => Promise<any>;
-  remove?: (node: NodeModel<CustomData>) => Promise<NodeModel<CustomData>[]>;
-  edit?: (
-    node: NodeModel<CustomData>,
-    newName: string
-  ) => Promise<NodeModel<CustomData>[]>;
-  download?: (node: NodeModel<CustomData>) => Promise<void>;
+  /**
+   * call when the node is clicked
+   */
   onClick?: (
     treeData: NodeModel<CustomData>[],
     node: NodeModel<CustomData>
   ) => Promise<void> | Promise<NodeModel<CustomData>[]>;
+  /**
+   * called when a node is started to be dragged
+   */
   onDragStart?: (
     treeData: NodeModel<CustomData>[],
     node: NodeModel<CustomData>
   ) => Promise<void>;
+  /**
+   * called when a node dragging is ended
+   */
   onDragEnd?: (
     treeData: NodeModel<CustomData>[],
     node: NodeModel<CustomData>
   ) => Promise<void>;
-  progressRef: React.MutableRefObject<any>;
+  /**
+   * This is a ref to the progress text
+   */
+  progressRef: React.MutableRefObject<string>;
+  /**
+   * This is just a forward props of the original Tree component.
+   * This callback is used to check whether the a node can drag and drop within tree or cross-tree.
+   */
   canDrop?: (
     tree: NodeModel<CustomData>[],
     options: DropOptions<CustomData>
   ) => boolean | void;
+  /** a dummy text showing on UI when there is no file in the tree */
   nothingText?: string;
-  getNodeActions?: (
-    node: NodeModel<CustomData>
-  ) => { text: string; onClick: () => void }[];
-  rootActions?: { text: string; onClick: () => void }[];
+  /**
+   * given a node, return a list of actions such that can be shown on the context menu
+   */
+  getNodeActions?: (node?: NodeModel<CustomData>) => MenuItem[];
+  /**
+   * a list of actions shown on context menu when right click on root
+   */
+  rootActions?: MenuItem[];
+  /**
+   * this will be called when the context menu is closed
+   */
+  onContextMenuClose?: () => void;
+  /**
+   * buttons like `open all` and `close all` are shown above the tree view.
+   * By default, this is `true`. Hide the buttons by setting `false`.
+   * Hidding the button is useful when the fetching of treeData is done folder-by-folder (for example, the data are from remote storage).
+   * The tree data will never reveal the complete directory tree and therefore operations such as `open all` does not make sense.
+   */
+  showGlobalActionButtons?: boolean;
 };
 
 /**
@@ -117,12 +146,62 @@ const Progress = React.forwardRef((_, ref: any) => {
 });
 
 /**
- * this type is for exporting a ref to the FTree component
+ * this type is for exporting a ref to the FTree component. For example, you can access the `getFilesAndRerender` function by `ref.current.getFilesAndRerender`
  */
 export type MyTreeMethods = TreeMethods & {
-  getFilesAndReset(data?: NodeModel<CustomData>[]): Promise<void>;
+  /**
+   * this function is a reference to the `getFilesAndRerender` function in the `FTree` component, which is a wrapper of the tree's `getFiles` function. When this function is called, the tree is forced to fetch data and render.
+   * If data is provided, no fetching will be done. The tree will rerender directly based on the data supplied.
+   *
+   * @remarks
+   * normally, you don't need to call this function by manually because this function is used internally in the component.
+   * This function is called on `FTree` component mount and after an action that could change the tree data.
+   * One occasion that you might need to access this using ref is that when the context menu actions require getFilesAndRerender.
+   * As the context menu actions are added dynamically, the rerender need to be handled by user.
+   *
+   * @param data
+   */
+  getFilesAndRerender(data?: NodeModel<CustomData>[]): Promise<void>;
 };
 
+/**
+ * the buttons components
+ */
+const ButtonGroups = ({
+  handleOpenAll,
+  handleCloseAll,
+  treeData,
+}: {
+  handleOpenAll?: () => void;
+  handleCloseAll?: () => void;
+  treeData: NodeModel<CustomData>[];
+}) => {
+  return (
+    <>
+      <button
+        disabled={treeData.length == 0}
+        className="bg-gray-500 text-white px-4 h-5 text-xs rounded-md hover:bg-gray-600 mr-5 capitalize"
+        onClick={handleOpenAll}
+      >
+        open all
+      </button>
+      <button
+        disabled={treeData.length == 0}
+        className="bg-gray-500 text-white px-4 h-5 text-xs rounded-md hover:bg-gray-600 mr-5 capitalize"
+        onClick={handleCloseAll}
+      >
+        close all
+      </button>
+    </>
+  );
+};
+
+/**
+ * this is a custom tree view component based on https://github.com/minop1205/react-dnd-treeview
+ *
+ * This component expose a `getFiles` function which is used to get the tree data.
+ * The data should be stored outside the side the component, either client side or server side.
+ */
 const FTree = React.forwardRef(
   (
     {
@@ -132,22 +211,16 @@ const FTree = React.forwardRef(
       handleDropzone,
       handleMoveWithinTree,
       handleMoveFromAnotherTree,
-      handleCloseAll,
-      handleOpenAll,
       getFiles,
-      createFolder,
       onDragStart,
       onDragEnd,
-      duplicate,
-      getInfo,
-      remove,
-      edit,
-      download,
       onClick,
       progressRef,
       nothingText = "Click or drop files to upload",
       getNodeActions,
       rootActions,
+      onContextMenuClose,
+      showGlobalActionButtons = true,
     }: Props,
     ref: React.MutableRefObject<MyTreeMethods>
   ) => {
@@ -164,7 +237,7 @@ const FTree = React.forwardRef(
             fileRejections,
             event
           );
-          await getFilesAndReset(data);
+          await getFilesAndRerender(data);
         }
       },
     });
@@ -176,18 +249,19 @@ const FTree = React.forwardRef(
       setIsComponentVisible: setIsMenuVisible,
     } = useComponentVisible(false);
     const [menuLocation, setMenuLocation] = useState([0, 0]);
-    const [menuItems, setMenuItems] = useState<
-      { text: string; onClick: () => void }[]
-    >([]);
+    const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
 
-    async function getFilesAndReset(data?: NodeModel<CustomData>[]) {
-      console.log("get files");
+    /**
+     *
+     * @param data if `data` is provided,
+     */
+    async function getFilesAndRerender(data?: NodeModel<CustomData>[]) {
       if (!data) {
         data = await getFiles();
       }
       if (data != undefined) {
-        if (JSON.stringify(treeData) === JSON.stringify(data)) {
-          // console.log("data is the same, rerender omitted ")
+        if (_.isEqual(treeData, data)) {
+          console.log("data is the same, rerender omitted ");
         } else {
           // console.log("data is different, rerender...")
           setTreeData(data);
@@ -196,252 +270,190 @@ const FTree = React.forwardRef(
     }
 
     useEffect(() => {
-      getFilesAndReset();
+      getFilesAndRerender();
     }, []);
     useEffect(() => {
       ref.current = {
         ...ref.current,
-        getFilesAndReset,
+        getFilesAndRerender: getFilesAndRerender,
       };
       console.log("rerender");
     });
 
-    const ButtonGroups = () => {
-      return (
-        <>
-          {handleOpenAll ? (
-            <button
-              disabled={treeData.length == 0}
-              className="bg-gray-500 text-white px-4 h-5 text-xs rounded-md hover:bg-gray-600 mr-5 capitalize"
-              onClick={() => {
-                ref.current.openAll();
+    return (
+      <div className={classNames(styles, "wrapper")}>
+        {/* the buttons and progress text */}
+        <div className="flex flex-row items-center ">
+          {showGlobalActionButtons ? (
+            <ButtonGroups
+              handleCloseAll={() => {
+                nodeOpenRef.current = [];
+                ref.current.closeAll();
+              }}
+              handleOpenAll={() => {
                 nodeOpenRef.current = treeData
                   .filter((node) => node.droppable)
                   .map((node) => String(node.id));
+                ref.current.openAll();
               }}
-            >
-              open all
-            </button>
+              treeData={treeData}
+            ></ButtonGroups>
           ) : (
             <div className="h-5 w-0"></div>
           )}
-          {handleCloseAll ? (
-            <button
-              disabled={treeData.length == 0}
-              className="bg-gray-500 text-white px-4 h-5 text-xs rounded-md hover:bg-gray-600 mr-5 capitalize"
-              onClick={() => {
-                ref.current.closeAll();
-                nodeOpenRef.current = [];
-              }}
-            >
-              close all
-            </button>
-          ) : (
-            // a dummy div as padding
-            <div className="h-5 w-0"></div>
-          )}
-        </>
-      );
-    };
-
-    return (
-      <div
-        className={classNames(styles, "wrapper")}
-        onContextMenu={(event: React.MouseEvent) => {
-          event.preventDefault();
-          event.stopPropagation();
-          setIsMenuVisible(true);
-          setMenuLocation([event.clientX, event.clientY]);
-          setMenuItems(rootActions);
-        }}
-      >
-        <div className="flex flex-row items-center ">
-          <ButtonGroups></ButtonGroups>
           <Progress ref={progressRef} />
         </div>
-        <div className="h-full " onDrop={fastDropCallback}>
-          <div
-            {...getRootProps()}
-            className="h-full  min-h-[300px] max-h-[80vh] relative"
-          >
-            <input
-              type="file"
-              multiple
-              // directory=""
-              // webkitdirectory=""
-              {...getInputProps()}
-            />
+        {/* the tree */}
+        <div
+          {...getRootProps()}
+          className="h-full  min-h-[300px] max-h-[80vh] relative"
+          onDrop={fastDropCallback}
+          onContextMenu={(event: React.MouseEvent) => {
+            event.preventDefault();
+            event.stopPropagation();
+            if (rootActions) {
+              setIsMenuVisible(true);
+              setMenuLocation([event.clientX, event.clientY]);
+              setMenuItems(rootActions);
+            }
+          }}
+        >
+          <input
+            type="file"
+            multiple
+            // directory=""
+            // webkitdirectory=""
+            {...getInputProps()}
+          />
 
-            <Tree
-              ref={ref}
-              tree={treeData}
-              rootId={rootId ?? 0}
-              onDrop={async (
-                newTreeData: NodeModel<CustomData>[],
-                {
-                  dragSourceId,
-                  dropTargetId,
-                  dragSource,
-                  dropTarget,
-                }: DropOptions<CustomData>
-              ) => {
-                // if the target parent is the same as old parent , just refresh the UI
-                if (dragSource == undefined) {
-                  // from another tree
-                  const data = await handleMoveFromAnotherTree(
-                    newTreeData,
-                    dropTarget
-                  );
-                  await getFilesAndReset(data);
-                  return;
-                }
-                if (dragSource.id == dropTarget?.id) {
-                  // do nothing
-                  // setTreeData(newTreeData)
-                  return;
-                }
-                const data = await handleMoveWithinTree(newTreeData, {
-                  dragSourceId,
-                  dropTargetId,
-                  dragSource,
-                  dropTarget,
-                });
-                await getFilesAndReset(data);
-              }}
-              initialOpen={false}
-              canDrop={canDrop}
-              onChangeOpen={(newOpenIds) => {}}
-              render={(
-                node,
-                { depth, isOpen, onToggle, hasChild, draggable }
-              ) => {
-                return (
-                  <CustomNode
-                    node={node as NodeModel<CustomData>}
-                    depth={depth}
-                    // ui isopen
-                    isOpen={isOpen}
-                    handleDrop={handleDropzone}
-                    onToggle={async (node) => {
-                      const { id } = node;
-                      lastActiveNodeRef.current = id as string;
-                      if (nodeOpenRef.current == undefined) {
-                        nodeOpenRef.current = [];
-                      }
-                      // console.log("past: ", nodeOpenRef.current, "toggle : ", nodeRef.current)
-                      const contain = nodeOpenRef.current.includes(
-                        id as string
-                      );
-                      if (contain) {
-                        nodeOpenRef.current = nodeOpenRef.current.filter(
-                          (i) => i != id
-                        );
-                        ref.current.close([id]);
-                      } else {
-                        nodeOpenRef.current.push(id as string);
-                        ref.current.open(nodeOpenRef.current);
-                      }
-                    }}
-                    download={download}
-                    onClick={
-                      onClick &&
-                      ((node) => {
-                        return onClick(treeData, node);
-                      })
+          <Tree
+            ref={ref}
+            tree={treeData}
+            rootId={rootId ?? 0}
+            onDrop={async (
+              newTreeData: NodeModel<CustomData>[],
+              {
+                dragSourceId,
+                dropTargetId,
+                dragSource,
+                dropTarget,
+              }: DropOptions<CustomData>
+            ) => {
+              // if the target parent is the same as old parent , just refresh the UI
+              if (dragSource == undefined) {
+                // from another tree
+                const data = await handleMoveFromAnotherTree(
+                  newTreeData,
+                  dropTarget
+                );
+                await getFilesAndRerender(data);
+                return;
+              }
+              if (dragSource.id == dropTarget?.id) {
+                // do nothing
+                // setTreeData(newTreeData)
+                return;
+              }
+              const data = await handleMoveWithinTree(newTreeData, {
+                dragSourceId,
+                dropTargetId,
+                dragSource,
+                dropTarget,
+              });
+              await getFilesAndRerender(data);
+            }}
+            initialOpen={false}
+            canDrop={canDrop}
+            onChangeOpen={(newOpenIds) => {
+              // this function is called internally in the tree component when node expand or collapse.
+            }}
+            render={(node, params) => {
+              const { depth, isOpen, hasChild, draggable } = params;
+              return (
+                <CustomNode
+                  node={node}
+                  depth={depth}
+                  // ui isopen
+                  isOpen={isOpen}
+                  handleDrop={async (acceptedFiles, fileRejections, event) => {
+                    const data = await handleDropzone(
+                      acceptedFiles,
+                      fileRejections,
+                      event,
+                      node
+                    );
+                    await getFilesAndRerender(data);
+                  }}
+                  onToggle={async () => {
+                    // we don't use the internal onToggle function because seems to have bugs.
+                    const { id } = node;
+                    lastActiveNodeRef.current = id as string;
+                    if (nodeOpenRef.current == undefined) {
+                      nodeOpenRef.current = [];
                     }
-                    onContextMenu={async (node, event) => {
+                    const contain = nodeOpenRef.current.includes(id as string);
+                    if (contain) {
+                      nodeOpenRef.current = nodeOpenRef.current.filter(
+                        (i) => i != id
+                      );
+                      ref.current.close([id]);
+                    } else {
+                      nodeOpenRef.current.push(id as string);
+                      ref.current.open(nodeOpenRef.current);
+                    }
+                    await getFilesAndRerender();
+                  }}
+                  onClick={() => {
+                    if (onClick) onClick(treeData, node);
+                  }}
+                  onContextMenu={(event) => {
+                    if (getNodeActions) {
                       setIsMenuVisible(true);
                       setMenuLocation([event.clientX, event.clientY]);
                       setMenuItems(getNodeActions(node));
-                    }}
-                    onDragStart={
-                      onDragStart &&
-                      ((node) => {
-                        return onDragStart(treeData, node);
-                      })
                     }
-                    onDragEnd={
-                      onDragEnd &&
-                      ((node) => {
-                        return onDragEnd(treeData, node);
-                      })
-                    }
-                    getFilesAndReset={getFilesAndReset}
-                    createFolder={createFolder}
-                    duplicate={duplicate}
-                    edit={edit}
-                    remove={remove}
-                    getInfo={getInfo}
-                  />
-                );
-              }}
-              classes={{
-                root: classNames(
-                  styles,
-                  "root",
-                  treeData.length == 0 ? "root-nothing" : ""
-                ),
-                draggingSource: "opacity-30 ",
-                dropTarget: "bg-blue-200/50 dark:bg-white/10",
-                listItem: "",
-              }}
-              dragPreviewRender={(
-                monitorProps: DragLayerMonitorProps<CustomData>
-              ) => <CustomDragPreview monitorProps={monitorProps} />}
-              sort={(a, b) => {
-                return a.text.localeCompare(b.text);
-              }}
-              placeholderRender={(node, { depth }) => (
-                <Placeholder node={node} depth={depth} />
-              )}
-            ></Tree>
-            {treeData.length == 0 && (
-              <p className={classNames(styles, "root-nothing-text")}>
-                {nothingText}
-              </p>
+                  }}
+                  onDragStart={() => onDragStart(treeData, node)}
+                  onDragEnd={() => onDragEnd(treeData, node)}
+                />
+              );
+            }}
+            classes={{
+              root: classNames(
+                styles,
+                "root",
+                treeData.length == 0 ? "root-nothing" : ""
+              ),
+              draggingSource: "opacity-30 ",
+              dropTarget: "bg-blue-200/50 dark:bg-white/10",
+              listItem: "",
+            }}
+            dragPreviewRender={(
+              monitorProps: DragLayerMonitorProps<CustomData>
+            ) => <CustomDragPreview monitorProps={monitorProps} />}
+            sort={(a, b) => {
+              return a.text.localeCompare(b.text);
+            }}
+            placeholderRender={(node, { depth }) => (
+              <Placeholder node={node} depth={depth} />
             )}
-          </div>
+          ></Tree>
+          {treeData.length == 0 && (
+            <p className={classNames(styles, "root-nothing-text")}>
+              {nothingText}
+            </p>
+          )}
         </div>
-        <Transition
-          show={isMenuVisible}
-          enter="transition-opacity duration-75"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="transition-opacity duration-150"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
-          <Dialog
+        {menuItems && menuItems.length != 0 && (
+          <ContextMenu
             ref={menuRef}
-            onClose={() => {
-              setIsMenuVisible(false);
-            }}
-            style={{
-              left: menuLocation[0] + "px",
-              top: menuLocation[1] + "px",
-            }}
-            className="z-10 shadow-lg rounded-md left-[100%] absolute bg-white p-2 dark:bg-gray-700 text-gray-600 dark:text-gray-200 w-fit"
-          >
-            <div className="flex flex-col">
-              {menuItems
-                .sort((a, b) => a.text.localeCompare(b.text))
-                .map((i) => {
-                  return (
-                    <button
-                      key={i.text}
-                      onClick={() => {
-                        setIsMenuVisible(false);
-                        i.onClick();
-                      }}
-                      className="hover:bg-gray-200 dark:hover:bg-gray-500 rounded  px-2 text-left whitespace-nowrap capitalize"
-                    >
-                      {i.text}
-                    </button>
-                  );
-                })}
-            </div>
-          </Dialog>
-        </Transition>
+            isMenuVisible={isMenuVisible}
+            setIsMenuVisible={setIsMenuVisible}
+            menuItems={menuItems}
+            menuLocation={menuLocation}
+            onClose={onContextMenuClose}
+          />
+        )}
       </div>
     );
   }

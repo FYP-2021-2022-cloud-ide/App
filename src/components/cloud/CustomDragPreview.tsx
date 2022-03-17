@@ -11,11 +11,11 @@ export const CustomDragPreview: React.FC<Props> = ({ monitorProps }: Props) => {
   const item = monitorProps.item;
 
   return (
-    <div className="flex flex-row space-x-2 bg-slate-500 rounded-lg p-2 items-center w-fit">
+    <div className="flex flex-row  bg-slate-500 rounded-lg py-1 px-2 items-center w-fit">
       <div className="">
         <TypeIcon
           droppable={item.droppable as boolean}
-          fileType={item?.data?.fileType}
+          fileName={item.data.fileName}
           className={"w-4 h-4 text-white"}
         />
       </div>

@@ -11,7 +11,7 @@ export type Data = { [id: string]: any };
 export type ValidationOutput = { ok: false; message: string } | { ok: true };
 
 export type Entry = {
-  text?: string;
+  label?: string;
   description?: string;
   tooltip?: string;
   conditional?: (data: Data) => boolean; // return a boolean which determine whether it is shown
@@ -45,7 +45,6 @@ export type Entry = {
 
 // the key of a form structure will be the title
 export type Section = {
-  children?: React.ReactNode; // support drop in react elements
   displayTitle?: boolean;
   conditional?: (data: Data) => boolean;
   entries: { [id: string]: Entry };
@@ -86,8 +85,8 @@ const Entry = ({
     return (
       <div className="" style={{ zIndex: zIndex }} id={id}>
         <div className="flex flex-row space-x-2  items-center">
-          {entry.text && (
-            <p className="modal-form-text-base capitalize">{entry.text}</p>
+          {entry.label && (
+            <p className="modal-form-text-base capitalize">{entry.label}</p>
           )}
           {entry.tooltip && (
             <div
@@ -119,8 +118,8 @@ const Entry = ({
     return (
       <div style={{ zIndex: zIndex }} id={id}>
         <div className="flex flex-row space-x-2  items-center">
-          {entry.text && (
-            <p className="modal-form-text-base capitalize">{entry.text}</p>
+          {entry.label && (
+            <p className="modal-form-text-base capitalize">{entry.label}</p>
           )}
           {entry.tooltip && (
             <div
@@ -149,8 +148,8 @@ const Entry = ({
     return (
       <div className="modal-form-list-box" style={{ zIndex: zIndex }} id={id}>
         <div className="flex flex-row space-x-2 items-center">
-          {entry.text && (
-            <p className="modal-form-text-base capitalize">{entry.text}</p>
+          {entry.label && (
+            <p className="modal-form-text-base capitalize">{entry.label}</p>
           )}
           {entry.tooltip && (
             <div
@@ -173,8 +172,8 @@ const Entry = ({
   } else if (entry.type == "toggle") {
     return (
       <div className="modal-form-toggle" style={{ zIndex: zIndex }} id={id}>
-        {entry.text && (
-          <p className="modal-form-text-base capitalize">{entry.text}</p>
+        {entry.label && (
+          <p className="modal-form-text-base capitalize">{entry.label}</p>
         )}
         {entry.tooltip && (
           <div
@@ -185,7 +184,7 @@ const Entry = ({
           </div>
         )}
         <Toggle
-          text={entry.text}
+          text={entry.label}
           onChange={(newValue) =>
             onChange(Object.assign(data, { [id]: newValue }), id)
           }
@@ -197,8 +196,8 @@ const Entry = ({
     return (
       <div style={{ zIndex: zIndex }} id={id}>
         <div className="flex flex-row space-x-2 items-center">
-          {entry.text && (
-            <p className="modal-form-text-base capitalize">{entry.text}</p>
+          {entry.label && (
+            <p className="modal-form-text-base capitalize">{entry.label}</p>
           )}
           {entry.tooltip && (
             <div
@@ -322,6 +321,7 @@ const Input = ({
 
 const fromStructureToData = (structure: FormStructure): Data => {
   let data: Data = {};
+  if (!structure) return data;
   Object.keys(structure).forEach((title) => {
     Object.keys(structure[title].entries).forEach((entry) => {
       const type = structure[title].entries[entry].type;
@@ -339,30 +339,35 @@ const fromStructureToData = (structure: FormStructure): Data => {
   return data;
 };
 
-const ModalForm = ({
-  isOpen,
-  setOpen,
-  onClose,
-  onOpen,
-  clickOutsideToClose,
-  formStructure,
-  onEnter,
-  title,
-  size = "sm",
-  onChange,
-}: Props) => {
+/**
+ * A component to show a form in modal. Use this component to keep consistency in the app.
+ * To use this, put the <ModalForm> in a component and supply a form structure.
+ */
+const ModalForm = (props: Props) => {
+  const {
+    isOpen,
+    setOpen,
+    onClose,
+    onOpen,
+    clickOutsideToClose,
+    formStructure,
+    onEnter,
+    title,
+    size = "sm",
+    onChange,
+  } = props;
   let ref = createRef<HTMLDivElement>();
   let okBtnRef = createRef<HTMLButtonElement>();
   const [data, setData] = useState<Data>(fromStructureToData(formStructure));
+  useEffect(() => {
+    setData(fromStructureToData(formStructure));
+  }, [formStructure]);
+
   const sizeMap = {
     sm: "w-[550px]",
     md: "w-[850px]",
     lg: "w-[1100px]",
   };
-
-  useEffect(() => {
-    setData(fromStructureToData(formStructure));
-  }, [formStructure]);
 
   const patchedOnClose = (isEnter: boolean = false) => {
     if (onClose) {
@@ -382,6 +387,8 @@ const ModalForm = ({
     );
   };
   // size = "lg";
+
+  if (!formStructure) return <></>;
 
   return (
     <Modal
