@@ -2,6 +2,7 @@ import React from "react";
 import { DragLayerMonitorProps } from "@minoru/react-dnd-treeview";
 import { CustomData } from "./CustomNode";
 import { TypeIcon } from "./TypeIcon";
+import path from "path";
 
 type Props = {
   monitorProps: DragLayerMonitorProps<CustomData>;
@@ -15,7 +16,7 @@ export const CustomDragPreview: React.FC<Props> = ({ monitorProps }: Props) => {
       <div className="">
         <TypeIcon
           droppable={item.droppable as boolean}
-          fileName={item.data.fileName}
+          fileName={path.basename(item.data.filePath)}
           className={"w-4 h-4 text-white"}
         />
       </div>

@@ -5,7 +5,7 @@ importScripts('https://www.gstatic.com/firebasejs/7.24.0/firebase-messaging.js')
 // import localforage from 'localforage'
 
 
-if (!firebase.apps.length) {
+if (!firebase.apps.length && firebase.messaging.isSupported()) {
   firebase.initializeApp({
     apiKey: "AIzaSyBeaQh0WK8j7SF_1vjkm7JFR4a9zXUBWho",
     projectId: "cnails-524ee",

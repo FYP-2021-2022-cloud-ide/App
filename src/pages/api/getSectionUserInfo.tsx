@@ -27,9 +27,9 @@ export default async function handler(
         res.json({
             success : GoLangResponse.getSuccess(),
             error:{
-                status: GoLangResponse.getError().getStatus(),
-                error: GoLangResponse.getError().getError(),
-            } ,
+                status: GoLangResponse.getError()?.getStatus(),
+                error: GoLangResponse.getError()?.getError(),
+              } ,
             sectionUserID : GoLangResponse.getSectionuserid(),
             courseName: GoLangResponse.getCoursename(),
             role:GoLangResponse.getRole() as SectionRole,

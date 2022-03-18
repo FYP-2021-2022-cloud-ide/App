@@ -19,7 +19,7 @@ import CustomNode, { CustomData } from "./CustomNode";
 import useComponentVisible from "./useComponentVisible";
 import { CustomDragPreview } from "./CustomDragPreview";
 import { Placeholder } from "./placeholder";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import React from "react";
 import styles from "../../styles/file_tree.module.css";
 import classNames from "../../lib/classnames";
@@ -47,14 +47,27 @@ export type Props = {
    */
   fastDropCallback?: () => void;
   /**
-   *  will only be called in the target tree if in-tree moving
+   *  will only be called in the target tree if in-tree moving. Return the new tree data such that the tree will rerender base on this data.
+   *
+   * @param treeData the treeData that suppose to be after this move
+   * @param options Note that `dropTarget` is `undefined` if the the target is root. Else it is the id of the target node.
+   * @returns the new tree
    */
   handleMoveWithinTree?: (
-    newTreeData: NodeModel<CustomData>[],
+    treeData: NodeModel<CustomData>[],
     options: DropOptions<CustomData>
   ) => Promise<NodeModel<CustomData>[]>;
   /**
-   * by default the tree does not know the existence of another tree, so we need to handle the logic outside the tree
+   * by default each tree does not know the existence of another tree, so we need to handle the logic outside the tree.
+   * Return the new tree data suhch that the tree will rerender base on this data.
+   *
+   * @param treeData
+   * @param dropTarget target is `undefined` if moving to root. Else target is the id of the target node. Therefore in your dnd, you need to handle 3 cases:
+   *
+   * 1. `dropTarget` is `undefined`
+   * 2. `dropTarget` is the a directory
+   * 3. `dropTarget` is a file
+   * @returns the new tree
    */
   handleMoveFromAnotherTree?: (
     treeData: NodeModel<CustomData>[],
@@ -64,14 +77,18 @@ export type Props = {
    * The source of files in the tree. This function will be wrapped by a function `getFilesAndRerender`.
    * The function is called on component mount or specific call.
    */
-  getFiles: () => Promise<NodeModel<CustomData>[]>;
+  getFiles: () => NodeModel<CustomData>[] | Promise<NodeModel<CustomData>[]>;
+  /**
+   * this is called when the directory is toggled
+   */
+  onToggle?: (node: NodeModel<CustomData>) => void | Promise<void>;
   /**
    * call when the node is clicked
    */
   onClick?: (
     treeData: NodeModel<CustomData>[],
     node: NodeModel<CustomData>
-  ) => Promise<void> | Promise<NodeModel<CustomData>[]>;
+  ) => void;
   /**
    * called when a node is started to be dragged
    */
@@ -162,6 +179,7 @@ export type MyTreeMethods = TreeMethods & {
    * @param data
    */
   getFilesAndRerender(data?: NodeModel<CustomData>[]): Promise<void>;
+  rootId: string | number;
 };
 
 /**
@@ -201,6 +219,13 @@ const ButtonGroups = ({
  *
  * This component expose a `getFiles` function which is used to get the tree data.
  * The data should be stored outside the side the component, either client side or server side.
+ * This component will get files from source and rerender in the following times:
+ *
+ * 1. component mount
+ * 2. an actions that could change the tree. For example, upload files, moving of nodes.
+ *
+ * @remarks
+ * The tree will not rerender on a custom action even when it could possibly change the tree. The rerender will to be triggered manually by calling `ref.current.getFilesAndRerender` .
  */
 const FTree = React.forwardRef(
   (
@@ -214,6 +239,7 @@ const FTree = React.forwardRef(
       getFiles,
       onDragStart,
       onDragEnd,
+      onToggle,
       onClick,
       progressRef,
       nothingText = "Click or drop files to upload",
@@ -241,6 +267,10 @@ const FTree = React.forwardRef(
         }
       },
     });
+    const patchGetRootProps = () => {
+      return handleDropzone ? getRootProps() : {};
+    };
+
     const lastActiveNodeRef = useRef<string>();
     const nodeOpenRef = useRef<string[]>();
     const {
@@ -251,17 +281,13 @@ const FTree = React.forwardRef(
     const [menuLocation, setMenuLocation] = useState([0, 0]);
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
 
-    /**
-     *
-     * @param data if `data` is provided,
-     */
     async function getFilesAndRerender(data?: NodeModel<CustomData>[]) {
       if (!data) {
         data = await getFiles();
       }
       if (data != undefined) {
         if (_.isEqual(treeData, data)) {
-          console.log("data is the same, rerender omitted ");
+          // console.log("data is the same, rerender omitted ");
         } else {
           // console.log("data is different, rerender...")
           setTreeData(data);
@@ -269,16 +295,17 @@ const FTree = React.forwardRef(
       } else console.error("Tree data is undefined");
     }
 
+    const temp = useCallback((...args) => {
+      ref.current = Object.assign(ref.current ? ref.current : {}, {
+        ...args[0],
+        getFilesAndRerender: getFilesAndRerender,
+        rootId: rootId ?? 0,
+      });
+    }, []);
+
     useEffect(() => {
       getFilesAndRerender();
     }, []);
-    useEffect(() => {
-      ref.current = {
-        ...ref.current,
-        getFilesAndRerender: getFilesAndRerender,
-      };
-      console.log("rerender");
-    });
 
     return (
       <div className={classNames(styles, "wrapper")}>
@@ -305,7 +332,7 @@ const FTree = React.forwardRef(
         </div>
         {/* the tree */}
         <div
-          {...getRootProps()}
+          {...patchGetRootProps()}
           className="h-full  min-h-[300px] max-h-[80vh] relative"
           onDrop={fastDropCallback}
           onContextMenu={(event: React.MouseEvent) => {
@@ -318,20 +345,24 @@ const FTree = React.forwardRef(
             }
           }}
         >
-          <input
-            type="file"
-            multiple
-            // directory=""
-            // webkitdirectory=""
-            {...getInputProps()}
-          />
+          {handleDropzone ? (
+            <input
+              type="file"
+              multiple
+              // directory=""
+              // webkitdirectory=""
+              {...getInputProps()}
+            />
+          ) : (
+            <></>
+          )}
 
           <Tree
-            ref={ref}
+            ref={temp}
             tree={treeData}
             rootId={rootId ?? 0}
             onDrop={async (
-              newTreeData: NodeModel<CustomData>[],
+              tree: NodeModel<CustomData>[],
               {
                 dragSourceId,
                 dropTargetId,
@@ -339,22 +370,17 @@ const FTree = React.forwardRef(
                 dropTarget,
               }: DropOptions<CustomData>
             ) => {
-              // if the target parent is the same as old parent , just refresh the UI
               if (dragSource == undefined) {
                 // from another tree
-                const data = await handleMoveFromAnotherTree(
-                  newTreeData,
-                  dropTarget
-                );
+                const data = await handleMoveFromAnotherTree(tree, dropTarget);
                 await getFilesAndRerender(data);
                 return;
               }
               if (dragSource.id == dropTarget?.id) {
-                // do nothing
-                // setTreeData(newTreeData)
+                // if the target parent is the same as old parent , there is no moving of files, so just refresh the UI
                 return;
               }
-              const data = await handleMoveWithinTree(newTreeData, {
+              const data = await handleMoveWithinTree(tree, {
                 dragSourceId,
                 dropTargetId,
                 dragSource,
@@ -368,22 +394,26 @@ const FTree = React.forwardRef(
               // this function is called internally in the tree component when node expand or collapse.
             }}
             render={(node, params) => {
-              const { depth, isOpen, hasChild, draggable } = params;
+              const { depth, isOpen } = params;
               return (
                 <CustomNode
                   node={node}
                   depth={depth}
                   // ui isopen
                   isOpen={isOpen}
-                  handleDrop={async (acceptedFiles, fileRejections, event) => {
-                    const data = await handleDropzone(
-                      acceptedFiles,
-                      fileRejections,
-                      event,
-                      node
-                    );
-                    await getFilesAndRerender(data);
-                  }}
+                  handleDrop={
+                    handleDropzone
+                      ? async (acceptedFiles, fileRejections, event) => {
+                          const data = await handleDropzone(
+                            acceptedFiles,
+                            fileRejections,
+                            event,
+                            node
+                          );
+                          await getFilesAndRerender(data);
+                        }
+                      : undefined
+                  }
                   onToggle={async () => {
                     // we don't use the internal onToggle function because seems to have bugs.
                     const { id } = node;
@@ -401,7 +431,9 @@ const FTree = React.forwardRef(
                       nodeOpenRef.current.push(id as string);
                       ref.current.open(nodeOpenRef.current);
                     }
-                    await getFilesAndRerender();
+                    if (onToggle) {
+                      await onToggle(node);
+                    }
                   }}
                   onClick={() => {
                     if (onClick) onClick(treeData, node);

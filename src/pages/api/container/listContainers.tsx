@@ -5,8 +5,6 @@ import {grpcClient}from '../../../lib/grpcClient'
 import {  ListContainerReply,  SubRequest } from '../../../proto/dockerGet/dockerGet_pb';
 import { ContainerListResponse,nodeError } from "../../../lib/api/api";
 
-
-
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<ContainerListResponse>
@@ -17,17 +15,19 @@ export default function handler(
     var docReq = new SubRequest();
     docReq.setSessionKey(fetchAppSession(req));
     docReq.setSub(sub as string);
-    
+    console.log(sub)
     try{
       client.listContainers(docReq, function(err, GoLangResponse: ListContainerReply) {
+       
+        console.log(GoLangResponse.getError()==undefined)
         var containersInfo =GoLangResponse.getContainerinfo();
         var containers = GoLangResponse.getContainersList();
         var tempContainers = GoLangResponse.getTempcontainersList();
         res.json({ 
           success : GoLangResponse.getSuccess(),
           error:{
-              status: GoLangResponse.getError().getStatus(),
-              error: GoLangResponse.getError().getError(),
+              status:GoLangResponse.getError()?.getStatus(),
+              error: GoLangResponse.getError()?.getError(),
           } ,
           containersInfo: {
               containersAlive: containersInfo?.getContainersalive(),

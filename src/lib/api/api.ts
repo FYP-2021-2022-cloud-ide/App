@@ -9,64 +9,57 @@ export type {
   SectionUserInfoResponse,
   SectionRole,
   CourseListResponse,
-  
   Environment,
   EnvironmentListResponse,
   EnvironmentAddResponse,
-
   Template,
   TemplateListResponse,
   TemplateAddResponse,
   TemplateGetStudentWorkspaceResponse,
-
   Container,
   ContainerListResponse,
   ContainerAddResponse,
-
   SandboxAddResponse,
   SandboxImageAddResponse,
   SandboxImageListResponse,
-
   NotificationListResponse,
   NotificationSendResponse,
   NotificationTokenResponse,
-
   GoogleOAuthReponse,
   GoogleDriveListResponse,
   LocalFilesDownloadToUserResponse,
   LocalFilesListResponse,
   FetchCookieResponse,
   GetUserDataResponse,
-  
+  Error,
 };
 type SectionRole = "instructor" | "student";
 type SuccessStringResponse = {
   success: boolean;
   error: Error;
 };
-const emptyError:Error={
-  status: "",
-  error: "",
-  
-}
-
-const nodeError=(err):Error=>{
-  return {
-      status: "TODO",
-      error: err.error,
-  } 
-}
-export {nodeError,emptyError}
-
 
 type Error = {
   status: string;
   error: string;
 };
+
+export const emptyError: Error = {
+  status: "",
+  error: "",
+};
+
+export const nodeError = (err): Error => {
+  return {
+    status: "TODO",
+    error: err.error,
+  };
+};
+
 type SectionUserInfoResponse =
   | {
       success: true;
-      error: Error
+      error: Error;
       courseName: string;
       // role: "instructor" | "student";
       role: SectionRole;
@@ -113,7 +106,7 @@ type Template = {
   name: string;
   description: string;
   imageId: string;
-  environment_id:string
+  environment_id: string;
   assignment_config_id: string;
   storage: string;
   containerID: string;
@@ -147,25 +140,25 @@ type TemplateAddResponse =
 
 type StudentWorkspace = {
   // status: "NOT_STARTED_BEFORE" | "ON" | "OFF";
-  status:string;
+  status: string;
   workspaceId: string;
   student: {
     name: string;
     sub: string;
-    userId:string;
+    userId: string;
   };
 };
 
 type TemplateGetStudentWorkspaceResponse =
-| {
-    success: true;
-    error: Error;
-    studentWorkspaces: StudentWorkspace[];
-  }
-| {
-    success: false;
-    error: Error;
-};
+  | {
+      success: true;
+      error: Error;
+      studentWorkspaces: StudentWorkspace[];
+    }
+  | {
+      success: false;
+      error: Error;
+    };
 
 type ContainerInfo = {
   containersAlive: number | undefined;
@@ -304,13 +297,12 @@ type GoogleOAuthReponse =
   | {
       success: true;
       error: Error;
-      authURL:string;
+      authURL: string;
     }
   | {
       success: false;
       error: Error;
     };
-
 
 type GoogleDriveListResponse =
   | {
@@ -351,16 +343,21 @@ type LocalFilesListResponse =
       error: Error;
     };
 
-type FetchCookieResponse = {
-  sub: string;
-  name: string;
-  email: string;
-  userId: string;
-  semesterId: string;
-  darkMode: string;
-  bio: string;
-  role: string;
-};
+type FetchCookieResponse =
+  | {
+      success: true;
+      cookies: {
+        sub: string;
+        name: string;
+        email: string;
+        userId: string;
+        semesterId: string;
+        darkMode: string;
+        bio: string;
+        role: string;
+      };
+    }
+  | { success: false; error: Error };
 type GetUserDataResponse =
   | {
       success: true;

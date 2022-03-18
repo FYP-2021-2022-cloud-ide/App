@@ -6,9 +6,14 @@ import { DropEvent, FileRejection, useDropzone } from "react-dropzone";
 import path from "path";
 
 export type CustomData = {
-  fileType?: string;
+  /**
+   * whether this is a file or directory
+   */
+  fileType?: "file" | "directory";
   fileSize?: string;
-  fileName?: string;
+  /**
+   * the full path of the file
+   */
   filePath?: string;
 };
 
@@ -85,11 +90,12 @@ const CustomNode: React.FC<Props> = ({
       }
     },
   });
+  const patchGetRootProps = () => {
+    return handleDrop ? getRootProps() : {};
+  };
 
   const handleToggle = async (event: React.MouseEvent) => {
-    console.log("arrow is click , handle toggle");
     event.stopPropagation();
-    // nodeOpenRef.current[node.id] = !nodeOpenRef.current[node.id]
     onToggle();
     onClick(event);
   };
@@ -124,7 +130,7 @@ const CustomNode: React.FC<Props> = ({
   return (
     <>
       <button
-        {...getRootProps()}
+        {...patchGetRootProps()}
         onClick={onClick}
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
@@ -139,7 +145,7 @@ const CustomNode: React.FC<Props> = ({
         }}
         draggable
       >
-        <input {...getInputProps()} />
+        {handleDrop ? <input {...getInputProps()} /> : <></>}
         <Leading depth={depth} droppable={node.droppable}></Leading>
         <FolderArrow
           open={isOpen}
@@ -148,10 +154,9 @@ const CustomNode: React.FC<Props> = ({
         ></FolderArrow>
         <TypeIcon
           className={`w-6 h-6 text-gray-600 `}
-          fileName={data?.fileName}
           droppable={droppable}
+          fileName={node.text}
           isOpen={isOpen}
-          extension={path.extname(data?.fileName as string)}
         />
 
         <p className="truncate w-full text-left">{node.text}</p>

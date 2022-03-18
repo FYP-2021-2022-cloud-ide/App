@@ -304,7 +304,18 @@ const MessageTable = () => {
         clickOutsideToClose
         size="sm"
         formStructure={getMessageReplyFormStructure(replyTarget)}
-        onEnter={(data) => {
+        onEnter={async(data)  => {
+          console.log(data)
+          const response = await sendNotification(
+            "Replytest",//the title can change? or use "RE: <message title>
+            data.message,
+            userId,
+            userId,//should pass the userid of the people to reply to
+            true
+          );
+          if (response.success) {
+            fetchNotifications(userId);
+          }
           setReplyFormOpen(false);
         }}
         onClose={() => {

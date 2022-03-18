@@ -8,7 +8,7 @@ import myToast from "../components/CustomToast";
 const registry = process.env.NEXT_PUBLIC_REGISTRY;
 // console.log(registry)
 const rootImage = `${registry}/codeserver:latest`;
-const CPU = 1;
+const CPU = 0.5;
 const memory = 800;
 const envChoices = [
   { value: "C++/C", id: `${registry}/cpp:latest` },
@@ -54,7 +54,7 @@ export const getCreateEnvironmentFormStructure = (
         is_predefined: {
           type: "toggle",
           defaultValue: true,
-          text: "Use predefined environment? ",
+          label: "Use predefined environment? ",
           description: "whether this environment is a predefined environment",
           tooltip:
             "If you are not using a custom environment, you will be prompt to a temporary workspace where you can set up the environment.",
@@ -62,7 +62,7 @@ export const getCreateEnvironmentFormStructure = (
         environment_choice: {
           type: "listbox",
           defaultValue: envChoices[0],
-          text: "Pick the Programming Language",
+          label: "Pick the Programming Language",
           options: envChoices,
           conditional: (data) => {
             return data.is_predefined as boolean;
@@ -71,7 +71,7 @@ export const getCreateEnvironmentFormStructure = (
         name: {
           type: "input",
           defaultValue: "",
-          text: "Name",
+          label: "Name",
           placeholder: `e.g. ${validName}`,
           emptyValue: validName,
           validate: (data) => {
@@ -83,7 +83,7 @@ export const getCreateEnvironmentFormStructure = (
         description: {
           type: "textarea",
           defaultValue: "",
-          text: "Description",
+          label: "Description",
         },
       },
     },
@@ -110,7 +110,7 @@ export const getUpdateEnvironmentFormStructure = (
         update_internal: {
           type: "custom",
           defaultValue: "",
-          text: "Update internal",
+          label: "Update internal",
           tooltip: "Open a temp workspace for you to update the environment.",
           node: (onChange, currentValue) => {
             const { addTempContainer } = containerAPI;
@@ -169,7 +169,7 @@ export const getUpdateEnvironmentFormStructure = (
         name: {
           type: "input",
           defaultValue: targetEnvironment.name,
-          text: "Name",
+          label: "Name",
           placeholder: `e.g. ${validName}`,
           emptyValue: validName,
           validate: (data) => {
@@ -186,7 +186,7 @@ export const getUpdateEnvironmentFormStructure = (
         description: {
           type: "textarea",
           defaultValue: targetEnvironment.description,
-          text: "Description",
+          label: "Description",
         },
       },
     },
@@ -211,7 +211,7 @@ export const getCreateTemplateFormStructure = (
     create_template: {
       entries: {
         environment: {
-          text: "Environment",
+          label: "Environment",
           type: "listbox",
           options: envOptions,
           defaultValue: envOptions[0],
@@ -219,7 +219,7 @@ export const getCreateTemplateFormStructure = (
         name: {
           type: "input",
           defaultValue: "",
-          text: "Name (Optional)",
+          label: "Name (Optional)",
           placeholder: `e.g. ${validName}`,
           emptyValue: validName,
           validate: (data) => {
@@ -232,12 +232,12 @@ export const getCreateTemplateFormStructure = (
           type: "textarea",
           placeholder: `e.g. ${validName} is about ...`,
           defaultValue: "",
-          text: "Description (Optional)",
+          label: "Description (Optional)",
         },
         allow_notification: {
           type: "toggle",
           defaultValue: false,
-          text: "Can students send question to You? ",
+          label: "Can students send question to You? ",
           description: "Can students send question to You?",
           tooltip:
             "Student can send comment to you by highlighting the code, useful for real-time interaction in tutorials and laboraries.",
@@ -245,14 +245,14 @@ export const getCreateTemplateFormStructure = (
         is_exam: {
           type: "toggle",
           defaultValue: false,
-          text: "Exam mode",
+          label: "Exam mode",
           tooltip:
             "You can restrict the time span of the container if the template is for an exam.",
         },
         time_limit: {
           type: "input",
           defaultValue: "60",
-          text: "Time Limit(in minutes) ",
+          label: "Time Limit(in minutes) ",
           description: "Time Limit of the exam",
           conditional: (data) => {
             return data.is_exam as boolean;
@@ -281,7 +281,7 @@ export const getUpdateTemplateFormStructure = (
         update_internal: {
           type: "custom",
           defaultValue: "",
-          text: "Update internal",
+          label: "Update internal",
           tooltip: "Open a temp workspace for you to update the template.",
           node: (onChange, currentValue) => {
             const { addTempContainer } = containerAPI;
@@ -340,7 +340,7 @@ export const getUpdateTemplateFormStructure = (
         name: {
           type: "input",
           defaultValue: targetTemplate.name,
-          text: "Name (Optional)",
+          label: "Name (Optional)",
           placeholder: `e.g. ${validName}`,
           emptyValue: validName,
           validate: (data) => {
@@ -358,12 +358,12 @@ export const getUpdateTemplateFormStructure = (
           type: "textarea",
           placeholder: "e.g. The assignment is about ...",
           defaultValue: targetTemplate.description,
-          text: "Description (Optional)",
+          label: "Description (Optional)",
         },
         allow_notification: {
           type: "toggle",
           defaultValue: targetTemplate.allow_notification,
-          text: "Can students send question to You? ",
+          label: "Can students send question to You? ",
           description: "Can students send question to You?",
           tooltip:
             "Student can send comment to you by highlighting the code, useful for real-time interaction in tutorials.",
@@ -371,7 +371,7 @@ export const getUpdateTemplateFormStructure = (
         is_exam: {
           type: "toggle",
           defaultValue: targetTemplate.isExam,
-          text: "Exam mode",
+          label: "Exam mode",
           description: "whether this assignment is an exam",
           tooltip:
             "Whether this assignment is an exam. The environment would be restricted to simple editors without compliers.",
@@ -379,7 +379,7 @@ export const getUpdateTemplateFormStructure = (
         time_limit: {
           type: "input",
           defaultValue: String(targetTemplate.timeLimit),
-          text: "Time Limit(in minutes) ",
+          label: "Time Limit(in minutes) ",
           description: "Time Limit of the exam",
           conditional: (data) => {
             return data.is_exam as boolean;
@@ -398,13 +398,13 @@ export const getMessageReplyFormStructure = (
       displayTitle: false,
       entries: {
         target: {
-          text: "Reply to",
+          label: "Reply to",
           type: "input",
           defaultValue: targets.map((t) => t.name).join(", "),
           disabled: true,
         },
         message: {
-          text: "Message",
+          label: "Message",
           type: "textarea",
           defaultValue: "",
         },
@@ -427,7 +427,7 @@ export const getCreateSandboxFormStructure = (
         environment_choice: {
           type: "listbox",
           defaultValue: envChoices[0],
-          text: "Pick the Programming Language",
+          label: "Pick the Programming Language",
           options: envChoices,
         },
         name: {
@@ -435,7 +435,7 @@ export const getCreateSandboxFormStructure = (
           defaultValue: "",
           placeholder: `e.g. ${validName}`,
           emptyValue: validName,
-          text: "Name (Optional)",
+          label: "Name (Optional)",
           validate: (data) => {
             if (sandboxes.map((s) => s.title).includes(data.name))
               return { ok: false, message: "Name crash" };
@@ -446,7 +446,7 @@ export const getCreateSandboxFormStructure = (
           type: "textarea",
           defaultValue: "",
           placeholder: "e.g. This workspace is about ...",
-          text: "Description (Optional)",
+          label: "Description (Optional)",
         },
       },
     },
@@ -469,7 +469,7 @@ export const getUpdateSandboxFormStructure = (
       entries: {
         update_environment: {
           type: "custom",
-          text: "Update Environment",
+          label: "Update Environment",
           defaultValue: "",
           tooltip:
             "If you need to update the environment of your workspace, click the button below. You will be prompt to a temporary environment to set up your workspace.",
@@ -532,7 +532,7 @@ export const getUpdateSandboxFormStructure = (
           defaultValue: targetSandbox?.title,
           placeholder: `e.g. ${validName}`,
           emptyValue: validName,
-          text: "Name (Optional)",
+          label: "Name (Optional)",
           validate: (data) => {
             if (
               sandboxes
@@ -548,7 +548,7 @@ export const getUpdateSandboxFormStructure = (
           type: "textarea",
           defaultValue: targetSandbox?.description,
           placeholder: "e.g. This workspace is about ...",
-          text: "Description (Optional)",
+          label: "Description (Optional)",
         },
       },
     },

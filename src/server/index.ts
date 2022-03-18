@@ -76,8 +76,8 @@ app.prepare().then(() => {
   // authentication
   server.use(
     auth({
-      issuerBaseURL: "https://cas.ust.hk/cas/oidc",
-      baseURL: "https://codespace.ust.dev",
+      issuerBaseURL: process.env.OAUTH_ISSUER_BASE_URL,
+      baseURL: process.env.OAUTH_BASE_URL,
       clientID: process.env.OAUTH_CLIENT_ID!,
       clientSecret: process.env.OAUTH_CLIENT_SECRET!,
       secret: process.env.OAUTH_SECRET!,
@@ -85,6 +85,7 @@ app.prepare().then(() => {
         response_type: "code",
         scope: "openid profile email",
       },
+      idpLogout: false,
       session: {
         genid: () => crypto.randomBytes(16).toString("hex"),
         store: {
@@ -131,6 +132,9 @@ app.prepare().then(() => {
           domain: process.env.HOSTNAME,
           secure: true,
         },
+      },
+      routes: {
+        postLogoutRedirect: process.env.POST_LOGOUT_REDIRECT_URI
       },
       afterCallback: async (req, res, session, decodedState) => {
         try {
@@ -257,17 +261,18 @@ app.prepare().then(() => {
   });
 
   // // authentication logout
-  server.all("/logout", async function (req: Request, res: Response) {
-    console.log("logout inside");
-    res.oidc!.logout({ returnTo: "/" });
+  server.get('/logout', (req: Request, res: Response) => {
     // @ts-ignore
     req.appSession!.destroy((err) => {
       if (err) {
         console.error(err);
       }
-      res.oidc!.logout({ returnTo: "/" });
+      res.oidc!.logout({ returnTo: process.env.POST_LOGOUT_REDIRECT_URI });
     });
+    res.oidc!.logout({ returnTo: process.env.POST_LOGOUT_REDIRECT_URI });
+
   });
+
 
   // grpc api route
   server.all(

@@ -26,9 +26,9 @@ export default async  function handler(
             res.json({
                 success : GoLangResponse.getSuccess(),
                 error:{
-                    status: GoLangResponse.getError().getStatus(),
-                    error: GoLangResponse.getError().getError(),
-                } ,
+                    status: GoLangResponse.getError()?.getStatus(),
+                    error: GoLangResponse.getError()?.getError(),
+                  } ,
                 studentWorkspaces:
                     studentWorkspaces.map((s)=>{
                         return {

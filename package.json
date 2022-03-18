@@ -20,7 +20,7 @@
     "daisyui": "^1.16.2",
     "directory-tree": "^2.3.1",
     "express": "^4.17.1",
-    "express-openid-connect": "^2.5.0",
+    "express-openid-connect": "^2.7.1",
     "extract-zip": "^2.0.1",
     "firebase": "^9.5.0",
     "formidable": "^2.0.1",

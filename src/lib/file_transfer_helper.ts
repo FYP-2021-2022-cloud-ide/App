@@ -11,7 +11,6 @@ import { NodeModel } from "@minoru/react-dnd-treeview";
 import { DirectoryTree } from "directory-tree";
 import path from "path";
 import { CustomData } from "../components/cloud/CustomNode";
-import myToast from "../components/CustomToast";
 import { googleAPI } from "./api/googleAPI";
 
 /**
@@ -36,6 +35,13 @@ export const isBlacklisted = (path: string): boolean => {
   return path.includes("node_modules");
 };
 
+/**
+ * expand a google folder in a tree and return the new tree. The original tree is not modified.
+ * @param wholeTree the original tree
+ * @param folder the target folder to expand
+ * @param sub
+ * @returns the new tree
+ */
 export const expandGoogleFolder = async (
   wholeTree: GoogleFolder,
   folder: GoogleFolder,
@@ -50,14 +56,21 @@ export const expandGoogleFolder = async (
       name: name,
       path: path,
       closed: closed,
-      children: folders.map((child) => ({
-        id: child.id,
-        name: child.name,
-        path: path + "/" + child.name,
-        closed: true,
-        children: [],
-        files: [],
-      })),
+      children: folders.map((child) => {
+        // see if the folder has been expanded before
+        // if yes, replace it
+        // if no, return []
+
+        const folder = getFolderById(wholeTree, child.id);
+        return {
+          id: child.id,
+          name: child.name,
+          path: path + "/" + child.name,
+          closed: true,
+          children: folder ? folder.children : [],
+          files: folder ? folder.files : [],
+        };
+      }),
       files: files.map((file) => ({
         id: file.id,
         name: file.name,
@@ -104,17 +117,21 @@ export const findAndReplaceGoogleFolder = (
 ): GoogleFolder => {
   if (!oldTree) return newItem;
   if (oldTree.id == newItem.id) return newItem;
-  let temp: GoogleFolder = {
-    id: oldTree.id,
-    name: oldTree.name,
-    path: oldTree.path,
-    closed: oldTree.closed,
+  // let temp: GoogleFolder = {
+  //   id: oldTree.id,
+  //   name: oldTree.name,
+  //   path: oldTree.path,
+  //   closed: oldTree.closed,
+  //   children: oldTree.children.map((child) =>
+  //     findAndReplaceGoogleFolder(child, newItem)
+  //   ),
+  //   files: oldTree.files,
+  // };
+  return Object.assign(oldTree, {
     children: oldTree.children.map((child) =>
       findAndReplaceGoogleFolder(child, newItem)
     ),
-    files: oldTree.files,
-  };
-  return temp;
+  });
 };
 
 /**
@@ -124,6 +141,7 @@ export const findAndReplaceGoogleFolder = (
  * @returns
  */
 export const getFolderById = (tree: GoogleFolder, id: string): GoogleFolder => {
+  if (!tree) return undefined;
   if (tree.id == id) return tree;
   for (let child of tree.children) {
     let result = getFolderById(child, id);
@@ -153,7 +171,6 @@ export const convertGoogleTree = (
         text: child.name,
         droppable: true,
         data: {
-          fileName: child.name,
           filePath: child.path,
           fileType: "directory",
         },
@@ -168,7 +185,6 @@ export const convertGoogleTree = (
       text: file.name,
       droppable: false,
       data: {
-        fileName: file.name,
         filePath: file.path,
         fileType: "file",
       },
@@ -196,7 +212,6 @@ export function convertDirectoryTree(
       text: tree.name,
       droppable: tree.children != undefined,
       data: {
-        fileName: tree.name,
         filePath: tree.path,
         fileSize: String(tree.size),
         fileType: tree.type,

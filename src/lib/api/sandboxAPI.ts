@@ -11,6 +11,7 @@ const sandboxAPI = {
     numCPU: Number,
     sandboxImageId: string
   ): Promise<SandboxAddResponse> => {
+    // start a workspace
     var res = await fetch("/api/sandbox/addSandbox", {
       method: "POST",
       body: JSON.stringify({
@@ -39,7 +40,6 @@ const sandboxAPI = {
     });
     return res.json();
   },
-
 
   listSandboxImage: async (
     userId: string
@@ -76,7 +76,7 @@ const sandboxAPI = {
     return res.json();
   },
 
-  // if the tempContainerId is an empty string, only db data will be updated 
+  // if the tempContainerId is an empty string, only db data will be updated
   updateSandboxImage: async (
     sandboxImageId: string,
     title: string,

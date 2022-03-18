@@ -22,8 +22,8 @@ export default function handler(
         res.json({ 
           success:GoLangResponse.getSuccess(),
           error:{
-              status: GoLangResponse.getError().getStatus(),
-              error: GoLangResponse.getError().getError(),
+            status: GoLangResponse.getError()?.getStatus(),
+            error: GoLangResponse.getError()?.getError(),
           } ,
         });
         res.status(200).end();

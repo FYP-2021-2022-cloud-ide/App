@@ -1,5 +1,11 @@
 import { googleAPI } from "../lib/api/googleAPI";
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { useCnails } from "../contexts/cnails";
 import { NodeModel, TreeMethods } from "@minoru/react-dnd-treeview";
 import { CustomData } from "../components/cloud/CustomNode";
@@ -29,22 +35,7 @@ export default function Page() {
     removeFile,
     downloadFileToUser,
   } = localFileAPI;
-  const filesRef = useRef<GoogleFolder>();
-  useEffect(() => {
-    const fetchRoot = async (sub: string) => {
-      filesRef.current = await expandGoogleFolder(
-        filesRef.current,
-        {
-          id: "root",
-          name: "root",
-          path: "/root",
-          closed: false,
-        },
-        sub
-      );
-    };
-    fetchRoot(sub);
-  }, []);
+  const googleFilesRef = useRef<GoogleFolder>();
 
   let ref1 = useRef<MyTreeMethods>();
   let ref2 = useRef<MyTreeMethods>();
@@ -64,6 +55,23 @@ export default function Page() {
     useState<boolean>(false);
   const [isEditNameModalOpen, setIsEditNameModalOpen] =
     useState<boolean>(false);
+
+  const fetchRoot = async (sub: string) => {
+    googleFilesRef.current = await expandGoogleFolder(
+      googleFilesRef.current,
+      {
+        id: "root",
+        name: "root",
+        path: "/root",
+        closed: false,
+      },
+      sub
+    );
+    if (ref2.current) rerenderRemoteStorage(googleFilesRef.current);
+  };
+  useEffect(() => {
+    fetchRoot(sub);
+  }, [ref2.current]);
 
   const rerenderPersonalVolume = async (data: directoryTree.DirectoryTree) => {
     await ref1.current.getFilesAndRerender(convertDirectoryTree(data));
@@ -168,7 +176,7 @@ export default function Page() {
               }
               await googleAPI.downloadFiles(
                 sub,
-                draggingRef.current.node.id,
+                draggingRef.current.node.id as string,
                 draggingRef.current.node.text,
                 target,
                 draggingRef.current.node.data.fileType
@@ -192,24 +200,33 @@ export default function Page() {
               const data = await listFolders(userId);
               progressRef1.current = "";
               if (data.success) {
-                console.log(data.tree);
                 return convertDirectoryTree(data.tree);
               } else alert(JSON.stringify(data.error.status));
             }}
             progressRef={progressRef1}
-            canDrop={(_tree, { dragSource, dropTarget }) => {
+            canDrop={(_, { dragSource, dropTarget }) => {
+              // can move to another tree
               if (dropTarget == undefined || dragSource == undefined)
                 return true;
+
+              // cannot move a parent to children
               if (dropTarget.data.filePath.includes(dragSource.data.filePath))
                 return false;
+
+              // cannot move to itself
               if (dragSource.id == dropTarget.id) return false;
+
+              // cannot move to a file of same layer
               if (
                 dragSource.parent == dropTarget.parent &&
-                !dropTarget.droppable
+                dropTarget.data.fileType === "file"
               )
                 return false;
+
+              // cannot move its parent
               if (dragSource.parent == dropTarget.id) return false;
-              // if (isDescedent(String(dragSource.id), dropTarget)) return false
+
+              // cannot move a file
               if (dropTarget.data.fileType == "file") return false;
               return true;
             }}
@@ -229,7 +246,8 @@ export default function Page() {
                       node.data.filePath
                     );
                     progressRef1.current = "";
-                    if (response.success) rerenderPersonalVolume(response.tree);
+                    if (response.success)
+                      await rerenderPersonalVolume(response.tree);
                     else alert(response.error.status);
                   },
                 },
@@ -237,14 +255,14 @@ export default function Page() {
                   text: "download",
                   onClick: async () => {
                     progressRef1.current = status.loading;
-                    const data = await downloadFileToUser(
+                    const response = await downloadFileToUser(
                       userId,
                       node.data.filePath,
                       node.droppable
                     );
-                    if (data != undefined && data.success) {
+                    if (response.success) {
                       // console.log(res)
-                      var decodedByte = Buffer.from(data.file, "base64");
+                      var decodedByte = Buffer.from(response.file, "base64");
                       var b = new Blob([decodedByte]);
                       async function downloadFileURL(
                         file: Blob,
@@ -255,7 +273,7 @@ export default function Page() {
                         link.download = fileName;
                         link.click();
                       }
-                      await downloadFileURL(b, data.fileName);
+                      await downloadFileURL(b, response.fileName);
                     }
                     progressRef1.current = "";
                   },
@@ -286,6 +304,9 @@ export default function Page() {
                 },
               },
             ]}
+            onContextMenuClose={() => {
+              targetNodeRef.current = null;
+            }}
           ></FTree>
         </div>
         {/* cloud  */}
@@ -293,7 +314,7 @@ export default function Page() {
           <p className="text-gray-600 font-bold text-xl dark:text-gray-300 h-fit">
             Cloud Volume (Google Drive)
           </p>
-          {!filesRef.current ? (
+          {!googleFilesRef.current ? (
             <button
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-fit capitalize"
               onClick={async () => {
@@ -308,83 +329,66 @@ export default function Page() {
               rootId={"root"}
               handleMoveFromAnotherTree={async (treeData, dropTarget) => {
                 progressRef2.current = status.loading;
-                if (dropTarget.droppable) {
-                  console.log("droppable");
-                  const response = await googleAPI.uploadFiles(
-                    sub,
-                    draggingRef.current.node.data.filePath,
-                    dropTarget.id,
-                    draggingRef.current.node.data.fileType
-                  );
-                  if (!response.success) return treeData;
-                  // console.log(files, String(dropTarget.id), dropTarget.data.filePath)
-                  const response2 = await googleAPI.expandFolder(
-                    dropTarget,
-                    sub
-                  );
-                  const temp = await expandGoogleFolder(
-                    filesRef.current,
-                    {
+                const getParentId = () => {
+                  if (!dropTarget) return "root";
+                  if (dropTarget && dropTarget.droppable) return dropTarget.id;
+                  if (dropTarget && !dropTarget.droppable)
+                    return dropTarget.parent;
+                };
+                const getTargetFolder = () => {
+                  if (!dropTarget)
+                    return {
+                      id: "root",
+                      name: "root",
+                      path: "/root",
+                      closed: false,
+                    };
+                  if (dropTarget && dropTarget.droppable)
+                    return {
                       id: String(dropTarget.id),
                       name: dropTarget.text,
                       path: dropTarget.data.filePath,
                       closed: false,
-                    },
-                    sub
-                  );
-                } else {
-                  console.log("not droppable");
-                  const response = await googleAPI.uploadFiles(
-                    sub,
-                    draggingRef.current.node.data.filePath,
-                    dropTarget.parent,
-                    draggingRef.current.node.data.fileType
-                  );
-                  if (!response.success) return treeData;
-                  // console.log(files, String(dropTarget.parent), dropTarget.data.filePath)
-                  const response2 = await googleAPI.expandFolder(
-                    dropTarget.parent,
-                    sub
-                  );
-                  const temp = await expandGoogleFolder(
-                    filesRef.current,
-                    {
+                    };
+                  if (dropTarget && !dropTarget.droppable)
+                    return {
                       id: String(dropTarget.parent),
                       name: dropTarget.text,
                       path: dropTarget.data.filePath,
                       closed: false,
-                    },
-                    sub
-                  );
-                }
+                    };
+                };
+                const response = await googleAPI.uploadFiles(
+                  sub,
+                  draggingRef.current.node.data.filePath,
+                  getParentId() as string,
+                  draggingRef.current.node.data.fileType
+                );
+                if (!response.success) return treeData;
+                googleFilesRef.current = await expandGoogleFolder(
+                  googleFilesRef.current,
+                  getTargetFolder(),
+                  sub
+                );
                 progressRef2.current = "";
-                console.log(filesRef.current);
-                return convertGoogleTree(filesRef.current);
+                return convertGoogleTree(googleFilesRef.current);
               }}
               showGlobalActionButtons={false}
-              // onClick={async (treeData, node) => {
-              //   if (
-              //     node.droppable &&
-              //     getFolderById(filesRef.current, String(node.id)).children
-              //       .length == 0
-              //   ) {
-              //     progressRef2.current = status.loading;
-              //     filesRef.current = await expandGoogleFolder(
-              //       filesRef.current,
-              //       {
-              //         id: String(node.id),
-              //         name: node.text,
-              //         path: node.data.filePath,
-              //         closed: false,
-              //       },
-              //       sub
-              //     );
-
-              //     progressRef2.current = "";
-              //     return convertGoogleTree(filesRef.current);
-              //   }
-              //   return treeData;
-              // }}
+              onToggle={async (node) => {
+                progressRef2.current = status.loading;
+                googleFilesRef.current = await expandGoogleFolder(
+                  googleFilesRef.current,
+                  {
+                    id: String(node.id),
+                    name: node.text,
+                    path: node.data.filePath,
+                    closed: false,
+                  },
+                  sub
+                );
+                progressRef2.current = "";
+                await rerenderRemoteStorage(googleFilesRef.current);
+              }}
               onDragStart={async (_treeData, node) => {
                 draggingRef.current = {
                   tree: "tree 2",
@@ -395,12 +399,16 @@ export default function Page() {
                 draggingRef.current = null;
               }}
               getFiles={async () => {
-                return convertGoogleTree(filesRef.current);
+                return convertGoogleTree(googleFilesRef.current);
               }}
               progressRef={progressRef2}
               canDrop={(_tree, { dragSource }) => {
+                // can move from another tree
                 if (dragSource == undefined) return true;
                 else return false;
+              }}
+              onContextMenuClose={() => {
+                targetNodeRef.current = null;
               }}
             ></FTree>
           )}
@@ -447,7 +455,7 @@ export default function Page() {
           const response = await makeFolder(userId, folderPath);
           progressRef1.current = "";
           targetNodeRef.current = null;
-          if (response.success) rerenderPersonalVolume(response.tree);
+          if (response.success) await rerenderPersonalVolume(response.tree);
           else alert(response.error.status);
         }}
       ></ModalForm>
@@ -478,7 +486,7 @@ export default function Page() {
               `${path.dirname(node.data.filePath)}/${newName}`
             );
             progressRef1.current = "";
-            if (response.success) rerenderPersonalVolume(response.tree);
+            if (response.success) await rerenderPersonalVolume(response.tree);
             else alert(response.error.status);
           }}
         ></ModalForm>
