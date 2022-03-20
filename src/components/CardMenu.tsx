@@ -12,6 +12,11 @@ export type Props = {
   items: MenuItem[];
 };
 
+/**
+ * A component to create a menu which is open from a button.
+ * Although it is called `CardMenu` but it doesn't need to be used in a card. It can be used anywhere.
+ * Pass `items` array as props.
+ */
 export default function CardMenu({ items }: Props) {
   return (
     <>

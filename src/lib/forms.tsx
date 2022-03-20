@@ -405,7 +405,7 @@ export const getMessageReplyFormStructure = (
         },
         message: {
           label: "Message",
-          type: "textarea",
+          type: "markdown",
           defaultValue: "",
         },
       },
@@ -549,6 +549,34 @@ export const getUpdateSandboxFormStructure = (
           defaultValue: targetSandbox?.description,
           placeholder: "e.g. This workspace is about ...",
           label: "Description (Optional)",
+        },
+      },
+    },
+  };
+};
+
+export const getAnnouncementFormStructure = (): FormStructure => {
+  return {
+    course_announcement: {
+      displayTitle: false,
+      entries: {
+        title: {
+          type: "input",
+          defaultValue: "",
+          placeholder: ``,
+          emptyValue: "",
+          label: "Title",
+        },
+        announcement: {
+          type: "markdown",
+          defaultValue: "",
+          label: "Announcement",
+        },
+        allow_reply: {
+          type: "toggle",
+          defaultValue: false,
+          label: "Can people reply to this announcement? ",
+          description: "Can people reply to this announcement?",
         },
       },
     },

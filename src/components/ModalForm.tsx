@@ -1,9 +1,17 @@
 import { Dialog } from "@headlessui/react";
-import React, { createRef, useEffect, useRef, useState } from "react";
+import React, { createRef, memo, useEffect, useRef, useState } from "react";
 import ListBox, { Option } from "./ListBox";
 import Modal, { ModalProps } from "./Modal";
 import Toggle from "./Toggle";
 import { InformationCircleIcon } from "@heroicons/react/solid";
+import dynamic from "next/dynamic";
+import "easymde/dist/easymde.min.css";
+import EasyMDE from "easymde";
+import ReactDOMServer from "react-dom/server";
+import { MyMarkDown } from "../pages/messages";
+const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
+  ssr: false,
+});
 
 // export type Data = { [id: string]: boolean | string | Option  };
 export type Data = { [id: string]: any };
@@ -33,6 +41,8 @@ export type Entry = {
     }
   | { type: "listbox"; defaultValue: Option; options: Option[] }
   | { type: "toggle"; defaultValue: boolean }
+  | { type: "markdown"; defaultValue: string }
+  | { type: "date"; defaultValue: string }
   | {
       type: "custom";
       defaultValue: any;
@@ -53,15 +63,53 @@ export type Section = {
 export type FormStructure = { [title: string]: Section };
 
 export type Props = {
+  /**
+   * the open and close state of modal
+   */
   isOpen: Boolean;
+  /**
+   * a setState function which control the open and close of modal
+   */
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  /**
+   * click the overlay to close the modal
+   */
   clickOutsideToClose?: boolean;
+  /**
+   * press ese key to close the modal
+   */
+  escToClose?: boolean;
+  /**
+   * callback when the modal is open
+   */
   onOpen?: () => void;
+  /**
+   * callback when the modal is close
+   * @param data the data in the form when the modal is closed
+   * @param isEnter whether this form close because of enter
+   */
   onClose?: (data: Data, isEnter: boolean) => void;
+  /**
+   * the title of this form
+   */
   title: string;
+  /**
+   * control the width of the form
+   */
   size?: "sm" | "md" | "lg";
+  /**
+   * The skeleton of the form
+   */
   formStructure: FormStructure;
+  /**
+   * a callback when the data of the form is change
+   * @param data the new data
+   * @param id the id of the data which is changed
+   */
   onChange?: (data: Data, id: string) => void;
+  /**
+   * a callback when the form is submitted
+   */
   onEnter?: (data: Data) => void;
 };
 
@@ -89,10 +137,7 @@ const Entry = ({
             <p className="modal-form-text-base capitalize">{entry.label}</p>
           )}
           {entry.tooltip && (
-            <div
-              className="tooltip tooltip-bottom tooltip-info"
-              data-tip={entry.tooltip}
-            >
+            <div className="tooltip tooltip-info" data-tip={entry.tooltip}>
               <InformationCircleIcon className="tooltip-icon" />
             </div>
           )}
@@ -214,34 +259,120 @@ const Entry = ({
         )}
       </div>
     );
+  } else if (entry.type == "markdown") {
+    return (
+      <div
+        onDoubleClick={(e) => {
+          console.log("called");
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      >
+        {window && window.navigator && (
+          <MDE
+            text={data[id] as string}
+            onChange={(text) => {
+              onChange(Object.assign(data, { [id]: text }), id);
+            }}
+          />
+        )}
+      </div>
+    );
   } else throw new Error("not such entry type in <ModalForm>");
 };
 
-const TextArea = ({
-  text: _text,
-  placeholder,
-  disabled = false,
-  onChange,
-}: {
-  text: string;
-  placeholder: string;
-  disabled?: boolean;
-  onChange: (text: string) => void;
-}) => {
-  const [text, setText] = useState(_text);
-  return (
-    <textarea
-      className="modal-form-textarea"
-      placeholder={placeholder}
-      value={text}
-      onChange={(e) => {
-        setText(e.target.value);
-        onChange(e.target.value);
-      }}
-      disabled={disabled}
-    ></textarea>
-  );
-};
+const MDE = memo(
+  ({
+    text: _text,
+    onChange,
+  }: {
+    text: string;
+    onChange: (text: string) => void;
+  }) => {
+    const mdeRef = useRef<EasyMDE>();
+    useEffect(() => {
+      const handleTab = (event: KeyboardEvent) => {
+        if (
+          event.key === "Tab" &&
+          mdeRef.current.codemirror
+            .getWrapperElement()
+            .contains(document.activeElement)
+        ) {
+          event.stopImmediatePropagation();
+          mdeRef.current.codemirror.execCommand("insertSoftTab");
+          mdeRef.current.codemirror.execCommand("indentLess");
+        }
+      };
+      window.addEventListener("keydown", handleTab);
+      return () => window.removeEventListener("keydown", handleTab);
+    }, [mdeRef.current]);
+    return (
+      <SimpleMDE
+        onChange={onChange}
+        options={{
+          spellChecker: false,
+          autofocus: true,
+          initialValue: _text,
+          // showIcons: ["undo"],
+          hideIcons: ["fullscreen"],
+          sideBySideFullscreen: false,
+          indentWithTabs: false,
+          maxHeight: "500px",
+          renderingConfig: {},
+          previewRender: () => {
+            return ReactDOMServer.renderToString(
+              <MyMarkDown text={mdeRef.current.codemirror.getValue()} />
+            );
+          },
+        }}
+        getMdeInstance={(instance) => {
+          mdeRef.current = instance;
+        }}
+      />
+    );
+  },
+  () => true
+);
+
+const TextArea = memo(
+  ({
+    text: _text,
+    placeholder,
+    disabled = false,
+    onChange,
+    isMarkdown = false,
+  }: {
+    text: string;
+    placeholder: string;
+    disabled?: boolean;
+    onChange: (text: string) => void;
+    isMarkdown?: boolean;
+  }) => {
+    // const [text, setText] = useState(_text);
+    const ref = useRef<HTMLTextAreaElement>();
+    useEffect(() => {
+      if (ref.current) {
+        ref.current.value = _text;
+      }
+    }, []);
+    return (
+      <textarea
+        className="modal-form-textarea"
+        placeholder={placeholder}
+        ref={ref}
+        // value={text}
+        onChange={(e) => {
+          // setText(e.target.value);
+          onChange(e.target.value);
+        }}
+        disabled={disabled}
+      ></textarea>
+    );
+  },
+  (prevProps, nextProps) => {
+    return true;
+  }
+);
 
 const Section = ({
   section,
@@ -278,47 +409,64 @@ const Section = ({
     );
 };
 
-const Input = ({
-  text: _text,
-  placeholder,
-  disabled = false,
-  onChange,
-  validate,
-}: {
-  text: string;
-  placeholder: string;
-  disabled?: boolean;
-  onChange: (text: string) => void;
-  validate: () => ValidationOutput;
-}) => {
-  const [text, setText] = useState(_text);
-  //@ts-ignore
-  const { ok, message } = validate();
-  return (
-    <div>
-      <input
-        className={`modal-form-input text-gray-500 dark:text-gray-300 ${
-          disabled ? "dark:text-gray-500 text-gray-300" : ""
-        } ${
-          ok
-            ? ""
-            : "border-red-400 border-2 bg-red-100 dark:bg-red-100  dark:border-red-400 dark:focus:outline-none text-gray-500 dark:text-gray-500 ring-2 ring-red-400"
-        }`}
-        placeholder={placeholder}
-        value={text}
-        onChange={(e) => {
-          setText(e.target.value);
-          onChange(e.target.value);
-        }}
-        disabled={disabled}
-      ></input>
-      {!ok && (
-        <p className="text-red-400 text-xs mt-1 ml-2 shiver"> {message}</p>
-      )}
-    </div>
-  );
-};
+const Input = memo(
+  ({
+    text: _text,
+    placeholder,
+    disabled = false,
+    onChange,
+    validate,
+  }: {
+    text: string;
+    placeholder: string;
+    disabled?: boolean;
+    onChange: (text: string) => void;
+    validate: () => ValidationOutput;
+  }) => {
+    // const [text, setText] = useState(_text);
+    const ref = useRef<HTMLInputElement>();
+    useEffect(() => {
+      if (ref.current) {
+        ref.current.value = _text;
+      }
+    }, []);
+    const validationResult = validate();
+    return (
+      <div>
+        <input
+          ref={ref}
+          className={`modal-form-input text-gray-500 dark:text-gray-300 ${
+            disabled ? "dark:text-gray-500 text-gray-300" : ""
+          } ${
+            validationResult.ok
+              ? ""
+              : "border-red-400 border-2 bg-red-100 dark:bg-red-100  dark:border-red-400 dark:focus:outline-none text-gray-500 dark:text-gray-500 ring-2 ring-red-400"
+          }`}
+          placeholder={placeholder}
+          // value={text}
+          onChange={(e) => {
+            // setText(e.target.value);
+            onChange(e.target.value);
+          }}
+          disabled={disabled}
+        ></input>
+        {validationResult.ok === false && (
+          <p className="text-red-400 text-xs mt-1 ml-2 shiver">
+            {" "}
+            {validationResult.message}
+          </p>
+        )}
+      </div>
+    );
+  },
+  () => true
+);
 
+/**
+ * this function will convert the form structure to the initial data of the form.
+ * @param structure
+ * @returns
+ */
 const fromStructureToData = (structure: FormStructure): Data => {
   let data: Data = {};
   if (!structure) return data;
@@ -327,8 +475,9 @@ const fromStructureToData = (structure: FormStructure): Data => {
       const type = structure[title].entries[entry].type;
       //@ts-ignore
       const emptyValue = structure[title].entries[entry].emptyValue;
+      // if the default value is empty and emptyValue exists, data will be the empty value else it will be the defaultValue
       if (
-        (type === "input" || type === "textarea") &&
+        (type === "input" || type === "textarea" || type === "markdown") &&
         structure[title].entries[entry].defaultValue == "" &&
         emptyValue
       ) {
@@ -341,7 +490,7 @@ const fromStructureToData = (structure: FormStructure): Data => {
 
 /**
  * A component to show a form in modal. Use this component to keep consistency in the app.
- * To use this, put the <ModalForm> in a component and supply a form structure.
+ * To use this, put the `<ModalForm>` in a component and supply a form structure.
  */
 const ModalForm = (props: Props) => {
   const {
@@ -350,13 +499,14 @@ const ModalForm = (props: Props) => {
     onClose,
     onOpen,
     clickOutsideToClose,
+    escToClose,
     formStructure,
     onEnter,
     title,
     size = "sm",
     onChange,
   } = props;
-  let ref = createRef<HTMLDivElement>();
+  // let ref = createRef<HTMLDivElement>();
   let okBtnRef = createRef<HTMLButtonElement>();
   const [data, setData] = useState<Data>(fromStructureToData(formStructure));
   useEffect(() => {
@@ -373,6 +523,7 @@ const ModalForm = (props: Props) => {
     if (onClose) {
       onClose(data, isEnter);
     }
+    // reset the initial data
     setData(fromStructureToData(formStructure));
   };
 
@@ -397,8 +548,9 @@ const ModalForm = (props: Props) => {
       onClose={patchedOnClose}
       onOpen={onOpen}
       clickOutsideToClose={clickOutsideToClose}
+      escToClose={escToClose}
     >
-      <div ref={ref} className={`modal-form ${sizeMap[size]} hide-scroll `}>
+      <div className={`modal-form ${sizeMap[size]} hide-scroll `}>
         <div className="modal-form-content">
           <Dialog.Title as="h3" className="modal-form-title capitalize">
             {title}
@@ -412,6 +564,7 @@ const ModalForm = (props: Props) => {
                 title={sectionTitle}
                 data={data}
                 onChange={(newData, id) => {
+                  console.log(newData, id);
                   setData(Object.assign({}, newData));
                   if (onChange) onChange(newData, id);
                 }}
@@ -420,7 +573,7 @@ const ModalForm = (props: Props) => {
           })}
           <div className="modal-form-btn-row pt-4">
             <button
-              className="modal-form-btn-cancel"
+              className="modal-form-btn-cancel "
               onClick={() => {
                 setOpen(false);
                 patchedOnClose();

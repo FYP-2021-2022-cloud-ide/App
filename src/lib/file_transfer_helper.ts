@@ -151,9 +151,9 @@ export const getFolderById = (tree: GoogleFolder, id: string): GoogleFolder => {
 };
 
 /**
- * given a google folder, convert it to NodeModel
+ * given a google folder, convert it to NodeModel.
  * @param tree
- * @param parent
+ * @param parent  When calling this function manually, `parent` is not required because it is for recursion only.
  * @returns
  */
 export const convertGoogleTree = (

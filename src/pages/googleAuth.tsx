@@ -18,8 +18,10 @@ const GoogleAuth = () => {
   }, [router.isReady]);
 
   return (
-    <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl text-[#415A6E]">
-      <Loader />
+    <div className="h-full w-full relative">
+      <div className="flex items-center justify-center h-full">
+        <Loader />
+      </div>
     </div>
   );
 };

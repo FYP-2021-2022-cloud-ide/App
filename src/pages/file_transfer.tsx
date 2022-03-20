@@ -24,6 +24,8 @@ import {
 import myToast from "../components/CustomToast";
 import ModalForm, { Props as ModalFormProps } from "../components/ModalForm";
 import directoryTree from "directory-tree";
+import classNames from "../lib/classnames";
+import styles from "../styles/file_tree.module.css";
 
 export default function Page() {
   const { userId, sub } = useCnails();
@@ -163,28 +165,31 @@ export default function Page() {
               else alert(JSON.stringify(data.error.status));
             }}
             handleMoveFromAnotherTree={async (_treeData, dropTarget) => {
-              let target: string = "";
               progressRef1.current = status.transfering;
-              if (!dropTarget) {
-                target = `/volumes/${userId}/persist`;
-              } else {
-                if (dropTarget.droppable) {
-                  target = dropTarget.data.filePath;
-                } else {
-                  target = path.dirname(dropTarget.data.filePath);
-                }
-              }
-              await googleAPI.downloadFiles(
+              console.log("something");
+              const getTarget = () => {
+                if (!dropTarget) return ref1.current.rootId;
+                if (dropTarget && dropTarget.droppable)
+                  return dropTarget.data.filePath;
+                if (dropTarget && !dropTarget.droppable)
+                  return path.dirname(dropTarget.data.filePath);
+              };
+              const response = await googleAPI.downloadFiles(
                 sub,
                 draggingRef.current.node.id as string,
                 draggingRef.current.node.text,
-                target,
+                getTarget() as string,
                 draggingRef.current.node.data.fileType
               );
-              const data = await listFolders(userId);
               progressRef1.current = "";
-              if (data.success) return convertDirectoryTree(data.tree);
-              else alert(JSON.stringify(data.error.status));
+              if (response.success) {
+                const response = await listFolders(userId);
+                if (response.success)
+                  return convertDirectoryTree(response.tree);
+                else alert(JSON.stringify(response.error.status));
+              } else {
+                myToast.error(response.error.error);
+              }
             }}
             onDragStart={async (_treeData, node) => {
               draggingRef.current = {
@@ -223,7 +228,7 @@ export default function Page() {
               )
                 return false;
 
-              // cannot move its parent
+              // cannot move to its parent because a node must be inside its parent already
               if (dragSource.parent == dropTarget.id) return false;
 
               // cannot move a file
@@ -315,14 +320,21 @@ export default function Page() {
             Cloud Volume (Google Drive)
           </p>
           {!googleFilesRef.current ? (
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-fit capitalize"
-              onClick={async () => {
-                await googleAPI.auth();
-              }}
-            >
-              Login first
-            </button>
+            <div className={classNames(styles, "wrapper")}>
+              <div className="h-5 w-0"></div>
+              <div className="h-full min-h-[300px] max-h-[80vh] relative">
+                <button
+                  className={classNames(styles, "root", "root-nothing")}
+                  onClick={async () => {
+                    await googleAPI.auth();
+                  }}
+                >
+                  <p className={classNames(styles, "root-nothing-text")}>
+                    Click here to log in Google Drive
+                  </p>
+                </button>
+              </div>
+            </div>
           ) : (
             <FTree
               ref={ref2}
@@ -420,6 +432,7 @@ export default function Page() {
         setOpen={setIsCreateFolderModalOpen}
         title="create folder"
         clickOutsideToClose
+        escToClose
         formStructure={{
           create_folder: {
             entries: {
@@ -465,6 +478,7 @@ export default function Page() {
           isOpen={isEditNameModalOpen}
           setOpen={setIsEditNameModalOpen}
           clickOutsideToClose
+          escToClose
           title="Edit Name"
           formStructure={{
             edit_name: {

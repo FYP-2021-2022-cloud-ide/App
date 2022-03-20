@@ -157,6 +157,7 @@ export const SandboxWrapper = () => {
         isOpen={createOpen}
         setOpen={setCreateOpen}
         clickOutsideToClose
+        escToClose
         title="Create Personal Workspace"
         formStructure={createFormStructure}
         onEnter={async (data) => {
@@ -188,6 +189,7 @@ export const SandboxWrapper = () => {
           setOpen={setUpdateOpen}
           title={"Update Workspace"}
           clickOutsideToClose
+          escToClose
           formStructure={updateFormStructure}
           onClose={async (data, isEnter) => {
             if (data.update_environment != "" && !isEnter) {

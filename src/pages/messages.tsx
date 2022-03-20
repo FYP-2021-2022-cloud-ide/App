@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
 import { ReplyIcon } from "@heroicons/react/outline";
 import { useCnails } from "../contexts/cnails";
 import EmptyDiv from "../components/EmptyDiv";
@@ -17,11 +17,196 @@ import ModalForm from "../components/ModalForm";
 import { getMessageReplyFormStructure } from "../lib/forms";
 import React from "react";
 import { useRouter } from "next/router";
+import _ from "lodash";
+import remarkGfm from "remark-gfm";
+import ReactMarkdown from "react-markdown";
+import dynamic from "next/dynamic";
+// const remarkGfm = dynamic( ()=> import("remark-gfm" , {ssr: false}  )
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+
+import { prism, okaidia } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { useTheme } from "../contexts/theme";
+
+const getTestMessage = () => {
+  return `
+  > This is a test blockquote
+  > - item 1 
+  > - item 2 
+  > - item 3
+
+  ---
+
+  # h1 Heading
+  ## h2 Heading
+  ### h3 Heading
+  #### h4 Heading
+  ##### h5 Heading
+  ###### h6 Heading
+
+  ___
+
+  ---
+
+  ***
+
+  ## Emphasis
+
+  **This is bold text**
+
+  __This is bold text__
+
+  *This is italic text*
+
+  _This is italic text_
+
+  ~~Strikethrough~~
+
+
+  ## Blockquotes
+
+
+  > Blockquotes can also be nested...
+  >> ...by using additional greater-than signs right next to each other...
+  > > > ...or with spaces between arrows.
+  >>>> ...even more 
+  >>>>> ...even more
+
+  ## Lists
+
+  Unordered
+
+  + Create a list by starting a line with \`+\`, \`-\`, or \`*\`
+  + Sub-lists are made by indenting 2 spaces:
+    - Marker character change forces new list start:
+      * Ac tristique libero volutpat at
+      + Facilisis in pretium nisl aliquet
+      - Nulla volutpat aliquam velit
+        - koewrkwe
+          - werkowekr
+            - wkeorkeow
+  + Very easy!
+
+
+1. Lorem ipsum dolor sit amet
+    1. qowekqwo
+      1. wqekwqoe
+         - kweorkweork
+      2. weokrework
+      3. wkeorewor
+2. Consectetur adipiscing elit
+3. Integer molestie lorem at massa
+
+
+  `;
+};
+
+export const MyMarkDown = ({ text }: { text: string }) => {
+  const { isDark } = useTheme();
+  return (
+    <ReactMarkdown
+      className=""
+      children={text}
+      remarkPlugins={[remarkGfm]}
+      components={{
+        code({ node, inline, className, children, ...props }) {
+          const match = /language-(\w+)/.exec(className || "");
+          return !inline ? (
+            <div className="p-3">
+              <SyntaxHighlighter
+                children={String(children).replace(/\n$/, "")}
+                language={match ? match[1] : undefined}
+                style={isDark ? okaidia : prism}
+                PreTag="div"
+                showLineNumbers
+                {...props}
+              />
+            </div>
+          ) : (
+            <code
+              className="text-red-400 bg-red-200/20 px-1 rounded"
+              {...props}
+            >
+              {children}
+            </code>
+          );
+        },
+        hr({ className }) {
+          return (
+            <hr className="my-5 border-b-2 dark:border-white/30 border-black-30"></hr>
+          );
+        },
+        table({ node, children }) {
+          return <table className="m-2">{children}</table>;
+        },
+        th({ node, children, style, isHeader }) {
+          // isHeader is true
+          return <th className="border">{children}</th>;
+        },
+        ul({ node, children, className }) {
+          console.log(className);
+          return (
+            <ul
+              className={
+                className === "contains-task-list"
+                  ? className
+                  : "list-disc list-inside ml-5"
+              }
+            >
+              {children}
+            </ul>
+          );
+        },
+        ol({ node, children, className }) {
+          return (
+            <ol
+              className={
+                className === "contains-task-list"
+                  ? className
+                  : "list-decimal list-inside ml-5"
+              }
+            >
+              {children}
+            </ol>
+          );
+        },
+        li({ node, children, index, ordered, checked, className }) {
+          if (checked != null) {
+            console.log(children);
+          }
+          return <li className=" ">{children}</li>;
+        },
+        td({ node, children, style, isHeader }) {
+          // isHeader is false
+          return <td className="border p-1">{children}</td>;
+        },
+        a({ node, children, href, title }) {
+          return (
+            <a title={title} href={href} className="text-blue-300 underline">
+              {children}
+            </a>
+          );
+        },
+      }}
+    />
+  );
+};
+
+const ExpandedComponent = memo(
+  ({ data }: { data: Notification }) => {
+    return (
+      <div className=" bg-gray-50 dark:bg-black/10 p-2 dark:text-gray-300 border-b border-[#D5D6D8] dark:border-[#2F3947]">
+        <MyMarkDown text={data.body} />
+      </div>
+    );
+  },
+  (prevProps, nextProps) => {
+    return _.isEqual(prevProps.data, nextProps.data);
+  }
+);
 
 const MessageTable = () => {
   const router = useRouter();
   const target = router.query.id;
-
   const [selectedRows, setSelectedRows] = useState<Notification[]>([]);
   const { userId, notifications, fetchNotifications } = useCnails();
   const [pending, setPending] = useState(true);
@@ -29,6 +214,7 @@ const MessageTable = () => {
   const [replyTarget, setReplyTarget] = useState<
     { id: string; name: string; sub: string }[]
   >([]);
+  const [input, setInput] = useState("");
   const { removeNotification, sendNotification } = notificationAPI;
   useEffect(() => {
     async function temp() {
@@ -226,12 +412,6 @@ const MessageTable = () => {
     );
   };
 
-  const ExpandedComponent = ({ data }: { data: Notification }) => (
-    <div className=" bg-gray-50 dark:bg-black/10 p-2 dark:text-gray-300">
-      <p className="">{data.body}</p>
-    </div>
-  );
-
   createTheme(
     "good",
     {
@@ -249,7 +429,6 @@ const MessageTable = () => {
       </div>
     );
   }
-
   return (
     <>
       {notifications.length == 0 ? (
@@ -278,39 +457,42 @@ const MessageTable = () => {
           expandableRowsComponent={ExpandedComponent}
         />
       )}
-      <button
+      {/* <button
         className="bg-green-500 text-white px-2 rounded h-min"
         onClick={async () => {
+          const temp = getTestMessage();
+          console.log(temp);
           const response = await sendNotification(
             "test",
-            "this is a test message. This button should be hidden. ".repeat(
-              Math.ceil(Math.random() * 10)
-            ),
+            temp,
             userId,
             userId,
             Math.random() > 0.5
           );
           if (response.success) {
             fetchNotifications(userId);
+          } else {
+            myToast.error(response.error.error);
           }
         }}
       >
         Send test message
-      </button>
+      </button> */}
       <ModalForm
         isOpen={replyFormOpen}
         setOpen={setReplyFormOpen}
         title={"Reply Message"}
-        clickOutsideToClose
-        size="sm"
+        size="lg"
         formStructure={getMessageReplyFormStructure(replyTarget)}
-        onEnter={async(data)  => {
-          console.log(data)
+        clickOutsideToClose
+        escToClose
+        onEnter={async (data) => {
+          console.log(data);
           const response = await sendNotification(
-            "Replytest",//the title can change? or use "RE: <message title>
+            "Replytest", //the title can change? or use "RE: <message title>
             data.message,
             userId,
-            userId,//should pass the userid of the people to reply to
+            userId, //should pass the userid of the people to reply to
             true
           );
           if (response.success) {
@@ -327,19 +509,6 @@ const MessageTable = () => {
 };
 
 export default function Messages() {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [notificationsPerPage, setNotificationsPerPage] = useState(6);
-  const { userId } = useCnails();
-  const { sendNotification } = notificationAPI;
-  const indexOfLastNotification = currentPage * notificationsPerPage;
-  const indexOfFirstNotification =
-    indexOfLastNotification - notificationsPerPage;
-  const currentPosts = notifications.slice(
-    indexOfFirstNotification,
-    indexOfLastNotification
-  );
-
   return (
     <div className="px-10 mb-10">
       <p className="text-3xl  font-bold mb-2 text-gray-600 dark:text-gray-300">

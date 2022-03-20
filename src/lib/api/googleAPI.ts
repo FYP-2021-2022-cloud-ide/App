@@ -18,8 +18,6 @@ const googleAPI = {
       method: "POST",
     });
     const responseJSON = await response.json();
-    // console.log("message", message)
-    console.log(responseJSON);
     if (responseJSON.success) {
       location.replace(responseJSON.authURL);
       return {
@@ -57,6 +55,11 @@ const googleAPI = {
     });
     return response.json();
   },
+  /**
+   * download a file from google drive to personal volume
+   * @param fileId the google file id
+   * @param filePath the target path in personal volume
+   */
   downloadFiles: async (
     sub: string,
     fileId: string,

@@ -16,6 +16,7 @@ import {
 import myToast from "../../../../components/CustomToast";
 import {
   Environment as APIEnvironment,
+  SuccessStringResponse,
   Template as APITemplate,
 } from "../../../../lib/api/api";
 import ModalForm, { Section } from "../../../../components/ModalForm";
@@ -29,10 +30,13 @@ import {
   getCreateTemplateFormStructure,
   getUpdateTemplateFormStructure,
   getUpdateEnvironmentFormStructure,
+  getAnnouncementFormStructure,
 } from "../../../../lib/forms";
 import _ from "lodash";
-const registry =process.env.NEXT_PUBLIC_REGISTRY;
-const rootImage =  `${registry}/codeserver:latest`;
+import courseAPI from "../../../../lib/api/courses";
+import CardMenu from "../../../../components/CardMenu";
+const registry = process.env.NEXT_PUBLIC_REGISTRY;
+const rootImage = `${registry}/codeserver:latest`;
 const CPU = 0.5;
 const memory = 800;
 
@@ -266,8 +270,8 @@ const EnvironmentTemplateWrapper = () => {
             fetch();
           }}
           onUpdate={(template) => {
-            setTemplateUpdateOpen(true);
             setTemplateUpdateTarget(template);
+            setTemplateUpdateOpen(true);
           }}
           onWorkspaceCardClick={(template) => {
             if (template.containerID) {
@@ -350,6 +354,7 @@ const EnvironmentTemplateWrapper = () => {
         isOpen={envCreateOpen}
         setOpen={setEnvCreateOpen}
         clickOutsideToClose
+        escToClose
         title="Create Environment"
         formStructure={createEnvironmentFormStructure}
         onEnter={async (data) => {
@@ -371,7 +376,9 @@ const EnvironmentTemplateWrapper = () => {
               );
               fetch();
             } else {
-              myToast.error(`Fail to create environment. ${response.error.status}`);
+              myToast.error(
+                `Fail to create environment. ${response.error.status}`
+              );
             }
           }
           if (!data.is_predefined) {
@@ -469,6 +476,7 @@ const EnvironmentTemplateWrapper = () => {
         isOpen={envUpdateOpen && environments.length != 0}
         setOpen={setEnvUpdateOpen}
         clickOutsideToClose
+        escToClose
         formStructure={updateEnvironmentFormStructure}
         onClose={async (data, isEnter) => {
           const { update_internal: containerId } = data;
@@ -507,6 +515,7 @@ const EnvironmentTemplateWrapper = () => {
       {/* template create form   */}
       <ModalForm
         clickOutsideToClose
+        escToClose
         isOpen={templateCreateOpen && environments.length != 0}
         setOpen={setTemplateCreateOpen}
         formStructure={templateCreateFormStructure}
@@ -617,6 +626,7 @@ const EnvironmentTemplateWrapper = () => {
           templates.length != 0
         }
         clickOutsideToClose
+        escToClose
         setOpen={setTemplateUpdateOpen}
         formStructure={templateUpdateFormStructure}
         onChange={(data, id) => {
@@ -679,8 +689,13 @@ const Home = () => {
   const sectionId = router.query.sectionId as string;
   // data fetching from API
   const [sectionUserInfo, setSectionUserInfo] = useState<SectionUserInfo>(null);
+  // for testing
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [allowReply, setAllowReply] = useState(true);
+  const [announceFormOpen, setAnnounceFormOpen] = useState<boolean>(false);
   const { getSectionUserInfo } = generalAPI;
-  const { sub } = useCnails();
+  const { sub, userId } = useCnails();
   const fetchSectionUserInfo = async () => {
     const response = await getSectionUserInfo(sectionId, sub); //
 
@@ -695,18 +710,17 @@ const Home = () => {
         sub: sub,
       });
       //restrict the student to access instructor page
-      if (role.toUpperCase() as SectionRole!="INSTRUCTOR"){
+      if ((role.toUpperCase() as SectionRole) != "INSTRUCTOR") {
         router.push("/");
       }
     } else {
       router.push("/");
     }
-    
   };
   useEffect(() => {
     fetchSectionUserInfo();
   }, []);
-
+  console.log(allowReply);
   if (!sectionUserInfo) return <></>;
 
   return (
@@ -725,12 +739,24 @@ const Home = () => {
               },
             ]}
           />
-          <CourseBar
-            role="INSTRUCTOR"
-            courseCode={sectionUserInfo.courseCode}
-            courseTitle={sectionUserInfo.courseTitle}
-            sectionCode={sectionUserInfo.sectionCode}
-          ></CourseBar>
+          <div className="flex flex-row space-x-2 z-[2]">
+            <CourseBar
+              role="INSTRUCTOR"
+              courseCode={sectionUserInfo.courseCode}
+              courseTitle={sectionUserInfo.courseTitle}
+              sectionCode={sectionUserInfo.sectionCode}
+            />
+            <CardMenu
+              items={[
+                {
+                  text: "Make announcement",
+                  onClick: () => {
+                    setAnnounceFormOpen(true);
+                  },
+                },
+              ]}
+            ></CardMenu>
+          </div>
           <InstructorProvider sectionUserInfo={sectionUserInfo}>
             <EnvironmentTemplateWrapper></EnvironmentTemplateWrapper>
           </InstructorProvider>
@@ -738,6 +764,31 @@ const Home = () => {
       ) : (
         <Loader />
       )}
+      <ModalForm
+        isOpen={announceFormOpen}
+        setOpen={setAnnounceFormOpen}
+        title={"Course Annoucement"}
+        size="lg"
+        formStructure={getAnnouncementFormStructure()}
+        clickOutsideToClose
+        escToClose
+        onEnter={async (data) => {
+          const response = await courseAPI.sendNotificationAnnouncement(
+            data.allow_reply,
+            data.announcement,
+            data.title,
+            userId,
+            sectionId
+          );
+          if (response.success)
+            myToast.success("The course announcement is sent.");
+          else myToast.error("Fail to send course announcement.");
+          setAnnounceFormOpen(false);
+        }}
+        onClose={() => {
+          setAnnounceFormOpen(false);
+        }}
+      ></ModalForm>
     </div>
   );
 };

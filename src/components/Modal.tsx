@@ -1,14 +1,13 @@
 import React, { useEffect, useRef } from "react";
 import { Dialog, Transition } from "@headlessui/react";
+import { useWindowEvent } from "./useWindowEvent";
 import { Fragment } from "react";
-import { useTheme } from "../contexts/theme";
-
-type CloseModal = (...args: Boolean[]) => void;
 
 export type ModalProps = {
   isOpen: Boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   clickOutsideToClose?: boolean;
+  escToClose?: boolean;
   onOpen?: () => void;
   onClose?: () => void;
 };
@@ -18,9 +17,17 @@ function Modal({
   isOpen,
   setOpen,
   clickOutsideToClose = false,
+  escToClose = false,
   onOpen,
   onClose,
 }: ModalProps & { children: React.ReactNode }) {
+  useWindowEvent("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    if (escToClose) {
+      if (onClose) onClose();
+      setOpen(false);
+    }
+  });
   useEffect(() => {
     if (isOpen) {
       if (onOpen) onOpen();
@@ -46,12 +53,9 @@ function Modal({
           <Dialog
             as="div"
             className={`fixed inset-0 z-[10] overflow-y-auto `}
-            onClose={() => {
-              if (clickOutsideToClose) {
-                if (onClose) onClose();
-                setOpen(false);
-              }
-            }}
+            open={Boolean(isOpen)}
+            // this will disable the orginal useWindowEvent
+            onClose={() => null}
           >
             <div className="min-h-screen w-full px-4 text-center z-[100]">
               <Transition.Child
@@ -63,7 +67,16 @@ function Modal({
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
               >
-                <Dialog.Overlay className="fixed inset-0 dark:bg-black dark:opacity-70" />
+                {/* use a custom div instead of Dialog.overlay such that onClick is working */}
+                <div
+                  className="fixed inset-0 dark:bg-black dark:opacity-70"
+                  onClick={() => {
+                    if (clickOutsideToClose) {
+                      if (onClose) onClose();
+                      setOpen(false);
+                    }
+                  }}
+                ></div>
               </Transition.Child>
 
               {/* This element is to trick the browser into centering the modal contents. */}

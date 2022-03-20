@@ -118,8 +118,8 @@ type CnailsContextState = {
   email: string;
   userId: string;
   semesterId: string;
-  bio: string;
-  isAdmin: boolean;
+  // bio: string;
+  // isAdmin: boolean;
   notifications: Notification[],
   containers: Container[],
   containerInfo: ContainerInfo,

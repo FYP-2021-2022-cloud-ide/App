@@ -54,9 +54,15 @@ const SideBar = () => {
 
       {containers && containerInfo && containerQuota && (
         <div className="w-full flex flex-col space-y-2 text-xs text-gray-500 dark:text-gray-400 select-none mb-5 px-4">
-          <div className="">
-            <p id="current-run-percentage">
-              {containers.length}/{containerQuota} (Quota)
+          <div
+            className="tooltip tooltip-info"
+            data-tip={`${containers.length}/${containerQuota} (Quota)`}
+          >
+            {/* <p id="current-run-percentage">
+              
+            </p> */}
+            <p className="capitalize whitespace-nowrap">
+              current running containers
             </p>
             <div className="current-run-bar-outer">
               <div

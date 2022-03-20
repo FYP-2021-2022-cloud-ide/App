@@ -12,7 +12,6 @@ import {
 import { useRouter } from "next/router";
 import { notificationAPI } from "../lib/api/notificationAPI";
 import { containerAPI } from "../lib/api/containerAPI";
-import Cookies from "js-cookie";
 import { FetchCookieResponse } from "../lib/api/api";
 
 const defaultQuota = 5;
@@ -71,7 +70,7 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
       })
     ).json()) as FetchCookieResponse;
     if (response.success) {
-      const { sub, name, email, userId, semesterId, bio, role } =
+      const { sub, name, email, userId, semesterId } =
         response.cookies;
       if (!userId) {
         throw new Error("user id is null ");
@@ -81,16 +80,16 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
       setEmail(email);
       setUserId(userId);
       setSemesterId(semesterId);
-      setBio(bio);
-      setIsAdmin(role == "admin");
+      // setBio(bio);
+      // setIsAdmin(role == "admin");
       return {
         sub,
         name,
         email,
         userId,
         semesterId,
-        bio,
-        role,
+        // bio,
+        // role,
       };
     } else {
       throw new Error("cookies cannot be fetched");
@@ -160,8 +159,8 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
           email,
           userId,
           semesterId,
-          bio,
-          isAdmin,
+          // bio,
+          // isAdmin,
           notifications,
           containers,
           containerInfo,

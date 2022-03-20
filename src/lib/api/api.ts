@@ -352,9 +352,6 @@ type FetchCookieResponse =
         email: string;
         userId: string;
         semesterId: string;
-        darkMode: string;
-        bio: string;
-        role: string;
       };
     }
   | { success: false; error: Error };

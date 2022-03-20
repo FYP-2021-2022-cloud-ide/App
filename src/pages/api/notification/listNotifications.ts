@@ -3,7 +3,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 
-import { NotificationListResponse  ,nodeError} from "../../../lib//api/api";
+import { NotificationListResponse, nodeError } from "../../../lib/api/api";
 
 import { grpcClient } from "../../../lib/grpcClient";
 import {
@@ -15,7 +15,7 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<NotificationListResponse>
 ) {
-  var client = grpcClient
+  var client = grpcClient;
   const { userId } = req.query!;
   var docReq = new UserIdRequest();
   docReq.setSessionKey(fetchAppSession(req));
@@ -24,14 +24,13 @@ export default function handler(
     client.listNotifications(
       docReq,
       function (err, GoLangResponse: ListNotificationsReply) {
-
         var nts = GoLangResponse.getNotificationsList();
         res.json({
           success: GoLangResponse.getSuccess(),
-          error:{
-              status: GoLangResponse.getError()?.getStatus(),
-              error: GoLangResponse.getError()?.getError(),
-          } ,
+          error: {
+            status: GoLangResponse.getError()?.getStatus(),
+            error: GoLangResponse.getError()?.getError(),
+          },
           notifications: nts.map((nt) => {
             var sender = nt.getSender();
             return {
@@ -54,7 +53,7 @@ export default function handler(
   } catch (error) {
     res.json({
       success: false,
-      error:nodeError(error) ,
+      error: nodeError(error),
     });
     res.status(405).end();
   }
