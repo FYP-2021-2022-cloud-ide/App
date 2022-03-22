@@ -2,47 +2,42 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { fetchAppSession } from "../../lib/fetchAppSession";
 
-import { CourseListResponse ,nodeError} from "../../lib/api/api";
+import { CourseListResponse, nodeError } from "../../lib/api/api";
 
 import { grpcClient } from "../../lib/grpcClient";
-import {
-  ListCoursesReply,
-  SubRequest,
-} from "../../proto/dockerGet/dockerGet_pb";
+import { ListCoursesReply, SubRequest } from "../../proto/dockerGet/dockerGet";
 
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<CourseListResponse>
 ) {
-  var client = grpcClient
+  var client = grpcClient;
   const { sub } = req.query;
 
-  var docReq = new SubRequest();
-  docReq.setSessionKey(fetchAppSession(req));
-  docReq.setSub(sub as string);
+  var docReq: SubRequest = SubRequest.fromPartial({
+    sessionKey: fetchAppSession(req),
+    sub: sub as string,
+  });
   try {
     client.listCourses(
       docReq,
       function (err, GoLangResponse: ListCoursesReply) {
-
-        var courses = GoLangResponse.getCoursesList();
+        var courses = GoLangResponse.courses;
         res.json({
-          success: GoLangResponse.getSuccess(),
-          error:{
-            status: GoLangResponse.getError()?.getStatus(),
-            error: GoLangResponse.getError()?.getError(),
-          } ,
+          success: GoLangResponse.success,
+          error: {
+            status: GoLangResponse.error?.status,
+            error: GoLangResponse.error?.error,
+          },
           courses:
             courses.map((course) => {
               return {
-                sectionID: course.getSectionid(),
-                courseCode: course.getCoursecode(),
-                section: course.getSection(),
-                name: course.getName(),
-                sectionRole: course.getSectionrole() as
-                  | "instructor"
-                  | "student",
-                lastUpdateTime: course.getLastupdatetime(),
+                sectionID: course.sectionID,
+                courseCode: course.courseCode,
+                section: course.section,
+                name: course.name,
+                sectionRole: course.sectionRole as "instructor" | "student",
+                lastUpdateTime: course.lastUpdateTime,
               };
             }) || [],
         });
@@ -52,7 +47,7 @@ export default function handler(
   } catch (error) {
     res.json({
       success: false,
-      error:nodeError(error) ,
+      error: nodeError(error),
     });
     res.status(405).end();
   }

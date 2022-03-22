@@ -57,6 +57,7 @@ service Docker {
   rpc removeNotification(RemoveNotificationRequest)returns(SuccessStringReply){}
   rpc updateNotificationToken(UpdateNotificationTokenRequest)returns(SuccessStringReply){}
   rpc updateSubscription(UpdateSubscriptionRequest)returns(SuccessStringReply){}
+  rpc sendNotificationAnnouncement(SendNotificationAnnouncementRequest)returns(SuccessStringReply){}
 
   rpc googleOAuth(EmptyRequest)returns(GoogleOAuthReply){}
   rpc requestAccessToken(CodeRequest)returns(SuccessStringReply){}
@@ -404,6 +405,14 @@ message SendNotificationRequest{
   string body=2;
   string sender=3;
   string receiver=5;
+  bool allow_reply=4;
+}
+message SendNotificationAnnouncementRequest{
+  string session_key=42;
+  string title=1;
+  string body=2;
+  string sender=3;
+  string section_id=5;
   bool allow_reply=4;
 }
 message SendNotificationReply{

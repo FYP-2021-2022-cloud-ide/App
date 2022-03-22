@@ -1,63 +1,69 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { fetchAppSession } from '../../../lib/fetchAppSession';
-import {grpcClient}from '../../../lib/grpcClient'
-import {  ListContainerReply,  SubRequest } from '../../../proto/dockerGet/dockerGet_pb';
-import { ContainerListResponse,nodeError } from "../../../lib/api/api";
+import type { NextApiRequest, NextApiResponse } from "next";
+import { fetchAppSession } from "../../../lib/fetchAppSession";
+import { grpcClient } from "../../../lib/grpcClient";
+import {
+  ListContainerReply,
+  SubRequest,
+} from "../../../proto/dockerGet/dockerGet";
+// const { ListContainerReply, SubRequest } = dockerGet_pb;
+import { ContainerListResponse, nodeError } from "../../../lib/api/api";
 
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<ContainerListResponse>
-  ) {
-    var client = grpcClient
-    const { sub } = req.query;
+) {
+  var client = grpcClient;
+  const { sub } = req.query;
 
-    var docReq = new SubRequest();
-    docReq.setSessionKey(fetchAppSession(req));
-    docReq.setSub(sub as string);
-    console.log(sub)
-    try{
-      client.listContainers(docReq, function(err, GoLangResponse: ListContainerReply) {
-       
-        console.log(GoLangResponse.getError()==undefined)
-        var containersInfo =GoLangResponse.getContainerinfo();
-        var containers = GoLangResponse.getContainersList();
-        var tempContainers = GoLangResponse.getTempcontainersList();
-        res.json({ 
-          success : GoLangResponse.getSuccess(),
-          error:{
-              status:GoLangResponse.getError()?.getStatus(),
-              error: GoLangResponse.getError()?.getError(),
-          } ,
-          containersInfo: {
-              containersAlive: containersInfo?.getContainersalive(),
-              containersTotal: containersInfo?.getContainerstotal(),
-          },
-          containers: containers.map( containers =>{
-            return ({
-              courseTitle: containers.getCoursetitle(),
-              assignmentName: containers.getAssignmentname(),
-              existedTime: containers.getExistedtime(),
-              containerID: containers.getContainerid(),
-            })
-          })||[],
-          tempContainers: tempContainers.map( containers =>{
-            return ({
-              courseTitle: containers.getCoursetitle(),
-              assignmentName: containers.getAssignmentname(),
-              existedTime: containers.getExistedtime(),
-              containerID: containers.getContainerid(),
-            })
-          })||[],
-         });
-        res.status(200).end();
-      })
-    }
-    catch(error) {
+  try {
+    client.listContainers(
+      {
+        sessionKey: fetchAppSession(req),
+        sub: sub as string,
+      },
+      function (err, GoLangResponse: ListContainerReply) {
+        console.log(GoLangResponse.containerInfo == undefined);
+        var containersInfo = GoLangResponse.containerInfo;
+        var containers = GoLangResponse.containers;
+        var tempContainers = GoLangResponse.tempContainers;
         res.json({
-          success:false,
-          error:nodeError(error) ,
+          success: GoLangResponse.success,
+          error: {
+            status: GoLangResponse.error?.status,
+            error: GoLangResponse.error?.error,
+          },
+          containersInfo: {
+            containersAlive: containersInfo?.containersAlive,
+            containersTotal: containersInfo?.containersTotal,
+          },
+          containers:
+            containers.map((containers) => {
+              return {
+                courseTitle: containers.courseTitle,
+                assignmentName: containers.courseTitle,
+                existedTime: containers.existedTime,
+                containerID: containers.containerID,
+              };
+            }) || [],
+          tempContainers:
+            tempContainers.map((containers) => {
+              return {
+                courseTitle: containers.courseTitle,
+                assignmentName: containers.assignmentName,
+                existedTime: containers.existedTime,
+                containerID: containers.containerID,
+              };
+            }) || [],
         });
-        res.status(405).end();
-    }
+        res.status(200).end();
+      }
+    );
+  } catch (error) {
+    res.json({
+      success: false,
+      error: nodeError(error),
+    });
+    res.status(405).end();
   }
+}

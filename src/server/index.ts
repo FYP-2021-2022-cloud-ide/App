@@ -5,10 +5,10 @@ import {
   GetUserDataRequest,
   InstantAddContainerRequest,
   AddContainerReply,
-  GetUserDataReply,
   CheckHaveContainerRequest,
+  GetUserDataReply,
   SuccessStringReply,
-} from "../proto/dockerGet/dockerGet_pb";
+} from "../proto/dockerGet/dockerGet";
 
 import express from "express";
 import { Request, Response, NextFunction } from "express";
@@ -18,21 +18,21 @@ import crypto from "crypto";
 import redis from "redis";
 
 // rest of the code remains same
-//const { createProxyMiddleware } = require('http-proxy-middleware')
 import next from "next";
 const port = 3000;
 const dev = process.env.NODE_ENV !== "production";
-var httpProxy = require("http-proxy");
+import httpProxy from "http-proxy";
 var proxy = httpProxy.createProxyServer({ ws: true });
-// var proxy = require('express-http-proxy');
-var http = require("http");
+import http from "http";
 // import cookieParser from 'cookie-parser';
 const app = next({ dev });
 const handle = app.getRequestHandler();
-import { auth, requiresAuth, OpenidRequest } from "express-openid-connect";
+import expressOpenidConnect from "express-openid-connect";
+const { auth, requiresAuth } = expressOpenidConnect;
 import { Header } from "next/dist/lib/load-custom-routes";
 import { parse } from "cookie";
 import { fetchAppSession } from "../lib/fetchAppSession";
+import { String } from "lodash";
 //import fetch from "node-fetch";
 
 const SESSION_VALID_FOR = 8 * 60 * 60 * 1000;
@@ -109,7 +109,6 @@ app.prepare().then(() => {
             });
           },
           set: (sid, data, callback) => {
-            // console.log(data)
             const key = crypto
               .createHmac("sha1", process.env.SESSIONSECRET!)
               .update(sid)
@@ -134,7 +133,7 @@ app.prepare().then(() => {
         },
       },
       routes: {
-        postLogoutRedirect: process.env.POST_LOGOUT_REDIRECT_URI
+        postLogoutRedirect: process.env.POST_LOGOUT_REDIRECT_URI,
       },
       afterCallback: async (req, res, session, decodedState) => {
         try {
@@ -157,23 +156,38 @@ app.prepare().then(() => {
           const { sub, name, email } = additionalUserClaims.data;
           if (sub == "" || name == "" || email == "")
             throw new Error("something goes wrong with data from cas.ust.hk ");
+          // const {  name, email } = additionalUserClaims.data;
+          // if (name == "" || email == "")
+          //   throw new Error("something goes wrong with data from cas.ust.hk ");
+          // const sub = "desmond"
+
           var client = grpcClient;
           // console.log(client)
-          var docReq = new GetUserDataRequest();
-          docReq.setSessionKey(session.id_token);
-          docReq.setIsSessionKey(false);
-          docReq.setSub(sub);
-
+          var docReq: GetUserDataRequest = {
+            sessionKey: session.id_token,
+            isSessionKey: false,
+            sub: sub,
+          };
+          const encrypt = (val: string) => {
+            let cipher = crypto.createCipheriv(
+              "aes-256-cbc",
+              crypto.scryptSync(process.env.SESSIONSECRET, "GfG", 32),
+              process.env.SESSIONIV
+            );
+            let encrypted = cipher.update(val, "utf8", "base64");
+            encrypted += cipher.final("base64");
+            return encrypted;
+          };
           await new Promise((resolve, reject) => {
             client.getUserData(
               docReq,
               function (err, GolangResponse: GetUserDataReply) {
                 resolve({
-                  userId: GolangResponse.getUserid(),
-                  semesterId: GolangResponse.getSemesterid(),
-                  darkMode: GolangResponse.getDarkmode(),
-                  bio: GolangResponse.getBio(),
-                  role: GolangResponse.getRole(),
+                  userId: GolangResponse.userId,
+                  semesterId: GolangResponse.semesterId,
+                  darkMode: GolangResponse.darkMode,
+                  bio: GolangResponse.bio,
+                  role: GolangResponse.role,
                 });
 
                 if (err) reject(err);
@@ -188,44 +202,44 @@ app.prepare().then(() => {
               role: string;
             }) => {
               console.log(value);
-              res.cookie("userId", value.userId, {
+              res.cookie("userId", encrypt(value.userId), {
                 maxAge: SESSION_VALID_FOR,
                 httpOnly: true,
                 domain: `${process.env.HOSTNAME}`,
               });
-              res.cookie("role", value.role, {
+              // res.cookie("role", encrypt(value.role), {
+              //   maxAge: SESSION_VALID_FOR,
+              //   httpOnly: true,
+              //   domain: `${process.env.HOSTNAME}`,
+              // });
+              res.cookie("semesterId", encrypt(value.semesterId), {
                 maxAge: SESSION_VALID_FOR,
                 httpOnly: true,
                 domain: `${process.env.HOSTNAME}`,
               });
-              res.cookie("semesterId", value.semesterId, {
-                maxAge: SESSION_VALID_FOR,
-                httpOnly: true,
-                domain: `${process.env.HOSTNAME}`,
-              });
-              res.cookie("darkMode", value.darkMode, {
-                maxAge: SESSION_VALID_FOR,
-                httpOnly: true,
-                domain: `${process.env.HOSTNAME}`,
-              });
-              res.cookie("bio", value.bio, {
-                maxAge: SESSION_VALID_FOR,
-                httpOnly: true,
-                domain: `${process.env.HOSTNAME}`,
-              });
+              // res.cookie("darkMode", encrypt(value.darkMode), {
+              //   maxAge: SESSION_VALID_FOR,
+              //   httpOnly: true,
+              //   domain: `${process.env.HOSTNAME}`,
+              // });
+              // res.cookie("bio", encrypt(value.bio), {
+              //   maxAge: SESSION_VALID_FOR,
+              //   httpOnly: true,
+              //   domain: `${process.env.HOSTNAME}`,
+              // });
             }
           );
-          res.cookie("sub", sub, {
+          res.cookie("sub", encrypt(sub), {
             maxAge: SESSION_VALID_FOR,
             httpOnly: true,
             domain: `${process.env.HOSTNAME}`,
           });
-          res.cookie("name", name, {
+          res.cookie("name", encrypt(name), {
             maxAge: SESSION_VALID_FOR,
             httpOnly: true,
             domain: `${process.env.HOSTNAME}`,
           });
-          res.cookie("email", email, {
+          res.cookie("email", encrypt(email), {
             maxAge: SESSION_VALID_FOR,
             httpOnly: true,
             domain: `${process.env.HOSTNAME}`,
@@ -261,7 +275,7 @@ app.prepare().then(() => {
   });
 
   // // authentication logout
-  server.get('/logout', (req: Request, res: Response) => {
+  server.get("/logout", (req: Request, res: Response) => {
     // @ts-ignore
     req.appSession!.destroy((err) => {
       if (err) {
@@ -270,9 +284,7 @@ app.prepare().then(() => {
       res.oidc!.logout({ returnTo: process.env.POST_LOGOUT_REDIRECT_URI });
     });
     res.oidc!.logout({ returnTo: process.env.POST_LOGOUT_REDIRECT_URI });
-
   });
-
 
   // grpc api route
   server.all(
@@ -280,26 +292,25 @@ app.prepare().then(() => {
     async function (req: Request, res: Response) {
       try {
         var client = grpcClient;
-        var docReq = new InstantAddContainerRequest();
         const { appSession } = parse(req.headers.cookie!);
         const key = crypto
           .createHmac("sha1", process.env.SESSIONSECRET!)
           .update(appSession)
           .digest()
           .toString("base64");
-        docReq.setSub(req.oidc.user!.sub);
-        docReq.setTemplateId(req.params.templateID);
-        docReq.setSessionKey(key);
+        var docReq: InstantAddContainerRequest = {
+          sub: req.oidc.user!.sub,
+          templateId: req.params.templateID,
+          sessionKey: key,
+        };
         client.instantAddContainer(
           docReq,
           function (err, GoLangResponse: AddContainerReply) {
-            if (!GoLangResponse.getSuccess()) {
-              console.log(GoLangResponse.getError().getError());
+            if (!GoLangResponse.success) {
+              console.log(GoLangResponse.error.error);
               res.redirect("/");
             } else {
-              res.redirect(
-                `/user/container/${GoLangResponse.getContainerid()}/`
-              );
+              res.redirect(`/user/container/${GoLangResponse.containerID}/`);
             }
           }
         );
@@ -319,21 +330,22 @@ app.prepare().then(() => {
 
       try {
         var client = grpcClient;
-        var docReq = new CheckHaveContainerRequest();
         const { appSession } = parse(req.headers.cookie!);
         const key = crypto
           .createHmac("sha1", process.env.SESSIONSECRET!)
           .update(appSession)
           .digest()
           .toString("base64");
-        docReq.setSessionKey(key);
-        docReq.setSub(req.oidc.user!.sub);
-        docReq.setContainerid(req.params.id);
+        var docReq: CheckHaveContainerRequest = {
+          sessionKey: key,
+          sub: req.oidc.user!.sub,
+          containerID: req.params.id,
+        };
         client.checkHaveContainer(
           docReq,
           function (err, GoLangResponse: SuccessStringReply) {
             // console.log(err,GoLangResponse.getMessage())
-            if (GoLangResponse.getSuccess()) {
+            if (GoLangResponse.success) {
               const reqHost = req.headers.host;
               req.headers.host = req.params.id;
               // req.header("Host") = req.params.id
@@ -346,7 +358,7 @@ app.prepare().then(() => {
                 target: "http://traefik.codespace.ust.dev",
               });
             } else {
-              console.error(GoLangResponse.getError().getError());
+              console.error(GoLangResponse.error.error);
               res.redirect(`/`);
             }
           }
@@ -369,3 +381,5 @@ app.prepare().then(() => {
     console.log(`> Ready on http://localhost:${port}`);
   });
 });
+
+export {};

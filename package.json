@@ -2,13 +2,16 @@
   "name": "client_ts",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "ts-node --project tsconfig.server.json src/server/index.ts",
-    "build": "next build && tsc --project tsconfig.server.json",
+    "dev": "NODE_OPTIONS='--experimental-specifier-resolution=node' ts-node src/server/index.ts",
+    "build": "next build && tsc ",
     "start": "node out/server/index.js",
-    "lint": "next lint"
+    "lint": "next lint",
+    "protoc": "grpc_tools_node_protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=. src/proto/dockerGet/dockerGet.proto --ts_proto_opt=outputServices=grpc-js,esModuleInterop=true "
   },
   "dependencies": {
+    "@grpc/grpc-js": "^1.5.9",
     "@headlessui/react": "^1.4.1",
     "@heroicons/react": "^1.0.4",
     "@minoru/react-dnd-treeview": "^1.6.1",
@@ -26,16 +29,16 @@
     "firebase": "^9.5.0",
     "formidable": "^2.0.1",
     "googleapis": "^92.0.0",
-    "grpc": "^1.24.11",
     "http-proxy": "^1.18.1",
     "http-proxy-middleware": "^2.0.1",
     "jszip": "^3.7.1",
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
-    "next": "^12.0.4",
+    "next": "^12.1.0",
     "node-fetch": "^2.6.1",
     "nprogress": "^0.2.0",
+    "protobufjs": "^6.11.2",
     "react": "^17.0.2",
     "react-data-table-component": "^7.4.7",
     "react-dom": "^17.0.2",
@@ -75,11 +78,17 @@
     "dotenv": "^16.0.0",
     "eslint": "7.31.0",
     "eslint-config-next": "11.0.1",
-    "grpc_tools_node_protoc_ts": "^5.3.0",
     "grpc-tools": "^1.11.2",
     "postcss": "^8.4.5",
     "tailwindcss": "^3.0.15",
-    "ts-node": "^10.1.0",
+    "ts-node": "^10.7.0",
+    "ts-proto": "^1.110.0",
     "typescript": "4.3.5"
+  },
+  "postcss": {
+    "plugins": {
+      "tailwindcss": {},
+      "autoprefixer": {}
+    }
   }
 }

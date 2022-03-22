@@ -12,6 +12,7 @@ export default async function handler(
         FirebaseProjectId: process.env.FirebaseProjectId,
         FirebaseMessagingSenderId : process.env.FirebaseMessagingSenderId,
         FirebaseAppId: process.env.FirebaseAppId,
+        Containers_limit :process.env.CONTAINERSLIMIT,
     })
     res.status(200).end();   
 }

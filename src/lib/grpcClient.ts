@@ -1,10 +1,10 @@
-import { DockerClient } from '../proto/dockerGet/dockerGet_grpc_pb';
-import * as grpc from 'grpc';
+import { DockerClient } from "../proto/dockerGet/dockerGet";
+// import * as grpc from "grpc";
+import * as grpc from "@grpc/grpc-js";
 
-const target= process.env.APIIP;
-const grpcClient=new DockerClient(
-       target,
-       grpc.credentials.createInsecure(),);
+const target = process.env.APIIP;
+const channel = grpc.credentials.createInsecure();
 
+const grpcClient = new DockerClient(target, channel);
 
-export {grpcClient}
+export { grpcClient };

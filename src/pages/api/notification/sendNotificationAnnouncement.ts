@@ -3,41 +3,40 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 
-import { ContainerAddResponse, nodeError } from "../../../lib/api/api";
+import { SuccessStringResponse, nodeError } from "../../../lib/api/api";
 
 import { grpcClient } from "../../../lib/grpcClient";
 import {
-  AddTempContainerReply,
-  AddTempContainerRequest,
+  SendNotificationAnnouncementRequest,
+  SuccessStringReply,
 } from "../../../proto/dockerGet/dockerGet";
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ContainerAddResponse>
+  res: NextApiResponse<SuccessStringResponse>
 ) {
   var client = grpcClient;
-
-  const { sub } = req.query;
-  const { memLimit, numCPU, imageName, accessRight } = JSON.parse(req.body);
-  var docReq: AddTempContainerRequest = AddTempContainerRequest.fromPartial({
+  const { title, body, sender, sectionId, allowReply } = JSON.parse(req.body);
+  var docReq = SendNotificationAnnouncementRequest.fromPartial({
     sessionKey: fetchAppSession(req),
-    accessRight: accessRight,
-    memLimit: memLimit,
-    numCPU: numCPU,
-    imageName: imageName,
-    sub: sub as string,
+    allowReply: allowReply,
+    body: body,
+    sender: sender,
+    title: title,
+    sectionId: sectionId,
   });
+
   try {
-    client.addTempContainer(
+    client.sendNotificationAnnouncement(
       docReq,
-      function (err, GoLangResponse: AddTempContainerReply) {
+      function (err, GoLangResponse: SuccessStringReply) {
+        console.log(GoLangResponse);
         res.json({
           success: GoLangResponse.success,
           error: {
             status: GoLangResponse.error?.status,
             error: GoLangResponse.error?.error,
           },
-          containerID: GoLangResponse.tempContainerId,
         });
         res.status(200).end();
       }

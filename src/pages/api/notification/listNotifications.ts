@@ -9,7 +9,7 @@ import { grpcClient } from "../../../lib/grpcClient";
 import {
   ListNotificationsReply,
   UserIdRequest,
-} from "../../../proto/dockerGet/dockerGet_pb";
+} from "../../../proto/dockerGet/dockerGet";
 
 export default function handler(
   req: NextApiRequest,
@@ -17,33 +17,34 @@ export default function handler(
 ) {
   var client = grpcClient;
   const { userId } = req.query!;
-  var docReq = new UserIdRequest();
-  docReq.setSessionKey(fetchAppSession(req));
-  docReq.setUserid(userId as string);
+  var docReq: UserIdRequest = UserIdRequest.fromPartial({
+    sessionKey: fetchAppSession(req),
+    userId: userId as string,
+  });
   try {
     client.listNotifications(
       docReq,
       function (err, GoLangResponse: ListNotificationsReply) {
-        var nts = GoLangResponse.getNotificationsList();
+        var nts = GoLangResponse.notifications;
         res.json({
-          success: GoLangResponse.getSuccess(),
+          success: GoLangResponse.success,
           error: {
-            status: GoLangResponse.getError()?.getStatus(),
-            error: GoLangResponse.getError()?.getError(),
+            status: GoLangResponse.error?.status,
+            error: GoLangResponse.error?.error,
           },
           notifications: nts.map((nt) => {
-            var sender = nt.getSender();
+            var sender = nt.sender;
             return {
-              id: nt.getId(),
-              title: nt.getTitle(),
-              body: nt.getBody(),
+              id: nt.id,
+              title: nt.title,
+              body: nt.body,
               sender: {
-                id: sender!.getId(),
-                sub: sender!.getSub(),
-                name: sender!.getName(),
+                id: sender!.id,
+                sub: sender!.sub,
+                name: sender!.name,
               },
-              allow_reply: nt.getAllowReply(),
-              updatedAt: nt.getUpdatedAt(),
+              allow_reply: nt.allowReply,
+              updatedAt: nt.updatedAt,
             };
           }),
         });

@@ -9,7 +9,7 @@ import { grpcClient } from "../../../lib/grpcClient";
 import {
   ListSandBoxImageReply,
   ListSandBoxImageRequest,
-} from "../../../proto/dockerGet/dockerGet_pb";
+} from "../../../proto/dockerGet/dockerGet";
 
 export default function handler(
   req: NextApiRequest,
@@ -18,26 +18,27 @@ export default function handler(
   var client = grpcClient;
 
   const { userId } = req.query!;
-  var docReq = new ListSandBoxImageRequest();
-  docReq.setSessionKey(fetchAppSession(req));
-  docReq.setUserid(userId as string);
+  var docReq = ListSandBoxImageRequest.fromPartial({
+    sessionKey: fetchAppSession(req),
+    userId: userId as string,
+  });
   try {
     client.listSandboxImage(
       docReq,
       function (err, GoLangResponse: ListSandBoxImageReply) {
         res.json({
-          success: GoLangResponse.getSuccess(),
+          success: GoLangResponse.success,
           error: {
-            status: GoLangResponse.getError()?.getStatus(),
-            error: GoLangResponse.getError()?.getError(),
+            status: GoLangResponse.error?.status,
+            error: GoLangResponse.error?.error,
           },
           sandboxImages:
-            GoLangResponse.getSandboximagesList().map((sandbox) => ({
-              id: sandbox.getId(),
-              title: sandbox.getTitle(),
-              description: sandbox.getDescription(),
-              imageId: sandbox.getImageid(),
-              sandboxesId: sandbox.getSandboxidList()[0],
+            GoLangResponse.sandboxImages.map((sandbox) => ({
+              id: sandbox.id,
+              title: sandbox.title,
+              description: sandbox.description,
+              imageId: sandbox.imageId,
+              sandboxesId: sandbox.sandboxId[0],
             })) || [],
         });
         res.status(200).end();

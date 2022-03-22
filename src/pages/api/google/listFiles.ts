@@ -6,7 +6,7 @@ import { GoogleDriveListResponse, nodeError } from "../../../lib/api/api";
 import {
   ChildrenReply,
   ListFilesRequest,
-} from "../../../proto/dockerGet/dockerGet_pb";
+} from "../../../proto/dockerGet/dockerGet";
 
 export default async function handler(
   req: NextApiRequest,
@@ -15,28 +15,30 @@ export default async function handler(
   console.log("inside list file");
   const { folderId, sub } = JSON.parse(req.body);
   var client = grpcClient;
-  var docReq = new ListFilesRequest();
-  docReq.setSessionKey(fetchAppSession(req));
-  docReq.setFolderid(folderId);
-  docReq.setSub(sub);
+  var docReq = ListFilesRequest.fromPartial({
+    sessionKey: fetchAppSession(req),
+    folderId: folderId,
+    sub: sub,
+  });
   try {
     client.googleListFile(docReq, (error, GoLangResponse: ChildrenReply) => {
+      // console.log(GoLangResponse.getFoldersList())
       res.json({
-        success: GoLangResponse.getSuccess(),
+        success: GoLangResponse.success,
         error: {
-          status: GoLangResponse.getError()?.getStatus(),
-          error: GoLangResponse.getError()?.getError(),
+          status: GoLangResponse.error?.status,
+          error: GoLangResponse.error?.error,
         },
         loadedFiles: {
           folders:
-            GoLangResponse.getFoldersList().map((folder) => ({
-              id: folder.getId(),
-              name: folder.getName(),
+            GoLangResponse.folders.map((folder) => ({
+              id: folder.id,
+              name: folder.name,
             })) || [],
           files:
-            GoLangResponse.getFilesList().map((file) => ({
-              id: file.getId(),
-              name: file.getName(),
+            GoLangResponse.files.map((file) => ({
+              id: file.id,
+              name: file.name,
             })) || [],
         },
       });
