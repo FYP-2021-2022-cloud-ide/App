@@ -1,7 +1,10 @@
 import React, { useLayoutEffect, useRef } from "react";
-import { LogoutIcon, ClockIcon } from "@heroicons/react/outline";
+import { ClockIcon, XIcon } from "@heroicons/react/outline";
 import Tilt from "react-parallax-tilt";
 import { useCleanTilt } from "../TemplateCard";
+import { containerAPI } from "../../lib/api/containerAPI";
+import { useCnails } from "../../contexts/cnails";
+import myToast from "../CustomToast";
 
 type Props = {
   courseTitle: string;
@@ -18,6 +21,8 @@ function ContainerCard({
   containerID,
   zIndex,
 }: Props) {
+  const { removeContainer } = containerAPI;
+  const { sub, fetchContainers } = useCnails();
   const { ref, cleanStyle } = useCleanTilt(
     zIndex ? `z-index : ${zIndex};` : ""
   );
@@ -54,7 +59,19 @@ function ContainerCard({
               {courseTitle}
             </div>
           </div>
-          <button onClick={(e) => e.stopPropagation()}></button>
+          <button
+            title="remove workspace"
+            onClick={async (e) => {
+              e.stopPropagation();
+              const response = await removeContainer(containerID, sub);
+              if (response.success) {
+                myToast.success("Workspace is removed.");
+                fetchContainers(sub);
+              } else myToast.error("Fail to remove workspace");
+            }}
+          >
+            <XIcon className="w-3 h-3 text-gray-700 dark:text-gray-300" />
+          </button>
         </div>
         <div className="w-full flex flex-row justify-end items-center space-x-1 ">
           <ClockIcon className="h-4 w-4 text-gray-600 dark:text-gray-300 "></ClockIcon>

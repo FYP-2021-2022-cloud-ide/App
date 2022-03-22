@@ -20,7 +20,7 @@ export type {
   CnailsContextState,
   InstructorContextState,
   Workspace,
-  StudentWorkspace
+  StudentWorkspace,
 };
 
 type SectionRole = "INSTRUCTOR" | "STUDENT";
@@ -120,25 +120,33 @@ type CnailsContextState = {
   semesterId: string;
   // bio: string;
   // isAdmin: boolean;
-  notifications: Notification[],
-  containers: Container[],
-  containerInfo: ContainerInfo,
+  notifications: Notification[];
+  containers: Container[];
+  containerInfo: ContainerInfo;
+  /**
+   * a function to fetch the new container list.
+   * It will update the context and hence update all affected UI.
+   */
   fetchContainers: (sub: string) => Promise<{
     containers: Container[];
     containersInfo: ContainerInfo;
-  }>,
-  fetchNotifications: (userId: string) => Promise<Notification[]>,
-  containerQuota: number,
+  }>;
+  /**
+   * a function to fetch a new list of notification.
+   * It will update the context and hence update all affected UI.
+   */
+  fetchNotifications: (userId: string) => Promise<Notification[]>;
+  containerQuota: number;
 };
 
 type InstructorContextState = {
-  environments: Environment[],
-  templates: Template[],
-  fetch: () => void,
-  sectionUserInfo: SectionUserInfo,
-  highlightedEnv: Environment,
-  setHighlightedEnv: React.Dispatch<React.SetStateAction<Environment>>,
-}
+  environments: Environment[];
+  templates: Template[];
+  fetch: () => void;
+  sectionUserInfo: SectionUserInfo;
+  highlightedEnv: Environment;
+  setHighlightedEnv: React.Dispatch<React.SetStateAction<Environment>>;
+};
 
 type StudentWorkspace = {
   status: "NOT_STARTED_BEFORE" | "ON" | "OFF";
@@ -148,6 +156,5 @@ type StudentWorkspace = {
     sub: string;
   };
 };
-
 
 export type ActionType = "delete" | "reply";

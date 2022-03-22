@@ -1,4 +1,4 @@
-import CodeSpace from "./ContainerCard";
+import ContainerCard from "./ContainerCard";
 import EmptyDiv from "../EmptyDiv";
 import { Container, ContainerInfo } from "../../lib/cnails";
 import { useCnails } from "../../contexts/cnails";
@@ -50,14 +50,14 @@ const ContainersList = () => {
               const { containerID, courseTitle, assignmentName, existedTime } =
                 container;
               return (
-                <CodeSpace
+                <ContainerCard
                   key={containerID}
                   courseTitle={courseTitle}
                   containerName={assignmentName}
                   existedTime={existedTime}
                   containerID={containerID}
                   zIndex={containers.length - i}
-                ></CodeSpace>
+                ></ContainerCard>
               );
             })}
           </div>

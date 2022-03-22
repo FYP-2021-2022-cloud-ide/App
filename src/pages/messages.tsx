@@ -20,11 +20,9 @@ import { useRouter } from "next/router";
 import _ from "lodash";
 import remarkGfm from "remark-gfm";
 import ReactMarkdown from "react-markdown";
-import dynamic from "next/dynamic";
-// const remarkGfm = dynamic( ()=> import("remark-gfm" , {ssr: false}  )
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 
-import { prism, okaidia } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { prism, okaidia } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import { useTheme } from "../contexts/theme";
 
 const getTestMessage = () => {
@@ -104,7 +102,6 @@ export const MyMarkDown = ({ text }: { text: string }) => {
   const { isDark } = useTheme();
   return (
     <ReactMarkdown
-      className=""
       children={text}
       remarkPlugins={[remarkGfm]}
       components={{
@@ -196,6 +193,7 @@ const ExpandedComponent = memo(
     return (
       <div className=" bg-gray-50 dark:bg-black/10 p-2 dark:text-gray-300 border-b border-[#D5D6D8] dark:border-[#2F3947]">
         <MyMarkDown text={data.body} />
+        {/* <p>{data.body}</p> */}
       </div>
     );
   },

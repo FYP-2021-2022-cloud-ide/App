@@ -2,7 +2,7 @@ module.exports = {
   content: [
     // Example content paths...
     './public/**/*.html',
-    './src/**/*.{js,jsx,ts,tsx,vue}',
+    './src/**/*.{js,jsx,ts,tsx}',
     './src/pages/**/*.{js,ts,jsx,tsx}',
     './src/components/**/*.{js,ts,jsx,tsx}'
   ],
@@ -22,3 +22,4 @@ module.exports = {
     require('@tailwindcss/typography'),
   ],
 }
+

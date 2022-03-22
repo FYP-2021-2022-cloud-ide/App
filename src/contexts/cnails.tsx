@@ -11,10 +11,11 @@ import {
 } from "../lib/cnails";
 import { useRouter } from "next/router";
 import { notificationAPI } from "../lib/api/notificationAPI";
+import { generalAPI } from "../lib/api/generalAPI";
 import { containerAPI } from "../lib/api/containerAPI";
 import { FetchCookieResponse } from "../lib/api/api";
 
-const defaultQuota = 5;
+const defaultQuota = Number(3); // process.env.CONTAINERSLIMIT
 
 interface CnailsProviderProps {
   children: JSX.Element;
@@ -39,6 +40,7 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
   const router = useRouter();
   const { listNotifications } = notificationAPI;
   const { containerList } = containerAPI;
+  const {getEnv}=generalAPI;
   const fetchNotifications = async (userId: string) => {
     const response = await listNotifications(userId);
     if (response.success) {
@@ -62,7 +64,10 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
         response
       );
   };
-
+  const fetchEnv = async () => {
+    const response = await getEnv();
+    setContainerQuota(response.Containers_limit)
+  };
   async function fetchCookies() {
     const response = (await (
       await fetch(`/api/fetchCookies`, {
@@ -70,8 +75,7 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
       })
     ).json()) as FetchCookieResponse;
     if (response.success) {
-      const { sub, name, email, userId, semesterId } =
-        response.cookies;
+      const { sub, name, email, userId, semesterId } = response.cookies;
       if (!userId) {
         throw new Error("user id is null ");
       }

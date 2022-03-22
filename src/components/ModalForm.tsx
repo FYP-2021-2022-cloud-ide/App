@@ -9,6 +9,7 @@ import "easymde/dist/easymde.min.css";
 import EasyMDE from "easymde";
 import ReactDOMServer from "react-dom/server";
 import { MyMarkDown } from "../pages/messages";
+// import { MyMarkDown } from "../pages/messages";
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
   ssr: false,
 });
@@ -127,6 +128,7 @@ const Entry = ({
   onChange: (newData: Data, id: string) => void;
 }) => {
   if (entry.conditional) {
+    console.log(entry.conditional(data));
     if (!entry.conditional(data)) return <></>;
   }
   if (entry.type == "input") {
@@ -323,6 +325,7 @@ const MDE = memo(
             return ReactDOMServer.renderToString(
               <MyMarkDown text={mdeRef.current.codemirror.getValue()} />
             );
+            // return ReactDOMServer.renderToString(<div></div>);
           },
         }}
         getMdeInstance={(instance) => {
@@ -369,9 +372,7 @@ const TextArea = memo(
       ></textarea>
     );
   },
-  (prevProps, nextProps) => {
-    return true;
-  }
+  () => false
 );
 
 const Section = ({
@@ -459,7 +460,7 @@ const Input = memo(
       </div>
     );
   },
-  () => true
+  () => false
 );
 
 /**

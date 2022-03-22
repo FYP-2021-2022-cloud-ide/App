@@ -8,14 +8,19 @@
     "jsx": "preserve",
     "lib": ["dom", "es2017"],
     "module": "esnext",
-    "types": ["cypress"],
+    "types": ["cypress", "node"],
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": false,
     "target": "esnext",
+    "outDir": "out/",
     "incremental": true,
-    "noEmit": true
+    "sourceMap": true,
+    "noEmit": false
+  },
+  "ts-node": {
+    "esm": true
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.json"],
   "exclude": ["node_modules"]

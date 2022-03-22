@@ -739,7 +739,7 @@ const Home = () => {
               },
             ]}
           />
-          <div className="flex flex-row space-x-2 z-[2]">
+          <div className="flex flex-row justify-between space-x-2 z-[2]">
             <CourseBar
               role="INSTRUCTOR"
               courseCode={sectionUserInfo.courseCode}
