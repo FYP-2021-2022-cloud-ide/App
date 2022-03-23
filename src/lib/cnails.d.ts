@@ -103,6 +103,7 @@ type Notification = {
   id: string;
   // courseCode? : string ;
   // sectionCode? : string ;
+  // read : boolean ;
   sender: {
     id: string;
     name: string;

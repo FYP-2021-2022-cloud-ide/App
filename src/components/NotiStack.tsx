@@ -61,7 +61,7 @@ export default function NotiStack() {
                   </div>
                 ) : (
                   // the notification
-                  <div className="flex  flex-col space-y-2">
+                  <div className="flex  flex-col space-y-2 select-none">
                     <p className="text-2xs dark:text-gray-300">
                       Showing {Math.min(notifications.length, maxShow)} of{" "}
                       {notifications.length} message

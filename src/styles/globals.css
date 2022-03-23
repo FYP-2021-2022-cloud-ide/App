@@ -454,3 +454,9 @@ span.CodeMirror-selectedtext {
   background-size: 1em 1em;
   @apply w-5 h-5 inline-block;
 }
+
+.btn-disabled,
+.btn[disabled] {
+  --tw-bg-opacity: 0.3;
+  --tw-text-opacity: 0.4;
+}
