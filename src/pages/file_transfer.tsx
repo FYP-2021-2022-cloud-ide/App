@@ -1,15 +1,9 @@
 import { googleAPI } from "../lib/api/googleAPI";
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useCnails } from "../contexts/cnails";
-import { NodeModel, TreeMethods } from "@minoru/react-dnd-treeview";
-import { CustomData } from "../components/cloud/CustomNode";
-import FTree, { MyTreeMethods } from "../components/cloud/FTree";
+import { NodeModel } from "@minoru/react-dnd-treeview";
+import { CustomData } from "../components/FTree/CustomNode";
+import FTree, { MyTreeMethods } from "../components/FTree/FTree";
 import path, { dirname } from "path";
 import { localFileAPI } from "../lib/api/localFile";
 import {
@@ -17,12 +11,11 @@ import {
   status,
   expandGoogleFolder,
   GoogleFolder,
-  getFolderById,
   convertGoogleTree,
   convertDirectoryTree,
-} from "../lib/file_transfer_helper";
+} from "../lib/fileTransferHelper";
 import myToast from "../components/CustomToast";
-import ModalForm, { Props as ModalFormProps } from "../components/ModalForm";
+import ModalForm from "../components/ModalForm/ModalForm";
 import directoryTree from "directory-tree";
 import classNames from "../lib/classnames";
 import styles from "../styles/file_tree.module.css";

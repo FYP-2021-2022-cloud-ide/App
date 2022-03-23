@@ -19,7 +19,7 @@ import {
   SuccessStringResponse,
   Template as APITemplate,
 } from "../../../../lib/api/api";
-import ModalForm, { Section } from "../../../../components/ModalForm";
+import ModalForm from "../../../../components/ModalForm/ModalForm";
 import { containerAPI } from "../../../../lib/api/containerAPI";
 import EnvironmentList from "../../../../components/EnvironmentList";
 import CourseBar from "../../../../components/CourseBar";

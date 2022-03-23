@@ -13,7 +13,7 @@ import { Notification } from "../lib/cnails";
 import moment from "moment";
 import Loader from "../components/Loader";
 import myToast from "../components/CustomToast";
-import ModalForm from "../components/ModalForm";
+import ModalForm from "../components/ModalForm/ModalForm";
 import { getMessageReplyFormStructure } from "../lib/forms";
 import React from "react";
 import { useRouter } from "next/router";
@@ -462,27 +462,6 @@ const MessageTable = () => {
           expandableRowsComponent={ExpandedComponent}
         />
       )}
-      {/* <button
-        className="bg-green-500 text-white px-2 rounded h-min"
-        onClick={async () => {
-          const temp = getTestMessage();
-          console.log(temp);
-          const response = await sendNotification(
-            "test",
-            temp,
-            userId,
-            userId,
-            Math.random() > 0.5
-          );
-          if (response.success) {
-            fetchNotifications(userId);
-          } else {
-            myToast.error(response.error.error);
-          }
-        }}
-      >
-        Send test message
-      </button> */}
       <ModalForm
         isOpen={replyFormOpen}
         setOpen={setReplyFormOpen}

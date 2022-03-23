@@ -3,7 +3,7 @@ import { useCnails } from "../contexts/cnails";
 import { sandboxAPI } from "../lib/api/sandboxAPI";
 import { SandboxImage } from "../lib/cnails";
 import myToast from "./CustomToast";
-import ModalForm from "./ModalForm";
+import ModalForm from "./ModalForm/ModalForm";
 import SandboxImageList from "./SandboxImageList";
 import { containerAPI } from "../lib/api/containerAPI";
 import { Option } from "./ListBox";

@@ -10,7 +10,7 @@
 import { NodeModel } from "@minoru/react-dnd-treeview";
 import { DirectoryTree } from "directory-tree";
 import path from "path";
-import { CustomData } from "../components/cloud/CustomNode";
+import { CustomData } from "../components/FTree/CustomNode";
 import { googleAPI } from "./api/googleAPI";
 
 /**

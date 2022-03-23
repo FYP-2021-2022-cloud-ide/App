@@ -1,4 +1,4 @@
-import { FormStructure, Section } from "../components/ModalForm";
+import { FormStructure, Section } from "../components/ModalForm/types";
 import { Environment, SandboxImage, Template } from "./cnails";
 
 import { Option } from "../components/ListBox";
@@ -6,7 +6,6 @@ import { containerAPI } from "./api/containerAPI";
 import myToast from "../components/CustomToast";
 
 const registry = process.env.NEXT_PUBLIC_REGISTRY;
-// console.log(registry)
 const rootImage = `${registry}/codeserver:latest`;
 const CPU = 0.5;
 const memory = 800;
