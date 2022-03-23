@@ -12,6 +12,7 @@ import { MyMarkDown } from "../pages/messages";
 import fm from "front-matter";
 import flat from "flat";
 import _ from "lodash";
+import Twemoji from "react-twemoji";
 // import { MyMarkDown } from "../pages/messages";
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
   ssr: false,
@@ -25,10 +26,25 @@ export type Data = { [id: string]: any };
 export type ValidationOutput = { ok: false; message: string } | { ok: true };
 
 export type Entry = {
+  /**
+   * label of entry
+   */
   label?: string;
+  /**
+   * description of this entry in small text
+   */
   description?: string;
+  /**
+   * whether this entry has a tooltip. shown next to the label.
+   */
   tooltip?: string;
-  conditional?: (data: Data) => boolean; // return a boolean which determine whether it is shown
+  /**
+   * whether this entry should be shown
+   */
+  conditional?: (data: Data) => boolean;
+  /**
+   * validate the entry data on input. If the result is not ok, the form cannot proceed.
+   */
   validate?: (data: Data) => ValidationOutput;
 } & (
   | {
@@ -123,14 +139,19 @@ export type Props = {
   formStructure: FormStructure;
   /**
    * a callback when the data of the form is change
+   *
    * @param data the new data
-   * @param id the id of the data which is changed
+   * @param id the id of the data which is changed. id in the form of `sectionId.entryId`
    */
   onChange?: (data: Data, id: string) => void;
   /**
    * a callback when the form is submitted
    */
   onEnter?: (data: Data) => void;
+  /**
+   * text for the ok and cancel buttons
+   */
+  btnsText?: { cancel: string; ok: string };
 };
 
 type EntryProps = {
@@ -143,7 +164,11 @@ type EntryProps = {
    */
   entry: Entry;
   /**
-   * id of this entry in the format of `sectionId.entryId`
+   * the section of this entry
+   */
+  sectionId: string;
+  /**
+   * id of this entry in the format
    */
   id: string;
   /**
@@ -156,7 +181,14 @@ type EntryProps = {
   onChange: (data: any) => void;
 };
 
-const Entry = ({ zIndex, entry, id, data, onChange }: EntryProps) => {
+const Entry = ({
+  zIndex,
+  entry,
+  id,
+  data,
+  sectionId,
+  onChange,
+}: EntryProps) => {
   if (entry.conditional) {
     if (!entry.conditional(data)) return <></>;
   }
@@ -174,7 +206,7 @@ const Entry = ({ zIndex, entry, id, data, onChange }: EntryProps) => {
           )}
         </div>
         <Input
-          text={data[id] as string}
+          text={data[sectionId][id] as string}
           placeholder={entry.placeholder}
           disabled={entry.disabled}
           onChange={(text) => {
@@ -208,7 +240,7 @@ const Entry = ({ zIndex, entry, id, data, onChange }: EntryProps) => {
         </div>
 
         <TextArea
-          text={data[id] as string}
+          text={data[sectionId][id] as string}
           placeholder={entry.placeholder}
           disabled={entry.disabled}
           onChange={(text) => {
@@ -237,7 +269,7 @@ const Entry = ({ zIndex, entry, id, data, onChange }: EntryProps) => {
           )}
         </div>
         <ListBox
-          selected={data[id] as Option}
+          selected={data[sectionId][id] as Option}
           onChange={onChange}
           options={entry.options}
         />
@@ -260,14 +292,14 @@ const Entry = ({ zIndex, entry, id, data, onChange }: EntryProps) => {
         <Toggle
           text={entry.label}
           onChange={onChange}
-          enabled={data[id] as boolean}
+          enabled={data[sectionId][id] as boolean}
         ></Toggle>
       </div>
     );
   } else if (entry.type == "markdown") {
     const getBadge = () => {
       try {
-        return fm(data[id] as string).attributes;
+        return fm(data[sectionId][id] as string).attributes;
       } catch (error) {
         return {};
       }
@@ -277,7 +309,7 @@ const Entry = ({ zIndex, entry, id, data, onChange }: EntryProps) => {
         {window && window.navigator && (
           <>
             <FrontMatter attributes={getBadge()}></FrontMatter>
-            <MDE text={data[id] as string} onChange={onChange} />
+            <MDE text={data[sectionId][id] as string} onChange={onChange} />
           </>
         )}
       </div>
@@ -298,7 +330,7 @@ const Entry = ({ zIndex, entry, id, data, onChange }: EntryProps) => {
             </div>
           )}
         </div>
-        {entry.node((newValue) => onChange(newValue), data[id])}
+        {entry.node((newValue) => onChange(newValue), data[sectionId][id])}
       </div>
     );
   } else throw new Error("not such entry type in <ModalForm>");
@@ -441,10 +473,12 @@ type SectionProps = {
    */
   data: Data;
   /**
+   * onChange callback
+   *
    * @param data the new value of a data
-   * @param id the id of this entry in the format of `sectionId.entryId`
+   * @param id the entry id
    */
-  onChange: (data: any, id: string) => void; // return the new values of this sections
+  onChange: (data: any, id: string) => void;
 };
 
 const Section = ({ section, id: sectionId, data, onChange }: SectionProps) => {
@@ -460,14 +494,14 @@ const Section = ({ section, id: sectionId, data, onChange }: SectionProps) => {
         )}
         {React.isValidElement(section.entries)
           ? section.entries
-          : Object.keys(section.entries).map((entryId, index) => {
-              const id = `${sectionId}.${entryId}`;
+          : Object.keys(section.entries).map((id, index) => {
               return (
                 <Entry
                   zIndex={Object.keys(section.entries).length - index}
                   key={id}
-                  entry={section.entries[entryId]}
+                  entry={section.entries[id]}
                   id={id}
+                  sectionId={sectionId}
                   data={data}
                   onChange={(data) => onChange(data, id)}
                 ></Entry>
@@ -554,7 +588,7 @@ const fromStructureToData = (sections: FormStructure): Data => {
       } else data[id] = sections[sectionId].entries[entryId].defaultValue;
     });
   });
-  return data;
+  return flat.unflatten(data);
 };
 
 /**
@@ -574,6 +608,7 @@ const ModalForm = (props: Props) => {
     title,
     size = "sm",
     onChange,
+    btnsText,
   } = props;
   const [data, setData] = useState<Data>(fromStructureToData(formStructure));
   const dataRef = useRef<Data>(data);
@@ -582,6 +617,7 @@ const ModalForm = (props: Props) => {
   }, [formStructure]);
   useEffect(() => {
     dataRef.current = data;
+    console.log(dataRef.current);
   });
 
   const sizeMap = {
@@ -599,11 +635,11 @@ const ModalForm = (props: Props) => {
   };
 
   const canProceed = (): boolean => {
-    return Object.keys(formStructure).every((sectionTitle) =>
-      Object.keys(formStructure[sectionTitle].entries).every((entryTitle) => {
-        if (formStructure[sectionTitle].entries[entryTitle].validate) {
-          return formStructure[sectionTitle].entries[entryTitle].validate(data)
-            .ok;
+    if (_.isEmpty(data)) return false;
+    return Object.keys(formStructure).every((sectionId) =>
+      Object.keys(formStructure[sectionId].entries).every((entryId) => {
+        if (formStructure[sectionId].entries[entryId].validate) {
+          return formStructure[sectionId].entries[entryId].validate(data).ok;
         } else return true;
       })
     );
@@ -621,56 +657,58 @@ const ModalForm = (props: Props) => {
       escToClose={escToClose}
     >
       <div className={`modal-form ${sizeMap[size]} hide-scroll `}>
-        <div className="modal-form-content">
-          <Dialog.Title as="h3" className="modal-form-title capitalize">
-            {title}
-          </Dialog.Title>
-          {Object.keys(formStructure).map((sectionTitle) => {
-            const section = formStructure[sectionTitle];
-            return (
-              <Section
-                key={sectionTitle}
-                section={section}
-                id={sectionTitle}
-                data={data}
-                onChange={(newValue, id) => {
-                  const newData = {
-                    ...dataRef.current,
-                    [id]: newValue,
-                  };
-                  setData(newData);
-                  if (onChange) onChange(newData, id);
-                }}
-              ></Section>
-            );
-          })}
-          <div className="modal-form-btn-row pt-4">
-            <button
-              className="modal-form-btn-cancel "
-              onClick={() => {
-                setOpen(false);
-                patchedOnClose();
-              }}
-            >
-              Cancel
-            </button>
-            <button
-              className={
-                canProceed() ? "modal-form-btn-ok" : "modal-form-btn-cancel"
-              }
-              disabled={!canProceed()}
-              onClick={() => {
-                if (onEnter) {
-                  onEnter(data);
+        <Twemoji noWrapper options={{ className: "twemoji" }}>
+          <div className="modal-form-content">
+            <Dialog.Title as="h3" className="modal-form-title capitalize">
+              {title}
+            </Dialog.Title>
+            {Object.keys(formStructure).map((sectionId) => {
+              const section = formStructure[sectionId];
+              return (
+                <Section
+                  key={sectionId}
+                  section={section}
+                  id={sectionId}
+                  data={data}
+                  onChange={(newValue, id) => {
+                    const newData = flat.unflatten({
+                      ...(flat.flatten(dataRef.current) as object),
+                      [`${sectionId}.${id}`]: newValue,
+                    });
+                    setData(newData);
+                    if (onChange) onChange(newData, id);
+                  }}
+                ></Section>
+              );
+            })}
+            <div className="modal-form-btn-row pt-4">
+              <button
+                className="modal-form-btn-cancel "
+                onClick={() => {
                   setOpen(false);
-                  patchedOnClose(true);
+                  patchedOnClose();
+                }}
+              >
+                {btnsText?.cancel ?? "Cancel"}
+              </button>
+              <button
+                className={
+                  canProceed() ? "modal-form-btn-ok" : "modal-form-btn-cancel"
                 }
-              }}
-            >
-              OK
-            </button>
+                disabled={!canProceed()}
+                onClick={() => {
+                  if (onEnter) {
+                    onEnter(data);
+                    setOpen(false);
+                    patchedOnClose(true);
+                  }
+                }}
+              >
+                {btnsText?.ok ?? "OK"}
+              </button>
+            </div>
           </div>
-        </div>
+        </Twemoji>
       </div>
     </Modal>
   );

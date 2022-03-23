@@ -14,6 +14,7 @@ import { notificationAPI } from "../lib/api/notificationAPI";
 import { generalAPI } from "../lib/api/generalAPI";
 import { containerAPI } from "../lib/api/containerAPI";
 import { FetchCookieResponse } from "../lib/api/api";
+import Twemoji from "react-twemoji";
 
 const defaultQuota = Number(3); // process.env.CONTAINERSLIMIT
 
@@ -40,7 +41,7 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
   const router = useRouter();
   const { listNotifications } = notificationAPI;
   const { containerList } = containerAPI;
-  const {getEnv}=generalAPI;
+  const { getEnv } = generalAPI;
   const fetchNotifications = async (userId: string) => {
     const response = await listNotifications(userId);
     if (response.success) {
@@ -66,7 +67,7 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
   };
   const ContainerQuotaFromEnv = async () => {
     const response = await getEnv();
-    setContainerQuota(parseInt(response.Containers_limit))
+    setContainerQuota(parseInt(response.Containers_limit));
   };
   async function fetchCookies() {
     const response = (await (
@@ -148,7 +149,7 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
       await initMessage(sub, userId, semesterId);
       await fetchContainers(sub);
       await fetchNotifications(userId);
-      await ContainerQuotaFromEnv()
+      await ContainerQuotaFromEnv();
     }
     init();
   }, []);
@@ -186,34 +187,36 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
             if (oldClassName == "toaster-loading") t.duration = loadingTime;
             if (oldClassName == "toaster-custom") t.duration = 60 * 60000;
             return (
-              <div
-                onClick={() => {
-                  if (
-                    !["toaster-loading", "toaster-custom"].includes(
-                      oldClassName
+              <Twemoji noWrapper options={{ className: "twemoji" }}>
+                <div
+                  onClick={() => {
+                    if (
+                      !["toaster-loading", "toaster-custom"].includes(
+                        oldClassName
+                      )
                     )
-                  )
-                    myToast.dismiss(t.id);
-                  // dirty
-                  if (myToast.onClickCallbacks[t.id]) {
-                    myToast.onClickCallbacks[t.id]();
-                    delete myToast.onClickCallbacks[t.id];
-                  }
-                }}
-              >
-                <ToastBar toast={t}>
-                  {({ icon, message }) => {
-                    return (
-                      <div className="toaster-content">
-                        {icon}
-                        <div className="toaster-text">
-                          {(message as JSX.Element).props.children}
-                        </div>
-                      </div>
-                    );
+                      myToast.dismiss(t.id);
+                    // dirty
+                    if (myToast.onClickCallbacks[t.id]) {
+                      myToast.onClickCallbacks[t.id]();
+                      delete myToast.onClickCallbacks[t.id];
+                    }
                   }}
-                </ToastBar>
-              </div>
+                >
+                  <ToastBar toast={t}>
+                    {({ icon, message }) => {
+                      return (
+                        <div className="toaster-content">
+                          {icon}
+                          <div className="toaster-text">
+                            {(message as JSX.Element).props.children}
+                          </div>
+                        </div>
+                      );
+                    }}
+                  </ToastBar>
+                </div>
+              </Twemoji>
             );
           }}
         </Toaster>

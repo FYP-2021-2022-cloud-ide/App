@@ -1,3 +1,5 @@
+import Twemoji from "react-twemoji";
+
 export type Props = {
   children?: JSX.Element;
   message?: string;
@@ -6,16 +8,18 @@ export type Props = {
 
 const EmptyDiv = ({ children, message, icon }: Props) => {
   return (
-    <div className="empty-div">
-      {children ? (
-        children
-      ) : (
-        <p className="empty-div-text">
-          <span className="mr-3 text-2xl ">{icon ? icon : " 🤷‍♂️ "}</span>
-          {message}
-        </p>
-      )}
-    </div>
+    <Twemoji noWrapper options={{ className: "twemoji" }}>
+      <div className="empty-div">
+        {children ? (
+          children
+        ) : (
+          <p className="empty-div-text">
+            <span className="mr-1">{icon ? icon : " 🤷‍♂️ "}</span>
+            {message}
+          </p>
+        )}
+      </div>
+    </Twemoji>
   );
 };
 

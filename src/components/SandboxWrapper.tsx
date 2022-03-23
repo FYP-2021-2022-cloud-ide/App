@@ -160,7 +160,7 @@ export const SandboxWrapper = () => {
         escToClose
         title="Create Personal Workspace"
         formStructure={createFormStructure}
-        onEnter={async (data) => {
+        onEnter={async ({ create_sandbox: data }) => {
           const environment = data.environment_choice as Option;
           const toastId = myToast.loading("Creating a personal workspace...");
           const response = await addSandboxImage(
@@ -191,7 +191,7 @@ export const SandboxWrapper = () => {
           clickOutsideToClose
           escToClose
           formStructure={updateFormStructure}
-          onClose={async (data, isEnter) => {
+          onClose={async ({ update_sandbox: data }, isEnter) => {
             if (data.update_environment != "" && !isEnter) {
               const containerId = data.update_environment;
               // remove the temp container

@@ -65,7 +65,7 @@ export const getCreateEnvironmentFormStructure = (
           label: "Pick the Programming Language",
           options: envChoices,
           conditional: (data) => {
-            return data["create_environment.is_predefined"] as boolean;
+            return data.create_environment.is_predefined as boolean;
           },
         },
         name: {
@@ -75,7 +75,11 @@ export const getCreateEnvironmentFormStructure = (
           placeholder: `e.g. ${validName}`,
           emptyValue: validName,
           validate: (data) => {
-            if (environments.map((e) => e.name).includes(data.name))
+            if (
+              environments
+                .map((e) => e.name)
+                .includes(data.create_environment.name)
+            )
               return { ok: false, message: "Name crash" };
             else return { ok: true };
           },
@@ -177,7 +181,7 @@ export const getUpdateEnvironmentFormStructure = (
               environments
                 .map((e) => e.name)
                 .filter((n) => n != targetEnvironment.name)
-                .includes(data.name)
+                .includes(data.update_environment.name)
             )
               return { ok: false, message: "Name crash" };
             else return { ok: true };
@@ -223,7 +227,10 @@ export const getCreateTemplateFormStructure = (
           placeholder: `e.g. ${validName}`,
           emptyValue: validName,
           validate: (data) => {
-            if (templates.map((t) => t.name).includes(data.name))
+            console.log(data);
+            if (
+              templates.map((t) => t.name).includes(data.create_template.name)
+            )
               return { ok: false, message: "Name crash" };
             else return { ok: true };
           },
@@ -255,7 +262,7 @@ export const getCreateTemplateFormStructure = (
           label: "Time Limit(in minutes) ",
           description: "Time Limit of the exam",
           conditional: (data) => {
-            return data.is_exam as boolean;
+            return data.create_template.is_exam as boolean;
           },
         },
       },
@@ -348,7 +355,7 @@ export const getUpdateTemplateFormStructure = (
               templates
                 .map((t) => t.name)
                 .filter((n) => n != targetTemplate.name)
-                .includes(data.name)
+                .includes(data.update_template.name)
             )
               return { ok: false, message: "Name crash" };
             else return { ok: true };
@@ -382,7 +389,7 @@ export const getUpdateTemplateFormStructure = (
           label: "Time Limit(in minutes) ",
           description: "Time Limit of the exam",
           conditional: (data) => {
-            return data.is_exam as boolean;
+            return data.update_template.is_exam as boolean;
           },
         },
       },
@@ -437,7 +444,9 @@ export const getCreateSandboxFormStructure = (
           emptyValue: validName,
           label: "Name (Optional)",
           validate: (data) => {
-            if (sandboxes.map((s) => s.title).includes(data.name))
+            if (
+              sandboxes.map((s) => s.title).includes(data.create_sandbox.name)
+            )
               return { ok: false, message: "Name crash" };
             return { ok: true };
           },
@@ -464,7 +473,7 @@ export const getUpdateSandboxFormStructure = (
     true
   );
   return {
-    update_section: {
+    update_sandbox: {
       inDisclosure: false,
       entries: {
         update_environment: {
@@ -538,7 +547,7 @@ export const getUpdateSandboxFormStructure = (
               sandboxes
                 .map((s) => s.title)
                 .filter((n) => n != targetSandbox.title)
-                .includes(data.name)
+                .includes(data.update_sandbox.name)
             )
               return { ok: false, message: "Name crash" };
             return { ok: true };

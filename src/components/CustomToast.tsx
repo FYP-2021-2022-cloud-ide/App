@@ -1,4 +1,5 @@
 import toast from "react-hot-toast";
+import { ExclamationIcon, InboxInIcon } from "@heroicons/react/solid";
 
 export const loadingTime = 5 * 60000;
 
@@ -30,27 +31,28 @@ const myToast = {
   },
   warning: (text: string | JSX.Element, onClick?: () => void) => {
     // the custom is broken
-    const id = toast.success(text, {
-      icon: "⚠️",
-      className: "toaster-warning",
-    });
-    myToast.onClickCallbacks[id] = onClick;
-    return id;
+    return myToast.custom(text, "toaster-warning", "⚠️", onClick);
   },
   notification: (text: string | JSX.Element, onClick?: () => void) => {
-    const id = toast.success(text, {
-      icon: "📩",
-      className: "toaster-notification",
-    });
-    myToast.onClickCallbacks[id] = onClick;
-    return id;
+    return myToast.custom(text, "toaster_notification", "📥", onClick);
   },
 
-  // the lasting time of custom toast is one hour
-  custom: (text: string | JSX.Element, icon: string, onClick?: () => void) => {
+  /**
+   * @param text
+   * @param icon an JSX element such as heroicon
+   * @param className
+   * @param onClick
+   * @returns
+   */
+  custom: (
+    text: string | JSX.Element,
+    className: string,
+    icon: JSX.Element | string,
+    onClick?: () => void
+  ) => {
     const id = toast.success(text, {
       icon: icon,
-      className: "toaster-custom",
+      className: className,
     });
     myToast.onClickCallbacks[id] = onClick;
     return id;

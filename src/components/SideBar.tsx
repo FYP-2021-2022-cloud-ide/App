@@ -10,9 +10,8 @@ import {
 import { useRouter } from "next/router";
 import { useCnails } from "../contexts/cnails";
 import Logo from "./Logo";
-import { Fragment } from "react";
 const SideBar = () => {
-  const { isAdmin, containerInfo, containerQuota, containers } = useCnails();
+  const { containerInfo, containerQuota, containers } = useCnails();
   const router = useRouter();
   var pages = [
     { name: "Dashboard", link: "/", icon: HomeIcon },
@@ -20,7 +19,6 @@ const SideBar = () => {
     { name: "File Transfer", link: "/file_transfer", icon: CloudIcon },
     // { name: "Admin", link: "/admin", icon: IdentificationIcon },
   ];
-  if (!isAdmin) pages = pages.filter((page) => page.link != "/admin");
   return (
     <div className="sidebar-container justify-between" id="sidebar">
       <div>

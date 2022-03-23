@@ -357,7 +357,7 @@ const EnvironmentTemplateWrapper = () => {
         escToClose
         title="Create Environment"
         formStructure={createEnvironmentFormStructure}
-        onEnter={async (data) => {
+        onEnter={async ({ create_environment: data }) => {
           // console.log(data);
           const { environment_choice: environment, name, description } = data;
           const id = myToast.loading("Creating the environment...");
@@ -396,9 +396,9 @@ const EnvironmentTemplateWrapper = () => {
                 const customToastId = myToast.custom(
                   <div className="flex flex-col space-y-2">
                     <p>
-                      A temp workspace is created. Click the link to set up your
-                      workspace. After finish setup, click{" "}
-                      <span className="font-bold">Finish</span>.
+                      A temporary workspace is created. Click the link to open a
+                      new window where set up your workspace. After finish
+                      setup, click <span className="font-bold">Finish</span>.
                     </p>
                     <a
                       className="btn btn-xs"
@@ -459,6 +459,7 @@ const EnvironmentTemplateWrapper = () => {
                       </button>
                     </div>
                   </div>,
+                  "toaster-custom",
                   "🗂"
                 );
               }
@@ -478,7 +479,7 @@ const EnvironmentTemplateWrapper = () => {
         clickOutsideToClose
         escToClose
         formStructure={updateEnvironmentFormStructure}
-        onClose={async (data, isEnter) => {
+        onClose={async ({ update_environment: data }, isEnter) => {
           const { update_internal: containerId } = data;
           if (containerId != "" && !isEnter) {
             // remove the temp container
@@ -520,7 +521,7 @@ const EnvironmentTemplateWrapper = () => {
         setOpen={setTemplateCreateOpen}
         formStructure={templateCreateFormStructure}
         title="Create Template"
-        onEnter={async (data) => {
+        onEnter={async ({ create_template: data }) => {
           const toastId = myToast.loading("Creating a temporary workspace...");
           var selectedEnv = data.environment;
           try {
@@ -608,6 +609,7 @@ const EnvironmentTemplateWrapper = () => {
                     </button>
                   </div>
                 </div>,
+                "toaster-custom",
                 "🗂"
               );
             }
@@ -629,11 +631,8 @@ const EnvironmentTemplateWrapper = () => {
         escToClose
         setOpen={setTemplateUpdateOpen}
         formStructure={templateUpdateFormStructure}
-        onChange={(data, id) => {
-          console.log(data, id);
-        }}
         title="Update Template"
-        onClose={async (data, isEnter) => {
+        onClose={async ({ update_template: data }, isEnter) => {
           const { update_internal: containerId } = data;
           if (containerId != "" && !isEnter) {
             // remove the temp container
@@ -720,7 +719,6 @@ const Home = () => {
   useEffect(() => {
     fetchSectionUserInfo();
   }, []);
-  console.log(allowReply);
   if (!sectionUserInfo) return <></>;
 
   return (
@@ -772,7 +770,7 @@ const Home = () => {
         formStructure={getAnnouncementFormStructure()}
         clickOutsideToClose
         escToClose
-        onEnter={async (data) => {
+        onEnter={async ({ course_announcement: data }) => {
           const response = await courseAPI.sendNotificationAnnouncement(
             data.allow_reply,
             data.announcement,
@@ -781,7 +779,9 @@ const Home = () => {
             sectionId
           );
           if (response.success)
-            myToast.success("The course announcement is sent.");
+            myToast.success(
+              "The course announcement is sent. oewkorwek owrk owek rowekoke w wer okwer okowe kwoekro eorwko ewrkok o kweorkew "
+            );
           else myToast.error("Fail to send course announcement.");
           setAnnounceFormOpen(false);
         }}

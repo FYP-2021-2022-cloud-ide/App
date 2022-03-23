@@ -444,7 +444,7 @@ export default function Page() {
             },
           },
         }}
-        onEnter={async (data) => {
+        onEnter={async ({ create_folder: data }) => {
           const node = targetNodeRef.current;
           const folderName = data.name;
           if (folderName == "") {
@@ -490,7 +490,7 @@ export default function Page() {
               },
             },
           }}
-          onEnter={async (data) => {
+          onEnter={async ({ edit_name: data }) => {
             const node = targetNodeRef.current;
             const newName = data.name;
             progressRef1.current = status.loading;

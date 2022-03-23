@@ -491,8 +491,7 @@ const MessageTable = () => {
         formStructure={getMessageReplyFormStructure(replyTarget)}
         clickOutsideToClose
         escToClose
-        onEnter={async (data) => {
-          console.log(data);
+        onEnter={async ({ reply_message: data }) => {
           const response = await sendNotification(
             "Replytest", //the title can change? or use "RE: <message title>
             data.message,
