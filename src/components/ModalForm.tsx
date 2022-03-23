@@ -9,6 +9,8 @@ import "easymde/dist/easymde.min.css";
 import EasyMDE from "easymde";
 import ReactDOMServer from "react-dom/server";
 import { MyMarkDown } from "../pages/messages";
+import fm from "front-matter";
+import _ from "lodash";
 // import { MyMarkDown } from "../pages/messages";
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
   ssr: false,
@@ -262,25 +264,80 @@ const Entry = ({
       </div>
     );
   } else if (entry.type == "markdown") {
+    const getBadge = () => {
+      try {
+        return fm(data[id] as string).attributes;
+      } catch (error) {
+        return {};
+      }
+    };
     return (
-      <div
-        onDoubleClick={(e) => {
-          console.log("called");
-          e.preventDefault();
-          e.stopPropagation();
-        }}
-      >
+      <div>
         {window && window.navigator && (
-          <MDE
-            text={data[id] as string}
-            onChange={(text) => {
-              onChange(Object.assign(data, { [id]: text }), id);
-            }}
-          />
+          <>
+            <FrontMatter attributes={getBadge()}></FrontMatter>
+            <MDE
+              text={data[id] as string}
+              onChange={(text) => {
+                onChange(Object.assign(data, { [id]: text }), id);
+              }}
+            />
+          </>
         )}
       </div>
     );
   } else throw new Error("not such entry type in <ModalForm>");
+};
+
+function flatten(data: any): any {
+  var result = {};
+  function recurse(cur, prop) {
+    if (Object(cur) !== cur) {
+      result[prop] = cur;
+    } else if (Array.isArray(cur)) {
+      for (var i = 0, l = cur.length; i < l; i++)
+        recurse(cur[i], prop + "[" + i + "]");
+      if (l == 0) result[prop] = [];
+    } else {
+      var isEmpty = true;
+      for (var p in cur) {
+        isEmpty = false;
+        recurse(cur[p], prop ? prop + "." + p : p);
+      }
+      if (isEmpty && prop) result[prop] = {};
+    }
+  }
+  recurse(data, "");
+  return result;
+}
+
+const validFrontmatter = ["course.code", "status", "course.section"];
+
+const FrontMatter = ({ attributes }: { attributes?: unknown }) => {
+  const flattened = flatten(attributes);
+  return _.isEqual(attributes, {}) ? (
+    <></>
+  ) : (
+    <div className="flex flex-row space-x-2 mb-4">
+      {Object.keys(flattened)
+        .filter((a) => validFrontmatter.includes(a))
+        .map((a) => {
+          return (
+            <div
+              className={`flex rounded bg-blue-500 select-none overflow-hidden frontmatter-badge-${a.replace(
+                ".",
+                "-"
+              )}`}
+            >
+              <div className="px-1 text-2xs text-white font-bold">{a}</div>
+              <div className="px-1 text-2xs text-white bg-white/20">
+                {flattened[a]}
+              </div>
+            </div>
+          );
+        })}
+    </div>
+  );
 };
 
 const MDE = memo(
@@ -309,29 +366,31 @@ const MDE = memo(
       return () => window.removeEventListener("keydown", handleTab);
     }, [mdeRef.current]);
     return (
-      <SimpleMDE
-        onChange={onChange}
-        options={{
-          spellChecker: false,
-          autofocus: true,
-          initialValue: _text,
-          // showIcons: ["undo"],
-          hideIcons: ["fullscreen"],
-          sideBySideFullscreen: false,
-          indentWithTabs: false,
-          maxHeight: "500px",
-          renderingConfig: {},
-          previewRender: () => {
-            return ReactDOMServer.renderToString(
-              <MyMarkDown text={mdeRef.current.codemirror.getValue()} />
-            );
-            // return ReactDOMServer.renderToString(<div></div>);
-          },
-        }}
-        getMdeInstance={(instance) => {
-          mdeRef.current = instance;
-        }}
-      />
+      <>
+        <SimpleMDE
+          onChange={onChange}
+          options={{
+            spellChecker: false,
+            autofocus: true,
+            initialValue: _text,
+            // showIcons: ["undo"],
+            hideIcons: ["fullscreen"],
+            sideBySideFullscreen: false,
+            indentWithTabs: false,
+            maxHeight: "500px",
+            renderingConfig: {},
+            previewRender: () => {
+              return ReactDOMServer.renderToString(
+                <MyMarkDown text={mdeRef.current.codemirror.getValue()} />
+              );
+              // return ReactDOMServer.renderToString(<div></div>);
+            },
+          }}
+          getMdeInstance={(instance) => {
+            mdeRef.current = instance;
+          }}
+        />
+      </>
     );
   },
   () => true

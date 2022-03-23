@@ -19,9 +19,14 @@ import React from "react";
 import { useRouter } from "next/router";
 import _ from "lodash";
 import remarkGfm from "remark-gfm";
+import remarkFrontMatter from "remark-frontmatter";
+import remarkEmoji from "remark-emoji";
+import remarkMath from "remark-math";
+import rehypeRaw from "rehype-raw";
+import rehypeKatex from "rehype-katex";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-
+import fm from "front-matter";
 import { prism, okaidia } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import { useTheme } from "../contexts/theme";
 
@@ -100,10 +105,12 @@ const getTestMessage = () => {
 
 export const MyMarkDown = ({ text }: { text: string }) => {
   const { isDark } = useTheme();
+
   return (
     <ReactMarkdown
       children={text}
-      remarkPlugins={[remarkGfm]}
+      remarkPlugins={[remarkGfm, remarkFrontMatter, remarkEmoji, remarkMath]}
+      rehypePlugins={[rehypeRaw, rehypeKatex]}
       components={{
         code({ node, inline, className, children, ...props }) {
           const match = /language-(\w+)/.exec(className || "");

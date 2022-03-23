@@ -3,6 +3,7 @@ import { ClockIcon, XIcon } from "@heroicons/react/outline";
 import Tilt from "react-parallax-tilt";
 import { useCleanTilt } from "../TemplateCard";
 import { containerAPI } from "../../lib/api/containerAPI";
+import { sandboxAPI } from "../../lib/api/sandboxAPI";
 import { useCnails } from "../../contexts/cnails";
 import myToast from "../CustomToast";
 
@@ -22,6 +23,7 @@ function ContainerCard({
   zIndex,
 }: Props) {
   const { removeContainer } = containerAPI;
+  const { removeSandbox } = sandboxAPI;
   const { sub, fetchContainers } = useCnails();
   const { ref, cleanStyle } = useCleanTilt(
     zIndex ? `z-index : ${zIndex};` : ""
@@ -63,8 +65,20 @@ function ContainerCard({
             title="remove workspace"
             onClick={async (e) => {
               e.stopPropagation();
-              const response = await removeContainer(containerID, sub);
-              if (response.success) {
+              let success=false
+              if (containerName=="A sandbox"){
+                const response = await removeSandbox(containerID, sub);
+                if (response.success) {
+                  success=true
+                }
+              }else{
+                const response = await removeContainer(containerID, sub);
+                if (response.success) {
+                  success=true
+                }
+              }
+              
+              if (success) {
                 myToast.success("Workspace is removed.");
                 fetchContainers(sub);
               } else myToast.error("Fail to remove workspace");

@@ -101,6 +101,8 @@ type ContainerInfo = {
 
 type Notification = {
   id: string;
+  // courseCode? : string ;
+  // sectionCode? : string ;
   sender: {
     id: string;
     name: string;

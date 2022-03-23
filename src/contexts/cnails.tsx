@@ -64,9 +64,9 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
         response
       );
   };
-  const fetchEnv = async () => {
+  const ContainerQuotaFromEnv = async () => {
     const response = await getEnv();
-    setContainerQuota(response.Containers_limit)
+    setContainerQuota(parseInt(response.Containers_limit))
   };
   async function fetchCookies() {
     const response = (await (
@@ -148,6 +148,7 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
       await initMessage(sub, userId, semesterId);
       await fetchContainers(sub);
       await fetchNotifications(userId);
+      await ContainerQuotaFromEnv()
     }
     init();
   }, []);
