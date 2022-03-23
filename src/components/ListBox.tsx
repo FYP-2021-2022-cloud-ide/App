@@ -1,11 +1,11 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
 import React from "react";
 
 export interface ListBoxProps {
   options: Option[];
-  initSelected: Option;
+  selected: Option;
   onChange?: (newValve: Option) => void;
 }
 
@@ -14,9 +14,10 @@ export interface Option {
   id: string;
 }
 
-function ListBox({ options, initSelected, onChange }: ListBoxProps) {
-  const [selected, setSelected] = useState(initSelected);
-
+/**
+ * a stateless listbox using headless ui
+ */
+function ListBox({ options, selected, onChange }: ListBoxProps) {
   return (
     <div className="w-full top-16">
       <Listbox
@@ -24,7 +25,6 @@ function ListBox({ options, initSelected, onChange }: ListBoxProps) {
         onChange={(newValue) => {
           if (onChange) {
             onChange(newValue);
-            setSelected(newValue);
           }
         }}
       >

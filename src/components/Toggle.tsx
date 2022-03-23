@@ -7,15 +7,17 @@ type Props = {
   text: string;
 };
 
-function Toggle({ enabled: _enabled, onChange, text }: Props) {
-  const [enabled, setEnabled] = useState(_enabled);
-
+/**
+ * a stateless toggle using headless ui
+ * @param param0
+ * @returns
+ */
+function Toggle({ enabled, onChange, text }: Props) {
   return (
     <Switch
       checked={enabled}
       onChange={() => {
         onChange(!enabled);
-        setEnabled(!enabled);
       }}
       className={`${
         enabled ? "bg-green-400" : "bg-gray-200 dark:bg-gray-600"

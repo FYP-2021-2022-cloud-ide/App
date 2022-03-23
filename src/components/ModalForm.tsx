@@ -10,13 +10,16 @@ import EasyMDE from "easymde";
 import ReactDOMServer from "react-dom/server";
 import { MyMarkDown } from "../pages/messages";
 import fm from "front-matter";
+import flat from "flat";
 import _ from "lodash";
 // import { MyMarkDown } from "../pages/messages";
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
   ssr: false,
 });
 
-// export type Data = { [id: string]: boolean | string | Option  };
+/**
+ *  the id is a flatten JSON object, each property is named in the format of `sectionId.entryId`
+ */
 export type Data = { [id: string]: any };
 
 export type ValidationOutput = { ok: false; message: string } | { ok: true };
@@ -58,12 +61,26 @@ export type Entry = {
 
 // the key of a form structure will be the title
 export type Section = {
-  displayTitle?: boolean;
+  /**
+   * the title of this section
+   */
+  title?: string;
+  /**
+   * whether this section should be in a disclosure.
+   * If it is not in a disclosure, its content will spread out.
+   */
+  inDisclosure?: boolean;
+  /**
+   * whether this section should be shown
+   */
   conditional?: (data: Data) => boolean;
   entries: { [id: string]: Entry };
 };
 
-export type FormStructure = { [title: string]: Section };
+/**
+ * a form is composed of many sections
+ */
+export type FormStructure = { [id: string]: Section };
 
 export type Props = {
   /**
@@ -116,21 +133,31 @@ export type Props = {
   onEnter?: (data: Data) => void;
 };
 
-const Entry = ({
-  zIndex,
-  entry,
-  id,
-  data,
-  onChange,
-}: {
+type EntryProps = {
+  /**
+   * the z index to be used for styling. The upper entry usually has a higher z index than a lower entry
+   */
   zIndex: number;
+  /**
+   * an `Entry` object from the `FromStructure`
+   */
   entry: Entry;
+  /**
+   * id of this entry in the format of `sectionId.entryId`
+   */
   id: string;
+  /**
+   * the current data
+   */
   data: Data;
-  onChange: (newData: Data, id: string) => void;
-}) => {
+  /**
+   * @param data new value of this entry
+   */
+  onChange: (data: any) => void;
+};
+
+const Entry = ({ zIndex, entry, id, data, onChange }: EntryProps) => {
   if (entry.conditional) {
-    console.log(entry.conditional(data));
     if (!entry.conditional(data)) return <></>;
   }
   if (entry.type == "input") {
@@ -154,7 +181,7 @@ const Entry = ({
             if (text == "" && entry.emptyValue) {
               text = entry.emptyValue;
             }
-            onChange(Object.assign(data, { [id]: text }), id);
+            onChange(text);
           }}
           validate={() => {
             if (entry.validate) return entry.validate(data);
@@ -188,7 +215,7 @@ const Entry = ({
             if (text == "" && entry.emptyValue) {
               text = entry.emptyValue;
             }
-            onChange(Object.assign(data, { [id]: text }), id);
+            onChange(text);
           }}
         ></TextArea>
       </div>
@@ -210,10 +237,8 @@ const Entry = ({
           )}
         </div>
         <ListBox
-          initSelected={data[id] as Option}
-          onChange={(option) =>
-            onChange(Object.assign(data, { [id]: option }), id)
-          }
+          selected={data[id] as Option}
+          onChange={onChange}
           options={entry.options}
         />
       </div>
@@ -234,11 +259,27 @@ const Entry = ({
         )}
         <Toggle
           text={entry.label}
-          onChange={(newValue) =>
-            onChange(Object.assign(data, { [id]: newValue }), id)
-          }
+          onChange={onChange}
           enabled={data[id] as boolean}
         ></Toggle>
+      </div>
+    );
+  } else if (entry.type == "markdown") {
+    const getBadge = () => {
+      try {
+        return fm(data[id] as string).attributes;
+      } catch (error) {
+        return {};
+      }
+    };
+    return (
+      <div>
+        {window && window.navigator && (
+          <>
+            <FrontMatter attributes={getBadge()}></FrontMatter>
+            <MDE text={data[id] as string} onChange={onChange} />
+          </>
+        )}
       </div>
     );
   } else if (entry.type == "custom") {
@@ -257,64 +298,16 @@ const Entry = ({
             </div>
           )}
         </div>
-        {entry.node(
-          (newValue) => onChange(Object.assign(data, { [id]: newValue }), id),
-          data[id]
-        )}
-      </div>
-    );
-  } else if (entry.type == "markdown") {
-    const getBadge = () => {
-      try {
-        return fm(data[id] as string).attributes;
-      } catch (error) {
-        return {};
-      }
-    };
-    return (
-      <div>
-        {window && window.navigator && (
-          <>
-            <FrontMatter attributes={getBadge()}></FrontMatter>
-            <MDE
-              text={data[id] as string}
-              onChange={(text) => {
-                onChange(Object.assign(data, { [id]: text }), id);
-              }}
-            />
-          </>
-        )}
+        {entry.node((newValue) => onChange(newValue), data[id])}
       </div>
     );
   } else throw new Error("not such entry type in <ModalForm>");
 };
 
-function flatten(data: any): any {
-  var result = {};
-  function recurse(cur, prop) {
-    if (Object(cur) !== cur) {
-      result[prop] = cur;
-    } else if (Array.isArray(cur)) {
-      for (var i = 0, l = cur.length; i < l; i++)
-        recurse(cur[i], prop + "[" + i + "]");
-      if (l == 0) result[prop] = [];
-    } else {
-      var isEmpty = true;
-      for (var p in cur) {
-        isEmpty = false;
-        recurse(cur[p], prop ? prop + "." + p : p);
-      }
-      if (isEmpty && prop) result[prop] = {};
-    }
-  }
-  recurse(data, "");
-  return result;
-}
-
 const validFrontmatter = ["course.code", "status", "course.section"];
 
 const FrontMatter = ({ attributes }: { attributes?: unknown }) => {
-  const flattened = flatten(attributes);
+  const flattened = flat.flatten(attributes);
   return _.isEqual(attributes, {}) ? (
     <></>
   ) : (
@@ -431,40 +424,55 @@ const TextArea = memo(
       ></textarea>
     );
   },
-  () => false
+  () => true
 );
 
-const Section = ({
-  section,
-  title,
-  data,
-  onChange,
-}: {
+type SectionProps = {
+  /**
+   * the `Section` object from `FromStructure`
+   */
   section: Section;
-  title: string;
+  /**
+   * id of this section
+   */
+  id: string;
+  /**
+   * the current form data
+   */
   data: Data;
-  onChange: (newValues: Data, id: string) => void; // return the new values of this sections
-}) => {
+  /**
+   * @param data the new value of a data
+   * @param id the id of this entry in the format of `sectionId.entryId`
+   */
+  onChange: (data: any, id: string) => void; // return the new values of this sections
+};
+
+const Section = ({ section, id: sectionId, data, onChange }: SectionProps) => {
   if (section.conditional) {
     if (!section.conditional(data)) return <></>;
   } else
     return (
-      <div className="flex flex-col space-y-3" id={title}>
-        {title && section.displayTitle && (
-          <div className="font-medium mt-4 dark:text-gray-300">{title}</div>
+      <div className="flex flex-col space-y-3" id={sectionId}>
+        {section.title && (
+          <div className="font-medium mt-4 dark:text-gray-300">
+            {section.title}
+          </div>
         )}
         {React.isValidElement(section.entries)
           ? section.entries
-          : Object.keys(section.entries).map((id, index) => (
-              <Entry
-                zIndex={Object.keys(section.entries).length - index}
-                key={id}
-                entry={section.entries[id]}
-                id={id}
-                data={data}
-                onChange={(newData) => onChange(newData, id)}
-              ></Entry>
-            ))}
+          : Object.keys(section.entries).map((entryId, index) => {
+              const id = `${sectionId}.${entryId}`;
+              return (
+                <Entry
+                  zIndex={Object.keys(section.entries).length - index}
+                  key={id}
+                  entry={section.entries[entryId]}
+                  id={id}
+                  data={data}
+                  onChange={(data) => onChange(data, id)}
+                ></Entry>
+              );
+            })}
       </div>
     );
 };
@@ -505,7 +513,6 @@ const Input = memo(
           placeholder={placeholder}
           // value={text}
           onChange={(e) => {
-            // setText(e.target.value);
             onChange(e.target.value);
           }}
           disabled={disabled}
@@ -519,30 +526,32 @@ const Input = memo(
       </div>
     );
   },
-  () => false
+  () => true
 );
 
 /**
  * this function will convert the form structure to the initial data of the form.
- * @param structure
+ * @param sections
  * @returns
  */
-const fromStructureToData = (structure: FormStructure): Data => {
+const fromStructureToData = (sections: FormStructure): Data => {
   let data: Data = {};
-  if (!structure) return data;
-  Object.keys(structure).forEach((title) => {
-    Object.keys(structure[title].entries).forEach((entry) => {
-      const type = structure[title].entries[entry].type;
+  if (!sections) return data;
+  Object.keys(sections).forEach((sectionId) => {
+    Object.keys(sections[sectionId].entries).forEach((entryId) => {
+      const type = sections[sectionId].entries[entryId].type;
       //@ts-ignore
-      const emptyValue = structure[title].entries[entry].emptyValue;
+      const emptyValue = sections[sectionId].entries[entryId].emptyValue;
       // if the default value is empty and emptyValue exists, data will be the empty value else it will be the defaultValue
+      const id = `${sectionId}.${entryId}`;
       if (
         (type === "input" || type === "textarea" || type === "markdown") &&
-        structure[title].entries[entry].defaultValue == "" &&
+        sections[sectionId].entries[entryId].defaultValue == "" &&
         emptyValue
       ) {
-        data[entry] = emptyValue;
-      } else data[entry] = structure[title].entries[entry].defaultValue;
+        // add the value
+        data[id] = emptyValue;
+      } else data[id] = sections[sectionId].entries[entryId].defaultValue;
     });
   });
   return data;
@@ -566,12 +575,14 @@ const ModalForm = (props: Props) => {
     size = "sm",
     onChange,
   } = props;
-  // let ref = createRef<HTMLDivElement>();
-  let okBtnRef = createRef<HTMLButtonElement>();
   const [data, setData] = useState<Data>(fromStructureToData(formStructure));
+  const dataRef = useRef<Data>(data);
   useEffect(() => {
     setData(fromStructureToData(formStructure));
   }, [formStructure]);
+  useEffect(() => {
+    dataRef.current = data;
+  });
 
   const sizeMap = {
     sm: "w-[550px]",
@@ -597,7 +608,6 @@ const ModalForm = (props: Props) => {
       })
     );
   };
-  // size = "lg";
 
   if (!formStructure) return <></>;
 
@@ -621,11 +631,14 @@ const ModalForm = (props: Props) => {
               <Section
                 key={sectionTitle}
                 section={section}
-                title={sectionTitle}
+                id={sectionTitle}
                 data={data}
-                onChange={(newData, id) => {
-                  console.log(newData, id);
-                  setData(Object.assign({}, newData));
+                onChange={(newValue, id) => {
+                  const newData = {
+                    ...dataRef.current,
+                    [id]: newValue,
+                  };
+                  setData(newData);
                   if (onChange) onChange(newData, id);
                 }}
               ></Section>
@@ -653,7 +666,6 @@ const ModalForm = (props: Props) => {
                   patchedOnClose(true);
                 }
               }}
-              ref={okBtnRef}
             >
               OK
             </button>
@@ -663,9 +675,5 @@ const ModalForm = (props: Props) => {
     </Modal>
   );
 };
-
-// export default React.memo(ModalForm, (prevProps, nextProps) => {
-//   return false;
-// });
 
 export default ModalForm;

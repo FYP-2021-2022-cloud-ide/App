@@ -49,7 +49,7 @@ export const getCreateEnvironmentFormStructure = (
   );
   return {
     create_environment: {
-      displayTitle: false,
+      inDisclosure: false,
       entries: {
         is_predefined: {
           type: "toggle",
@@ -65,7 +65,7 @@ export const getCreateEnvironmentFormStructure = (
           label: "Pick the Programming Language",
           options: envChoices,
           conditional: (data) => {
-            return data.is_predefined as boolean;
+            return data["create_environment.is_predefined"] as boolean;
           },
         },
         name: {
@@ -105,7 +105,7 @@ export const getUpdateEnvironmentFormStructure = (
   );
   return {
     update_environment: {
-      displayTitle: false,
+      inDisclosure: false,
       entries: {
         update_internal: {
           type: "custom",
@@ -395,7 +395,7 @@ export const getMessageReplyFormStructure = (
 ): FormStructure => {
   return {
     reply_message: {
-      displayTitle: false,
+      inDisclosure: false,
       entries: {
         target: {
           label: "Reply to",
@@ -422,7 +422,7 @@ export const getCreateSandboxFormStructure = (
   );
   return {
     create_sandbox: {
-      displayTitle: false,
+      inDisclosure: false,
       entries: {
         environment_choice: {
           type: "listbox",
@@ -465,7 +465,7 @@ export const getUpdateSandboxFormStructure = (
   );
   return {
     update_section: {
-      displayTitle: false,
+      inDisclosure: false,
       entries: {
         update_environment: {
           type: "custom",
@@ -558,7 +558,7 @@ export const getUpdateSandboxFormStructure = (
 export const getAnnouncementFormStructure = (): FormStructure => {
   return {
     course_announcement: {
-      displayTitle: false,
+      inDisclosure: false,
       entries: {
         title: {
           type: "input",
