@@ -1,8 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { parse } from "cookie";
-import crypto from "crypto";
+import { removeCookies } from "cookies-next";
 
+import crypto from "crypto";
 
 import { FetchCookieResponse } from "../../lib/api/api";
 
@@ -12,14 +13,16 @@ export default function handler(
 ) {
   //console.log(req.headers.cookie!)
   try {
-    const decrypt = ((encrypted:string) => {
-      let decipher = crypto.createDecipheriv('aes-256-cbc', crypto.scryptSync(process.env.SESSIONSECRET, 'GfG', 32), process.env.SESSIONIV);
-      let decrypted = decipher.update(encrypted, 'base64', 'utf8');
-      return (decrypted + decipher.final('utf8'));
-    });
-    const { sub, name, email, userId, semesterId } = parse(
-      req.headers.cookie!
-    );
+    const decrypt = (encrypted: string) => {
+      let decipher = crypto.createDecipheriv(
+        "aes-256-cbc",
+        crypto.scryptSync(process.env.SESSIONSECRET, "GfG", 32),
+        process.env.SESSIONIV
+      );
+      let decrypted = decipher.update(encrypted, "base64", "utf8");
+      return decrypted + decipher.final("utf8");
+    };
+    const { sub, name, email, userId, semesterId } = parse(req.headers.cookie!);
     if (!sub || !name || !userId)
       throw new Error(
         `something is missing in cookies. cookies: ${req.headers.cookie}`
@@ -28,11 +31,11 @@ export default function handler(
     res.json({
       success: true,
       cookies: {
-        sub:decrypt(sub),
-        name:decrypt(name),
-        email:decrypt(email),
-        userId:decrypt(userId),
-        semesterId:decrypt(semesterId)
+        sub: decrypt(sub),
+        name: decrypt(name),
+        email: decrypt(email),
+        userId: decrypt(userId),
+        semesterId: decrypt(semesterId),
       },
     });
   } catch (error) {
