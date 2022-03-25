@@ -31,6 +31,7 @@
     "extract-zip": "^2.0.1",
     "firebase": "^9.5.0",
     "flat": "^5.0.2",
+    "focus-trap-react": "^8.9.2",
     "formidable": "^2.0.1",
     "front-matter": "^4.0.2",
     "googleapis": "^92.0.0",

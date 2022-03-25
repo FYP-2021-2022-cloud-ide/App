@@ -44,6 +44,7 @@ const Home = () => {
         sub: sub,
       });
     } else {
+      myToast.error("Fail to get section information.");
       Router.push("/");
     }
   };
@@ -62,9 +63,8 @@ const Home = () => {
     }
   };
   useEffect(() => {
-    fetchSectionUserInfo()
-    if (sectionId!=undefined)
-      fetchWorkspaces();
+    fetchSectionUserInfo();
+    if (sectionId != undefined) fetchWorkspaces();
   }, []);
 
   return (

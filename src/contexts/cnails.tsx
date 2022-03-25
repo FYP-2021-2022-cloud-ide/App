@@ -16,6 +16,7 @@ import { containerAPI } from "../lib/api/containerAPI";
 import { FetchCookieResponse } from "../lib/api/api";
 import Twemoji from "react-twemoji";
 import _ from "lodash";
+import ModalForm from "../components/ModalForm/ModalForm";
 
 const defaultQuota = Number(3); // process.env.CONTAINERSLIMIT
 
@@ -43,6 +44,9 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
   const { listNotifications } = notificationAPI;
   const { containerList } = containerAPI;
   const { getEnv } = generalAPI;
+  const [reportIssueModalOpen, setReportIssueModalOpen] =
+    useState<boolean>(false);
+  const [issue, setIssue] = useState<any>();
   const fetchNotifications = async (userId: string) => {
     const response = await listNotifications(userId);
     if (response.success) {
@@ -157,6 +161,11 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
     init();
   }, []);
 
+  const reportIssue = (issue: any) => {
+    setReportIssueModalOpen(true);
+    setIssue(issue);
+  };
+
   if (sub == "" || userId == "") {
     return <></>;
   } else {
@@ -176,6 +185,7 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
           fetchNotifications,
           fetchContainers,
           containerQuota,
+          reportIssue,
         }}
       >
         <Toaster
@@ -224,6 +234,40 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
           }}
         </Toaster>
         {children}
+        <ModalForm
+          title="Report issue"
+          formStructure={{
+            reportIssue: {
+              title: "Report Issue",
+              entries: {
+                temp1: {
+                  type: "input",
+                  defaultValue: "",
+                  label: "temp1",
+                },
+                tempe: {
+                  type: "markdown",
+                  defaultValue: "",
+                  label: "temp1",
+                },
+                temp2: {
+                  type: "input",
+                  defaultValue: "",
+                  label: "temp1",
+                },
+              },
+            },
+          }}
+          clickOutsideToClose
+          size="lg"
+          escToClose
+          onClose={() => {
+            setIssue("");
+          }}
+          useDisclosure
+          isOpen={reportIssueModalOpen}
+          setOpen={setReportIssueModalOpen}
+        />
       </CnailsContext.Provider>
     );
   }

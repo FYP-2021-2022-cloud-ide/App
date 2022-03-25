@@ -49,7 +49,6 @@ export const getCreateEnvironmentFormStructure = (
   );
   return {
     create_environment: {
-      inDisclosure: false,
       entries: {
         is_predefined: {
           type: "toggle",
@@ -109,7 +108,6 @@ export const getUpdateEnvironmentFormStructure = (
   );
   return {
     update_environment: {
-      inDisclosure: false,
       entries: {
         update_internal: {
           type: "custom",
@@ -408,7 +406,6 @@ export const getMessageReplyFormStructure = (
 ): FormStructure => {
   return {
     reply_message: {
-      inDisclosure: false,
       entries: {
         target: {
           label: "Reply to",
@@ -435,7 +432,6 @@ export const getCreateSandboxFormStructure = (
   );
   return {
     create_sandbox: {
-      inDisclosure: false,
       entries: {
         environment_choice: {
           type: "listbox",
@@ -480,7 +476,6 @@ export const getUpdateSandboxFormStructure = (
   );
   return {
     update_sandbox: {
-      inDisclosure: false,
       entries: {
         update_environment: {
           type: "custom",
@@ -573,7 +568,6 @@ export const getUpdateSandboxFormStructure = (
 export const getAnnouncementFormStructure = (): FormStructure => {
   return {
     course_announcement: {
-      inDisclosure: false,
       entries: {
         title: {
           type: "input",

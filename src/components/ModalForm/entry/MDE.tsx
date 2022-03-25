@@ -1,6 +1,6 @@
 import flat from "flat";
 import dynamic from "next/dynamic";
-import { memo, useEffect, useRef } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import _ from "lodash";
 import ReactDOMServer from "react-dom/server";
 import { MyMarkDown } from "../../MyMarkdown";
@@ -8,9 +8,12 @@ import "easymde/dist/easymde.min.css";
 import { EntryProps, MarkdownEntry } from "../types";
 import fm from "front-matter";
 import Custom from "./Custom";
+import FocusTrap from "focus-trap-react";
+import EasyMDE from "easymde";
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
   ssr: false,
 });
+// import SimpleMDE from "react-simplemde-editor";
 
 const validFrontmatter = ["course.code", "status", "course.section"];
 
@@ -45,31 +48,19 @@ const MDE = memo(
   ({
     text: _text,
     onChange,
+    onFocus,
+    mdeRef,
   }: {
     text: string;
     onChange: (text: string) => void;
+    onFocus: () => void;
+    mdeRef: React.MutableRefObject<EasyMDE>;
   }) => {
-    const mdeRef = useRef<EasyMDE>();
-    useEffect(() => {
-      const handleTab = (event: KeyboardEvent) => {
-        if (
-          event.key === "Tab" &&
-          mdeRef.current.codemirror
-            .getWrapperElement()
-            .contains(document.activeElement)
-        ) {
-          event.stopImmediatePropagation();
-          mdeRef.current.codemirror.execCommand("insertSoftTab");
-          mdeRef.current.codemirror.execCommand("indentLess");
-        }
-      };
-      window.addEventListener("keydown", handleTab);
-      return () => window.removeEventListener("keydown", handleTab);
-    }, [mdeRef.current]);
     return (
-      <>
+      <div>
         <SimpleMDE
           onChange={onChange}
+          onFocus={onFocus}
           options={{
             spellChecker: false,
             autofocus: false,
@@ -90,14 +81,31 @@ const MDE = memo(
             mdeRef.current = instance;
           }}
         />
-      </>
+      </div>
     );
   },
   () => true
 );
 
 const component = (props: EntryProps) => {
+  const [focusTrapActive, setFocusTrapActive] = useState(false);
+  const mdeRef = useRef<EasyMDE>();
   const entry = props.entry as MarkdownEntry;
+  useEffect(() => {
+    if (focusTrapActive) {
+      const handleTab = (event: KeyboardEvent) => {
+        if (event.key === "Tab" && focusTrapActive) {
+          console.log("active");
+          // event.stopImmediatePropagation();
+          mdeRef.current.codemirror.execCommand("insertSoftTab");
+          // mdeRef.current.codemirror.execCommand("indentLess");
+        }
+      };
+      window.addEventListener("keydown", handleTab);
+      return () => window.removeEventListener("keydown", handleTab);
+    }
+  }, [mdeRef.current, focusTrapActive]);
+
   if (entry.type != "markdown") return <></>;
 
   return (
@@ -115,8 +123,28 @@ const component = (props: EntryProps) => {
           };
           return window && window.navigator ? (
             <>
-              <FrontMatter attributes={getBadge()}></FrontMatter>
-              <MDE text={data} onChange={onChange} />
+              <FocusTrap
+                active={focusTrapActive}
+                focusTrapOptions={{
+                  allowOutsideClick: (e) => {
+                    setFocusTrapActive(false);
+                    return true;
+                  },
+                  clickOutsideDeactivates: false,
+                }}
+              >
+                <div>
+                  <FrontMatter attributes={getBadge()}></FrontMatter>
+                  <MDE
+                    mdeRef={mdeRef}
+                    text={data}
+                    onChange={onChange}
+                    onFocus={() => {
+                      setFocusTrapActive(true);
+                    }}
+                  />
+                </div>
+              </FocusTrap>
             </>
           ) : (
             <></>

@@ -46,7 +46,9 @@ function Modal({
             leaveTo="opacity-0"
             className="fixed inset-0 transition-opacity pointer-events-none"
           >
-            <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+            {/* This element is to trick the browser into centering the modal contents. */}
+
+            <div className="absolute inset-0 transparent"></div>
           </Transition.Child>
           <span className="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
           &#8203;
@@ -70,6 +72,7 @@ function Modal({
                 {/* use a custom div instead of Dialog.overlay such that onClick is working */}
                 <div
                   className="fixed inset-0 dark:bg-black dark:opacity-70"
+                  id="modal-overlay"
                   onClick={() => {
                     if (clickOutsideToClose) {
                       if (onClose) onClose();

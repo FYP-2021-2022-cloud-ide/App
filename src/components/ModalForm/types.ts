@@ -111,11 +111,6 @@ export type Section = {
    */
   title?: string;
   /**
-   * whether this section should be in a disclosure.
-   * If it is not in a disclosure, its content will spread out.
-   */
-  inDisclosure?: boolean;
-  /**
    * whether this section should be shown
    */
   conditional?: (data: Data) => boolean;
@@ -128,6 +123,11 @@ export type Section = {
 export type FormStructure = { [id: string]: Section };
 
 export type Props = {
+  /**
+   * whether this section should be in a disclosure.
+   * If it is not in a disclosure, its content will spread out.
+   */
+  useDisclosure?: boolean;
   /**
    * the open and close state of modal
    */
@@ -226,6 +226,7 @@ export type SectionProps = {
    * the current form data
    */
   data: Data;
+  useDisclosure: boolean;
   /**
    * onChange callback
    *

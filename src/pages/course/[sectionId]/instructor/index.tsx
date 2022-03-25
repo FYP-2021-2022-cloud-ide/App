@@ -688,13 +688,9 @@ const Home = () => {
   const sectionId = router.query.sectionId as string;
   // data fetching from API
   const [sectionUserInfo, setSectionUserInfo] = useState<SectionUserInfo>(null);
-  // for testing
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
-  const [allowReply, setAllowReply] = useState(true);
   const [announceFormOpen, setAnnounceFormOpen] = useState<boolean>(false);
   const { getSectionUserInfo } = generalAPI;
-  const { sub, userId } = useCnails();
+  const { sub, userId, reportIssue } = useCnails();
   const fetchSectionUserInfo = async () => {
     const response = await getSectionUserInfo(sectionId, sub); //
 
@@ -710,9 +706,15 @@ const Home = () => {
       });
       //restrict the student to access instructor page
       if ((role.toUpperCase() as SectionRole) != "INSTRUCTOR") {
+        myToast.error(
+          "Permission denied: You are not an instructor of this section."
+        );
         router.push("/");
       }
     } else {
+      myToast.error(`Fail to get section information.`, () =>
+        reportIssue(response.error)
+      );
       router.push("/");
     }
   };
@@ -771,7 +773,7 @@ const Home = () => {
         clickOutsideToClose
         escToClose
         onEnter={async ({ course_announcement: data }) => {
-          console.log(data)
+          console.log(data);
           const response = await courseAPI.sendNotificationAnnouncement(
             data.allow_reply,
             data.announcement,
@@ -780,9 +782,7 @@ const Home = () => {
             sectionId
           );
           if (response.success)
-            myToast.success(
-              "The course announcement is sent."
-            );
+            myToast.success("The course announcement is sent.");
           else myToast.error("Fail to send course announcement.");
           setAnnounceFormOpen(false);
         }}

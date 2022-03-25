@@ -1,4 +1,4 @@
-import { Dialog } from "@headlessui/react";
+import { Dialog, Disclosure, Transition } from "@headlessui/react";
 import React, { useEffect, useRef, useState } from "react";
 
 import Modal from "../Modal";
@@ -20,6 +20,7 @@ import {
   Section,
   SectionProps,
 } from "./types";
+import { ChevronRightIcon } from "@heroicons/react/solid";
 
 const Entry = (props: EntryProps) => {
   const { entry, data } = props;
@@ -43,12 +44,65 @@ const Entry = (props: EntryProps) => {
   } else throw new Error("not such entry type in <ModalForm>");
 };
 
-const Section = ({ section, id: sectionId, data, onChange }: SectionProps) => {
+const Section = ({
+  section,
+  id: sectionId,
+  data,
+  onChange,
+  useDisclosure,
+}: SectionProps) => {
   if (section.conditional) {
     if (!section.conditional(data)) return <></>;
   } else
-    return (
+    return useDisclosure ? (
+      <Disclosure as="div" className={`modal-form-section-${sectionId} w-full`}>
+        {({ open }) => (
+          <>
+            <Disclosure.Button className={` bg-blue-500 rounded-md w-full`}>
+              <div className=" rounded flex flex-row justify-between p-2 items-center hover:bg-white/10 text-white transition ease-in-out ">
+                <span className="font-bold">{section.title ?? sectionId}</span>
+                <ChevronRightIcon
+                  className={`w-5 h-5 ${open ? "transform rotate-90" : ""}`}
+                />
+              </div>
+            </Disclosure.Button>
+            <Transition
+              enter="transition duration-200 ease-out"
+              enterFrom="transform opacity-0"
+              enterTo="transform  opacity-100"
+              leave="transition duration-200 ease-out"
+              leaveFrom="transform opacity-100"
+              leaveTo="transform  opacity-0"
+            >
+              <Disclosure.Panel>
+                <div
+                  className="flex flex-col space-y-3 px-5 mt-3"
+                  id={sectionId}
+                >
+                  {React.isValidElement(section.entries)
+                    ? section.entries
+                    : Object.keys(section.entries).map((id, index) => {
+                        return (
+                          <Entry
+                            zIndex={Object.keys(section.entries).length - index}
+                            key={id}
+                            entry={section.entries[id]}
+                            id={id}
+                            sectionId={sectionId}
+                            data={data}
+                            onChange={(data) => onChange(data, id)}
+                          ></Entry>
+                        );
+                      })}
+                </div>
+              </Disclosure.Panel>
+            </Transition>
+          </>
+        )}
+      </Disclosure>
+    ) : (
       <div className="flex flex-col space-y-3" id={sectionId}>
+        {/* if disclosure is not use, title will be shown here */}
         {section.title && (
           <div className="font-medium mt-4 dark:text-gray-300">
             {section.title}
@@ -119,6 +173,7 @@ const ModalForm = (props: Props) => {
     size = "sm",
     onChange,
     btnsText,
+    useDisclosure,
   } = props;
   const [data, setData] = useState<Data>(fromStructureToData(formStructure));
   const dataRef = useRef<Data>(data);
@@ -179,6 +234,7 @@ const ModalForm = (props: Props) => {
                   section={section}
                   id={sectionId}
                   data={data}
+                  useDisclosure={useDisclosure}
                   onChange={(newValue, id) => {
                     const newData = flat.unflatten({
                       ...(flat.flatten(dataRef.current) as object),

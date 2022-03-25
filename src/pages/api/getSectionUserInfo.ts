@@ -21,7 +21,6 @@ export default async function handler(
 ) {
   var client = grpcClient;
   const { sectionid, sub } = req.query;
-
   var docReq: SectionAndSubRequest = {
     sessionKey: fetchAppSession(req),
     sub: sub as string,
