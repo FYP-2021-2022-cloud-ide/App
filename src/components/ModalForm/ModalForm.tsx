@@ -11,6 +11,7 @@ import ListBox from "./entry/ListBox";
 import Toggle from "./entry/Toggle";
 import MDE from "./entry/MDE";
 import Custom from "./entry/Custom";
+import DatePicker from "./entry/DatePicker";
 import {
   Data,
   EntryProps,
@@ -37,6 +38,8 @@ const Entry = (props: EntryProps) => {
     return <MDE {...props}></MDE>;
   } else if (entry.type == "custom") {
     return <Custom {...props}></Custom>;
+  } else if (entry.type == "datetime") {
+    return <DatePicker {...props}></DatePicker>;
   } else throw new Error("not such entry type in <ModalForm>");
 };
 
@@ -124,7 +127,6 @@ const ModalForm = (props: Props) => {
   }, [formStructure]);
   useEffect(() => {
     dataRef.current = data;
-    console.log(dataRef.current);
   });
 
   const sizeMap = {

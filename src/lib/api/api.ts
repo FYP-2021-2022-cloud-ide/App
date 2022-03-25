@@ -242,7 +242,11 @@ type Notification = {
   body: string;
   sender: Notification_Sender;
   allow_reply: boolean;
-  updatedAt: string;
+  sentAt: string;
+  courseCode : string ;
+  sectionCode : string ;
+  section_id:string;
+  read : boolean ;
 };
 type Notification_Sender = {
   id: string;

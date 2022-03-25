@@ -1,10 +1,10 @@
-import { InformationCircleIcon } from "@heroicons/react/solid";
-import { memo, useEffect, useRef } from "react";
-import { EntryProps, ValidationOutput } from "../types";
+import { memo } from "react";
+import { EntryProps, InputEntry, ValidationOutput } from "../types";
+import Custom from "./Custom";
 
 const Input = memo(
   ({
-    text: _text,
+    text,
     placeholder,
     disabled = false,
     onChange,
@@ -16,18 +16,11 @@ const Input = memo(
     onChange: (text: string) => void;
     validate: () => ValidationOutput;
   }) => {
-    const ref = useRef<HTMLInputElement>();
-    useEffect(() => {
-      if (ref.current) {
-        ref.current.value = _text;
-      }
-    }, []);
     const validationResult = validate();
     return (
       <div>
         <input
-          ref={ref}
-          className={`modal-form-input text-gray-500 dark:text-gray-300 ${
+          className={` border dark:border-0 focus:outline-none dark:bg-gray-700 p-1 px-3 w-full flex-row space-x-2  text-left rounded-md shadow-lg text-gray-500 dark:text-gray-300 ${
             disabled ? "dark:text-gray-500 text-gray-300" : ""
           } ${
             validationResult.ok
@@ -35,7 +28,8 @@ const Input = memo(
               : "border-red-400 border-2 bg-red-100 dark:bg-red-100  dark:border-red-400 dark:focus:outline-none text-gray-500 dark:text-gray-500 ring-2 ring-red-400"
           }`}
           placeholder={placeholder}
-          // value={text}
+          // this component will never be rerender so text is the default value
+          defaultValue={text}
           onChange={(e) => {
             onChange(e.target.value);
           }}
@@ -53,43 +47,36 @@ const Input = memo(
   () => true
 );
 
-const component = ({
-  zIndex,
-  id,
-  entry,
-  sectionId,
-  data,
-  onChange,
-}: EntryProps) => {
+const component = (props: EntryProps) => {
+  const entry = props.entry as InputEntry;
   if (entry.type != "input") return <></>;
   return (
-    <div className="" style={{ zIndex: zIndex }} id={id}>
-      <div className="flex flex-row space-x-2  items-center">
-        {entry.label && (
-          <p className="modal-form-text-base capitalize">{entry.label}</p>
-        )}
-        {entry.tooltip && (
-          <div className="tooltip tooltip-info" data-tip={entry.tooltip}>
-            <InformationCircleIcon className="tooltip-icon" />
-          </div>
-        )}
-      </div>
-      <Input
-        text={data[sectionId][id] as string}
-        placeholder={entry.placeholder}
-        disabled={entry.disabled}
-        onChange={(text) => {
-          if (text == "" && entry.emptyValue) {
-            text = entry.emptyValue;
-          }
-          onChange(text);
-        }}
-        validate={() => {
-          if (entry.validate) return entry.validate(data);
-          else return { ok: true, message: "" };
-        }}
-      ></Input>
-    </div>
+    <Custom
+      {...props}
+      entry={{
+        ...entry,
+        // when you are creating a custom component,
+        // you can either use the `onChange` from props or the parameter of callback because they are the same.
+        // For consistency, we use the value from parameter
+        node: (onChange, currentValue, data) => (
+          <Input
+            text={currentValue}
+            placeholder={entry.placeholder}
+            disabled={entry.disabled}
+            onChange={(text) => {
+              if (text == "" && entry.emptyValue) {
+                text = entry.emptyValue;
+              }
+              onChange(text);
+            }}
+            validate={() => {
+              if (entry.validate) return entry.validate(data);
+              else return { ok: true, message: "" };
+            }}
+          ></Input>
+        ),
+      }}
+    />
   );
 };
 

@@ -101,9 +101,10 @@ type ContainerInfo = {
 
 type Notification = {
   id: string;
-  // courseCode? : string ;
-  // sectionCode? : string ;
-  // read : boolean ;
+  courseCode?: string;
+  sectionCode?: string;
+  section_id?: string;
+  read: boolean;
   sender: {
     id: string;
     name: string;
@@ -111,7 +112,7 @@ type Notification = {
   };
   title: string;
   body: string;
-  updatedAt: string;
+  sentAt: string;
   allow_reply: boolean;
 };
 

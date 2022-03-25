@@ -33,6 +33,7 @@ export default function handler(
             error: GoLangResponse.error?.error,
           },
           notifications: nts.map((nt) => {
+            // console.log(nts)
             var sender = nt.sender;
             return {
               id: nt.id,
@@ -44,7 +45,11 @@ export default function handler(
                 name: sender!.name,
               },
               allow_reply: nt.allowReply,
-              updatedAt: nt.updatedAt,
+              read:nt.read,
+              courseCode:nt.courseCode,
+              sectionCode:nt.sectionCode,
+              section_id:nt.sectionId,
+              sentAt: nt.sentAt,
             };
           }),
         });

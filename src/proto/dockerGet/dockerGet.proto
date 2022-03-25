@@ -53,12 +53,13 @@ service Docker {
 
   rpc getNotificationToken(SubRequest)returns(GetNotificationTokenReply){}
   rpc sendNotification(SendNotificationRequest)returns(SendNotificationReply){}
-  rpc listNotifications(UserIdRequest)returns(ListNotificationsReply){}
+  rpc listNotifications(UserIdRequest)returns(ListNotificationsReply){} 
+  rpc changeNotificationRead(ChangeNotificationReadRequest)returns(SuccessStringReply){}
   rpc removeNotification(RemoveNotificationRequest)returns(SuccessStringReply){}
   rpc updateNotificationToken(UpdateNotificationTokenRequest)returns(SuccessStringReply){}
   rpc updateSubscription(UpdateSubscriptionRequest)returns(SuccessStringReply){}
   rpc sendNotificationAnnouncement(SendNotificationAnnouncementRequest)returns(SuccessStringReply){}
-
+ 
   rpc googleOAuth(EmptyRequest)returns(GoogleOAuthReply){}
   rpc requestAccessToken(CodeRequest)returns(SuccessStringReply){}
   rpc googleListFile(ListFilesRequest)returns(ChildrenReply){}
@@ -113,7 +114,11 @@ message ListNotificationsReply {
     }
     Sender sender = 4;
     bool allow_reply=6;
-    string updated_at = 5;
+    bool read=7;
+    string course_code=8;
+    string section_code=9;
+    string section_id=10;
+    string sent_at = 5;
   }
   repeated Notification notifications = 3;
 }
@@ -406,6 +411,7 @@ message SendNotificationRequest{
   string sender=3;
   string receiver=5;
   bool allow_reply=4;
+  string section_id=6;
 }
 message SendNotificationAnnouncementRequest{
   string session_key=42;
@@ -426,7 +432,12 @@ message UpdateNotificationTokenRequest{
   string sub = 1;
   string token = 2;
 }
-
+message ChangeNotificationReadRequest{
+  string session_key=42;
+  string userId = 1;
+  repeated string notificationId = 2;
+  bool read =3;
+}
 message RemoveNotificationRequest{
   string session_key=42;
   string userId = 1;

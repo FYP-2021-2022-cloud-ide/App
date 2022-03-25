@@ -771,6 +771,7 @@ const Home = () => {
         clickOutsideToClose
         escToClose
         onEnter={async ({ course_announcement: data }) => {
+          console.log(data)
           const response = await courseAPI.sendNotificationAnnouncement(
             data.allow_reply,
             data.announcement,
@@ -780,7 +781,7 @@ const Home = () => {
           );
           if (response.success)
             myToast.success(
-              "The course announcement is sent. oewkorwek owrk owek rowekoke w wer okwer okowe kwoekro eorwko ewrkok o kweorkew "
+              "The course announcement is sent."
             );
           else myToast.error("Fail to send course announcement.");
           setAnnounceFormOpen(false);

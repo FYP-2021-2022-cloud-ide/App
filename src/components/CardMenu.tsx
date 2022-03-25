@@ -4,6 +4,7 @@ import { MenuIcon } from "@heroicons/react/outline";
 
 export type MenuItem = {
   text: string;
+  icon?: JSX.Element;
   onClick?: MouseEventHandler<HTMLButtonElement>;
   conditional?: () => boolean;
 };

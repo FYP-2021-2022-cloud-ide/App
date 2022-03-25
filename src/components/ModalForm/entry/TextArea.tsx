@@ -1,34 +1,26 @@
 import { InformationCircleIcon } from "@heroicons/react/solid";
 import { memo, useEffect, useRef } from "react";
-import { EntryProps, ValidationOutput } from "../types";
+import { EntryProps, TextAreaEntry, ValidationOutput } from "../types";
+import Custom from "./Custom";
 
 const TextArea = memo(
   ({
-    text: _text,
+    text,
     placeholder,
     disabled = false,
     onChange,
-    isMarkdown = false,
   }: {
     text: string;
     placeholder: string;
     disabled?: boolean;
     onChange: (text: string) => void;
-    isMarkdown?: boolean;
   }) => {
-    // const [text, setText] = useState(_text);
-    const ref = useRef<HTMLTextAreaElement>();
-    useEffect(() => {
-      if (ref.current) {
-        ref.current.value = _text;
-      }
-    }, []);
     return (
       <textarea
-        className="modal-form-textarea"
+        className=" min-h-[100px] max-h-[400px] border dark:border-0 focus:outline-none dark:bg-gray-700 p-1 px-3 w-full text-gray-500 dark:text-gray-300 flex-row space-x-2  text-left rounded-xl shadow-lg h-32"
         placeholder={placeholder}
-        ref={ref}
-        // value={text}
+        // this component will never be rerender so the input props is the default value
+        defaultValue={text}
         onChange={(e) => {
           // setText(e.target.value);
           onChange(e.target.value);
@@ -40,43 +32,29 @@ const TextArea = memo(
   () => true
 );
 
-const component = ({
-  zIndex,
-  id,
-  entry,
-  sectionId,
-  data,
-  onChange,
-}: EntryProps) => {
+const component = (props: EntryProps) => {
+  const entry = props.entry as TextAreaEntry;
   if (entry.type != "textarea") return <></>;
   return (
-    <div style={{ zIndex: zIndex }} id={id}>
-      <div className="flex flex-row space-x-2  items-center">
-        {entry.label && (
-          <p className="modal-form-text-base capitalize">{entry.label}</p>
-        )}
-        {entry.tooltip && (
-          <div
-            className="tooltip tooltip-bottom tooltip-info"
-            data-tip={entry.tooltip}
-          >
-            <InformationCircleIcon className="tooltip-icon" />
-          </div>
-        )}
-      </div>
-
-      <TextArea
-        text={data[sectionId][id] as string}
-        placeholder={entry.placeholder}
-        disabled={entry.disabled}
-        onChange={(text) => {
-          if (text == "" && entry.emptyValue) {
-            text = entry.emptyValue;
-          }
-          onChange(text);
-        }}
-      ></TextArea>
-    </div>
+    <Custom
+      {...props}
+      entry={{
+        ...entry,
+        node: (onChange, data) => (
+          <TextArea
+            text={data}
+            placeholder={entry.placeholder}
+            disabled={entry.disabled}
+            onChange={(text) => {
+              if (text == "" && entry.emptyValue) {
+                text = entry.emptyValue;
+              }
+              onChange(text);
+            }}
+          ></TextArea>
+        ),
+      }}
+    ></Custom>
   );
 };
 export default component;

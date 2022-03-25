@@ -1,38 +1,71 @@
-import flat from "flat";
-import dynamic from "next/dynamic";
-import { memo, useEffect, useRef } from "react";
-import _ from "lodash";
-import ReactDOMServer from "react-dom/server";
-import { MyMarkDown } from "../../../pages/messages";
-import { EntryProps } from "../types";
-import fm from "front-matter";
 import { InformationCircleIcon } from "@heroicons/react/solid";
+import _ from "lodash";
+import { EntryProps } from "../types";
+import ReactDOM from "react-dom";
+import { usePopperTooltip } from "react-popper-tooltip";
+import styles from "./Tooltip.module.css";
+import classNames from "../../../lib/classnames";
 
-const component = ({
-  zIndex,
-  id,
-  entry,
-  sectionId,
-  data,
-  onChange,
-}: EntryProps) => {
-  if (entry.type != "custom") return <></>;
+const Label = ({ entry }: EntryProps) => {
+  const {
+    getArrowProps,
+    getTooltipProps,
+    setTooltipRef,
+    setTriggerRef,
+    visible,
+  } = usePopperTooltip();
   return (
-    <div style={{ zIndex: zIndex }} id={id}>
-      <div className="flex flex-row space-x-2 items-center">
-        {entry.label && (
-          <p className="modal-form-text-base capitalize">{entry.label}</p>
-        )}
-        {entry.tooltip && (
-          <div
+    <div className="flex flex-row space-x-2 items-center">
+      {entry.label && (
+        <p className="modal-form-text-base capitalize" id="label">
+          {entry.label}
+        </p>
+      )}
+      {entry.tooltip && (
+        <>
+          {/* <div
+            id="tooltip"
             className="tooltip tooltip-bottom tooltip-info"
             data-tip={entry.tooltip}
           >
             <InformationCircleIcon className="tooltip-icon" />
+          </div> */}
+          <div ref={setTriggerRef}>
+            <InformationCircleIcon className="tooltip-icon" />
           </div>
-        )}
-      </div>
-      {entry.node((newValue) => onChange(newValue), data[sectionId][id])}
+          {visible &&
+            ReactDOM.createPortal(
+              <div
+                ref={setTooltipRef}
+                {...getTooltipProps({
+                  className: classNames(styles, "tooltip-container"),
+                })}
+              >
+                {entry.tooltip}
+                <div
+                  {...getArrowProps({
+                    className: classNames(styles, "tooltip-arrow"),
+                  })}
+                />
+              </div>,
+              document.body
+            )}
+        </>
+      )}
+    </div>
+  );
+};
+
+const component = (props: EntryProps) => {
+  const { zIndex, id, entry, sectionId, data, onChange } = props;
+  return (
+    <div
+      style={{ zIndex: zIndex }}
+      id={id}
+      className={`modal-form-${entry.type}`}
+    >
+      <Label {...props}></Label>
+      {entry.node(onChange, data[sectionId][id], data)}
     </div>
   );
 };

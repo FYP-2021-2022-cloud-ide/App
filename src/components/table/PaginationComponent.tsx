@@ -90,6 +90,7 @@ const PaginationComponent = (
       text: string;
       icon: JSX.Element;
       onClick: () => void;
+      shown?: boolean; // default is shown
     }[];
   }
 ) => {
@@ -101,27 +102,29 @@ const PaginationComponent = (
   return (
     <div className="flex flex-row bg-gray-100 dark:bg-black/50 rounded-b-md p-2 justify-between items-center rdt_pagination">
       <div className="flex flex-row items-center space-x-2">
-        {selectedRows.length != 0 && (
-          <div>
+        <div>
+          {selectedRows.length != 0 && (
             <p className="text-gray-700 dark:text-gray-300 text-xs">
               Selecting {selectedRows.length} of {rowCount}
             </p>
-            <div className="flex flex-row items-center space-x-2">
-              {actions.map((action) => {
+          )}
+          <div className="flex flex-row items-center space-x-2">
+            {actions
+              .filter((action) => action.shown || action.shown === undefined)
+              .map((action) => {
                 return (
                   <button
                     key={action.text}
                     title={action.text}
-                    className="bg-gray-500 rounded p-1"
+                    className="btn bg-gray-500/50  rounded p-1 border-none min-h-0 h-auto w-auto dark:hover:bg-white/30"
                     onClick={action.onClick}
                   >
                     {action.icon}
                   </button>
                 );
               })}
-            </div>
           </div>
-        )}
+        </div>
       </div>
       <Right {...props}></Right>
     </div>

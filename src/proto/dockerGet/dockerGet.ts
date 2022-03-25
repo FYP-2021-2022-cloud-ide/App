@@ -62,7 +62,11 @@ export interface ListNotificationsReply_Notification {
   body: string;
   sender: ListNotificationsReply_Notification_Sender | undefined;
   allowReply: boolean;
-  updatedAt: string;
+  read: boolean;
+  courseCode: string;
+  sectionCode: string;
+  sectionId: string;
+  sentAt: string;
 }
 
 export interface ListNotificationsReply_Notification_Sender {
@@ -365,6 +369,7 @@ export interface SendNotificationRequest {
   sender: string;
   receiver: string;
   allowReply: boolean;
+  sectionId: string;
 }
 
 export interface SendNotificationAnnouncementRequest {
@@ -386,6 +391,13 @@ export interface UpdateNotificationTokenRequest {
   sessionKey: string;
   sub: string;
   token: string;
+}
+
+export interface ChangeNotificationReadRequest {
+  sessionKey: string;
+  userId: string;
+  notificationId: string[];
+  read: boolean;
 }
 
 export interface RemoveNotificationRequest {
@@ -1051,7 +1063,11 @@ function createBaseListNotificationsReply_Notification(): ListNotificationsReply
     body: "",
     sender: undefined,
     allowReply: false,
-    updatedAt: "",
+    read: false,
+    courseCode: "",
+    sectionCode: "",
+    sectionId: "",
+    sentAt: "",
   };
 }
 
@@ -1078,8 +1094,20 @@ export const ListNotificationsReply_Notification = {
     if (message.allowReply === true) {
       writer.uint32(48).bool(message.allowReply);
     }
-    if (message.updatedAt !== "") {
-      writer.uint32(42).string(message.updatedAt);
+    if (message.read === true) {
+      writer.uint32(56).bool(message.read);
+    }
+    if (message.courseCode !== "") {
+      writer.uint32(66).string(message.courseCode);
+    }
+    if (message.sectionCode !== "") {
+      writer.uint32(74).string(message.sectionCode);
+    }
+    if (message.sectionId !== "") {
+      writer.uint32(82).string(message.sectionId);
+    }
+    if (message.sentAt !== "") {
+      writer.uint32(42).string(message.sentAt);
     }
     return writer;
   },
@@ -1112,8 +1140,20 @@ export const ListNotificationsReply_Notification = {
         case 6:
           message.allowReply = reader.bool();
           break;
+        case 7:
+          message.read = reader.bool();
+          break;
+        case 8:
+          message.courseCode = reader.string();
+          break;
+        case 9:
+          message.sectionCode = reader.string();
+          break;
+        case 10:
+          message.sectionId = reader.string();
+          break;
         case 5:
-          message.updatedAt = reader.string();
+          message.sentAt = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -1132,7 +1172,11 @@ export const ListNotificationsReply_Notification = {
         ? ListNotificationsReply_Notification_Sender.fromJSON(object.sender)
         : undefined,
       allowReply: isSet(object.allowReply) ? Boolean(object.allowReply) : false,
-      updatedAt: isSet(object.updatedAt) ? String(object.updatedAt) : "",
+      read: isSet(object.read) ? Boolean(object.read) : false,
+      courseCode: isSet(object.courseCode) ? String(object.courseCode) : "",
+      sectionCode: isSet(object.sectionCode) ? String(object.sectionCode) : "",
+      sectionId: isSet(object.sectionId) ? String(object.sectionId) : "",
+      sentAt: isSet(object.sentAt) ? String(object.sentAt) : "",
     };
   },
 
@@ -1146,7 +1190,12 @@ export const ListNotificationsReply_Notification = {
         ? ListNotificationsReply_Notification_Sender.toJSON(message.sender)
         : undefined);
     message.allowReply !== undefined && (obj.allowReply = message.allowReply);
-    message.updatedAt !== undefined && (obj.updatedAt = message.updatedAt);
+    message.read !== undefined && (obj.read = message.read);
+    message.courseCode !== undefined && (obj.courseCode = message.courseCode);
+    message.sectionCode !== undefined &&
+      (obj.sectionCode = message.sectionCode);
+    message.sectionId !== undefined && (obj.sectionId = message.sectionId);
+    message.sentAt !== undefined && (obj.sentAt = message.sentAt);
     return obj;
   },
 
@@ -1162,7 +1211,11 @@ export const ListNotificationsReply_Notification = {
         ? ListNotificationsReply_Notification_Sender.fromPartial(object.sender)
         : undefined;
     message.allowReply = object.allowReply ?? false;
-    message.updatedAt = object.updatedAt ?? "";
+    message.read = object.read ?? false;
+    message.courseCode = object.courseCode ?? "";
+    message.sectionCode = object.sectionCode ?? "";
+    message.sectionId = object.sectionId ?? "";
+    message.sentAt = object.sentAt ?? "";
     return message;
   },
 };
@@ -5042,6 +5095,7 @@ function createBaseSendNotificationRequest(): SendNotificationRequest {
     sender: "",
     receiver: "",
     allowReply: false,
+    sectionId: "",
   };
 }
 
@@ -5067,6 +5121,9 @@ export const SendNotificationRequest = {
     }
     if (message.allowReply === true) {
       writer.uint32(32).bool(message.allowReply);
+    }
+    if (message.sectionId !== "") {
+      writer.uint32(50).string(message.sectionId);
     }
     return writer;
   },
@@ -5099,6 +5156,9 @@ export const SendNotificationRequest = {
         case 4:
           message.allowReply = reader.bool();
           break;
+        case 6:
+          message.sectionId = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -5115,6 +5175,7 @@ export const SendNotificationRequest = {
       sender: isSet(object.sender) ? String(object.sender) : "",
       receiver: isSet(object.receiver) ? String(object.receiver) : "",
       allowReply: isSet(object.allowReply) ? Boolean(object.allowReply) : false,
+      sectionId: isSet(object.sectionId) ? String(object.sectionId) : "",
     };
   },
 
@@ -5126,6 +5187,7 @@ export const SendNotificationRequest = {
     message.sender !== undefined && (obj.sender = message.sender);
     message.receiver !== undefined && (obj.receiver = message.receiver);
     message.allowReply !== undefined && (obj.allowReply = message.allowReply);
+    message.sectionId !== undefined && (obj.sectionId = message.sectionId);
     return obj;
   },
 
@@ -5139,6 +5201,7 @@ export const SendNotificationRequest = {
     message.sender = object.sender ?? "";
     message.receiver = object.receiver ?? "";
     message.allowReply = object.allowReply ?? false;
+    message.sectionId = object.sectionId ?? "";
     return message;
   },
 };
@@ -5405,6 +5468,96 @@ export const UpdateNotificationTokenRequest = {
     message.sessionKey = object.sessionKey ?? "";
     message.sub = object.sub ?? "";
     message.token = object.token ?? "";
+    return message;
+  },
+};
+
+function createBaseChangeNotificationReadRequest(): ChangeNotificationReadRequest {
+  return { sessionKey: "", userId: "", notificationId: [], read: false };
+}
+
+export const ChangeNotificationReadRequest = {
+  encode(
+    message: ChangeNotificationReadRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.sessionKey !== "") {
+      writer.uint32(338).string(message.sessionKey);
+    }
+    if (message.userId !== "") {
+      writer.uint32(10).string(message.userId);
+    }
+    for (const v of message.notificationId) {
+      writer.uint32(18).string(v!);
+    }
+    if (message.read === true) {
+      writer.uint32(24).bool(message.read);
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): ChangeNotificationReadRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseChangeNotificationReadRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 42:
+          message.sessionKey = reader.string();
+          break;
+        case 1:
+          message.userId = reader.string();
+          break;
+        case 2:
+          message.notificationId.push(reader.string());
+          break;
+        case 3:
+          message.read = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ChangeNotificationReadRequest {
+    return {
+      sessionKey: isSet(object.sessionKey) ? String(object.sessionKey) : "",
+      userId: isSet(object.userId) ? String(object.userId) : "",
+      notificationId: Array.isArray(object?.notificationId)
+        ? object.notificationId.map((e: any) => String(e))
+        : [],
+      read: isSet(object.read) ? Boolean(object.read) : false,
+    };
+  },
+
+  toJSON(message: ChangeNotificationReadRequest): unknown {
+    const obj: any = {};
+    message.sessionKey !== undefined && (obj.sessionKey = message.sessionKey);
+    message.userId !== undefined && (obj.userId = message.userId);
+    if (message.notificationId) {
+      obj.notificationId = message.notificationId.map((e) => e);
+    } else {
+      obj.notificationId = [];
+    }
+    message.read !== undefined && (obj.read = message.read);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<ChangeNotificationReadRequest>, I>>(
+    object: I
+  ): ChangeNotificationReadRequest {
+    const message = createBaseChangeNotificationReadRequest();
+    message.sessionKey = object.sessionKey ?? "";
+    message.userId = object.userId ?? "";
+    message.notificationId = object.notificationId?.map((e) => e) || [];
+    message.read = object.read ?? false;
     return message;
   },
 };
@@ -7372,6 +7525,18 @@ export const DockerService = {
     responseDeserialize: (value: Buffer) =>
       ListNotificationsReply.decode(value),
   },
+  changeNotificationRead: {
+    path: "/dockerGet.Docker/changeNotificationRead",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: ChangeNotificationReadRequest) =>
+      Buffer.from(ChangeNotificationReadRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) =>
+      ChangeNotificationReadRequest.decode(value),
+    responseSerialize: (value: SuccessStringReply) =>
+      Buffer.from(SuccessStringReply.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => SuccessStringReply.decode(value),
+  },
   removeNotification: {
     path: "/dockerGet.Docker/removeNotification",
     requestStream: false,
@@ -7551,6 +7716,10 @@ export interface DockerServer extends UntypedServiceImplementation {
     SendNotificationReply
   >;
   listNotifications: handleUnaryCall<UserIdRequest, ListNotificationsReply>;
+  changeNotificationRead: handleUnaryCall<
+    ChangeNotificationReadRequest,
+    SuccessStringReply
+  >;
   removeNotification: handleUnaryCall<
     RemoveNotificationRequest,
     SuccessStringReply
@@ -8183,6 +8352,21 @@ export interface DockerClient extends Client {
       error: ServiceError | null,
       response: ListNotificationsReply
     ) => void
+  ): ClientUnaryCall;
+  changeNotificationRead(
+    request: ChangeNotificationReadRequest,
+    callback: (error: ServiceError | null, response: SuccessStringReply) => void
+  ): ClientUnaryCall;
+  changeNotificationRead(
+    request: ChangeNotificationReadRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: SuccessStringReply) => void
+  ): ClientUnaryCall;
+  changeNotificationRead(
+    request: ChangeNotificationReadRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: SuccessStringReply) => void
   ): ClientUnaryCall;
   removeNotification(
     request: RemoveNotificationRequest,

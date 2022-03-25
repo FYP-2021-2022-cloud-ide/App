@@ -15,7 +15,7 @@ const SideBar = () => {
   const router = useRouter();
   var pages = [
     { name: "Dashboard", link: "/", icon: HomeIcon },
-    { name: "Notifications", link: "/messages", icon: AnnotationIcon },
+    { name: "Messages", link: "/messages", icon: AnnotationIcon },
     { name: "File Transfer", link: "/file_transfer", icon: CloudIcon },
     // { name: "Admin", link: "/admin", icon: IdentificationIcon },
   ];

@@ -15,6 +15,7 @@ import { generalAPI } from "../lib/api/generalAPI";
 import { containerAPI } from "../lib/api/containerAPI";
 import { FetchCookieResponse } from "../lib/api/api";
 import Twemoji from "react-twemoji";
+import _ from "lodash";
 
 const defaultQuota = Number(3); // process.env.CONTAINERSLIMIT
 
@@ -77,9 +78,6 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
     ).json()) as FetchCookieResponse;
     if (response.success) {
       const { sub, name, email, userId, semesterId } = response.cookies;
-      if (!userId) {
-        throw new Error("user id is null ");
-      }
       setSub(sub);
       setName(name);
       setEmail(email);
@@ -97,8 +95,9 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
         // role,
       };
     } else {
-      throw new Error("cookies cannot be fetched");
-      myToast.error("cookies cannot be fetched for some reasons.");
+      console.error("cookies cannot be fetched");
+      router.push("/logout");
+      return {};
     }
   }
 
@@ -145,11 +144,15 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
   }
   useEffect(() => {
     async function init() {
-      const { sub, userId, semesterId } = await fetchCookies();
-      await initMessage(sub, userId, semesterId);
-      await fetchContainers(sub);
-      await fetchNotifications(userId);
-      await ContainerQuotaFromEnv();
+      const cookies = await fetchCookies();
+
+      if (!_.isEmpty(cookies)) {
+        const { sub, userId, semesterId } = cookies;
+        await initMessage(sub, userId, semesterId);
+        await fetchContainers(sub);
+        await fetchNotifications(userId);
+        await ContainerQuotaFromEnv();
+      }
     }
     init();
   }, []);

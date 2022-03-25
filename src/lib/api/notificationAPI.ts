@@ -11,7 +11,8 @@ const notificationAPI = {
         body: string,
          sender: string,
           receiver: string,
-           allowReply: boolean
+           allowReply: boolean,
+           sectionId:string
            ): Promise<NotificationSendResponse>  => {
         var res = await fetch('/api/notification/sendNotification', {
             method: 'POST',
@@ -21,6 +22,7 @@ const notificationAPI = {
                 "sender": sender,
                 "receiver": receiver,
                 "allowReply": allowReply,
+                sectionId,
             }),
         })
         return res.json()
@@ -37,6 +39,17 @@ const notificationAPI = {
             body: JSON.stringify({
                 "userId": userId,
                 "notificationIds": notificationIds,
+            }),
+        })
+        return res.json()
+    }   ,
+    changeNotificationRead: async (userId: string, notificationIds: string[],read:boolean) : Promise<SuccessStringResponse>  => {
+        var res = await fetch('/api/notification/changeNotificationRead', {
+            method: 'POST',
+            body: JSON.stringify({
+                "userId": userId,
+                "notificationIds": notificationIds,
+                read,
             }),
         })
         return res.json()

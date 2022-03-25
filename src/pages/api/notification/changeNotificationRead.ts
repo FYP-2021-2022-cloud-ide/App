@@ -3,33 +3,34 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 
-import { NotificationSendResponse, nodeError } from "../../../lib/api/api";
+import { SuccessStringResponse, nodeError } from "../../../lib/api/api";
 
 import { grpcClient } from "../../../lib/grpcClient";
 import {
-  SendNotificationReply,
-  SendNotificationRequest,
+  SuccessStringReply,
+  ChangeNotificationReadRequest,
 } from "../../../proto/dockerGet/dockerGet";
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<NotificationSendResponse>
+  res: NextApiResponse<SuccessStringResponse>
 ) {
   var client = grpcClient;
-  const { title, body, sender, receiver, allowReply,sectionId } = JSON.parse(req.body);
-  var docReq = SendNotificationRequest.fromPartial({
+  const { userId, notificationIds ,read} = JSON.parse(req.body);
+  // console.log(notificationIds)
+  var docReq = ChangeNotificationReadRequest.fromPartial({
     sessionKey: fetchAppSession(req),
-    title: title,
-    body: body,
-    sender: sender,
-    receiver: receiver,
-    allowReply: allowReply,
-    sectionId:sectionId,
+    userId: userId,
+    read: read,
   });
+  notificationIds.forEach((element: string) => {
+    docReq.notificationId.push(element);
+  });
+
   try {
-    client.sendNotification(
+    client.changeNotificationRead(
       docReq,
-      function (err, GoLangResponse: SendNotificationReply) {
+      function (err, GoLangResponse: SuccessStringReply) {
         console.log(GoLangResponse);
         res.json({
           success: GoLangResponse.success,
@@ -37,7 +38,6 @@ export default function handler(
             status: GoLangResponse.error?.status,
             error: GoLangResponse.error?.error,
           },
-          notificationId: GoLangResponse.notificationId,
         });
         res.status(200).end();
       }

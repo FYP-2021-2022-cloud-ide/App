@@ -4,6 +4,7 @@ import { Environment, SandboxImage, Template } from "./cnails";
 import { Option } from "../components/ListBox";
 import { containerAPI } from "./api/containerAPI";
 import myToast from "../components/CustomToast";
+import moment from "moment";
 
 const registry = process.env.NEXT_PUBLIC_REGISTRY;
 const rootImage = `${registry}/codeserver:latest`;
@@ -226,7 +227,6 @@ export const getCreateTemplateFormStructure = (
           placeholder: `e.g. ${validName}`,
           emptyValue: validName,
           validate: (data) => {
-            console.log(data);
             if (
               templates.map((t) => t.name).includes(data.create_template.name)
             )
@@ -240,6 +240,13 @@ export const getCreateTemplateFormStructure = (
           defaultValue: "",
           label: "Description (Optional)",
         },
+        // schedule_publish: {
+        //   label: "Schedule publishig period",
+        //   description: "choose a date time period",
+        //   tooltip: "do something",
+        //   type: "datetime",
+        //   defaultValue: moment().format("YYYY-MM-DDTHH:mm"),
+        // },
         allow_notification: {
           type: "toggle",
           defaultValue: false,
@@ -578,7 +585,7 @@ export const getAnnouncementFormStructure = (): FormStructure => {
         announcement: {
           type: "markdown",
           defaultValue: "",
-          label: "Announcement",
+          label: "Content",
         },
         allow_reply: {
           type: "toggle",

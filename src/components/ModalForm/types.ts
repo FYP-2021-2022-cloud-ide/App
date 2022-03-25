@@ -7,7 +7,15 @@ export type Data = { [id: string]: any };
 
 export type ValidationOutput = { ok: false; message: string } | { ok: true };
 
-export type Entry = {
+export interface BaseEntry {
+  /**
+   * type of this entry.
+   */
+  type: string;
+  /**
+   * default value of this entry
+   */
+  defaultValue: any;
   /**
    * label of entry
    */
@@ -28,36 +36,75 @@ export type Entry = {
    * validate the entry data on input. If the result is not ok, the form cannot proceed.
    */
   validate?: (data: Data) => ValidationOutput;
-} & (
-  | {
-      type: "input";
-      defaultValue: string;
-      placeholder?: string;
-      emptyValue?: string; // when empty value is given, this value will be return on enter when the actual value is empty
-      disabled?: boolean;
-    }
-  | {
-      type: "textarea";
-      defaultValue: string;
-      placeholder?: string;
-      emptyValue?: string; // when empty value is given, this value will be return on enter when the actual value is empty
-      disabled?: boolean;
-    }
-  | { type: "listbox"; defaultValue: Option; options: Option[] }
-  | { type: "toggle"; defaultValue: boolean }
-  | { type: "markdown"; defaultValue: string }
-  | { type: "date"; defaultValue: string }
-  | {
-      type: "custom";
-      defaultValue: any;
-      node: (
-        onChange: (newValue: any) => void,
-        currentValue: any
-      ) => React.ReactNode;
-    }
-);
+  /**
+   * This function provides the `onChange` callback, `currentValue` and `data` for you.
+   * Based on these two props, you need to determine how to render your element.
+   * For performance purpose, you may also want to use a memorized element.
+   *
+   * @param onChange a function you need to call to change the data of the form.
+   * This `onChange` function is exactly the function pass to the Custom Component.
+   * @param data the currentValue of this entry. Basically `data[sectionId][id]`.
+   * @param formData all the data of the modal form.
+   */
+  node?: (
+    onChange: (newValue: any) => void,
+    data: any,
+    formData: any
+  ) => JSX.Element;
+}
 
-// the key of a form structure will be the title
+export interface InputEntry extends BaseEntry {
+  type: "input";
+  defaultValue: string;
+  placeholder?: string;
+  emptyValue?: string; // when empty value is given, this value will be return on enter when the actual value is empty
+  disabled?: boolean;
+}
+
+export interface TextAreaEntry extends BaseEntry {
+  type: "textarea";
+  defaultValue: string;
+  placeholder?: string;
+  emptyValue?: string; // when empty value is given, this value will be return on enter when the actual value is empty
+  disabled?: boolean;
+}
+
+export interface ListBoxEntry extends BaseEntry {
+  type: "listbox";
+  defaultValue: Option;
+  options: Option[];
+}
+
+export interface ToggleEntry extends BaseEntry {
+  type: "toggle";
+  defaultValue: boolean;
+}
+
+export interface MarkdownEntry extends BaseEntry {
+  type: "markdown";
+  defaultValue: string;
+}
+
+export interface DateTimeEntry extends BaseEntry {
+  type: "datetime";
+  /**
+   * the `moment` string
+   */
+  defaultValue: string;
+}
+
+export type Entry =
+  | BaseEntry
+  | InputEntry
+  | TextAreaEntry
+  | ListBoxEntry
+  | ToggleEntry
+  | MarkdownEntry
+  | DateTimeEntry;
+
+/**
+ * a form structure is compose of many sections
+ */
 export type Section = {
   /**
    * the title of this section
@@ -136,6 +183,9 @@ export type Props = {
   btnsText?: { cancel: string; ok: string };
 };
 
+/**
+ * T is EntryType
+ */
 export type EntryProps = {
   /**
    * the z index to be used for styling. The upper entry usually has a higher z index than a lower entry

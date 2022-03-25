@@ -34,7 +34,7 @@
 @tailwind utilities;
 
 .rdt_TableRow {
-  @apply bg-gray-100 dark:bg-black/50   text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-black/20 border-[#D5D6D8] dark:border-[#2F3947] !important;
+  @apply bg-gray-100 dark:bg-black/50 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-black/40 border-[#D5D6D8] dark:border-[#2F3947] !important;
 }
 
 .rdt_pagination {
@@ -42,11 +42,11 @@
 }
 
 .rdt_Table {
-  @apply bg-transparent shadow-lg  border-t border-l border-r  rounded-t-md  border-[#D5D6D8] dark:border-[#2F3947] !important;
+  @apply shadow-lg  border-t border-l border-r  rounded-t-md  border-[#D5D6D8] dark:border-[#2F3947] !important;
 }
 
 .rdt_TableHead {
-  @apply rounded-t-md overflow-hidden bg-transparent border-b-0 dark:border-b border-[#D5D6D8] dark:border-[#2F3947] !important;
+  @apply rounded-t-md overflow-hidden  border-b-0 dark:border-b border-[#D5D6D8] dark:border-[#2F3947] !important;
 }
 
 .rdt_TableHeadRow {
@@ -155,8 +155,8 @@
   @apply text-xl font-medium leading-6 dark:text-gray-300 mb-2;
 }
 
-.modal-form-textarea {
-  @apply min-h-[100px] max-h-[400px] border dark:border-0 focus:outline-none dark:bg-gray-700 p-1 px-3 w-full text-gray-500 dark:text-gray-300 flex-row space-x-2  text-left rounded-xl shadow-lg h-32;
+.modal-form-datetime {
+  @apply dark:text-gray-300 border dark:border-0 focus:outline-none dark:bg-gray-700 p-1 px-3 w-full flex-row space-x-2  text-left rounded-md shadow-lg;
 }
 
 .modal-form-title-md {
@@ -175,10 +175,6 @@
   @apply flex flex-row items-center space-x-2;
 }
 
-.modal-form-input {
-  @apply border dark:border-0 focus:outline-none dark:bg-gray-700 p-1 px-3 w-full flex-row space-x-2  text-left rounded-md shadow-lg;
-}
-
 .modal-form-list-box {
 }
 
@@ -192,6 +188,15 @@
 
 .listbox-options {
   @apply mb-10  absolute overflow-visible w-full py-1 mt-1  text-base bg-white dark:bg-gray-700 dark:text-gray-400 rounded-md shadow-lg shadow-black/30 max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm;
+}
+
+.tooltip-arrow-up {
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid;
+  @apply border-b-red-200;
 }
 
 .tooltip-icon {
@@ -224,6 +229,19 @@
 
 :not(.tooltip-bottom).tooltip.tooltip-info::after {
   @apply border-t-blue-100/50 dark:border-t-blue-300/50;
+}
+
+.tooltip-container[data-popper-placement*="bottom"] .tooltip-arrow {
+  border-color: transparent transparent black transparent !important;
+  /* @apply border-t-blue-100/50 dark:border-t-blue-300/50 !important; */
+}
+
+.tooltip-container[data-popper-placement*="bottom"] .tooltip-arrow::before {
+  border-color: transparent transparent black transparent !important;
+}
+
+.tooltip-container {
+  @apply border-0 outline-0 !important;
 }
 
 .tooltip-bottom.tooltip-info::after {

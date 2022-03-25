@@ -3,10 +3,11 @@ import dynamic from "next/dynamic";
 import { memo, useEffect, useRef } from "react";
 import _ from "lodash";
 import ReactDOMServer from "react-dom/server";
-import { MyMarkDown } from "../../../pages/messages";
+import { MyMarkDown } from "../../MyMarkdown";
 import "easymde/dist/easymde.min.css";
-import { EntryProps } from "../types";
+import { EntryProps, MarkdownEntry } from "../types";
 import fm from "front-matter";
+import Custom from "./Custom";
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
   ssr: false,
 });
@@ -71,7 +72,7 @@ const MDE = memo(
           onChange={onChange}
           options={{
             spellChecker: false,
-            autofocus: true,
+            autofocus: false,
             initialValue: _text,
             // showIcons: ["undo"],
             hideIcons: ["fullscreen"],
@@ -95,30 +96,34 @@ const MDE = memo(
   () => true
 );
 
-const component = ({
-  zIndex,
-  id,
-  entry,
-  sectionId,
-  data,
-  onChange,
-}: EntryProps) => {
-  const getBadge = () => {
-    try {
-      return fm(data[sectionId][id] as string).attributes;
-    } catch (error) {
-      return {};
-    }
-  };
+const component = (props: EntryProps) => {
+  const entry = props.entry as MarkdownEntry;
+  if (entry.type != "markdown") return <></>;
+
   return (
-    <div>
-      {window && window.navigator && (
-        <>
-          <FrontMatter attributes={getBadge()}></FrontMatter>
-          <MDE text={data[sectionId][id] as string} onChange={onChange} />
-        </>
-      )}
-    </div>
+    <Custom
+      {...props}
+      entry={{
+        ...entry,
+        node: (onChange, data, formData) => {
+          const getBadge = () => {
+            try {
+              return fm(data).attributes;
+            } catch (error) {
+              return {};
+            }
+          };
+          return window && window.navigator ? (
+            <>
+              <FrontMatter attributes={getBadge()}></FrontMatter>
+              <MDE text={data} onChange={onChange} />
+            </>
+          ) : (
+            <></>
+          );
+        },
+      }}
+    ></Custom>
   );
 };
 
