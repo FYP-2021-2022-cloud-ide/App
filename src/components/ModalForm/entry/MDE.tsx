@@ -1,6 +1,6 @@
 import flat from "flat";
 import dynamic from "next/dynamic";
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
 import _ from "lodash";
 import ReactDOMServer from "react-dom/server";
 import { MyMarkDown } from "../../MyMarkdown";
@@ -10,10 +10,10 @@ import fm from "front-matter";
 import Custom from "./Custom";
 import FocusTrap from "focus-trap-react";
 import EasyMDE from "easymde";
+import Image from "next/image";
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
   ssr: false,
 });
-// import SimpleMDE from "react-simplemde-editor";
 
 const validFrontmatter = ["course.code", "status", "course.section"];
 
@@ -56,6 +56,24 @@ const MDE = memo(
     onFocus: () => void;
     mdeRef: React.MutableRefObject<EasyMDE>;
   }) => {
+    // const handleToggle = (e: MouseEvent) => {
+    //   console.log("toggle", previewBtnRef.current, scrollerElRef.current);
+    //   previewBtnRef.current.classList.contains("active")
+    //     ? scrollerElRef.current.classList.add("opacity-0")
+    //     : scrollerElRef.current.classList.remove("opacity-0");
+    // };
+
+    // const previewBtnRef = useRef<HTMLButtonElement>(null);
+    // const scrollerElRef = useRef<HTMLDivElement>(null);
+    // useLayoutEffect(() => {
+    //   setTimeout(() => {
+    //     previewBtnRef.current = document.querySelector("button.preview");
+    //     previewBtnRef.current?.addEventListener("click", handleToggle);
+    //   }, 2000);
+    //   return () => {
+    //     previewBtnRef.current?.removeEventListener("click", handleToggle);
+    //   };
+    // }, []);
     return (
       <div>
         <SimpleMDE
@@ -66,9 +84,11 @@ const MDE = memo(
             autofocus: false,
             initialValue: _text,
             // showIcons: ["undo"],
-            hideIcons: ["fullscreen"],
+            // side by side has low render performance so disable it
+            hideIcons: ["fullscreen", "side-by-side"],
             sideBySideFullscreen: false,
             indentWithTabs: false,
+            status: false,
             maxHeight: "500px",
             renderingConfig: {},
             previewRender: () => {
@@ -79,6 +99,8 @@ const MDE = memo(
           }}
           getMdeInstance={(instance) => {
             mdeRef.current = instance;
+            // scrollerElRef.current =
+            //   mdeRef.current.codemirror.getScrollerElement() as HTMLDivElement;
           }}
         />
       </div>
@@ -143,6 +165,24 @@ const component = (props: EntryProps) => {
                       setFocusTrapActive(true);
                     }}
                   />
+                  <a
+                    className="markdown-support"
+                    title="Markdown Basic"
+                    onClick={() => {
+                      window.open(
+                        "https://www.markdownguide.org/basic-syntax/"
+                      );
+                    }}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 640 512"
+                      strokeWidth={2}
+                    >
+                      <path d="M593.8 59.1H46.2C20.7 59.1 0 79.8 0 105.2v301.5c0 25.5 20.7 46.2 46.2 46.2h547.7c25.5 0 46.2-20.7 46.1-46.1V105.2c0-25.4-20.7-46.1-46.2-46.1zM338.5 360.6H277v-120l-61.5 76.9-61.5-76.9v120H92.3V151.4h61.5l61.5 76.9 61.5-76.9h61.5v209.2zm135.3 3.1L381.5 256H443V151.4h61.5V256H566z" />
+                    </svg>
+                    <p>Styling with Markdown is supported</p>
+                  </a>
                 </div>
               </FocusTrap>
             </>

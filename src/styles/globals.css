@@ -4,32 +4,6 @@
 
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
 @tailwind base;
-@layer base {
-  h1 {
-    @apply text-3xl font-bold;
-  }
-  h2 {
-    @apply text-2xl font-bold;
-  }
-  h3 {
-    @apply text-xl font-bold;
-  }
-  h4 {
-    @apply text-lg font-bold;
-  }
-  h5 {
-    @apply text-lg font-semibold;
-  }
-  h6 {
-    @apply text-base font-semibold;
-  }
-  li > p {
-    @apply inline-block;
-  }
-  blockquote {
-    @apply m-4 p-2 border-l-4 border-l-black/50 dark:border-l-white/20 shadow-md dark:shadow-white/10;
-  }
-}
 @tailwind components;
 @tailwind utilities;
 
@@ -156,11 +130,15 @@
 }
 
 .modal-form-datetime {
-  @apply dark:text-gray-300 border dark:border-0 focus:outline-none dark:bg-gray-700 p-1 px-3 w-full flex-row space-x-2  text-left rounded-md shadow-lg;
+  @apply dark:text-gray-300 border dark:border-0 focus:outline-none dark:bg-gray-700 p-1 px-3 w-full flex-row space-x-2  text-left rounded-md shadow-md;
 }
 
 .modal-form-title-md {
   @apply font-medium mt-4 text-gray-700 dark:text-gray-300;
+}
+
+.validate-fail {
+  @apply border-red-400 border-2 bg-red-100 dark:bg-red-100  dark:border-red-400 dark:focus:outline-none text-gray-500 dark:text-gray-500 ring-2 ring-red-400 !important;
 }
 
 .modal-form-btn-row {
@@ -431,15 +409,15 @@
 }
 
 .editor-toolbar {
-  @apply border-white/50 !important;
+  @apply border-gray-300 dark:border-gray-500 !important;
 }
 .editor-toolbar i.separator {
-  @apply border-white/50 !important;
+  @apply dark:border-gray-500 !important;
 }
 
 .editor-toolbar .easymde-dropdown,
 .editor-toolbar button {
-  @apply text-white;
+  @apply dark:text-white;
 }
 
 .editor-toolbar .easymde-dropdown,
@@ -449,11 +427,11 @@
 }
 
 .EasyMDEContainer .CodeMirror {
-  @apply border-white/50 text-gray-600 dark:text-gray-300 bg-transparent !important;
+  @apply border-gray-300 dark:border-gray-500 text-gray-600 dark:text-gray-300 bg-transparent shadow-md !important;
 }
 
 .CodeMirror-cursor {
-  @apply dark:border-white/50 border-black/50 !important;
+  @apply dark:border-gray-500 border-black/50 !important;
 }
 
 span.CodeMirror-selectedtext {
@@ -462,6 +440,92 @@ span.CodeMirror-selectedtext {
 
 .simplemde-editor-5-wrapper {
   @apply max-h-96;
+}
+
+.editor-preview {
+  @apply bg-white dark:bg-gray-800 !important;
+}
+
+.react-markdown {
+  @apply mt-10;
+}
+
+.react-markdown h1 {
+  @apply text-3xl font-bold;
+}
+
+.react-markdown h2 {
+  @apply text-2xl font-bold;
+}
+
+.react-markdown h3 {
+  @apply text-xl font-bold;
+}
+
+.react-markdown h4 {
+  @apply text-lg font-bold;
+}
+
+.react-markdown h5 {
+  @apply text-lg font-semibold;
+}
+
+.react-markdown h6 {
+  @apply text-base font-semibold;
+}
+
+.react-markdown h1,
+.react-markdown h2,
+.react-markdown h3 {
+  @apply mt-10 mb-2;
+}
+
+.react-markdown blockquote {
+  @apply m-4 p-2 border border-l-4 border-l-black/50 dark:border-l-white/20 shadow-md dark:shadow-white/10 !important;
+}
+
+.react-markdown hr {
+  @apply my-5 border-b-2 dark:border-white/30 border-black/30 !important;
+}
+
+.react-markdown code {
+  @apply text-red-400 bg-red-200/20 px-1 rounded !important;
+}
+
+.react-markdown th {
+  @apply border;
+}
+
+.react-markdown td {
+  @apply border p-1;
+}
+
+.react-markdown table {
+  @apply m-2;
+}
+
+.react-markdown ul {
+  @apply list-disc list-inside ml-5;
+}
+
+.react-markdown ol {
+  @apply list-decimal list-inside ml-5;
+}
+
+.react-markdown a {
+  @apply text-blue-300 underline;
+}
+
+.react-markdown code[class^="language-"] {
+  @apply bg-transparent !important;
+}
+
+.react-markdown pre {
+  @apply bg-transparent !important;
+}
+
+.react-markdown pre > div {
+  @apply rounded-md !important;
 }
 
 .twemoji {
@@ -477,4 +541,24 @@ span.CodeMirror-selectedtext {
 .btn[disabled] {
   --tw-bg-opacity: 0.3;
   --tw-text-opacity: 0.4;
+}
+
+.markdown-support {
+  @apply flex flex-row items-center rounded flex-nowrap grow-0 w-min p-1 fill-blue-200 space-x-2 cursor-pointer;
+}
+
+.markdown-support svg {
+  @apply w-5 h-5 fill-gray-600 dark:fill-gray-400;
+}
+
+.markdown-support:hover svg {
+  @apply fill-blue-500 dark:fill-blue-400;
+}
+
+.markdown-support p {
+  @apply text-2xs text-gray-600 dark:text-gray-400 whitespace-nowrap grow-0;
+}
+
+.markdown-support:hover p {
+  @apply text-blue-500 dark:text-blue-400;
 }

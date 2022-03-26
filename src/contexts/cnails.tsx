@@ -191,7 +191,7 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
         <Toaster
           position="bottom-right"
           toastOptions={{
-            duration: 5000,
+            duration: 100000,
           }}
         >
           {(t: Toast) => {
@@ -244,6 +244,12 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
                   type: "input",
                   defaultValue: "",
                   label: "temp1",
+                  validate: (data) => {
+                    return {
+                      ok: data.reportIssue.temp1 != "e",
+                      message: "cannot be e",
+                    };
+                  },
                 },
                 tempe: {
                   type: "markdown",

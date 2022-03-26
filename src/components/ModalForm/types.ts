@@ -34,6 +34,9 @@ export interface BaseEntry {
   conditional?: (data: Data) => boolean;
   /**
    * validate the entry data on input. If the result is not ok, the form cannot proceed.
+   * You need to pay attention to where do you call this validate.
+   *
+   * @param data the new data
    */
   validate?: (data: Data) => ValidationOutput;
   /**

@@ -71,7 +71,7 @@ function Modal({
               >
                 {/* use a custom div instead of Dialog.overlay such that onClick is working */}
                 <div
-                  className="fixed inset-0 dark:bg-black dark:opacity-70"
+                  className="fixed inset-0 bg-black opacity-70 "
                   id="modal-overlay"
                   onClick={() => {
                     if (clickOutsideToClose) {

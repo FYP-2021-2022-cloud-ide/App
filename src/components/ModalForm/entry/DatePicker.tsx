@@ -19,9 +19,7 @@ const component = (props: EntryProps) => {
             <input
               type="datetime-local"
               defaultValue={data}
-              onChange={(e) => {
-                onChange(e.target.value);
-              }}
+              onChange={(e) => onChange(e.target.value)}
             />
           );
         },
