@@ -7,16 +7,19 @@ import ModalForm from "./ModalForm/ModalForm";
 import SandboxImageList from "./SandboxImageList";
 import { containerAPI } from "../lib/api/containerAPI";
 import { Option } from "./ListBox";
+import { Error } from "../lib/api/api";
+import { errorToToastDescription } from "../lib/errorHelper";
 import {
   getCreateSandboxFormStructure,
   getUpdateSandboxFormStructure,
 } from "../lib/forms";
+import { CLICK_TO_DISMISS, CLICK_TO_REPORT } from "../lib/constants";
 const CPU = 1;
 const memory = 600;
 
 async function fetchSandboxes(
   userId: string,
-  onFailCallBack?: () => void,
+  onFailCallBack?: (error: Error) => void,
   onSuccessCallBack?: (sandboxes: SandboxImage[]) => void
 ) {
   if (!userId) {
@@ -25,7 +28,7 @@ async function fetchSandboxes(
   const { listSandboxImage } = sandboxAPI;
   const response = await listSandboxImage(userId);
   if (!response.success && onFailCallBack) {
-    onFailCallBack();
+    onFailCallBack(response.error);
   } else if (response.success && onSuccessCallBack) {
     onSuccessCallBack(response.sandboxImages);
   }
@@ -50,10 +53,14 @@ export const SandboxWrapper = () => {
   const fetch = async (mount: boolean) => {
     await fetchSandboxes(
       userId,
-      () => {
-        myToast.error("sandboxes cannot be fetched for some reasons.");
+      (error) => {
+        myToast.error({
+          title: "Personal workspaced cannot be fetched",
+          description: errorToToastDescription(error),
+        });
       },
       (sandboxImages) => {
+        console.log(sandboxImages);
         if (mount) setSandboxImages(sandboxImages);
       }
     );
@@ -97,7 +104,12 @@ export const SandboxWrapper = () => {
         }}
         onSandboxDelete={async (sandboxImage) => {
           if (sandboxImage.sandboxesId) {
-            myToast.error(`The workspace is still active. Fail to removed.`);
+            myToast.error({
+              title: "The workspace is still active. Fail to removed.",
+              description:
+                "You can need to stop your workspace first before removing it.",
+              comment: "Click to dismiss",
+            });
             return;
           }
           const id = myToast.loading(`Removing ${sandboxImage.title}...`);
@@ -109,7 +121,10 @@ export const SandboxWrapper = () => {
             );
             fetch(mount.current);
           } else {
-            myToast.error(`Fail to remove workspace (${sandboxImage.title}).`);
+            myToast.error({
+              title: `Fail to remove workspace (${sandboxImage.title})`,
+              description: errorToToastDescription(response.error),
+            });
           }
         }}
         onSandboxUpdate={(sandbox) => {
@@ -118,9 +133,11 @@ export const SandboxWrapper = () => {
         }}
         onSandboxStart={async (sandboxImage) => {
           if (containers.length == containerQuota) {
-            myToast.error(
-              `You have met your simultaneous run quota. Fail to start workspace.`
-            );
+            myToast.error({
+              title: `You have met your simultaneous workspace quota. Fail to start workspace.`,
+              description: `You can have at most ${containerQuota}`,
+              comment: CLICK_TO_DISMISS,
+            });
             return;
           }
           const id = myToast.loading(`Starting a workspace....`);
@@ -132,7 +149,11 @@ export const SandboxWrapper = () => {
             );
             fetch(mount.current);
           } else {
-            myToast.error(`Cannot started workspace. ${response.error.status}`);
+            myToast.error({
+              title: "Fail to start workspace",
+              description: errorToToastDescription(response.error),
+              comment: CLICK_TO_REPORT,
+            });
           }
         }}
         onSandboxStop={async (sandboxImage) => {
@@ -148,7 +169,11 @@ export const SandboxWrapper = () => {
             );
             fetch(mount.current);
           } else {
-            myToast.error(`Cannot stop workspace. ${response.error.status}`);
+            myToast.error({
+              title: "Fail to stop workspace",
+              description: errorToToastDescription(response.error),
+              comment: CLICK_TO_REPORT,
+            });
           }
         }}
       ></SandboxImageList>
@@ -176,9 +201,11 @@ export const SandboxWrapper = () => {
             fetch(mount.current);
           } else {
             // myToast.dismiss(toastId);
-            myToast.error(
-              `Workspace cannot be created. ${response.error.status}`
-            );
+            myToast.error({
+              title: "Fail to create workspace",
+              description: errorToToastDescription(response.error),
+              comment: CLICK_TO_REPORT,
+            });
           }
         }}
       ></ModalForm>
@@ -222,7 +249,12 @@ export const SandboxWrapper = () => {
             if (response.success) {
               myToast.success("workspace is successfully updated.");
               fetch(mount.current);
-            } else myToast.error("Fail to update the workspace.");
+            } else
+              myToast.error({
+                title: "Fail to update workspace",
+                description: errorToToastDescription(response.error),
+                comment: CLICK_TO_REPORT,
+              });
           }}
         ></ModalForm>
       )}

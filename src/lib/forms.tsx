@@ -5,6 +5,8 @@ import { Option } from "../components/ListBox";
 import { containerAPI } from "./api/containerAPI";
 import myToast from "../components/CustomToast";
 import moment from "moment";
+import { errorToToastDescription } from "./errorHelper";
+import { CLICK_TO_REPORT } from "./constants";
 
 const registry = process.env.NEXT_PUBLIC_REGISTRY;
 const rootImage = `${registry}/codeserver:latest`;
@@ -156,9 +158,12 @@ export const getUpdateEnvironmentFormStructure = (
                         window.open(link);
                         onChange(response.containerID);
                       } else
-                        myToast.error(
-                          "fail to start temp container for this environment."
-                        );
+                        myToast.error({
+                          title:
+                            "Fail to start temporary workspace for this environment.",
+                          description: errorToToastDescription(response.error),
+                          comment: CLICK_TO_REPORT,
+                        });
                     }}
                   >
                     Click me
@@ -336,9 +341,12 @@ export const getUpdateTemplateFormStructure = (
                         window.open(link);
                         onChange(response.containerID);
                       } else
-                        myToast.error(
-                          "fail to start temp container for this template."
-                        );
+                        myToast.error({
+                          title:
+                            "Fail to remove temporary workspace for this template",
+                          description: errorToToastDescription(response.error),
+                          comment: CLICK_TO_REPORT,
+                        });
                     }}
                   >
                     Click me
@@ -525,9 +533,12 @@ export const getUpdateSandboxFormStructure = (
                         window.open(link);
                         onChange(response.containerID);
                       } else
-                        myToast.error(
-                          "fail to start temp container for this workspace."
-                        );
+                        myToast.error({
+                          title:
+                            "Fail to start temporary workspace for this environment.",
+                          description: errorToToastDescription(response.error),
+                          comment: CLICK_TO_REPORT,
+                        });
                     }}
                   >
                     Click me

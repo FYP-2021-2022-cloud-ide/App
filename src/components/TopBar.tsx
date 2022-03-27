@@ -8,8 +8,9 @@ import {
 } from "@heroicons/react/solid";
 import UserMenu from "./UserMenu";
 import { useTheme } from "../contexts/theme";
-import NotiStack from "./NotiStack";
+import NotiButton from "./NotiButton";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 interface props {
   sub: string;
@@ -19,7 +20,7 @@ interface props {
 
 const TopBar = ({ sub, name, email }: props) => {
   const { isDark, setDark } = useTheme();
-
+  const router = useRouter();
   const SearchBar = () => {
     return (
       <div className="border flex flex-row space-x-2 items-center focus:border-black-600 text-left rounded dark:border-gray-700 dark:bg-gray-700 hover:border-gray-300 w-36 md:w-96 px-2 shadow mr-6">
@@ -45,12 +46,22 @@ const TopBar = ({ sub, name, email }: props) => {
           email={email}
           items={[
             {
+              text: "Report Issue",
+              onClick: () => {
+                window.open(
+                  "https://github.com/FYP-2021-2022-cloud-ide/Public-Issues/issues"
+                );
+              },
+            },
+            {
               text: "Sign Out",
-              href: "/logout",
+              onClick: () => {
+                router.push("/logout");
+              },
             },
           ]}
         ></UserMenu>
-        <NotiStack />
+        <NotiButton />
         <Link href="">
           <a id="help_doc_btn" title="Help and docs">
             <QuestionMarkCircleIcon

@@ -16,7 +16,7 @@
 }
 
 .rdt_Table {
-  @apply shadow-lg  border-t border-l border-r  rounded-t-md  border-[#D5D6D8] dark:border-[#2F3947] !important;
+  @apply shadow-lg  border-t border-l border-r  rounded-t-md  border-[#D5D6D8] dark:border-[#2F3947]  !important;
 }
 
 .rdt_TableHead {
@@ -270,7 +270,7 @@
 }
 
 .toaster {
-  @apply cursor-pointer rounded text-gray-600 bg-gray-50 border border-gray-200 dark:bg-slate-900  dark:border-gray-900 dark:text-gray-300 !important;
+  @apply cursor-pointer rounded text-gray-600 bg-gray-50 border border-gray-200 dark:bg-slate-900  dark:border-gray-900 dark:text-gray-300 min-w-[16rem] !important;
 }
 
 .toaster-content {
@@ -278,13 +278,25 @@
 }
 
 .toaster-text {
-  @apply text-justify text-sm;
+  @apply text-sm;
+}
+
+.toaster-text #title {
+  @apply font-bold;
+}
+
+.toaster-text #comment {
+  @apply text-2xs text-gray-400;
 }
 
 .toaster-success {
 }
 
 .toaster-error {
+}
+
+.toaster-loading {
+  @apply cursor-default !important;
 }
 
 .toaster-warning {
@@ -444,10 +456,6 @@ span.CodeMirror-selectedtext {
 
 .editor-preview {
   @apply bg-white dark:bg-gray-800 !important;
-}
-
-.react-markdown {
-  @apply mt-10;
 }
 
 .react-markdown h1 {

@@ -28,6 +28,8 @@ import { MyMarkDown } from "../components/MyMarkdown";
 import PaginationComponent from "../components/table/PaginationComponent";
 import { ExpandRowToggled } from "react-data-table-component/dist/src/DataTable/types";
 import { async } from "@firebase/util";
+import { errorToToastDescription } from "../lib/errorHelper";
+import { CLICK_TO_REPORT } from "../lib/constants";
 
 type Course = {
   fullCode: string;
@@ -46,7 +48,7 @@ const notificationToCourse = (notification: Notification): Course => {
 const ExpandedComponent = memo(
   ({ data }: { data: Notification }) => {
     return (
-      <div className=" bg-gray-50 dark:bg-black/20 p-2 dark:text-gray-300 border-b border-[#D5D6D8] dark:border-[#2F3947]">
+      <div className=" bg-gray-50 dark:bg-black/20 p-2 dark:text-gray-300 border-b border-[#D5D6D8] dark:border-[#2F3947] ">
         <MyMarkDown text={data.body} />
       </div>
     );
@@ -68,11 +70,18 @@ const MessageTable = () => {
   >([]);
   const [replySection, setReplySection] = useState<string>("");
   const [replyTitle, setReplyTitle] = useState<string>("");
+  const [readDuringUnreadFiltering, setReadDuringUnreadFiltering] = useState<
+    Notification[]
+  >([]);
   const [onlyUnread, setOnlyUnread] = useState<boolean>(false);
   const [onlyCourses, setOnlyCourses] = useState<string[]>([]);
   let filterNotifications = notifications
     .filter((notification) => {
-      return !onlyUnread || (onlyUnread && !notification.read);
+      return (
+        readDuringUnreadFiltering.some((j) => j.id == notification.id) ||
+        !onlyUnread ||
+        (onlyUnread && !notification.read)
+      );
     })
     .filter((notification) => {
       return (
@@ -276,6 +285,11 @@ const MessageTable = () => {
     notification
   ) => {
     // read notification
+    if (expand && onlyUnread)
+      setReadDuringUnreadFiltering([
+        ...readDuringUnreadFiltering,
+        notification,
+      ]);
     if (expand && !notification.read) {
       const response = await changeNotificationRead(
         userId,
@@ -284,6 +298,7 @@ const MessageTable = () => {
       );
       if (!response.success) console.error("fail to read messages");
       // should not fetch notification here because it will refresh the table and make row disappear
+      await fetchNotifications(userId);
     }
   };
 
@@ -310,7 +325,7 @@ const MessageTable = () => {
         <EmptyDiv message="You have no notifications."></EmptyDiv>
       ) : (
         // only if user have notifications
-        <div className="flex flex-row min-w-max space-x-2">
+        <div className="flex flex-row space-x-2">
           <div className="min-w-[12rem] h-min  flex flex-col space-y-2 p-3 border rounded-md text-xs bg-gray-100 dark:bg-black/50   border-[#D5D6D8] dark:border-[#2F3947] ">
             <p className="text-lg font-bold">Facet</p>
             <label htmlFor="only not read" className="whitespace-nowrap">
@@ -319,6 +334,7 @@ const MessageTable = () => {
                   type="checkbox"
                   onChange={(e) => {
                     setOnlyUnread(e.target.checked);
+                    setReadDuringUnreadFiltering([]);
                   }}
                 />
               </span>
@@ -360,7 +376,7 @@ const MessageTable = () => {
               })}
             </div>
           </div>
-          <div className="w-full">
+          <div className="w-full ">
             <DataTable
               columns={columns}
               data={filterNotifications}
@@ -499,6 +515,32 @@ const MessageTable = () => {
           ></ModalForm>
         </div>
       )}
+      <button
+        className="bg-green-500 text-white px-2 rounded h-min"
+        onClick={async () => {
+          const response = await sendNotification(
+            "test",
+            "this is a test message. This button should be hidden. ".repeat(
+              Math.ceil(Math.random() * 10)
+            ),
+            userId,
+            userId,
+            Math.random() > 0.5,
+            "e2de12fe-ba9c-4ded-8496-8428446b96d4"
+          );
+          if (response.success) {
+            fetchNotifications(userId);
+          } else {
+            myToast.error({
+              title: "Fail to send message",
+              description: errorToToastDescription(response.error),
+              comment: CLICK_TO_REPORT,
+            });
+          }
+        }}
+      >
+        Send test message
+      </button>
     </>
   );
 };

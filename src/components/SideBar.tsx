@@ -60,7 +60,7 @@ const SideBar = () => {
               
             </p> */}
             <p className="capitalize whitespace-nowrap">
-              current running containers
+              current running Workspaces
             </p>
             <div className="current-run-bar-outer">
               <div

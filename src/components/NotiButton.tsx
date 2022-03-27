@@ -36,14 +36,17 @@ const NotificationBtn = ({ num }: { num: number }) => {
   );
 };
 
-export default function NotiStack() {
+export default function NotiButton() {
   const { userId, notifications } = useCnails();
+  let filterNotifications = notifications.filter(
+    (notification) => !notification.read
+  );
   const router = useRouter();
   return (
     <Popover className="relative z-[1] ">
       {({ open, close }) => (
         <>
-          <NotificationBtn num={notifications?.length} />
+          <NotificationBtn num={filterNotifications?.length} />
           <Transition
             as={Fragment}
             enter="transition ease-out duration-200"
@@ -55,21 +58,21 @@ export default function NotiStack() {
           >
             <Popover.Panel className="absolute z-1 min-w-fit px-4 mt-3 transform -translate-x-[80%] left-1/2 sm:px-0">
               <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 bg-white dark:bg-gray-700 p-2">
-                {notifications && notifications?.length == 0 ? (
+                {filterNotifications && filterNotifications?.length == 0 ? (
                   <div className="text-gray-400 bg-white dark:text-gray-300 dark:bg-gray-700 w-96 flex flex-col items-center p-5 select-none">
-                    You have no notifications
+                    You have no unread notifications
                   </div>
                 ) : (
                   // the notification
                   <div className="flex  flex-col space-y-2 select-none">
                     <p className="text-2xs dark:text-gray-300">
-                      Showing {Math.min(notifications.length, maxShow)} of{" "}
-                      {notifications.length} message
-                      {notifications.length == 1 ? "" : "s"}
+                      Showing {Math.min(filterNotifications.length, maxShow)} of{" "}
+                      {filterNotifications.length} unread message
+                      {filterNotifications.length == 1 ? "" : "s"}
                     </p>
-                    {notifications!
+                    {filterNotifications!
                       .sort((a, b) =>
-                        moment(a.updatedAt) > moment(b.updatedAt) ? -1 : 1
+                        moment(a.sentAt) > moment(b.sentAt) ? -1 : 1
                       )
                       .slice(0, maxShow)
                       .map((item: Notification) => (
@@ -92,9 +95,7 @@ export default function NotiStack() {
                               @{item.sender.sub}
                             </p>
                             <p className="text-2xs text-gray-400 dark:text-gray-400">
-                              {moment(item.updatedAt).format(
-                                "YYYY-MM-DD HH:mm"
-                              )}
+                              {moment(item.sentAt).format("YYYY-MM-DD HH:mm")}
                             </p>
                           </div>
                         </div>

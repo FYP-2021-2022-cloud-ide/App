@@ -10,8 +10,7 @@ interface UserMenuProps {
   email: string;
   items: {
     text: string;
-    onClick?: () => void; // onclick or href should have either one
-    href?: string;
+    onClick?: () => void;
   }[];
 }
 
@@ -54,7 +53,7 @@ export default function UserMenu({ sub, name, email, items }: UserMenuProps) {
                 return (
                   <Menu.Item key={item.text}>
                     {({ active }) => (
-                      <div
+                      <button
                         className={`${
                           active
                             ? "bg-gray-200 dark:bg-gray-500 dark:font-semibold"
@@ -64,10 +63,8 @@ export default function UserMenu({ sub, name, email, items }: UserMenuProps) {
                           if (item.onClick) item.onClick();
                         }}
                       >
-                        <Link href={item.href}>
-                          <a className="w-full">{item.text}</a>
-                        </Link>
-                      </div>
+                        {item.text}
+                      </button>
                     )}
                   </Menu.Item>
                 );

@@ -16,6 +16,7 @@ import {
 import myToast from "../../../../components/CustomToast";
 import {
   Environment as APIEnvironment,
+  Error,
   SuccessStringResponse,
   Template as APITemplate,
 } from "../../../../lib/api/api";
@@ -35,6 +36,8 @@ import {
 import _ from "lodash";
 import courseAPI from "../../../../lib/api/courses";
 import CardMenu from "../../../../components/CardMenu";
+import { errorToToastDescription } from "../../../../lib/errorHelper";
+import { CLICK_TO_DISMISS, CLICK_TO_REPORT } from "../../../../lib/constants";
 const registry = process.env.NEXT_PUBLIC_REGISTRY;
 const rootImage = `${registry}/codeserver:latest`;
 const CPU = 0.5;
@@ -72,10 +75,12 @@ export const InstructorProvider = ({
     fetchEnvironmentsAndTemplates(
       sectionUserInfo.sectionId,
       sub,
-      () => {
-        myToast.error(
-          "environments or templates cannot be fetched for some reasons."
-        );
+      (error) => {
+        myToast.error({
+          title: "Fail to fetch environments or templates",
+          description: errorToToastDescription(error),
+          comment: CLICK_TO_REPORT,
+        });
       },
       (environments, templates) => {
         setEnvironments(
@@ -130,7 +135,7 @@ export const InstructorProvider = ({
 async function fetchEnvironmentsAndTemplates(
   sectionId: string,
   sub: string,
-  onFailCallBack?: () => void,
+  onFailCallBack?: (error: Error) => void,
   onSuccessCallBack?: (
     environments: APIEnvironment[],
     templates: APITemplate[]
@@ -141,7 +146,10 @@ async function fetchEnvironmentsAndTemplates(
   const envResponse = await fetchEnvironments(sectionId, sub);
   const templateResponse = await fetchTemplates(sectionId, sub);
   if (!envResponse.success || !templateResponse.success) {
-    if (onFailCallBack) onFailCallBack();
+    if (onFailCallBack)
+      onFailCallBack(
+        !envResponse.success ? envResponse.error : templateResponse.error
+      );
   } else {
     if (onSuccessCallBack)
       onSuccessCallBack(envResponse.environments, templateResponse.templates);
@@ -217,15 +225,17 @@ const EnvironmentTemplateWrapper = () => {
             // console.log(router.asPath);
           }}
           onEnvDelete={async (env) => {
-            const l = templates.filter(
+            const numTemplates = templates.filter(
               (t) => t.environment_id === env.id
             ).length;
-            if (l != 0) {
-              myToast.error(
-                `Fail to removed environment. ${l} template${
-                  l > 1 ? "s are" : " is"
-                } still using ${env.name}.`
-              );
+            if (numTemplates != 0) {
+              myToast.error({
+                title: "Fail to remove environment",
+                description: `${numTemplates} template${
+                  numTemplates > 1 ? "s are" : " is"
+                } still using ${env.name}.`,
+                comment: CLICK_TO_DISMISS,
+              });
             } else {
               const response = await removeEnvironment(env.id, sectionUserId);
               if (response.success) {
@@ -288,9 +298,11 @@ const EnvironmentTemplateWrapper = () => {
               if (response.success) {
                 myToast.success("Template workspace is successfully stopped. ");
               } else
-                myToast.error(
-                  `Template workspace cannot be stopped. ${response.error.status}`
-                );
+                myToast.error({
+                  title: `Fail to stop template workspace`,
+                  description: errorToToastDescription(response.error),
+                  comment: CLICK_TO_REPORT,
+                });
             } else {
               const id = myToast.loading("Starting workspace...");
               const response = await addContainer(
@@ -306,9 +318,11 @@ const EnvironmentTemplateWrapper = () => {
               if (response.success) {
                 myToast.success("Template workspace is successfully started.");
               } else
-                myToast.error(
-                  `Template workspace cannot be started. ${response.error.status}`
-                );
+                myToast.error({
+                  title: `Fail to start template workspace`,
+                  description: errorToToastDescription(response.error),
+                  comment: CLICK_TO_REPORT,
+                });
             }
             fetch();
           }}
@@ -323,9 +337,11 @@ const EnvironmentTemplateWrapper = () => {
               if (response.success) {
                 myToast.success(`${template.name} is published.`);
               } else {
-                myToast.error(
-                  `${template.name} cannot be published. ${response.error.status}.`
-                );
+                myToast.error({
+                  title: `Fail to publish template`,
+                  description: errorToToastDescription(response.error),
+                  comment: CLICK_TO_REPORT,
+                });
               }
             } else {
               const id = myToast.loading(
@@ -339,9 +355,11 @@ const EnvironmentTemplateWrapper = () => {
               if (response.success) {
                 myToast.success(`${template.name} is unpublished.`);
               } else
-                myToast.error(
-                  `${template.name} cannot be unpublished. ${response.error.status}.`
-                );
+                myToast.error({
+                  title: `Fail to unpublish template`,
+                  description: errorToToastDescription(response.error),
+                  comment: CLICK_TO_REPORT,
+                });
             }
             fetch();
           }}
@@ -376,9 +394,11 @@ const EnvironmentTemplateWrapper = () => {
               );
               fetch();
             } else {
-              myToast.error(
-                `Fail to create environment. ${response.error.status}`
-              );
+              myToast.error({
+                title: `Fail to create environment`,
+                description: errorToToastDescription(response.error),
+                comment: CLICK_TO_REPORT,
+              });
             }
           }
           if (!data.is_predefined) {
@@ -459,7 +479,7 @@ const EnvironmentTemplateWrapper = () => {
                       </button>
                     </div>
                   </div>,
-                  "toaster-custom",
+                  "toaster toaster-custom",
                   "🗂"
                 );
               }
@@ -505,7 +525,11 @@ const EnvironmentTemplateWrapper = () => {
           if (response.success) {
             myToast.success("Environment is updated.");
           } else {
-            myToast.error("Fail to update environment.");
+            myToast.error({
+              title: "Fail to update environment",
+              description: errorToToastDescription(response.error),
+              comment: CLICK_TO_REPORT,
+            });
             console.log(response.error.status, containerId, sectionUserId);
           }
           fetch();
@@ -524,99 +548,87 @@ const EnvironmentTemplateWrapper = () => {
         onEnter={async ({ create_template: data }) => {
           const toastId = myToast.loading("Creating a temporary workspace...");
           var selectedEnv = data.environment;
-          try {
-            const response = await addTempContainer(
-              memory,
-              CPU,
-              selectedEnv.imageId,
-              sub,
-              "student"
-            );
-            myToast.dismiss(toastId);
-            console.log(response);
-            if (response.success) {
-              const { containerID } = response;
-              const customToastId = myToast.custom(
-                <div className="flex flex-col space-y-2">
-                  <p>
-                    A temp workspace is created. Click the link to set up your
-                    workspace. After finish setup, click{" "}
-                    <span className="font-bold">Finish</span>.
-                  </p>
-                  <a
-                    className="btn btn-xs border-none"
-                    href={
-                      "https://codespace.ust.dev/user/container/" +
-                      containerID +
-                      "/"
-                    }
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Set up workspace
-                  </a>
-                  <div className="flex flex-row space-x-2">
-                    <button
-                      className="btn btn-xs bg-gray-500 text-white hover:bg-gray-400 dark:bg-gray-400 dark:hover:bg-gray-500 border-none"
-                      onClick={async () => {
-                        // cancel the build
-                        myToast.dismiss(customToastId);
-                        const response = await removeContainer(
+          const response = await addTempContainer(
+            memory,
+            CPU,
+            selectedEnv.imageId,
+            sub,
+            "student"
+          );
+          myToast.dismiss(toastId);
+          console.log(response);
+          if (response.success) {
+            const { containerID } = response;
+            const customToastId = myToast.custom(
+              <div className="flex flex-col space-y-2">
+                <p>
+                  A temp workspace is created. Click the link to set up your
+                  workspace. After finish setup, click{" "}
+                  <span className="font-bold">Finish</span>.
+                </p>
+                <a
+                  className="btn btn-xs border-none"
+                  href={
+                    "https://codespace.ust.dev/user/container/" +
+                    containerID +
+                    "/"
+                  }
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Set up workspace
+                </a>
+                <div className="flex flex-row space-x-2">
+                  <button
+                    className="btn btn-xs bg-gray-500 text-white hover:bg-gray-400 dark:bg-gray-400 dark:hover:bg-gray-500 border-none"
+                    onClick={async () => {
+                      // cancel the build
+                      myToast.dismiss(customToastId);
+                      const response = await removeContainer(containerID, sub);
+                      if (response.success)
+                        console.log("remove temporary workspace", containerID);
+                      else
+                        console.log(
+                          "fail to remove temporary workspace",
+                          response.error.status,
                           containerID,
                           sub
                         );
-                        if (response.success)
-                          console.log(
-                            "remove temporary workspace",
-                            containerID
-                          );
-                        else
-                          console.log(
-                            "fail to remove temporary workspace",
-                            response.error.status,
-                            containerID,
-                            sub
-                          );
-                      }}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      className="btn btn-xs bg-green-500 text-white hover:bg-green-600 border-none "
-                      onClick={async () => {
-                        // build succeed
-                        myToast.dismiss(customToastId);
-                        const id = myToast.loading("Building your template...");
-                        const response = await addTemplate(
-                          data.name as string,
-                          data.description as string,
-                          sectionUserId,
-                          (data.environment as Option).id,
-                          "",
-                          containerID as string,
-                          false,
-                          data.is_exam as boolean,
-                          Number(data.time_limit),
-                          data.allow_notification as boolean
-                        );
-                        if (response.success) {
-                          fetch();
-                          myToast.dismiss(id);
-                        }
-                      }}
-                    >
-                      Finish
-                    </button>
-                  </div>
-                </div>,
-                "toaster-custom",
-                "🗂"
-              );
-            }
-          } catch (error) {
-            myToast.error(error.message);
-          } finally {
-            myToast.dismiss(toastId);
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="btn btn-xs bg-green-500 text-white hover:bg-green-600 border-none "
+                    onClick={async () => {
+                      // build succeed
+                      myToast.dismiss(customToastId);
+                      const id = myToast.loading("Building your template...");
+                      const response = await addTemplate(
+                        data.name as string,
+                        data.description as string,
+                        sectionUserId,
+                        (data.environment as Option).id,
+                        "",
+                        containerID as string,
+                        false,
+                        data.is_exam as boolean,
+                        Number(data.time_limit),
+                        data.allow_notification as boolean
+                      );
+                      if (response.success) {
+                        fetch();
+                        myToast.dismiss(id);
+                      }
+                    }}
+                  >
+                    Finish
+                  </button>
+                </div>
+              </div>,
+              "toaster-custom",
+              "🗂"
+            );
           }
         }}
       ></ModalForm>
@@ -669,12 +681,11 @@ const EnvironmentTemplateWrapper = () => {
           if (response.success) {
             myToast.success("Template is updated.");
           } else {
-            myToast.error("Fail to update template.");
-            console.error(
-              response.error.status,
-              templateUpdateTarget.id,
-              containerId
-            );
+            myToast.error({
+              title: "Fail to update template",
+              description: errorToToastDescription(response.error),
+              comment: CLICK_TO_REPORT,
+            });
           }
           fetch();
         }}
@@ -706,15 +717,19 @@ const Home = () => {
       });
       //restrict the student to access instructor page
       if ((role.toUpperCase() as SectionRole) != "INSTRUCTOR") {
-        myToast.error(
-          "Permission denied: You are not an instructor of this section."
-        );
+        myToast.error({
+          title: "Permission denied",
+          description: "You are not an instructor of this section.",
+          comment: CLICK_TO_DISMISS,
+        });
         router.push("/");
       }
     } else {
-      myToast.error(`Fail to get section information.`, () =>
-        reportIssue(response.error)
-      );
+      myToast.error({
+        title: "Fail to get section information",
+        description: errorToToastDescription(response.error),
+        comment: CLICK_TO_REPORT,
+      });
       router.push("/");
     }
   };
@@ -783,7 +798,12 @@ const Home = () => {
           );
           if (response.success)
             myToast.success("The course announcement is sent.");
-          else myToast.error("Fail to send course announcement.");
+          else
+            myToast.error({
+              title: "Fail to send course announcement",
+              description: errorToToastDescription(response.error),
+              comment: CLICK_TO_REPORT,
+            });
           setAnnounceFormOpen(false);
         }}
         onClose={() => {

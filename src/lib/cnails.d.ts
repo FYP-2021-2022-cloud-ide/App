@@ -141,10 +141,6 @@ type CnailsContextState = {
    */
   fetchNotifications: (userId: string) => Promise<Notification[]>;
   containerQuota: number;
-  /**
-   * this function will open up a modal to inform user how to report issue
-   */
-  reportIssue: (error: any) => void;
 };
 
 type InstructorContextState = {

@@ -243,10 +243,10 @@ type Notification = {
   sender: Notification_Sender;
   allow_reply: boolean;
   sentAt: string;
-  courseCode : string ;
-  sectionCode : string ;
-  section_id:string;
-  read : boolean ;
+  courseCode: string;
+  sectionCode: string;
+  section_id: string;
+  read: boolean;
 };
 type Notification_Sender = {
   id: string;

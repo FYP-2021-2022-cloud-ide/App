@@ -1,5 +1,10 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
-import { getMessaging, MessagePayload, onMessage } from "firebase/messaging";
+import {
+  getMessaging,
+  MessagePayload,
+  onMessage,
+  isSupported,
+} from "firebase/messaging";
 import { firebaseCloudMessaging } from "../lib/webpush";
 import { Toast, ToastBar, Toaster } from "react-hot-toast";
 import myToast, { loadingTime } from "../components/CustomToast";
@@ -46,7 +51,6 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
   const { getEnv } = generalAPI;
   const [reportIssueModalOpen, setReportIssueModalOpen] =
     useState<boolean>(false);
-  const [issue, setIssue] = useState<any>();
   const fetchNotifications = async (userId: string) => {
     const response = await listNotifications(userId);
     if (response.success) {
@@ -58,6 +62,7 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
   const fetchContainers = async (sub: string) => {
     const response = await containerList(sub);
     if (response.success) {
+      console.log(response);
       setContainers(response.containers);
       setContainerInfo(response.containersInfo);
       return {
@@ -105,6 +110,14 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
     }
   }
 
+  /**
+   *
+   * this function only works if the browser is supported
+   * @param sub
+   * @param userId
+   * @param semesterId
+   * @returns
+   */
   async function initMessage(sub: string, userId: string, semesterId: string) {
     try {
       const token = await firebaseCloudMessaging.init();
@@ -152,7 +165,10 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
 
       if (!_.isEmpty(cookies)) {
         const { sub, userId, semesterId } = cookies;
-        await initMessage(sub, userId, semesterId);
+
+        if (await isSupported()) {
+          await initMessage(sub, userId, semesterId);
+        }
         await fetchContainers(sub);
         await fetchNotifications(userId);
         await ContainerQuotaFromEnv();
@@ -160,11 +176,6 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
     }
     init();
   }, []);
-
-  const reportIssue = (issue: any) => {
-    setReportIssueModalOpen(true);
-    setIssue(issue);
-  };
 
   if (sub == "" || userId == "") {
     return <></>;
@@ -185,29 +196,24 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
           fetchNotifications,
           fetchContainers,
           containerQuota,
-          reportIssue,
         }}
       >
         <Toaster
           position="bottom-right"
           toastOptions={{
+            // this can the default duration of the toast
             duration: 100000,
           }}
         >
           {(t: Toast) => {
-            const oldClassName = t.className;
-            t.className = `toaster ${t.className}`;
-            if (oldClassName == "toaster-loading") t.duration = loadingTime;
-            if (oldClassName == "toaster-custom") t.duration = 60 * 60000;
+            const classList = t.className.split(" ");
+            if (classList.includes("toaster-loading")) t.duration = loadingTime;
+
             return (
               <Twemoji noWrapper options={{ className: "twemoji" }}>
                 <div
                   onClick={() => {
-                    if (
-                      !["toaster-loading", "toaster-custom"].includes(
-                        oldClassName
-                      )
-                    )
+                    if (!classList.includes("toaster-no-dismiss"))
                       myToast.dismiss(t.id);
                     // dirty
                     if (myToast.onClickCallbacks[t.id]) {
@@ -234,46 +240,6 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
           }}
         </Toaster>
         {children}
-        <ModalForm
-          title="Report issue"
-          formStructure={{
-            reportIssue: {
-              title: "Report Issue",
-              entries: {
-                temp1: {
-                  type: "input",
-                  defaultValue: "",
-                  label: "temp1",
-                  validate: (data) => {
-                    return {
-                      ok: data.reportIssue.temp1 != "e",
-                      message: "cannot be e",
-                    };
-                  },
-                },
-                tempe: {
-                  type: "markdown",
-                  defaultValue: "",
-                  label: "temp1",
-                },
-                temp2: {
-                  type: "input",
-                  defaultValue: "",
-                  label: "temp1",
-                },
-              },
-            },
-          }}
-          clickOutsideToClose
-          size="lg"
-          escToClose
-          onClose={() => {
-            setIssue("");
-          }}
-          useDisclosure
-          isOpen={reportIssueModalOpen}
-          setOpen={setReportIssueModalOpen}
-        />
       </CnailsContext.Provider>
     );
   }

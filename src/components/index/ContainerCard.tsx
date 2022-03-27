@@ -6,6 +6,7 @@ import { containerAPI } from "../../lib/api/containerAPI";
 import { sandboxAPI } from "../../lib/api/sandboxAPI";
 import { useCnails } from "../../contexts/cnails";
 import myToast from "../CustomToast";
+import { errorToToastDescription } from "../../lib/errorHelper";
 
 type Props = {
   courseTitle: string;
@@ -65,26 +66,33 @@ function ContainerCard({
             title="remove workspace"
             onClick={async (e) => {
               e.stopPropagation();
-              let success=false
-              if (containerName=="A sandbox"){
+              let success = false;
+              if (containerName == "A sandbox") {
                 const response = await removeSandbox(containerID, sub);
                 if (response.success) {
-                  success=true
+                  success = true;
                 }
-              }else{
+              } else {
                 const response = await removeContainer(containerID, sub);
                 if (response.success) {
-                  success=true
+                  success = true;
                 }
               }
-              
+
               if (success) {
                 myToast.success("Workspace is removed.");
                 fetchContainers(sub);
-              } else myToast.error("Fail to remove workspace");
+              } else
+                myToast.error({
+                  title: "Fail to remove workspace",
+                  description: errorToToastDescription({
+                    error: "sdflsdk",
+                    status: "sdfds",
+                  }),
+                });
             }}
           >
-            <XIcon className="w-3 h-3 text-gray-700 dark:text-gray-300" />
+            <XIcon className="w-3 h-3 text-gray-700 dark:text-gray-300 hover:text-blue-500" />
           </button>
         </div>
         <div className="w-full flex flex-row justify-end items-center space-x-1 ">

@@ -16,6 +16,8 @@ import {
 import myToast from "../../../../components/CustomToast";
 import { containerAPI } from "../../../../lib/api/containerAPI";
 import exampleTemplates from "../../../../fake_data/example_template.json";
+import { errorToToastDescription } from "../../../../lib/errorHelper";
+import { CLICK_TO_REPORT } from "../../../../lib/constants";
 
 const rootImage = "143.89.223.188:5000/codeserver:latest";
 const CPU = 0.5;
@@ -44,7 +46,11 @@ const Home = () => {
         sub: sub,
       });
     } else {
-      myToast.error("Fail to get section information.");
+      myToast.error({
+        title: "Fail to get section information",
+        description: errorToToastDescription(response.error),
+        comment: CLICK_TO_REPORT,
+      });
       Router.push("/");
     }
   };
@@ -116,9 +122,11 @@ const Home = () => {
                 if (response.success) {
                   myToast.success("Workspace is successfully started.");
                 } else
-                  myToast.error(
-                    `Workspace cannot be started. ${response.error.status}`
-                  );
+                  myToast.error({
+                    title: `Fail to start workspace`,
+                    description: errorToToastDescription(response.error),
+                    comment: CLICK_TO_REPORT,
+                  });
               } else {
                 const response = await removeContainer(
                   workspace.containerID,
@@ -127,9 +135,11 @@ const Home = () => {
                 if (response.success) {
                   myToast.success("Workspace is successfully stopped.");
                 } else
-                  myToast.error(
-                    `Workspace cannot be stopped. ${response.error.status}`
-                  );
+                  myToast.error({
+                    title: `Fail to stop workspace`,
+                    description: errorToToastDescription(response.error),
+                    comment: CLICK_TO_REPORT,
+                  });
               }
             }}
           ></WorkspacesList>

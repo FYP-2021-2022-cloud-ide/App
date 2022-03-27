@@ -23,7 +23,7 @@ const ContainersList = () => {
   return (
     <div className=" w-full ">
       <div className="current-run-header">
-        <div className="current-run-title">Current Running Containers</div>
+        <div className="current-run-title">Current Running Workspaces</div>
         <div className="flex flex-col justify-between w-32">
           <div className="current-run-percentage" id="current-run-percentage">
             {numActiveContainers}/{quota}

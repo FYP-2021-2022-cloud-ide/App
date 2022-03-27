@@ -6,6 +6,7 @@ import { CustomData } from "../components/FTree/CustomNode";
 import FTree, { MyTreeMethods } from "../components/FTree/FTree";
 import path, { dirname } from "path";
 import { localFileAPI } from "../lib/api/localFile";
+
 import {
   isBlacklisted,
   status,
@@ -19,6 +20,8 @@ import ModalForm from "../components/ModalForm/ModalForm";
 import directoryTree from "directory-tree";
 import classNames from "../lib/classnames";
 import styles from "../styles/file_tree.module.css";
+import { errorToToastDescription } from "../lib/errorHelper";
+import { CLICK_TO_DISMISS, CLICK_TO_REPORT } from "../lib/constants";
 
 export default function Page() {
   const { userId, sub } = useCnails();
@@ -181,7 +184,11 @@ export default function Page() {
                   return convertDirectoryTree(response.tree);
                 else alert(JSON.stringify(response.error.status));
               } else {
-                myToast.error(response.error.error);
+                myToast.error({
+                  title: "File operation failed",
+                  description: errorToToastDescription(response.error),
+                  comment: CLICK_TO_REPORT,
+                });
               }
             }}
             onDragStart={async (_treeData, node) => {
@@ -441,9 +448,12 @@ export default function Page() {
           const node = targetNodeRef.current;
           const folderName = data.name;
           if (folderName == "") {
-            myToast.error(
-              "Fail to create folder because folder name is empty."
-            );
+            myToast.error({
+              title: "Fail operation failed",
+              description:
+                "Fail to create folder because folder name is empty.",
+              comment: CLICK_TO_DISMISS,
+            });
             return;
           }
           let folderPath: string;
