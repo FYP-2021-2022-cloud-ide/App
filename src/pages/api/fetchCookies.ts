@@ -12,6 +12,13 @@ export default function handler(
   res: NextApiResponse<FetchCookieResponse>
 ) {
   try {
+    redisClient.get("good", (err, data) => {
+      console.log(data);
+    });
+  } catch (error) {
+    console.log(error);
+  }
+  try {
     const decrypt = (encrypted: string) => {
       let decipher = crypto.createDecipheriv(
         "aes-256-cbc",

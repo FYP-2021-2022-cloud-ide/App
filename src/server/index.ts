@@ -15,7 +15,7 @@ import { Request, Response, NextFunction } from "express";
 import { Socket } from "node:dgram";
 import axios from "axios";
 import crypto from "crypto";
-import redis from "redis";
+// import redis from "redis";
 
 // rest of the code remains same
 import next from "next";
@@ -31,6 +31,7 @@ import expressOpenidConnect from "express-openid-connect";
 const { auth, requiresAuth } = expressOpenidConnect;
 import { Header } from "next/dist/lib/load-custom-routes";
 import { parse } from "cookie";
+import ioredis from "ioredis";
 import { fetchAppSession } from "../lib/fetchAppSession";
 import { String } from "lodash";
 //import fetch from "node-fetch";
@@ -39,10 +40,15 @@ const SESSION_VALID_FOR = 8 * 60 * 60 * 1000;
 const ID_LENGTH = 36;
 
 console.log(process.env.REDISHOST);
-export const redisClient = redis.createClient(
-  process.env.REDISHOST.split(":")[1],
-  process.env.REDISHOST.split(":")[0]
-);
+// export const redisClient = redis.createClient(
+//   process.env.REDISHOST.split(":")[1],
+//   process.env.REDISHOST.split(":")[0]
+// );
+
+export const redisClient = new ioredis({
+  port: Number(process.env.REDISHOST.split(":")[1]),
+  host: process.env.REDISHOST.split(":")[0],
+});
 
 app.prepare().then(() => {
   var server = express();
