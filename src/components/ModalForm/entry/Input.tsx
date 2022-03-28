@@ -23,9 +23,8 @@ const Input = memo(
       <>
         <input
           ref={ref}
-          className={`border-gray-300 dark:border-gray-600 border dark:border-0 focus:outline-none dark:bg-gray-700 p-1 px-3 w-full flex-row space-x-2  text-left rounded-md shadow-md text-gray-500 dark:text-gray-300 ${
-            disabled ? "dark:text-gray-500 text-gray-300" : ""
-          }`}
+          className={`border-gray-300 dark:border-gray-600 border dark:border-0 focus:outline-none dark:bg-gray-700 p-1 px-3 w-full flex-row space-x-2  text-left rounded-md shadow-md text-gray-500 dark:text-gray-300 ${disabled ? "dark:text-gray-500 text-gray-300" : ""
+            }`}
           placeholder={placeholder}
           // this component will never be rerender so text is the default value
           defaultValue={text}

@@ -6,24 +6,24 @@ import { grpcClient } from "../../../lib/grpcClient";
 import { SuccessStringResponse, nodeError } from "../../../lib/api/api";
 import {
   SuccessStringReply,
-  RemoveContainerRequest,
+  SubmitFilesRequest,
 } from "../../../proto/dockerGet/dockerGet";
 
-export default async function handler(
+export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<SuccessStringResponse>
 ) {
   var client = grpcClient;
-  var body = JSON.parse(req.body);
-  const { sub } = req.query;
 
-  var docReq: RemoveContainerRequest = RemoveContainerRequest.fromPartial({
+  var body = JSON.parse(req.body);
+  console.log(body);
+  var docReq = SubmitFilesRequest.fromPartial({
     sessionKey: fetchAppSession(req),
     containerID: body.containerId,
-    sub: sub as string,
   });
+
   try {
-    client.removeContainer(
+    client.submitTemplateFiles(
       docReq,
       function (err, GoLangResponse: SuccessStringReply) {
         res.json({

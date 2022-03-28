@@ -20,7 +20,7 @@ import moment from "moment";
 import Loader from "../components/Loader";
 import myToast from "../components/CustomToast";
 import ModalForm from "../components/ModalForm/ModalForm";
-import { getMessageReplyFormStructure } from "../lib/forms";
+import { getMessageReplyFormStructure, MessageReplyFormData } from "../lib/forms";
 import React from "react";
 import { useRouter } from "next/router";
 import _ from "lodash";
@@ -39,9 +39,9 @@ type Course = {
 const notificationToCourse = (notification: Notification): Course => {
   return notification.section_id
     ? {
-        fullCode: `${notification.courseCode} (${notification.sectionCode})`,
-        id: notification.section_id,
-      }
+      fullCode: `${notification.courseCode} (${notification.sectionCode})`,
+      id: notification.section_id,
+    }
     : undefined;
 };
 
@@ -175,65 +175,65 @@ const MessageTable = () => {
           onClick: () => void;
           shown?: boolean; // default is shown
         }[] = [
-          {
-            text: row.read ? "Mark as unread" : "Mark as read",
-            icon: (
-              <div className="w-5 h-5 flex items-center justify-center">
-                {row.read ? (
-                  <div className="rounded-full w-3 h-3 border-2 bg-white  border-white "></div>
-                ) : (
-                  <div className="rounded-full w-3 h-3 border-2  border-white "></div>
-                )}
-              </div>
-            ),
-            onClick: async () => {
-              if (!row.read) {
-                const response = await changeNotificationRead(
-                  userId,
-                  [row.id],
-                  true
-                );
-                if (!response.success) {
-                  console.error("fail to read messages");
+            {
+              text: row.read ? "Mark as unread" : "Mark as read",
+              icon: (
+                <div className="w-5 h-5 flex items-center justify-center">
+                  {row.read ? (
+                    <div className="rounded-full w-3 h-3 border-2 bg-white  border-white "></div>
+                  ) : (
+                    <div className="rounded-full w-3 h-3 border-2  border-white "></div>
+                  )}
+                </div>
+              ),
+              onClick: async () => {
+                if (!row.read) {
+                  const response = await changeNotificationRead(
+                    userId,
+                    [row.id],
+                    true
+                  );
+                  if (!response.success) {
+                    console.error("fail to read messages");
+                  }
+                  await fetchNotifications(userId);
+                } else {
+                  const response = await changeNotificationRead(
+                    userId,
+                    [row.id],
+                    false
+                  );
+                  if (!response.success) {
+                    console.error("fail to unread messages");
+                  }
+                  await fetchNotifications(userId);
+                }
+              },
+            },
+            {
+              text: "Reply",
+              icon: <ReplyIcon className="w-5 h-5 text-white" />,
+              onClick: () => {
+                setReplyTarget([row.sender]);
+                setReplySection(row.section_id);
+                setReplyTitle("RE: " + row.title);
+                setReplyFormOpen(true);
+              },
+              shown: !row.allow_reply, //bug:this does not show when allow reply is true
+            },
+            {
+              text: "Delete message",
+              icon: <TrashIcon className="w-5 h-5 text-white"></TrashIcon>,
+              onClick: async () => {
+                const response = await removeNotification(userId, [row.id]);
+                if (response.success) {
+                  setSelectedRows(selectedRows.filter((r) => r.id != row.id));
+                  myToast.success(`A message has been removed.`);
                 }
                 await fetchNotifications(userId);
-              } else {
-                const response = await changeNotificationRead(
-                  userId,
-                  [row.id],
-                  false
-                );
-                if (!response.success) {
-                  console.error("fail to unread messages");
-                }
-                await fetchNotifications(userId);
-              }
+              },
             },
-          },
-          {
-            text: "Reply",
-            icon: <ReplyIcon className="w-5 h-5 text-white" />,
-            onClick: () => {
-              setReplyTarget([row.sender]);
-              setReplySection(row.section_id);
-              setReplyTitle("RE: " + row.title);
-              setReplyFormOpen(true);
-            },
-            shown: !row.allow_reply, //bug:this does not show when allow reply is true
-          },
-          {
-            text: "Delete message",
-            icon: <TrashIcon className="w-5 h-5 text-white"></TrashIcon>,
-            onClick: async () => {
-              const response = await removeNotification(userId, [row.id]);
-              if (response.success) {
-                setSelectedRows(selectedRows.filter((r) => r.id != row.id));
-                myToast.success(`A message has been removed.`);
-              }
-              await fetchNotifications(userId);
-            },
-          },
-        ];
+          ];
         return (
           <div className="flex flex-row space-x-2">
             {actions.map((action, index) => {
@@ -495,7 +495,7 @@ const MessageTable = () => {
             formStructure={getMessageReplyFormStructure(replyTarget)}
             clickOutsideToClose
             escToClose
-            onEnter={async ({ reply_message: data }) => {
+            onEnter={async ({ reply_message: data }: MessageReplyFormData) => {
               const response = await sendNotification(
                 replyTitle, //the title can change? or use "RE: <message title> // use "RE: <message title> thx
                 data.message,

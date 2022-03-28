@@ -1,50 +1,37 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import { grpcClient } from "../../../lib/grpcClient";
-import { ContainerAddResponse, nodeError } from "../../../lib/api/api";
-import {
-  AddContainerReply,
-  AddContainerRequest,
-} from "../../../proto/dockerGet/dockerGet";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
+import { grpcClient } from "../../../lib/grpcClient";
+
+import { SuccessStringResponse, nodeError } from "../../../lib/api/api";
+import {
+  SuccessStringReply,
+  RemoveContainerRequest,
+} from "../../../proto/dockerGet/dockerGet";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ContainerAddResponse>
+  res: NextApiResponse<SuccessStringResponse>
 ) {
   var client = grpcClient;
+  var body = JSON.parse(req.body);
+  const { sub } = req.query;
 
-  const {
-    imageName,
-    memLimit,
-    numCPU,
-    section_user_id,
-    template_id,
-    accessRight,
-    useFresh,
-  } = JSON.parse(req.body); //console.log(body)
-
-  var docReq: AddContainerRequest = AddContainerRequest.fromPartial({
+  var docReq: RemoveContainerRequest = RemoveContainerRequest.fromPartial({
     sessionKey: fetchAppSession(req),
-    imageName: imageName,
-    memLimit: memLimit,
-    numCPU: numCPU,
-    sectionUserId: section_user_id,
-    templateId: template_id,
-    accessRight: accessRight,
-    useFresh: useFresh,
+    containerID: body.containerId,
+    sub: sub as string,
   });
   try {
-    client.addContainer(
+    client.removeTemplateContainer(
       docReq,
-      function (err, GoLangResponse: AddContainerReply) {
+      function (err, GoLangResponse: SuccessStringReply) {
         res.json({
           success: GoLangResponse.success,
           error: {
             status: GoLangResponse.error?.status,
             error: GoLangResponse.error?.error,
           },
-          containerID: GoLangResponse.containerID,
         });
         res.status(200).end();
       }

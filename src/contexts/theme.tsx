@@ -1,29 +1,10 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useCnails } from "./cnails";
-import { generalAPI as gapi } from "../lib/api/generalAPI";
+import { generalAPI } from "../lib/api/generalAPI";
 type ThemeState = {
   isDark: boolean;
   setDark: (d: boolean) => Promise<any>;
 };
-
-// export function setCookie(name: string, val: string) {
-//   document.cookie = "darkMode=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
-//   const date = new Date();
-//   const value = val;
-
-//   // Set it expire in 7 days
-//   date.setTime(date.getTime() + 8 * 60 * 60 * 1000);
-
-//   // Set it
-//   document.cookie =
-//     name +
-//     "=" +
-//     value +
-//     "; expires=" +
-//     date.toUTCString() +
-//     "; path=/; domain=.codespace.ust.dev";
-// }
-
 const themeContext = createContext({} as ThemeState);
 export const useTheme = () => useContext(themeContext);
 
@@ -45,7 +26,7 @@ export const ThemeProvider = ({ children }: Props) => {
   useEffect(() => {
     init();
     async function init() {
-      const userData = await gapi.getUserData(sub);
+      const userData = await generalAPI.getUserData(sub);
       if (userData.success == true) {
         const { darkMode } = userData;
         setDark(darkMode);
@@ -59,7 +40,7 @@ export const ThemeProvider = ({ children }: Props) => {
         isDark: dark,
         setDark: async (d: boolean) => {
           setDark(d);
-          await gapi.updateUserData(sub, d, ""); //expect description
+          await generalAPI.updateUserData(sub, d, ""); //expect description
         },
       }}
     >

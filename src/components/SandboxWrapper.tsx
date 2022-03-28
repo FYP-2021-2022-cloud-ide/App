@@ -11,6 +11,8 @@ import { Error } from "../lib/api/api";
 import { errorToToastDescription } from "../lib/errorHelper";
 import {
   getCreateSandboxFormStructure,
+  CreateSandboxFormData,
+  UpdateSandboxFormData,
   getUpdateSandboxFormStructure,
 } from "../lib/forms";
 import { CLICK_TO_DISMISS, CLICK_TO_REPORT } from "../lib/constants";
@@ -55,7 +57,7 @@ export const SandboxWrapper = () => {
       userId,
       (error) => {
         myToast.error({
-          title: "Personal workspaced cannot be fetched",
+          title: "Personal workspaces cannot be fetched",
           description: errorToToastDescription(error),
         });
       },
@@ -64,7 +66,7 @@ export const SandboxWrapper = () => {
         if (mount) setSandboxImages(sandboxImages);
       }
     );
-    await fetchContainers(sub);
+    await fetchContainers(sub, userId);
   };
   useEffect(() => {
     mount.current = true;
@@ -97,8 +99,8 @@ export const SandboxWrapper = () => {
           if (sandboxImage.sandboxesId) {
             window.open(
               "https://codespace.ust.dev/user/container/" +
-                sandboxImage.sandboxesId +
-                "/"
+              sandboxImage.sandboxesId +
+              "/"
             );
           }
         }}
@@ -185,7 +187,7 @@ export const SandboxWrapper = () => {
         escToClose
         title="Create Personal Workspace"
         formStructure={createFormStructure}
-        onEnter={async ({ create_sandbox: data }) => {
+        onEnter={async ({ create_sandbox: data }: CreateSandboxFormData) => {
           const environment = data.environment_choice as Option;
           const toastId = myToast.loading("Creating a personal workspace...");
           const response = await addSandboxImage(
@@ -218,7 +220,7 @@ export const SandboxWrapper = () => {
           clickOutsideToClose
           escToClose
           formStructure={updateFormStructure}
-          onClose={async ({ update_sandbox: data }, isEnter) => {
+          onClose={async ({ update_sandbox: data }: UpdateSandboxFormData, isEnter) => {
             if (data.update_environment != "" && !isEnter) {
               const containerId = data.update_environment;
               // remove the temp container
@@ -233,11 +235,10 @@ export const SandboxWrapper = () => {
               }
             }
           }}
-          onEnter={async (data) => {
+          onEnter={async ({ update_sandbox: data }: UpdateSandboxFormData) => {
             // call some API here
             const id = myToast.loading("Updating a workspace...");
             const { name, description, update_environment: containerId } = data;
-            console.log(data);
             const response = await updateSandboxImage(
               udpateTarget.id,
               name,

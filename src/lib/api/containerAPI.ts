@@ -6,42 +6,12 @@ import {
   
 const containerAPI = {
     containerList: async (sub: string): Promise<ContainerListResponse> => {
-        var res = await fetch('/api/container/listContainers?sub=' + sub, {
+        var res = await fetch('/api/container/listAllContainers?sub=' + sub, {
             method: 'GET'
         })
         return res.json()
     },
-    addContainer: async (
-        imageName: string,
-        memLimit: Number,
-        numCPU: Number,
-        section_user_id: string,
-        template_id: string,
-        accessRight: string,
-        useFresh: boolean): Promise<ContainerAddResponse> => {
-        var res = await fetch('/api/container/addContainer', {
-            method: 'POST',
-            body: JSON.stringify({
-                "imageName": imageName,
-                "memLimit": memLimit,
-                "numCPU": numCPU,
-                "section_user_id": section_user_id,
-                "template_id": template_id,
-                "accessRight": accessRight,
-                "useFresh": useFresh,
-            }),
-        })
-        return res.json()
-    },
-    removeContainer: async (containerId: string, sub: string) : Promise<SuccessStringResponse>=> {
-        var res = await fetch('/api/container/removeContainer?sub=' + sub, {
-            method: 'POST',
-            body: JSON.stringify({
-                "containerId": containerId
-            }),
-        })
-        return res.json()
-    },
+
     addTempContainer: async (
         memLimit: Number,
         numCPU: Number, 

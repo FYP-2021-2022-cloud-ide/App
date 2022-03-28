@@ -84,7 +84,6 @@ export interface ListContainerReply {
   error: Error | undefined;
   containerInfo: ListContainerReply_ContainersInfo | undefined;
   containers: ListContainerReply_Container[];
-  tempContainers: ListContainerReply_Container[];
 }
 
 export interface ListContainerReply_ContainersInfo {
@@ -93,10 +92,53 @@ export interface ListContainerReply_ContainersInfo {
 }
 
 export interface ListContainerReply_Container {
-  courseTitle: string;
-  assignmentName: string;
+  title: string;
+  subTitle: string;
   existedTime: string;
   containerID: string;
+  type: ListContainerReply_Container_containerType;
+}
+
+export enum ListContainerReply_Container_containerType {
+  TEMPORARY = 0,
+  TEMPLATE_WORKSPACE = 1,
+  SANDBOX = 2,
+  UNRECOGNIZED = -1,
+}
+
+export function listContainerReply_Container_containerTypeFromJSON(
+  object: any
+): ListContainerReply_Container_containerType {
+  switch (object) {
+    case 0:
+    case "TEMPORARY":
+      return ListContainerReply_Container_containerType.TEMPORARY;
+    case 1:
+    case "TEMPLATE_WORKSPACE":
+      return ListContainerReply_Container_containerType.TEMPLATE_WORKSPACE;
+    case 2:
+    case "SANDBOX":
+      return ListContainerReply_Container_containerType.SANDBOX;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return ListContainerReply_Container_containerType.UNRECOGNIZED;
+  }
+}
+
+export function listContainerReply_Container_containerTypeToJSON(
+  object: ListContainerReply_Container_containerType
+): string {
+  switch (object) {
+    case ListContainerReply_Container_containerType.TEMPORARY:
+      return "TEMPORARY";
+    case ListContainerReply_Container_containerType.TEMPLATE_WORKSPACE:
+      return "TEMPLATE_WORKSPACE";
+    case ListContainerReply_Container_containerType.SANDBOX:
+      return "SANDBOX";
+    default:
+      return "UNKNOWN";
+  }
 }
 
 export interface ListCoursesReply {
@@ -1355,7 +1397,6 @@ function createBaseListContainerReply(): ListContainerReply {
     error: undefined,
     containerInfo: undefined,
     containers: [],
-    tempContainers: [],
   };
 }
 
@@ -1380,12 +1421,6 @@ export const ListContainerReply = {
       ListContainerReply_Container.encode(
         v!,
         writer.uint32(26).fork()
-      ).ldelim();
-    }
-    for (const v of message.tempContainers) {
-      ListContainerReply_Container.encode(
-        v!,
-        writer.uint32(42).fork()
       ).ldelim();
     }
     return writer;
@@ -1415,11 +1450,6 @@ export const ListContainerReply = {
             ListContainerReply_Container.decode(reader, reader.uint32())
           );
           break;
-        case 5:
-          message.tempContainers.push(
-            ListContainerReply_Container.decode(reader, reader.uint32())
-          );
-          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1437,11 +1467,6 @@ export const ListContainerReply = {
         : undefined,
       containers: Array.isArray(object?.containers)
         ? object.containers.map((e: any) =>
-            ListContainerReply_Container.fromJSON(e)
-          )
-        : [],
-      tempContainers: Array.isArray(object?.tempContainers)
-        ? object.tempContainers.map((e: any) =>
             ListContainerReply_Container.fromJSON(e)
           )
         : [],
@@ -1464,13 +1489,6 @@ export const ListContainerReply = {
     } else {
       obj.containers = [];
     }
-    if (message.tempContainers) {
-      obj.tempContainers = message.tempContainers.map((e) =>
-        e ? ListContainerReply_Container.toJSON(e) : undefined
-      );
-    } else {
-      obj.tempContainers = [];
-    }
     return obj;
   },
 
@@ -1489,10 +1507,6 @@ export const ListContainerReply = {
         : undefined;
     message.containers =
       object.containers?.map((e) =>
-        ListContainerReply_Container.fromPartial(e)
-      ) || [];
-    message.tempContainers =
-      object.tempContainers?.map((e) =>
         ListContainerReply_Container.fromPartial(e)
       ) || [];
     return message;
@@ -1572,12 +1586,7 @@ export const ListContainerReply_ContainersInfo = {
 };
 
 function createBaseListContainerReply_Container(): ListContainerReply_Container {
-  return {
-    courseTitle: "",
-    assignmentName: "",
-    existedTime: "",
-    containerID: "",
-  };
+  return { title: "", subTitle: "", existedTime: "", containerID: "", type: 0 };
 }
 
 export const ListContainerReply_Container = {
@@ -1585,17 +1594,20 @@ export const ListContainerReply_Container = {
     message: ListContainerReply_Container,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.courseTitle !== "") {
-      writer.uint32(10).string(message.courseTitle);
+    if (message.title !== "") {
+      writer.uint32(10).string(message.title);
     }
-    if (message.assignmentName !== "") {
-      writer.uint32(18).string(message.assignmentName);
+    if (message.subTitle !== "") {
+      writer.uint32(18).string(message.subTitle);
     }
     if (message.existedTime !== "") {
       writer.uint32(26).string(message.existedTime);
     }
     if (message.containerID !== "") {
       writer.uint32(34).string(message.containerID);
+    }
+    if (message.type !== 0) {
+      writer.uint32(48).int32(message.type);
     }
     return writer;
   },
@@ -1611,16 +1623,19 @@ export const ListContainerReply_Container = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.courseTitle = reader.string();
+          message.title = reader.string();
           break;
         case 2:
-          message.assignmentName = reader.string();
+          message.subTitle = reader.string();
           break;
         case 3:
           message.existedTime = reader.string();
           break;
         case 4:
           message.containerID = reader.string();
+          break;
+        case 6:
+          message.type = reader.int32() as any;
           break;
         default:
           reader.skipType(tag & 7);
@@ -1632,25 +1647,28 @@ export const ListContainerReply_Container = {
 
   fromJSON(object: any): ListContainerReply_Container {
     return {
-      courseTitle: isSet(object.courseTitle) ? String(object.courseTitle) : "",
-      assignmentName: isSet(object.assignmentName)
-        ? String(object.assignmentName)
-        : "",
+      title: isSet(object.title) ? String(object.title) : "",
+      subTitle: isSet(object.subTitle) ? String(object.subTitle) : "",
       existedTime: isSet(object.existedTime) ? String(object.existedTime) : "",
       containerID: isSet(object.containerID) ? String(object.containerID) : "",
+      type: isSet(object.type)
+        ? listContainerReply_Container_containerTypeFromJSON(object.type)
+        : 0,
     };
   },
 
   toJSON(message: ListContainerReply_Container): unknown {
     const obj: any = {};
-    message.courseTitle !== undefined &&
-      (obj.courseTitle = message.courseTitle);
-    message.assignmentName !== undefined &&
-      (obj.assignmentName = message.assignmentName);
+    message.title !== undefined && (obj.title = message.title);
+    message.subTitle !== undefined && (obj.subTitle = message.subTitle);
     message.existedTime !== undefined &&
       (obj.existedTime = message.existedTime);
     message.containerID !== undefined &&
       (obj.containerID = message.containerID);
+    message.type !== undefined &&
+      (obj.type = listContainerReply_Container_containerTypeToJSON(
+        message.type
+      ));
     return obj;
   },
 
@@ -1658,10 +1676,11 @@ export const ListContainerReply_Container = {
     object: I
   ): ListContainerReply_Container {
     const message = createBaseListContainerReply_Container();
-    message.courseTitle = object.courseTitle ?? "";
-    message.assignmentName = object.assignmentName ?? "";
+    message.title = object.title ?? "";
+    message.subTitle = object.subTitle ?? "";
     message.existedTime = object.existedTime ?? "";
     message.containerID = object.containerID ?? "";
+    message.type = object.type ?? 0;
     return message;
   },
 };
@@ -7151,8 +7170,8 @@ export const DockerService = {
       Buffer.from(SuccessStringReply.encode(value).finish()),
     responseDeserialize: (value: Buffer) => SuccessStringReply.decode(value),
   },
-  listContainers: {
-    path: "/dockerGet.Docker/listContainers",
+  listAllContainers: {
+    path: "/dockerGet.Docker/listAllContainers",
     requestStream: false,
     responseStream: false,
     requestSerialize: (value: SubRequest) =>
@@ -7173,6 +7192,28 @@ export const DockerService = {
       Buffer.from(ListCoursesReply.encode(value).finish()),
     responseDeserialize: (value: Buffer) => ListCoursesReply.decode(value),
   },
+  getUserData: {
+    path: "/dockerGet.Docker/getUserData",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: GetUserDataRequest) =>
+      Buffer.from(GetUserDataRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => GetUserDataRequest.decode(value),
+    responseSerialize: (value: GetUserDataReply) =>
+      Buffer.from(GetUserDataReply.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => GetUserDataReply.decode(value),
+  },
+  updateUserData: {
+    path: "/dockerGet.Docker/updateUserData",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: UpdateUserDataRequest) =>
+      Buffer.from(UpdateUserDataRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => UpdateUserDataRequest.decode(value),
+    responseSerialize: (value: SuccessStringReply) =>
+      Buffer.from(SuccessStringReply.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => SuccessStringReply.decode(value),
+  },
   getSectionInfo: {
     path: "/dockerGet.Docker/getSectionInfo",
     requestStream: false,
@@ -7183,6 +7224,30 @@ export const DockerService = {
     responseSerialize: (value: GetSectionInfoReply) =>
       Buffer.from(GetSectionInfoReply.encode(value).finish()),
     responseDeserialize: (value: Buffer) => GetSectionInfoReply.decode(value),
+  },
+  addTempContainer: {
+    path: "/dockerGet.Docker/addTempContainer",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: AddTempContainerRequest) =>
+      Buffer.from(AddTempContainerRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) =>
+      AddTempContainerRequest.decode(value),
+    responseSerialize: (value: AddTempContainerReply) =>
+      Buffer.from(AddTempContainerReply.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => AddTempContainerReply.decode(value),
+  },
+  removeTempContainer: {
+    path: "/dockerGet.Docker/removeTempContainer",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: RemoveTempContainerRequest) =>
+      Buffer.from(RemoveTempContainerRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) =>
+      RemoveTempContainerRequest.decode(value),
+    responseSerialize: (value: SuccessStringReply) =>
+      Buffer.from(SuccessStringReply.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => SuccessStringReply.decode(value),
   },
   listEnvironments: {
     path: "/dockerGet.Docker/listEnvironments",
@@ -7205,62 +7270,6 @@ export const DockerService = {
     responseSerialize: (value: ListTemplatesReply) =>
       Buffer.from(ListTemplatesReply.encode(value).finish()),
     responseDeserialize: (value: Buffer) => ListTemplatesReply.decode(value),
-  },
-  addContainer: {
-    path: "/dockerGet.Docker/addContainer",
-    requestStream: false,
-    responseStream: false,
-    requestSerialize: (value: AddContainerRequest) =>
-      Buffer.from(AddContainerRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer) => AddContainerRequest.decode(value),
-    responseSerialize: (value: AddContainerReply) =>
-      Buffer.from(AddContainerReply.encode(value).finish()),
-    responseDeserialize: (value: Buffer) => AddContainerReply.decode(value),
-  },
-  instantAddContainer: {
-    path: "/dockerGet.Docker/instantAddContainer",
-    requestStream: false,
-    responseStream: false,
-    requestSerialize: (value: InstantAddContainerRequest) =>
-      Buffer.from(InstantAddContainerRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer) =>
-      InstantAddContainerRequest.decode(value),
-    responseSerialize: (value: AddContainerReply) =>
-      Buffer.from(AddContainerReply.encode(value).finish()),
-    responseDeserialize: (value: Buffer) => AddContainerReply.decode(value),
-  },
-  removeContainer: {
-    path: "/dockerGet.Docker/removeContainer",
-    requestStream: false,
-    responseStream: false,
-    requestSerialize: (value: RemoveContainerRequest) =>
-      Buffer.from(RemoveContainerRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer) => RemoveContainerRequest.decode(value),
-    responseSerialize: (value: SuccessStringReply) =>
-      Buffer.from(SuccessStringReply.encode(value).finish()),
-    responseDeserialize: (value: Buffer) => SuccessStringReply.decode(value),
-  },
-  submitFiles: {
-    path: "/dockerGet.Docker/submitFiles",
-    requestStream: false,
-    responseStream: false,
-    requestSerialize: (value: SubmitFilesRequest) =>
-      Buffer.from(SubmitFilesRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer) => SubmitFilesRequest.decode(value),
-    responseSerialize: (value: SuccessStringReply) =>
-      Buffer.from(SuccessStringReply.encode(value).finish()),
-    responseDeserialize: (value: Buffer) => SuccessStringReply.decode(value),
-  },
-  getContainerTime: {
-    path: "/dockerGet.Docker/getContainerTime",
-    requestStream: false,
-    responseStream: false,
-    requestSerialize: (value: RemoveContainerRequest) =>
-      Buffer.from(RemoveContainerRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer) => RemoveContainerRequest.decode(value),
-    responseSerialize: (value: ContainerTimeReply) =>
-      Buffer.from(ContainerTimeReply.encode(value).finish()),
-    responseDeserialize: (value: Buffer) => ContainerTimeReply.decode(value),
   },
   addTemplate: {
     path: "/dockerGet.Docker/addTemplate",
@@ -7329,6 +7338,62 @@ export const DockerService = {
     responseDeserialize: (value: Buffer) =>
       TemplateGetStudentWorkspaceReply.decode(value),
   },
+  addTemplateContainer: {
+    path: "/dockerGet.Docker/addTemplateContainer",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: AddContainerRequest) =>
+      Buffer.from(AddContainerRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => AddContainerRequest.decode(value),
+    responseSerialize: (value: AddContainerReply) =>
+      Buffer.from(AddContainerReply.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => AddContainerReply.decode(value),
+  },
+  instantAddTemplateContainer: {
+    path: "/dockerGet.Docker/instantAddTemplateContainer",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: InstantAddContainerRequest) =>
+      Buffer.from(InstantAddContainerRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) =>
+      InstantAddContainerRequest.decode(value),
+    responseSerialize: (value: AddContainerReply) =>
+      Buffer.from(AddContainerReply.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => AddContainerReply.decode(value),
+  },
+  removeTemplateContainer: {
+    path: "/dockerGet.Docker/removeTemplateContainer",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: RemoveContainerRequest) =>
+      Buffer.from(RemoveContainerRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => RemoveContainerRequest.decode(value),
+    responseSerialize: (value: SuccessStringReply) =>
+      Buffer.from(SuccessStringReply.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => SuccessStringReply.decode(value),
+  },
+  submitTemplateFiles: {
+    path: "/dockerGet.Docker/submitTemplateFiles",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: SubmitFilesRequest) =>
+      Buffer.from(SubmitFilesRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => SubmitFilesRequest.decode(value),
+    responseSerialize: (value: SuccessStringReply) =>
+      Buffer.from(SuccessStringReply.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => SuccessStringReply.decode(value),
+  },
+  getTemplateContainerTime: {
+    path: "/dockerGet.Docker/getTemplateContainerTime",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: RemoveContainerRequest) =>
+      Buffer.from(RemoveContainerRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer) => RemoveContainerRequest.decode(value),
+    responseSerialize: (value: ContainerTimeReply) =>
+      Buffer.from(ContainerTimeReply.encode(value).finish()),
+    responseDeserialize: (value: Buffer) => ContainerTimeReply.decode(value),
+  },
   addEnvironment: {
     path: "/dockerGet.Docker/addEnvironment",
     requestStream: false,
@@ -7371,30 +7436,6 @@ export const DockerService = {
     requestSerialize: (value: EnvironmentIdRequest) =>
       Buffer.from(EnvironmentIdRequest.encode(value).finish()),
     requestDeserialize: (value: Buffer) => EnvironmentIdRequest.decode(value),
-    responseSerialize: (value: SuccessStringReply) =>
-      Buffer.from(SuccessStringReply.encode(value).finish()),
-    responseDeserialize: (value: Buffer) => SuccessStringReply.decode(value),
-  },
-  addTempContainer: {
-    path: "/dockerGet.Docker/addTempContainer",
-    requestStream: false,
-    responseStream: false,
-    requestSerialize: (value: AddTempContainerRequest) =>
-      Buffer.from(AddTempContainerRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer) =>
-      AddTempContainerRequest.decode(value),
-    responseSerialize: (value: AddTempContainerReply) =>
-      Buffer.from(AddTempContainerReply.encode(value).finish()),
-    responseDeserialize: (value: Buffer) => AddTempContainerReply.decode(value),
-  },
-  removeTempContainer: {
-    path: "/dockerGet.Docker/removeTempContainer",
-    requestStream: false,
-    responseStream: false,
-    requestSerialize: (value: RemoveTempContainerRequest) =>
-      Buffer.from(RemoveTempContainerRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer) =>
-      RemoveTempContainerRequest.decode(value),
     responseSerialize: (value: SuccessStringReply) =>
       Buffer.from(SuccessStringReply.encode(value).finish()),
     responseDeserialize: (value: Buffer) => SuccessStringReply.decode(value),
@@ -7463,28 +7504,6 @@ export const DockerService = {
     requestSerialize: (value: SandBoxIdRequest) =>
       Buffer.from(SandBoxIdRequest.encode(value).finish()),
     requestDeserialize: (value: Buffer) => SandBoxIdRequest.decode(value),
-    responseSerialize: (value: SuccessStringReply) =>
-      Buffer.from(SuccessStringReply.encode(value).finish()),
-    responseDeserialize: (value: Buffer) => SuccessStringReply.decode(value),
-  },
-  getUserData: {
-    path: "/dockerGet.Docker/getUserData",
-    requestStream: false,
-    responseStream: false,
-    requestSerialize: (value: GetUserDataRequest) =>
-      Buffer.from(GetUserDataRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer) => GetUserDataRequest.decode(value),
-    responseSerialize: (value: GetUserDataReply) =>
-      Buffer.from(GetUserDataReply.encode(value).finish()),
-    responseDeserialize: (value: Buffer) => GetUserDataReply.decode(value),
-  },
-  updateUserData: {
-    path: "/dockerGet.Docker/updateUserData",
-    requestStream: false,
-    responseStream: false,
-    requestSerialize: (value: UpdateUserDataRequest) =>
-      Buffer.from(UpdateUserDataRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer) => UpdateUserDataRequest.decode(value),
     responseSerialize: (value: SuccessStringReply) =>
       Buffer.from(SuccessStringReply.encode(value).finish()),
     responseDeserialize: (value: Buffer) => SuccessStringReply.decode(value),
@@ -7647,22 +7666,24 @@ export interface DockerServer extends UntypedServiceImplementation {
     CheckHaveContainerRequest,
     SuccessStringReply
   >;
-  listContainers: handleUnaryCall<SubRequest, ListContainerReply>;
+  listAllContainers: handleUnaryCall<SubRequest, ListContainerReply>;
   listCourses: handleUnaryCall<SubRequest, ListCoursesReply>;
+  getUserData: handleUnaryCall<GetUserDataRequest, GetUserDataReply>;
+  updateUserData: handleUnaryCall<UpdateUserDataRequest, SuccessStringReply>;
   getSectionInfo: handleUnaryCall<SectionAndSubRequest, GetSectionInfoReply>;
+  addTempContainer: handleUnaryCall<
+    AddTempContainerRequest,
+    AddTempContainerReply
+  >;
+  removeTempContainer: handleUnaryCall<
+    RemoveTempContainerRequest,
+    SuccessStringReply
+  >;
   listEnvironments: handleUnaryCall<
     SectionAndSubRequest,
     ListEnvironmentsReply
   >;
   listTemplates: handleUnaryCall<SectionAndSubRequest, ListTemplatesReply>;
-  addContainer: handleUnaryCall<AddContainerRequest, AddContainerReply>;
-  instantAddContainer: handleUnaryCall<
-    InstantAddContainerRequest,
-    AddContainerReply
-  >;
-  removeContainer: handleUnaryCall<RemoveContainerRequest, SuccessStringReply>;
-  submitFiles: handleUnaryCall<SubmitFilesRequest, SuccessStringReply>;
-  getContainerTime: handleUnaryCall<RemoveContainerRequest, ContainerTimeReply>;
   addTemplate: handleUnaryCall<AddTemplateRequest, AddTemplateReply>;
   updateTemplate: handleUnaryCall<UpdateTemplateRequest, SuccessStringReply>;
   activateTemplate: handleUnaryCall<TemplateIdRequest, SuccessStringReply>;
@@ -7671,6 +7692,20 @@ export interface DockerServer extends UntypedServiceImplementation {
   getTemplateStudentWorkspace: handleUnaryCall<
     TemplateIdRequest,
     TemplateGetStudentWorkspaceReply
+  >;
+  addTemplateContainer: handleUnaryCall<AddContainerRequest, AddContainerReply>;
+  instantAddTemplateContainer: handleUnaryCall<
+    InstantAddContainerRequest,
+    AddContainerReply
+  >;
+  removeTemplateContainer: handleUnaryCall<
+    RemoveContainerRequest,
+    SuccessStringReply
+  >;
+  submitTemplateFiles: handleUnaryCall<SubmitFilesRequest, SuccessStringReply>;
+  getTemplateContainerTime: handleUnaryCall<
+    RemoveContainerRequest,
+    ContainerTimeReply
   >;
   addEnvironment: handleUnaryCall<AddEnvironmentRequest, AddEnvironmentReply>;
   updateEnvironment: handleUnaryCall<
@@ -7682,14 +7717,6 @@ export interface DockerServer extends UntypedServiceImplementation {
     AddEnvironmentReply
   >;
   removeEnvironment: handleUnaryCall<EnvironmentIdRequest, SuccessStringReply>;
-  addTempContainer: handleUnaryCall<
-    AddTempContainerRequest,
-    AddTempContainerReply
-  >;
-  removeTempContainer: handleUnaryCall<
-    RemoveTempContainerRequest,
-    SuccessStringReply
-  >;
   addSandboxImage: handleUnaryCall<
     AddSandBoxImageRequest,
     AddSandBoxImageReply
@@ -7708,8 +7735,6 @@ export interface DockerServer extends UntypedServiceImplementation {
   >;
   addSandbox: handleUnaryCall<AddSandBoxRequest, AddSandBoxReply>;
   removeSandbox: handleUnaryCall<SandBoxIdRequest, SuccessStringReply>;
-  getUserData: handleUnaryCall<GetUserDataRequest, GetUserDataReply>;
-  updateUserData: handleUnaryCall<UpdateUserDataRequest, SuccessStringReply>;
   getNotificationToken: handleUnaryCall<SubRequest, GetNotificationTokenReply>;
   sendNotification: handleUnaryCall<
     SendNotificationRequest,
@@ -7759,16 +7784,16 @@ export interface DockerClient extends Client {
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: SuccessStringReply) => void
   ): ClientUnaryCall;
-  listContainers(
+  listAllContainers(
     request: SubRequest,
     callback: (error: ServiceError | null, response: ListContainerReply) => void
   ): ClientUnaryCall;
-  listContainers(
+  listAllContainers(
     request: SubRequest,
     metadata: Metadata,
     callback: (error: ServiceError | null, response: ListContainerReply) => void
   ): ClientUnaryCall;
-  listContainers(
+  listAllContainers(
     request: SubRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,
@@ -7788,6 +7813,36 @@ export interface DockerClient extends Client {
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: ListCoursesReply) => void
+  ): ClientUnaryCall;
+  getUserData(
+    request: GetUserDataRequest,
+    callback: (error: ServiceError | null, response: GetUserDataReply) => void
+  ): ClientUnaryCall;
+  getUserData(
+    request: GetUserDataRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: GetUserDataReply) => void
+  ): ClientUnaryCall;
+  getUserData(
+    request: GetUserDataRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: GetUserDataReply) => void
+  ): ClientUnaryCall;
+  updateUserData(
+    request: UpdateUserDataRequest,
+    callback: (error: ServiceError | null, response: SuccessStringReply) => void
+  ): ClientUnaryCall;
+  updateUserData(
+    request: UpdateUserDataRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: SuccessStringReply) => void
+  ): ClientUnaryCall;
+  updateUserData(
+    request: UpdateUserDataRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: SuccessStringReply) => void
   ): ClientUnaryCall;
   getSectionInfo(
     request: SectionAndSubRequest,
@@ -7812,6 +7867,45 @@ export interface DockerClient extends Client {
       error: ServiceError | null,
       response: GetSectionInfoReply
     ) => void
+  ): ClientUnaryCall;
+  addTempContainer(
+    request: AddTempContainerRequest,
+    callback: (
+      error: ServiceError | null,
+      response: AddTempContainerReply
+    ) => void
+  ): ClientUnaryCall;
+  addTempContainer(
+    request: AddTempContainerRequest,
+    metadata: Metadata,
+    callback: (
+      error: ServiceError | null,
+      response: AddTempContainerReply
+    ) => void
+  ): ClientUnaryCall;
+  addTempContainer(
+    request: AddTempContainerRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (
+      error: ServiceError | null,
+      response: AddTempContainerReply
+    ) => void
+  ): ClientUnaryCall;
+  removeTempContainer(
+    request: RemoveTempContainerRequest,
+    callback: (error: ServiceError | null, response: SuccessStringReply) => void
+  ): ClientUnaryCall;
+  removeTempContainer(
+    request: RemoveTempContainerRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: SuccessStringReply) => void
+  ): ClientUnaryCall;
+  removeTempContainer(
+    request: RemoveTempContainerRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: SuccessStringReply) => void
   ): ClientUnaryCall;
   listEnvironments(
     request: SectionAndSubRequest,
@@ -7851,81 +7945,6 @@ export interface DockerClient extends Client {
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: ListTemplatesReply) => void
-  ): ClientUnaryCall;
-  addContainer(
-    request: AddContainerRequest,
-    callback: (error: ServiceError | null, response: AddContainerReply) => void
-  ): ClientUnaryCall;
-  addContainer(
-    request: AddContainerRequest,
-    metadata: Metadata,
-    callback: (error: ServiceError | null, response: AddContainerReply) => void
-  ): ClientUnaryCall;
-  addContainer(
-    request: AddContainerRequest,
-    metadata: Metadata,
-    options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: AddContainerReply) => void
-  ): ClientUnaryCall;
-  instantAddContainer(
-    request: InstantAddContainerRequest,
-    callback: (error: ServiceError | null, response: AddContainerReply) => void
-  ): ClientUnaryCall;
-  instantAddContainer(
-    request: InstantAddContainerRequest,
-    metadata: Metadata,
-    callback: (error: ServiceError | null, response: AddContainerReply) => void
-  ): ClientUnaryCall;
-  instantAddContainer(
-    request: InstantAddContainerRequest,
-    metadata: Metadata,
-    options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: AddContainerReply) => void
-  ): ClientUnaryCall;
-  removeContainer(
-    request: RemoveContainerRequest,
-    callback: (error: ServiceError | null, response: SuccessStringReply) => void
-  ): ClientUnaryCall;
-  removeContainer(
-    request: RemoveContainerRequest,
-    metadata: Metadata,
-    callback: (error: ServiceError | null, response: SuccessStringReply) => void
-  ): ClientUnaryCall;
-  removeContainer(
-    request: RemoveContainerRequest,
-    metadata: Metadata,
-    options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: SuccessStringReply) => void
-  ): ClientUnaryCall;
-  submitFiles(
-    request: SubmitFilesRequest,
-    callback: (error: ServiceError | null, response: SuccessStringReply) => void
-  ): ClientUnaryCall;
-  submitFiles(
-    request: SubmitFilesRequest,
-    metadata: Metadata,
-    callback: (error: ServiceError | null, response: SuccessStringReply) => void
-  ): ClientUnaryCall;
-  submitFiles(
-    request: SubmitFilesRequest,
-    metadata: Metadata,
-    options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: SuccessStringReply) => void
-  ): ClientUnaryCall;
-  getContainerTime(
-    request: RemoveContainerRequest,
-    callback: (error: ServiceError | null, response: ContainerTimeReply) => void
-  ): ClientUnaryCall;
-  getContainerTime(
-    request: RemoveContainerRequest,
-    metadata: Metadata,
-    callback: (error: ServiceError | null, response: ContainerTimeReply) => void
-  ): ClientUnaryCall;
-  getContainerTime(
-    request: RemoveContainerRequest,
-    metadata: Metadata,
-    options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: ContainerTimeReply) => void
   ): ClientUnaryCall;
   addTemplate(
     request: AddTemplateRequest,
@@ -8026,6 +8045,81 @@ export interface DockerClient extends Client {
       response: TemplateGetStudentWorkspaceReply
     ) => void
   ): ClientUnaryCall;
+  addTemplateContainer(
+    request: AddContainerRequest,
+    callback: (error: ServiceError | null, response: AddContainerReply) => void
+  ): ClientUnaryCall;
+  addTemplateContainer(
+    request: AddContainerRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: AddContainerReply) => void
+  ): ClientUnaryCall;
+  addTemplateContainer(
+    request: AddContainerRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: AddContainerReply) => void
+  ): ClientUnaryCall;
+  instantAddTemplateContainer(
+    request: InstantAddContainerRequest,
+    callback: (error: ServiceError | null, response: AddContainerReply) => void
+  ): ClientUnaryCall;
+  instantAddTemplateContainer(
+    request: InstantAddContainerRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: AddContainerReply) => void
+  ): ClientUnaryCall;
+  instantAddTemplateContainer(
+    request: InstantAddContainerRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: AddContainerReply) => void
+  ): ClientUnaryCall;
+  removeTemplateContainer(
+    request: RemoveContainerRequest,
+    callback: (error: ServiceError | null, response: SuccessStringReply) => void
+  ): ClientUnaryCall;
+  removeTemplateContainer(
+    request: RemoveContainerRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: SuccessStringReply) => void
+  ): ClientUnaryCall;
+  removeTemplateContainer(
+    request: RemoveContainerRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: SuccessStringReply) => void
+  ): ClientUnaryCall;
+  submitTemplateFiles(
+    request: SubmitFilesRequest,
+    callback: (error: ServiceError | null, response: SuccessStringReply) => void
+  ): ClientUnaryCall;
+  submitTemplateFiles(
+    request: SubmitFilesRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: SuccessStringReply) => void
+  ): ClientUnaryCall;
+  submitTemplateFiles(
+    request: SubmitFilesRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: SuccessStringReply) => void
+  ): ClientUnaryCall;
+  getTemplateContainerTime(
+    request: RemoveContainerRequest,
+    callback: (error: ServiceError | null, response: ContainerTimeReply) => void
+  ): ClientUnaryCall;
+  getTemplateContainerTime(
+    request: RemoveContainerRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: ContainerTimeReply) => void
+  ): ClientUnaryCall;
+  getTemplateContainerTime(
+    request: RemoveContainerRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: ContainerTimeReply) => void
+  ): ClientUnaryCall;
   addEnvironment(
     request: AddEnvironmentRequest,
     callback: (
@@ -8100,45 +8194,6 @@ export interface DockerClient extends Client {
   ): ClientUnaryCall;
   removeEnvironment(
     request: EnvironmentIdRequest,
-    metadata: Metadata,
-    options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: SuccessStringReply) => void
-  ): ClientUnaryCall;
-  addTempContainer(
-    request: AddTempContainerRequest,
-    callback: (
-      error: ServiceError | null,
-      response: AddTempContainerReply
-    ) => void
-  ): ClientUnaryCall;
-  addTempContainer(
-    request: AddTempContainerRequest,
-    metadata: Metadata,
-    callback: (
-      error: ServiceError | null,
-      response: AddTempContainerReply
-    ) => void
-  ): ClientUnaryCall;
-  addTempContainer(
-    request: AddTempContainerRequest,
-    metadata: Metadata,
-    options: Partial<CallOptions>,
-    callback: (
-      error: ServiceError | null,
-      response: AddTempContainerReply
-    ) => void
-  ): ClientUnaryCall;
-  removeTempContainer(
-    request: RemoveTempContainerRequest,
-    callback: (error: ServiceError | null, response: SuccessStringReply) => void
-  ): ClientUnaryCall;
-  removeTempContainer(
-    request: RemoveTempContainerRequest,
-    metadata: Metadata,
-    callback: (error: ServiceError | null, response: SuccessStringReply) => void
-  ): ClientUnaryCall;
-  removeTempContainer(
-    request: RemoveTempContainerRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: SuccessStringReply) => void
@@ -8247,36 +8302,6 @@ export interface DockerClient extends Client {
   ): ClientUnaryCall;
   removeSandbox(
     request: SandBoxIdRequest,
-    metadata: Metadata,
-    options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: SuccessStringReply) => void
-  ): ClientUnaryCall;
-  getUserData(
-    request: GetUserDataRequest,
-    callback: (error: ServiceError | null, response: GetUserDataReply) => void
-  ): ClientUnaryCall;
-  getUserData(
-    request: GetUserDataRequest,
-    metadata: Metadata,
-    callback: (error: ServiceError | null, response: GetUserDataReply) => void
-  ): ClientUnaryCall;
-  getUserData(
-    request: GetUserDataRequest,
-    metadata: Metadata,
-    options: Partial<CallOptions>,
-    callback: (error: ServiceError | null, response: GetUserDataReply) => void
-  ): ClientUnaryCall;
-  updateUserData(
-    request: UpdateUserDataRequest,
-    callback: (error: ServiceError | null, response: SuccessStringReply) => void
-  ): ClientUnaryCall;
-  updateUserData(
-    request: UpdateUserDataRequest,
-    metadata: Metadata,
-    callback: (error: ServiceError | null, response: SuccessStringReply) => void
-  ): ClientUnaryCall;
-  updateUserData(
-    request: UpdateUserDataRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: SuccessStringReply) => void

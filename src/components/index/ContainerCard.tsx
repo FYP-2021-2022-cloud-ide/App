@@ -2,30 +2,28 @@ import React, { useLayoutEffect, useRef } from "react";
 import { ClockIcon, XIcon } from "@heroicons/react/outline";
 import Tilt from "react-parallax-tilt";
 import { useCleanTilt } from "../TemplateCard";
-import { containerAPI } from "../../lib/api/containerAPI";
 import { sandboxAPI } from "../../lib/api/sandboxAPI";
 import { useCnails } from "../../contexts/cnails";
 import myToast from "../CustomToast";
 import { errorToToastDescription } from "../../lib/errorHelper";
+import { Container } from "../../lib/cnails";
+import { templateAPI } from "../../lib/api/templateAPI";
+import { containerAPI } from "../../lib/api/containerAPI";
 
-type Props = {
-  courseTitle: string;
-  containerName: string;
-  existedTime: string;
-  containerID: string;
-  zIndex?: number;
-};
+type Props = Container & { zIndex: number };
 
 function ContainerCard({
-  courseTitle,
-  containerName,
+  title: courseTitle,
+  subTitle: assignmentName,
   existedTime,
   containerID,
+  type,
   zIndex,
 }: Props) {
-  const { removeContainer } = containerAPI;
+  const { removeTempContainer } = containerAPI;
+  const { removeTemplateContainer } = templateAPI;
   const { removeSandbox } = sandboxAPI;
-  const { sub, fetchContainers } = useCnails();
+  const { userId, sub, fetchContainers } = useCnails();
   const { ref, cleanStyle } = useCleanTilt(
     zIndex ? `z-index : ${zIndex};` : ""
   );
@@ -56,7 +54,7 @@ function ContainerCard({
           </div>
           <div className="w-full">
             <div className="font-semibold text-sm text-gray-800 dark:text-gray-200">
-              {containerName}
+              {assignmentName}
             </div>
             <div className="font-medium text-xs text-gray-600 dark:text-gray-300">
               {courseTitle}
@@ -67,13 +65,18 @@ function ContainerCard({
             onClick={async (e) => {
               e.stopPropagation();
               let success = false;
-              if (containerName == "A sandbox") {
-                const response = await removeSandbox(containerID, sub);
+              if (type == "SANDBOX") {
+                const response = await removeSandbox(containerID, userId);
                 if (response.success) {
                   success = true;
                 }
-              } else {
-                const response = await removeContainer(containerID, sub);
+              } else if(type == "TEMPLATE_WORKSPACE") {
+                const response = await removeTemplateContainer(containerID, sub);
+                if (response.success) {
+                  success = true;
+                }
+              }else if(type == "TEMPORARY") {
+                const response = await removeTempContainer(containerID, sub);
                 if (response.success) {
                   success = true;
                 }
@@ -81,7 +84,7 @@ function ContainerCard({
 
               if (success) {
                 myToast.success("Workspace is removed.");
-                fetchContainers(sub);
+                fetchContainers(sub, userId);
               } else
                 myToast.error({
                   title: "Fail to remove workspace",

@@ -82,18 +82,18 @@ const Section = ({
                   {React.isValidElement(section.entries)
                     ? section.entries
                     : Object.keys(section.entries).map((id, index) => {
-                        return (
-                          <Entry
-                            zIndex={Object.keys(section.entries).length - index}
-                            key={id}
-                            entry={section.entries[id]}
-                            id={id}
-                            sectionId={sectionId}
-                            data={data}
-                            onChange={(data) => onChange(data, id)}
-                          ></Entry>
-                        );
-                      })}
+                      return (
+                        <Entry
+                          zIndex={Object.keys(section.entries).length - index}
+                          key={id}
+                          entry={section.entries[id]}
+                          id={id}
+                          sectionId={sectionId}
+                          data={data}
+                          onChange={(data) => onChange(data, id)}
+                        ></Entry>
+                      );
+                    })}
                 </div>
               </Disclosure.Panel>
             </Transition>
@@ -111,18 +111,18 @@ const Section = ({
         {React.isValidElement(section.entries)
           ? section.entries
           : Object.keys(section.entries).map((id, index) => {
-              return (
-                <Entry
-                  zIndex={Object.keys(section.entries).length - index}
-                  key={id}
-                  entry={section.entries[id]}
-                  id={id}
-                  sectionId={sectionId}
-                  data={data}
-                  onChange={(data) => onChange(data, id)}
-                ></Entry>
-              );
-            })}
+            return (
+              <Entry
+                zIndex={Object.keys(section.entries).length - index}
+                key={id}
+                entry={section.entries[id]}
+                id={id}
+                sectionId={sectionId}
+                data={data}
+                onChange={(data) => onChange(data, id)}
+              ></Entry>
+            );
+          })}
       </div>
     );
 };
@@ -158,6 +158,8 @@ const fromStructureToData = (sections: FormStructure): Data => {
 /**
  * A component to show a form in modal. Use this component to keep consistency in the app.
  * To use this, put the `<ModalForm>` in a component and supply a form structure.
+ * 
+ * a good practice that you define a type of the formData as well 
  */
 const ModalForm = (props: Props) => {
   const {
@@ -172,7 +174,8 @@ const ModalForm = (props: Props) => {
     title,
     size = "sm",
     onChange,
-    btnsText,
+    okBtnText,
+    cancelBtnText,
     useDisclosure,
   } = props;
   const [data, setData] = useState<Data>(fromStructureToData(formStructure));
@@ -254,7 +257,7 @@ const ModalForm = (props: Props) => {
                   patchedOnClose();
                 }}
               >
-                {btnsText?.cancel ?? "Cancel"}
+                {cancelBtnText ?? "Cancel"}
               </button>
               <button
                 className={
@@ -269,7 +272,7 @@ const ModalForm = (props: Props) => {
                   }
                 }}
               >
-                {btnsText?.ok ?? "OK"}
+                {okBtnText ?? "OK"}
               </button>
             </div>
           </div>

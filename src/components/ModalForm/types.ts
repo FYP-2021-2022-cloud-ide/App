@@ -1,9 +1,6 @@
 import { Option } from "../ListBox";
 
-/**
- *  the id is a flatten JSON object, each property is named in the format of `sectionId.entryId`
- */
-export type Data = { [id: string]: any };
+export type Data = any;
 
 export type ValidationOutput = { ok: false; message: string } | { ok: true };
 
@@ -152,7 +149,8 @@ export type Props = {
    */
   onOpen?: () => void;
   /**
-   * callback when the modal is close
+   * callback when the modal is close. If the modal close because user submit the form,
+   * both onEnter and onClose is called, so you need to handle it by yourself.
    * @param data the data in the form when the modal is closed
    * @param isEnter whether this form close because of enter
    */
@@ -180,10 +178,8 @@ export type Props = {
    * a callback when the form is submitted
    */
   onEnter?: (data: Data) => void;
-  /**
-   * text for the ok and cancel buttons
-   */
-  btnsText?: { cancel: string; ok: string };
+  okBtnText?: string;
+  cancelBtnText?: string;
 };
 
 /**

@@ -14,7 +14,6 @@ import {
   Workspace,
 } from "../../../../lib/cnails";
 import myToast from "../../../../components/CustomToast";
-import { containerAPI } from "../../../../lib/api/containerAPI";
 import exampleTemplates from "../../../../fake_data/example_template.json";
 import { errorToToastDescription } from "../../../../lib/errorHelper";
 import { CLICK_TO_REPORT } from "../../../../lib/constants";
@@ -29,8 +28,7 @@ const Home = () => {
   const [sectionUserInfo, setSectionUserInfo] = useState<SectionUserInfo>(null);
   const [workspaces, setWorkspaces] = useState<Workspace[]>(null);
   const { sub } = useCnails();
-  const { templateList } = templateAPI;
-  const { addContainer, removeContainer } = containerAPI;
+  const { templateList,addTemplateContainer,removeTemplateContainer } = templateAPI;
   const { getSectionUserInfo } = generalAPI;
   // data fetching from API
   const fetchSectionUserInfo = async () => {
@@ -109,7 +107,7 @@ const Home = () => {
             onToggleStart={async (workspace, start) => {
               if (start) {
                 const id = myToast.loading("Starting workspace...");
-                const response = await addContainer(
+                const response = await addTemplateContainer(
                   workspace.imageId,
                   memory,
                   CPU,
@@ -128,7 +126,7 @@ const Home = () => {
                     comment: CLICK_TO_REPORT,
                   });
               } else {
-                const response = await removeContainer(
+                const response = await removeTemplateContainer(
                   workspace.containerID,
                   sub
                 );

@@ -14,17 +14,18 @@ const myToast = {
       description,
       comment = CLICK_TO_REPORT,
     }: { title: string; description: string; comment?: string },
-    onClick: () => void = () => {
-      window.open(
-        "https://github.com/FYP-2021-2022-cloud-ide/Public-Issues/issues"
-      );
-    }
+    // onClick: () => void = () => {
+    //   window.open(
+    //     "https://github.com/FYP-2021-2022-cloud-ide/Public-Issues/issues"
+    //   );
+    // }
+    onClick?: () => void
   ) => {
     const id = toast.error(
       <>
         <p id="title">{title}</p>
         <p id="description">{description}</p>
-        <p id="comment">{comment}</p>
+        <p id="comment">{CLICK_TO_DISMISS}</p>
       </>,
       {
         className: "toaster toaster-error",

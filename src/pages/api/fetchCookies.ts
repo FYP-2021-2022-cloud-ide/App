@@ -1,17 +1,16 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { parse } from "cookie";
-import { removeCookies } from "cookies-next";
 
 import crypto from "crypto";
 
 import { FetchCookieResponse } from "../../lib/api/api";
+import { redisClient } from "../../server";
 
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<FetchCookieResponse>
 ) {
-  //console.log(req.headers.cookie!)
   try {
     const decrypt = (encrypted: string) => {
       let decipher = crypto.createDecipheriv(

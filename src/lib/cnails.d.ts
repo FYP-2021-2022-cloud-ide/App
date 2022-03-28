@@ -25,6 +25,7 @@ export type {
 
 type SectionRole = "INSTRUCTOR" | "STUDENT";
 
+type ContainerType = "SANDBOX" | "TEMPORARY" | "TEMPLATE_WORKSPACE";
 type Environment = {
   id: string;
   imageId: string;
@@ -67,11 +68,24 @@ type SectionUserInfo = {
   sub: string;
 };
 
+/**
+ * @remark the naming convention of sandbox in the backend is poor.
+ * pay attention to the difference in `id` , `imageId`, `sandboxesId`
+ */
 type SandboxImage = {
+  /**
+   * the id of this sandbox in the database, you need to use this in `removeSandboxImage`
+   */
   id: string;
   title: string;
   description: string;
+  /**
+   * the underlying image id of the sandbox. You need to use this to call `addTempContainer`
+   */
   imageId: string;
+  /**
+   * the container id of the workspace created from sandbox.
+   */
   sandboxesId: string;
 };
 
@@ -79,23 +93,22 @@ type ContainerList = {
   containerInfo: ContainerInfo;
   containers: Container[];
 };
+
 type Container = {
-  courseTitle: string;
-  assignmentName: string;
+  title: string;
+  subTitle: string;
   existedTime: string;
   containerID: string;
+  type: ContainerType;
 };
 
 type Workspace = Template;
 
-/**
- * container info is actually the quota info
- */
 type ContainerInfo = {
   // the current active container number
   containersAlive: number;
 
-  // the max active container allowance
+  // total number of container
   containersTotal: number;
 };
 
@@ -127,11 +140,20 @@ type CnailsContextState = {
   notifications: Notification[];
   containers: Container[];
   containerInfo: ContainerInfo;
+  sandboxImages: SandboxImage[];
   /**
    * a function to fetch the new container list.
    * It will update the context and hence update all affected UI.
+   *
+   * @remark because of the inconsistency in backend API, both sub and userId are needed. Also, fetching this API will fetch the data
+   *
+   * @param sub the user sub
+   * @param userId the user id
    */
-  fetchContainers: (sub: string) => Promise<{
+  fetchContainers: (
+    sub: string,
+    userId: string
+  ) => Promise<{
     containers: Container[];
     containersInfo: ContainerInfo;
   }>;

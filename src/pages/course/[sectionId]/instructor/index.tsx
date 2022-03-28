@@ -32,6 +32,11 @@ import {
   getUpdateTemplateFormStructure,
   getUpdateEnvironmentFormStructure,
   getAnnouncementFormStructure,
+  CreateEnvironmentFormData,
+  CreateTemplateFormData,
+  UpdateTemplateFormData,
+  UpdateEnvironmentFormData,
+  AnnouncementFormData,
 } from "../../../../lib/forms";
 import _ from "lodash";
 import courseAPI from "../../../../lib/api/courses";
@@ -66,7 +71,7 @@ export const InstructorProvider = ({
   children: JSX.Element;
   sectionUserInfo: SectionUserInfo;
 }) => {
-  const { sub, fetchContainers } = useCnails();
+  const { sub, userId, fetchContainers } = useCnails();
   const [environments, setEnvironments] = useState<Environment[]>(null);
   const [templates, setTemplates] = useState<Template[]>(null);
   const [highlightedEnv, setHighlightedEnv] = useState<Environment>(null);
@@ -107,7 +112,7 @@ export const InstructorProvider = ({
         );
       }
     );
-    fetchContainers(sub);
+    fetchContainers(sub, userId);
   };
 
   useEffect(() => {
@@ -177,6 +182,8 @@ const EnvironmentTemplateWrapper = () => {
     activateTemplate,
     deactivateTemplate,
     updateTemplate,
+    addTemplateContainer,
+    removeTemplateContainer
   } = templateAPI;
   const {
     removeEnvironment,
@@ -185,10 +192,8 @@ const EnvironmentTemplateWrapper = () => {
     updateEnvironment,
   } = envAPI;
   const {
-    addContainer,
     addTempContainer,
     removeTempContainer,
-    removeContainer,
   } = containerAPI;
 
   // if environments or templates has not fetch, don't need to go down
@@ -231,9 +236,8 @@ const EnvironmentTemplateWrapper = () => {
             if (numTemplates != 0) {
               myToast.error({
                 title: "Fail to remove environment",
-                description: `${numTemplates} template${
-                  numTemplates > 1 ? "s are" : " is"
-                } still using ${env.name}.`,
+                description: `${numTemplates} template${numTemplates > 1 ? "s are" : " is"
+                  } still using ${env.name}.`,
                 comment: CLICK_TO_DISMISS,
               });
             } else {
@@ -287,14 +291,14 @@ const EnvironmentTemplateWrapper = () => {
             if (template.containerID) {
               window.open(
                 "https://codespace.ust.dev/user/container/" +
-                  template.containerID +
-                  "/"
+                template.containerID +
+                "/"
               );
             }
           }}
           onToggle={async (template) => {
             if (template.containerID) {
-              const response = await removeContainer(template.containerID, sub);
+              const response = await removeTemplateContainer(template.containerID, sub);
               if (response.success) {
                 myToast.success("Template workspace is successfully stopped. ");
               } else
@@ -305,7 +309,7 @@ const EnvironmentTemplateWrapper = () => {
                 });
             } else {
               const id = myToast.loading("Starting workspace...");
-              const response = await addContainer(
+              const response = await addTemplateContainer(
                 template.imageId,
                 memory,
                 CPU,
@@ -375,7 +379,7 @@ const EnvironmentTemplateWrapper = () => {
         escToClose
         title="Create Environment"
         formStructure={createEnvironmentFormStructure}
-        onEnter={async ({ create_environment: data }) => {
+        onEnter={async ({ create_environment: data }: CreateEnvironmentFormData) => {
           // console.log(data);
           const { environment_choice: environment, name, description } = data;
           const id = myToast.loading("Creating the environment...");
@@ -438,7 +442,7 @@ const EnvironmentTemplateWrapper = () => {
                         onClick={async () => {
                           // cancel the build
                           myToast.dismiss(customToastId);
-                          const response = await removeContainer(
+                          const response = await removeTempContainer(
                             containerID,
                             sub
                           );
@@ -499,7 +503,7 @@ const EnvironmentTemplateWrapper = () => {
         clickOutsideToClose
         escToClose
         formStructure={updateEnvironmentFormStructure}
-        onClose={async ({ update_environment: data }, isEnter) => {
+        onClose={async ({ update_environment: data }: UpdateEnvironmentFormData, isEnter) => {
           const { update_internal: containerId } = data;
           if (containerId != "" && !isEnter) {
             // remove the temp container
@@ -511,7 +515,7 @@ const EnvironmentTemplateWrapper = () => {
             fetch();
           }
         }}
-        onEnter={async (data) => {
+        onEnter={async ({ update_environment: data }: UpdateEnvironmentFormData) => {
           const id = myToast.loading("Updating an environment...");
           const { name, description, update_internal: containerId } = data;
           const response = await updateEnvironment(
@@ -545,15 +549,15 @@ const EnvironmentTemplateWrapper = () => {
         setOpen={setTemplateCreateOpen}
         formStructure={templateCreateFormStructure}
         title="Create Template"
-        onEnter={async ({ create_template: data }) => {
+        onEnter={async ({ create_template: data }: CreateTemplateFormData) => {
           const toastId = myToast.loading("Creating a temporary workspace...");
           var selectedEnv = data.environment;
           const response = await addTempContainer(
             memory,
             CPU,
-            selectedEnv.imageId,
+            selectedEnv.id,
             sub,
-            "student"
+            "root"
           );
           myToast.dismiss(toastId);
           console.log(response);
@@ -584,7 +588,7 @@ const EnvironmentTemplateWrapper = () => {
                     onClick={async () => {
                       // cancel the build
                       myToast.dismiss(customToastId);
-                      const response = await removeContainer(containerID, sub);
+                      const response = await removeTempContainer(containerID, sub);
                       if (response.success)
                         console.log("remove temporary workspace", containerID);
                       else
@@ -608,7 +612,7 @@ const EnvironmentTemplateWrapper = () => {
                         data.name as string,
                         data.description as string,
                         sectionUserId,
-                        (data.environment as Option).id,
+                        data.environment.id,
                         "",
                         containerID as string,
                         false,
@@ -644,7 +648,7 @@ const EnvironmentTemplateWrapper = () => {
         setOpen={setTemplateUpdateOpen}
         formStructure={templateUpdateFormStructure}
         title="Update Template"
-        onClose={async ({ update_template: data }, isEnter) => {
+        onClose={async ({ update_template: data }: UpdateTemplateFormData, isEnter) => {
           const { update_internal: containerId } = data;
           if (containerId != "" && !isEnter) {
             // remove the temp container
@@ -656,7 +660,7 @@ const EnvironmentTemplateWrapper = () => {
             fetch();
           }
         }}
-        onEnter={async (data) => {
+        onEnter={async ({ update_template: data }: UpdateTemplateFormData) => {
           const id = myToast.loading("Updating the template...");
           const {
             name,
@@ -674,7 +678,7 @@ const EnvironmentTemplateWrapper = () => {
             sectionUserId,
             containerId,
             is_exam,
-            time_limit,
+            Number(time_limit),
             allow_notification
           );
           myToast.dismiss(id);
@@ -701,7 +705,7 @@ const Home = () => {
   const [sectionUserInfo, setSectionUserInfo] = useState<SectionUserInfo>(null);
   const [announceFormOpen, setAnnounceFormOpen] = useState<boolean>(false);
   const { getSectionUserInfo } = generalAPI;
-  const { sub, userId, reportIssue } = useCnails();
+  const { sub, userId } = useCnails();
   const fetchSectionUserInfo = async () => {
     const response = await getSectionUserInfo(sectionId, sub); //
 
@@ -787,7 +791,7 @@ const Home = () => {
         formStructure={getAnnouncementFormStructure()}
         clickOutsideToClose
         escToClose
-        onEnter={async ({ course_announcement: data }) => {
+        onEnter={async ({ course_announcement: data }: AnnouncementFormData) => {
           console.log(data);
           const response = await courseAPI.sendNotificationAnnouncement(
             data.allow_reply,

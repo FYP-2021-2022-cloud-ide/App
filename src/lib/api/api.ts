@@ -32,8 +32,10 @@ export type {
   FetchCookieResponse,
   GetUserDataResponse,
   Error,
+  ContainerType,
 };
 type SectionRole = "instructor" | "student";
+type ContainerType = "SANDBOX" | "TEMPORARY" | "TEMPLATE_WORKSPACE";
 type SuccessStringResponse = {
   success: boolean;
   error: Error;
@@ -166,10 +168,11 @@ type ContainerInfo = {
 };
 
 type Container = {
-  courseTitle: string;
-  assignmentName: string;
+  title: string;
+  subTitle: string;
   existedTime: string;
   containerID: string;
+  type:ContainerType;
 };
 
 type ContainerListResponse =
@@ -178,7 +181,6 @@ type ContainerListResponse =
       error: Error;
       containersInfo: ContainerInfo;
       containers: Container[];
-      tempContainers: Container[];
     }
   | {
       success: false;

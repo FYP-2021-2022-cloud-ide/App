@@ -42,6 +42,15 @@ function getEnvOptions(environments: Environment[]) {
   return options;
 }
 
+export type CreateEnvironmentFormData = {
+  create_environment: {
+    is_predefined: boolean,
+    environment_choice: Option,
+    name: string,
+    description: string,
+  }
+}
+
 export const getCreateEnvironmentFormStructure = (
   environments: Environment[]
 ): FormStructure => {
@@ -66,7 +75,7 @@ export const getCreateEnvironmentFormStructure = (
           label: "Pick the Programming Language",
           options: envChoices,
           conditional: (data) => {
-            return data.create_environment.is_predefined as boolean;
+            return (data as CreateEnvironmentFormData).create_environment.is_predefined;
           },
         },
         name: {
@@ -79,7 +88,7 @@ export const getCreateEnvironmentFormStructure = (
             if (
               environments
                 .map((e) => e.name)
-                .includes(data.create_environment.name)
+                .includes((data as CreateEnvironmentFormData).create_environment.name)
             )
               return { ok: false, message: "Name crash" };
             else return { ok: true };
@@ -94,6 +103,14 @@ export const getCreateEnvironmentFormStructure = (
     },
   };
 };
+
+export type UpdateEnvironmentFormData = {
+  update_environment: {
+    update_internal: string,
+    name: string,
+    description: string,
+  }
+}
 
 export const getUpdateEnvironmentFormStructure = (
   sub: string,
@@ -184,7 +201,7 @@ export const getUpdateEnvironmentFormStructure = (
               environments
                 .map((e) => e.name)
                 .filter((n) => n != targetEnvironment.name)
-                .includes(data.update_environment.name)
+                .includes((data as UpdateEnvironmentFormData).update_environment.name)
             )
               return { ok: false, message: "Name crash" };
             else return { ok: true };
@@ -199,6 +216,17 @@ export const getUpdateEnvironmentFormStructure = (
     },
   };
 };
+
+export type CreateTemplateFormData = {
+  create_template: {
+    environment: Option,
+    name: string,
+    description: string,
+    allow_notification: boolean,
+    is_exam: boolean,
+    time_limit: string
+  }
+}
 
 export const getCreateTemplateFormStructure = (
   templates: Template[],
@@ -271,13 +299,24 @@ export const getCreateTemplateFormStructure = (
           label: "Time Limit(in minutes) ",
           description: "Time Limit of the exam",
           conditional: (data) => {
-            return data.create_template.is_exam as boolean;
+            return (data as CreateTemplateFormData).create_template.is_exam as boolean;
           },
         },
       },
     },
   };
 };
+
+export type UpdateTemplateFormData = {
+  update_template: {
+    update_internal: string,
+    name: string,
+    description: string,
+    allow_notification: boolean,
+    is_exam: boolean,
+    time_limit: string
+  }
+}
 
 export const getUpdateTemplateFormStructure = (
   sub: string,
@@ -367,7 +406,7 @@ export const getUpdateTemplateFormStructure = (
               templates
                 .map((t) => t.name)
                 .filter((n) => n != targetTemplate.name)
-                .includes(data.update_template.name)
+                .includes((data as UpdateTemplateFormData).update_template.name)
             )
               return { ok: false, message: "Name crash" };
             else return { ok: true };
@@ -401,13 +440,20 @@ export const getUpdateTemplateFormStructure = (
           label: "Time Limit(in minutes) ",
           description: "Time Limit of the exam",
           conditional: (data) => {
-            return data.update_template.is_exam as boolean;
+            return (data as UpdateTemplateFormData).update_template.is_exam
           },
         },
       },
     },
   };
 };
+
+export type MessageReplyFormData = {
+  reply_message: {
+    target: string,
+    message: string,
+  }
+}
 
 export const getMessageReplyFormStructure = (
   targets: { id: string; sub: string; name: string }[]
@@ -430,6 +476,14 @@ export const getMessageReplyFormStructure = (
     },
   };
 };
+
+export type CreateSandboxFormData = {
+  create_sandbox: {
+    environment_choice: Option,
+    name: string,
+    description: string,
+  }
+}
 
 export const getCreateSandboxFormStructure = (
   sandboxes: SandboxImage[]
@@ -455,7 +509,7 @@ export const getCreateSandboxFormStructure = (
           label: "Name (Optional)",
           validate: (data) => {
             if (
-              sandboxes.map((s) => s.title).includes(data.create_sandbox.name)
+              sandboxes.map((s) => s.title).includes((data as CreateSandboxFormData).create_sandbox.name)
             )
               return { ok: false, message: "Name crash" };
             return { ok: true };
@@ -471,6 +525,14 @@ export const getCreateSandboxFormStructure = (
     },
   };
 };
+
+export type UpdateSandboxFormData = {
+  update_sandbox: {
+    update_environment: string,
+    name: string,
+    description: string,
+  }
+}
 
 export const getUpdateSandboxFormStructure = (
   sub: string,
@@ -559,7 +621,7 @@ export const getUpdateSandboxFormStructure = (
               sandboxes
                 .map((s) => s.title)
                 .filter((n) => n != targetSandbox.title)
-                .includes(data.update_sandbox.name)
+                .includes((data as UpdateSandboxFormData).update_sandbox.name)
             )
               return { ok: false, message: "Name crash" };
             return { ok: true };
@@ -575,6 +637,14 @@ export const getUpdateSandboxFormStructure = (
     },
   };
 };
+
+export type AnnouncementFormData = {
+  course_announcement: {
+    title: string,
+    announcement: string,
+    allow_reply: boolean,
+  }
+}
 
 export const getAnnouncementFormStructure = (): FormStructure => {
   return {

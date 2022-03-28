@@ -4,10 +4,10 @@ import { fetchAppSession } from "../../../lib/fetchAppSession";
 import { grpcClient } from "../../../lib/grpcClient";
 import {
   ListContainerReply,
-  SubRequest,
+  listContainerReply_Container_containerTypeToJSON,
 } from "../../../proto/dockerGet/dockerGet";
 // const { ListContainerReply, SubRequest } = dockerGet_pb;
-import { ContainerListResponse, nodeError } from "../../../lib/api/api";
+import { ContainerListResponse, nodeError,ContainerType } from "../../../lib/api/api";
 
 export default function handler(
   req: NextApiRequest,
@@ -17,16 +17,15 @@ export default function handler(
   const { sub } = req.query;
 
   try {
-    client.listContainers(
+    client.listAllContainers(
       {
         sessionKey: fetchAppSession(req),
         sub: sub as string,
       },
       function (err, GoLangResponse: ListContainerReply) {
-        console.log(GoLangResponse.containerInfo == undefined);
+        // console.log(GoLangResponse.containerInfo == undefined);
         var containersInfo = GoLangResponse.containerInfo;
         var containers = GoLangResponse.containers;
-        var tempContainers = GoLangResponse.tempContainers;
         res.json({
           success: GoLangResponse.success,
           error: {
@@ -39,22 +38,16 @@ export default function handler(
           },
           containers:
             containers.map((containers) => {
+              // console.log(listContainerReply_Container_containerTypeToJSON(containers.type))
               return {
-                courseTitle: containers.courseTitle,
-                assignmentName: containers.courseTitle,
+                title: containers.title,
+                subTitle: containers.subTitle,
                 existedTime: containers.existedTime,
                 containerID: containers.containerID,
+                type: listContainerReply_Container_containerTypeToJSON(containers.type) as ContainerType,
               };
             }) || [],
-          tempContainers:
-            tempContainers.map((containers) => {
-              return {
-                courseTitle: containers.courseTitle,
-                assignmentName: containers.assignmentName,
-                existedTime: containers.existedTime,
-                containerID: containers.containerID,
-              };
-            }) || [],
+          
         });
         res.status(200).end();
       }

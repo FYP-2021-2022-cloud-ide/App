@@ -2,7 +2,8 @@ import {
   TemplateListResponse ,
   TemplateAddResponse,
   TemplateGetStudentWorkspaceResponse,
-  SuccessStringResponse
+  SuccessStringResponse,
+  ContainerAddResponse ,
 } from "./api";
 
 const templateAPI = {
@@ -112,16 +113,47 @@ const templateAPI = {
   },
 
   getTemplateStudentWorkspace: async (
-    templateId: string,
-     section_user_id: string): Promise<TemplateGetStudentWorkspaceResponse>  => {
-    var res = await fetch("/api/template/getTemplateStudentWorkspace", {
-      method: "POST",
-      body: JSON.stringify({
-        templateId: templateId,
-        section_user_id: section_user_id,
-      }),
-    });
-    return res.json();
+      templateId: string,
+      section_user_id: string): Promise<TemplateGetStudentWorkspaceResponse>  => {
+      var res = await fetch("/api/template/getTemplateStudentWorkspace", {
+        method: "POST",
+        body: JSON.stringify({
+          templateId: templateId,
+          section_user_id: section_user_id,
+        }),
+      });
+      return res.json();
+    },
+    addTemplateContainer: async (
+      imageName: string,
+      memLimit: Number,
+      numCPU: Number,
+      section_user_id: string,
+      template_id: string,
+      accessRight: string,
+      useFresh: boolean): Promise<ContainerAddResponse> => {
+      var res = await fetch('/api/template/addTemplateContainer', {
+          method: 'POST',
+          body: JSON.stringify({
+              "imageName": imageName,
+              "memLimit": memLimit,
+              "numCPU": numCPU,
+              "section_user_id": section_user_id,
+              "template_id": template_id,
+              "accessRight": accessRight,
+              "useFresh": useFresh,
+          }),
+      })
+      return res.json()
+  },
+  removeTemplateContainer: async (containerId: string, sub: string) : Promise<SuccessStringResponse>=> {
+      var res = await fetch('/api/template/removeTemplateContainer?sub=' + sub, {
+          method: 'POST',
+          body: JSON.stringify({
+              "containerId": containerId
+          }),
+      })
+      return res.json()
   },
 };
 

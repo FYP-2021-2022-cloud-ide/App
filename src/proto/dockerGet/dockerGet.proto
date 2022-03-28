@@ -12,19 +12,18 @@ package dockerGet;
 service Docker {
   rpc checkHaveContainer(CheckHaveContainerRequest)returns( SuccessStringReply ){}
 
-  rpc listContainers(SubRequest)returns( ListContainerReply ){}
+  rpc listAllContainers(SubRequest)returns( ListContainerReply ){}
   rpc listCourses(SubRequest)returns( ListCoursesReply ){}
 
+  rpc getUserData(GetUserDataRequest)returns(GetUserDataReply){}
+  rpc updateUserData(UpdateUserDataRequest)returns(SuccessStringReply){}
   rpc getSectionInfo(SectionAndSubRequest)returns(GetSectionInfoReply){}
 
+  rpc addTempContainer(AddTempContainerRequest)returns(AddTempContainerReply){}
+  rpc removeTempContainer(RemoveTempContainerRequest)returns(SuccessStringReply){}
+  
   rpc listEnvironments(SectionAndSubRequest)returns(ListEnvironmentsReply){}
   rpc listTemplates(SectionAndSubRequest)returns(ListTemplatesReply){}
-
-  rpc addContainer(AddContainerRequest)returns(AddContainerReply){}
-  rpc instantAddContainer(InstantAddContainerRequest)returns(AddContainerReply){}
-  rpc removeContainer(RemoveContainerRequest)returns(SuccessStringReply){} 
-  rpc submitFiles(SubmitFilesRequest)returns(SuccessStringReply){} 
-  rpc getContainerTime(RemoveContainerRequest)returns(ContainerTimeReply){} 
 
   rpc addTemplate(AddTemplateRequest)returns(AddTemplateReply){}
   rpc updateTemplate(UpdateTemplateRequest)returns(SuccessStringReply){}
@@ -32,24 +31,23 @@ service Docker {
   rpc deactivateTemplate(TemplateIdRequest)returns(SuccessStringReply){}
   rpc removeTemplate(TemplateIdRequest)returns(SuccessStringReply){}
   rpc getTemplateStudentWorkspace(TemplateIdRequest)returns(TemplateGetStudentWorkspaceReply){}
+  rpc addTemplateContainer(AddContainerRequest)returns(AddContainerReply){}
+  rpc instantAddTemplateContainer(InstantAddContainerRequest)returns(AddContainerReply){}
+  rpc removeTemplateContainer(RemoveContainerRequest)returns(SuccessStringReply){} 
+  rpc submitTemplateFiles(SubmitFilesRequest)returns(SuccessStringReply){} 
+  rpc getTemplateContainerTime(RemoveContainerRequest)returns(ContainerTimeReply){} 
 
   rpc addEnvironment(AddEnvironmentRequest)returns(AddEnvironmentReply){}
   rpc updateEnvironment(UpdateEnvironmentRequest)returns(SuccessStringReply){}
   rpc buildEnvironment(BuildEnvironmentRequest)returns(AddEnvironmentReply){}
   rpc removeEnvironment(EnvironmentIdRequest)returns(SuccessStringReply){}
 
-  rpc addTempContainer(AddTempContainerRequest)returns(AddTempContainerReply){}
-  rpc removeTempContainer(RemoveTempContainerRequest)returns(SuccessStringReply){}
-  
   rpc addSandboxImage(AddSandBoxImageRequest)returns(AddSandBoxImageReply){}
   rpc updateSandboxImage(UpdateSandBoxImageRequest)returns(SuccessStringReply){}
   rpc removeSandboxImage(SandBoxImageIdRequest)returns(SuccessStringReply){}
   rpc listSandboxImage(ListSandBoxImageRequest)returns(ListSandBoxImageReply){}
   rpc addSandbox(AddSandBoxRequest)returns(AddSandBoxReply){}
   rpc removeSandbox(SandBoxIdRequest)returns(SuccessStringReply){}
-
-  rpc getUserData(GetUserDataRequest)returns(GetUserDataReply){}
-  rpc updateUserData(UpdateUserDataRequest)returns(SuccessStringReply){}
 
   rpc getNotificationToken(SubRequest)returns(GetNotificationTokenReply){}
   rpc sendNotification(SendNotificationRequest)returns(SendNotificationReply){}
@@ -138,13 +136,18 @@ message ListContainerReply{
   ContainersInfo containerInfo=2;
 
   message Container {
-    string courseTitle =1;
-    string assignmentName   =2;
+    string title =1;
+    string subTitle   =2;
     string existedTime  =3; 
     string containerID   =4;
+    enum CONTAINER_TYPE{
+      TEMPORARY = 0;
+      TEMPLATE_WORKSPACE = 1;
+      SANDBOX = 2;
+    }
+    CONTAINER_TYPE type=6;
   }
 	repeated Container containers=3;
-  repeated Container tempContainers=5;
 }
 
 message ListCoursesReply {

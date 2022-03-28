@@ -37,9 +37,11 @@ import { String } from "lodash";
 
 const SESSION_VALID_FOR = 8 * 60 * 60 * 1000;
 const ID_LENGTH = 36;
-const client = redis.createClient(
-  parseInt(process.env.REDIS_PORT!, 10),
-  process.env.REDIS_HOST
+
+console.log(process.env.REDISHOST);
+export const redisClient = redis.createClient(
+  process.env.REDISHOST.split(":")[1],
+  process.env.REDISHOST.split(":")[0]
 );
 
 app.prepare().then(() => {
@@ -95,7 +97,7 @@ app.prepare().then(() => {
               .update(sid)
               .digest()
               .toString("base64");
-            client.get(key, (err, data) => {
+            redisClient.get(key, (err, data) => {
               if (err) return callback(err);
               if (!data) return callback(null);
 
@@ -114,7 +116,7 @@ app.prepare().then(() => {
               .update(sid)
               .digest()
               .toString("base64");
-            client.set(key, JSON.stringify(data), "EX", 86400, callback);
+            redisClient.set(key, JSON.stringify(data), "EX", 86400, callback);
             // client.expire(key, 86400)
           },
           destroy: (sid, callback) => {
@@ -123,7 +125,7 @@ app.prepare().then(() => {
               .update(sid)
               .digest()
               .toString("base64");
-            client.del(key, callback);
+            redisClient.del(key, callback);
           },
         },
         absoluteDuration: SESSION_VALID_FOR,
@@ -300,7 +302,7 @@ app.prepare().then(() => {
           templateId: req.params.templateID,
           sessionKey: key,
         };
-        client.instantAddContainer(
+        client.instantAddTemplateContainer(
           docReq,
           function (err, GoLangResponse: AddContainerReply) {
             if (!GoLangResponse.success) {

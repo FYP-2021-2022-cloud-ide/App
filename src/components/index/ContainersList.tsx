@@ -10,12 +10,18 @@ type Props = {
 };
 
 const ContainersList = () => {
-  const { sub, containers, containerInfo, fetchContainers, containerQuota } =
-    useCnails();
+  const {
+    sub,
+    userId,
+    containers,
+    containerInfo,
+    fetchContainers,
+    containerQuota,
+  } = useCnails();
   useEffect(() => {
-    fetchContainers(sub);
+    fetchContainers(sub, userId);
   }, []);
-  const numActiveContainers = containerInfo ? containerInfo.containersAlive : 0;
+  const numActiveContainers = containerInfo ? containers.length : 0;
   const quota = containerQuota;
 
   var percentage = (numActiveContainers / quota) * 100;
@@ -47,15 +53,11 @@ const ContainersList = () => {
             id="container-list-grid"
           >
             {containers.sort().map((container, i) => {
-              const { containerID, courseTitle, assignmentName, existedTime } =
-                container;
+              const { containerID } = container;
               return (
                 <ContainerCard
                   key={containerID}
-                  courseTitle={courseTitle}
-                  containerName={assignmentName}
-                  existedTime={existedTime}
-                  containerID={containerID}
+                  {...container}
                   zIndex={containers.length - i}
                 ></ContainerCard>
               );
