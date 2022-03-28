@@ -38,3 +38,9 @@ export default function handler(
     });
   }
 }
+
+export const config = {
+  api: {
+    externalResolver: true
+  }
+}

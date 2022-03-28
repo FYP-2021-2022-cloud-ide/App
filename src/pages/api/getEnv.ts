@@ -16,3 +16,9 @@ export default async function handler(
     })
     res.status(200).end();   
 }
+
+export const config = {
+  api: {
+    externalResolver: true
+  }
+}

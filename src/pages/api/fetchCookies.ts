@@ -5,7 +5,6 @@ import { parse } from "cookie";
 import crypto from "crypto";
 
 import { FetchCookieResponse } from "../../lib/api/api";
-import { redisClient } from "../../server";
 
 export default function handler(
   req: NextApiRequest,
@@ -46,3 +45,9 @@ export default function handler(
     res.status(405).end();
   }
 }
+
+export const config = {
+  api: {
+    externalResolver: true,
+  },
+};

@@ -39,7 +39,7 @@ const SESSION_VALID_FOR = 8 * 60 * 60 * 1000;
 const ID_LENGTH = 36;
 
 console.log(process.env.REDISHOST);
-export const redisClient = redis.createClient(
+const redisClient = redis.createClient(
   process.env.REDISHOST.split(":")[1],
   process.env.REDISHOST.split(":")[0]
 );

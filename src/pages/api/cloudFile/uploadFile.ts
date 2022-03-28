@@ -91,3 +91,8 @@ async function ensureDirectoryExistence(filePath) {
     }
 }
 
+// export const config = {
+//     api: {
+//       externalResolver: true
+//     }
+//   }
