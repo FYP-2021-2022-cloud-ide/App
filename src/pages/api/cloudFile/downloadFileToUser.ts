@@ -75,3 +75,9 @@ const addFilesFromDirectoryToZip = (directoryPath:string= "",rootPath:string, zi
     }
   });
 };
+
+export const config = {
+  api: {
+    externalResolver: true
+  }
+}

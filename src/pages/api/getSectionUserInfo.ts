@@ -51,3 +51,9 @@ export default async function handler(
     res.status(405).end();
   }
 }
+
+export const config = {
+  api: {
+    externalResolver: true
+  }
+}

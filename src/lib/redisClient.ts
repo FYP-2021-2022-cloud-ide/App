@@ -1,8 +1,6 @@
-import redis from "redis";
+import ioredis from "ioredis";
 
-export const client = redis.createClient({
-  url: `redis://${process.env.REDIS_HOST}:${parseInt(
-    process.env.REDIS_PORT!,
-    10
-  )}`,
+export const redisClient = new ioredis({
+  port: Number(process.env.REDISHOST.split(":")[1]),
+  host: process.env.REDISHOST.split(":")[0],
 });
