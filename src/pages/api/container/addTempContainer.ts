@@ -10,27 +10,52 @@ import {
   AddTempContainerReply,
   AddTempContainerRequest,
 } from "../../../proto/dockerGet/dockerGet";
+import { getCookie } from "../../../lib/cookiesHelper";
+import redisHelper, { eventToContainerType } from "../../../lib/redisHelper";
 
-export default function handler(
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ContainerAddResponse>
 ) {
-  var client = grpcClient;
-
-  const { sub } = req.query;
-  const { memLimit, numCPU, imageName, accessRight } = JSON.parse(req.body);
+  const {
+    memLimit,
+    numCPU,
+    imageId: imageName,
+    accessRight,
+    event,
+    title,
+    sub,
+  } = JSON.parse(req.body);
   var docReq: AddTempContainerRequest = AddTempContainerRequest.fromPartial({
     sessionKey: fetchAppSession(req),
     accessRight: accessRight,
     memLimit: memLimit,
     numCPU: numCPU,
     imageName: imageName,
-    sub: sub as string,
+    sub: sub,
   });
+  const userId = getCookie(req.headers.cookie, "userId");
+  const patch = ((event == "ENV_CREATE" ||
+    event == "TEMPLATE_CREATE" ||
+    event == "SANDBOX_CREATE") && {
+    cause: event,
+    title: title,
+  }) || {
+    cause: event,
+    id: imageName,
+    title: title,
+  };
   try {
-    client.addTempContainer(
+    await redisHelper.insert.createWorkspace(userId, patch);
+    grpcClient.addTempContainer(
       docReq,
-      function (err, GoLangResponse: AddTempContainerReply) {
+      async function (err, GoLangResponse: AddTempContainerReply) {
+        await redisHelper.insert.patchCreatedWorkspace(userId, {
+          id: GoLangResponse.tempContainerId,
+          type: eventToContainerType(event),
+          isTemporary: true,
+          createData: patch,
+        });
         res.json({
           success: GoLangResponse.success,
           error: {
@@ -43,16 +68,19 @@ export default function handler(
       }
     );
   } catch (error) {
+    console.error(error.stack);
     res.json({
       success: false,
       error: nodeError(error),
     });
     res.status(405).end();
+  } finally {
+    await redisHelper.remove.createWorkspace(userId, patch);
   }
 }
 
 export const config = {
   api: {
-    externalResolver: true
-  }
-}
+    externalResolver: true,
+  },
+};

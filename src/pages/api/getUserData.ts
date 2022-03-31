@@ -44,7 +44,7 @@ export default async function handler(
       }
     );
   } catch (error) {
-    //@ts-ignore
+    console.error(error.stack);
     res.json({
       success: false,
       error: nodeError(error),
@@ -55,6 +55,6 @@ export default async function handler(
 
 export const config = {
   api: {
-    externalResolver: true
-  }
-}
+    externalResolver: true,
+  },
+};

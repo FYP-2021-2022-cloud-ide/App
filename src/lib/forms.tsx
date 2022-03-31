@@ -9,13 +9,13 @@ import { errorToToastDescription } from "./errorHelper";
 import { CLICK_TO_REPORT } from "./constants";
 
 const registry = process.env.NEXT_PUBLIC_REGISTRY;
-const rootImage = `${registry}/codeserver:latest`;
-const CPU = 0.5;
-const memory = 800;
+export const rootImage = `${registry}/codeserver:latest`;
+export const CPU = 0.5;
+export const memory = 1000;
 const envChoices = [
-  { value: "C++/C", id: `${registry}/cpp:latest` },
-  { value: "Python3", id: `${registry}/python3:latest` },
-  { value: "Java", id: `${registry}/java:latest` },
+  { id: "", value: "C++/C", imageId: `${registry}/cpp:latest` },
+  { id: "", value: "Python3", imageId: `${registry}/python3:latest` },
+  { id: "", value: "Java", imageId: `${registry}/java:latest` },
 ];
 
 export const getValidName = (
@@ -133,7 +133,7 @@ export const getUpdateEnvironmentFormStructure = (
           defaultValue: "",
           label: "Update internal",
           tooltip: "Open a temp workspace for you to update the environment.",
-          node: (onChange, currentValue) => {
+          node: (onChange, currentValue, formData) => {
             const { addTempContainer } = containerAPI;
             return (
               <div>
@@ -157,12 +157,15 @@ export const getUpdateEnvironmentFormStructure = (
                       const btn = e.currentTarget;
                       btn.classList.add("loading");
                       btn.textContent = "Loading";
+                      const { update_environment: { name } } = formData as UpdateEnvironmentFormData
                       const response = await addTempContainer(
                         memory,
                         CPU,
                         targetEnvironment.imageId,
                         sub,
-                        "root"
+                        "root",
+                        "ENV_UPDATE",
+                        name ,
                       );
                       btn.classList.remove("loading");
                       btn.textContent = "Click me";
@@ -338,7 +341,14 @@ export const getUpdateTemplateFormStructure = (
           defaultValue: "",
           label: "Update internal",
           tooltip: "Open a temp workspace for you to update the template.",
-          node: (onChange, currentValue) => {
+          validate: (data) => {
+            if ((data as UpdateTemplateFormData).update_template.update_internal == "loading") {
+              return { ok: false, message: "temporary workspace is creating..." }
+            } else {
+              return { ok: true }
+            }
+          },
+          node: (onChange, currentValue, formData) => {
             const { addTempContainer } = containerAPI;
             return (
               <div>
@@ -362,13 +372,18 @@ export const getUpdateTemplateFormStructure = (
                       const btn = e.currentTarget;
                       btn.classList.add("loading");
                       btn.textContent = "Loading";
+                      onChange("loading")
+                      const { update_template: { name } } = formData as UpdateTemplateFormData
                       const response = await addTempContainer(
                         memory,
                         CPU,
                         targetTemplate.imageId,
                         sub,
-                        "root"
+                        "root",
+                        "TEMPLATE_UPDATE",
+                        name ,
                       );
+                      console.log(response)
                       btn.classList.remove("loading");
                       btn.textContent = "Click me";
                       if (response.success) {
@@ -553,7 +568,7 @@ export const getUpdateSandboxFormStructure = (
           defaultValue: "",
           tooltip:
             "If you need to update the environment of your workspace, click the button below. You will be prompt to a temporary environment to set up your workspace.",
-          node: (onChange, currentValue) => {
+          node: (onChange, currentValue, formData) => {
             const { addTempContainer } = containerAPI;
             return (
               <div>
@@ -577,12 +592,15 @@ export const getUpdateSandboxFormStructure = (
                       const btn = e.currentTarget;
                       btn.classList.add("loading");
                       btn.textContent = "Loading";
+                      const { update_sandbox: { name } } = formData as UpdateSandboxFormData
                       const response = await addTempContainer(
                         memory,
                         CPU,
                         targetSandbox.imageId,
                         sub,
-                        "root"
+                        "root",
+                        "SANDBOX_UPDATE",
+                        name
                       );
                       btn.classList.remove("loading");
                       btn.textContent = "Click me";

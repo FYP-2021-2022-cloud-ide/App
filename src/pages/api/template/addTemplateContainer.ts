@@ -7,13 +7,13 @@ import {
   AddContainerRequest,
 } from "../../../proto/dockerGet/dockerGet";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
+import { getCookie } from "../../../lib/cookiesHelper";
+import redisHelper from "../../../lib/redisHelper";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ContainerAddResponse>
 ) {
-  var client = grpcClient;
-
   const {
     imageName,
     memLimit,
@@ -22,8 +22,9 @@ export default async function handler(
     template_id,
     accessRight,
     useFresh,
-  } = JSON.parse(req.body); //console.log(body)
-
+    title,
+  } = JSON.parse(req.body);
+  const userId = getCookie(req.headers.cookie, "userId");
   var docReq: AddContainerRequest = AddContainerRequest.fromPartial({
     sessionKey: fetchAppSession(req),
     imageName: imageName,
@@ -35,9 +36,24 @@ export default async function handler(
     useFresh: useFresh,
   });
   try {
-    client.addTemplateContainer(
+    await redisHelper.insert.createWorkspace(userId, {
+      cause: "TEMPLATE_START_WORKSPACE",
+      id: template_id,
+      title: title,
+    });
+    grpcClient.addTemplateContainer(
       docReq,
-      function (err, GoLangResponse: AddContainerReply) {
+      async function (err, GoLangResponse: AddContainerReply) {
+        await redisHelper.insert.patchCreatedWorkspace(userId, {
+          id: GoLangResponse.containerID,
+          type: "TEMPLATE",
+          isTemporary: false,
+          createData: {
+            cause: "TEMPLATE_START_WORKSPACE",
+            id: template_id,
+            title: title,
+          },
+        });
         res.json({
           success: GoLangResponse.success,
           error: {
@@ -50,16 +66,23 @@ export default async function handler(
       }
     );
   } catch (error) {
+    console.error(error.stack);
     res.json({
       success: false,
       error: nodeError(error),
     });
     res.status(405).end();
+  } finally {
+    await redisHelper.remove.createWorkspace(userId, {
+      cause: "TEMPLATE_START_WORKSPACE",
+      id: template_id,
+      title: title,
+    });
   }
 }
 
 export const config = {
   api: {
-    externalResolver: true
-  }
-}
+    externalResolver: true,
+  },
+};

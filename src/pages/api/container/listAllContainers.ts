@@ -4,25 +4,31 @@ import { fetchAppSession } from "../../../lib/fetchAppSession";
 import { grpcClient } from "../../../lib/grpcClient";
 import {
   ListContainerReply,
+  ListContainerReply_Container_containerType,
   listContainerReply_Container_containerTypeToJSON,
 } from "../../../proto/dockerGet/dockerGet";
 // const { ListContainerReply, SubRequest } = dockerGet_pb;
-import { ContainerListResponse, nodeError,ContainerType } from "../../../lib/api/api";
+import {
+  ContainerListResponse,
+  nodeError,
+  ContainerType,
+} from "../../../lib/api/api";
+import redisHelper from "../../../lib/redisHelper";
+import { getCookie } from "../../../lib/cookiesHelper";
 
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<ContainerListResponse>
 ) {
-  var client = grpcClient;
-  const { sub } = req.query;
-
   try {
-    client.listAllContainers(
+    const { sub } = req.query;
+    const userId = getCookie(req.headers.cookie, "userId");
+    grpcClient.listAllContainers(
       {
         sessionKey: fetchAppSession(req),
         sub: sub as string,
       },
-      function (err, GoLangResponse: ListContainerReply) {
+      async function (err, GoLangResponse: ListContainerReply) {
         // console.log(GoLangResponse.containerInfo == undefined);
         var containersInfo = GoLangResponse.containerInfo;
         var containers = GoLangResponse.containers;
@@ -36,23 +42,37 @@ export default function handler(
             containersAlive: containersInfo?.containersAlive,
             containersTotal: containersInfo?.containersTotal,
           },
-          containers:
-            containers.map((containers) => {
+
+          containers: await redisHelper.patch.workspaces(
+            userId,
+            containers.map((container) => {
               // console.log(listContainerReply_Container_containerTypeToJSON(containers.type))
               return {
-                title: containers.title,
-                subTitle: containers.subTitle,
-                existedTime: containers.existedTime,
-                containerID: containers.containerID,
-                type: listContainerReply_Container_containerTypeToJSON(containers.type) as ContainerType,
+                title: container.title,
+                subTitle: container.subTitle,
+                startAt: container.existedTime,
+                containerID: container.containerID,
+                type:
+                  (container.type ==
+                    ListContainerReply_Container_containerType.SANDBOX &&
+                    "SANDBOX") ||
+                  (container.type ==
+                    ListContainerReply_Container_containerType.TEMPLATE_WORKSPACE &&
+                    "TEMPLATE") ||
+                  undefined,
+                sourceId: "",
+                isTemporary:
+                  container.type ==
+                  ListContainerReply_Container_containerType.TEMPORARY,
               };
-            }) || [],
-          
+            })
+          ),
         });
         res.status(200).end();
       }
     );
   } catch (error) {
+    console.error(error.stack);
     res.json({
       success: false,
       error: nodeError(error),
@@ -63,6 +83,6 @@ export default function handler(
 
 export const config = {
   api: {
-    externalResolver: true
-  }
-}
+    externalResolver: true,
+  },
+};

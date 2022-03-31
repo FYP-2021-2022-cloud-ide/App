@@ -42,6 +42,26 @@ const ID_LENGTH = 36;
 console.log(process.env.REDISHOST);
 
 app.prepare().then(() => {
+  var stream = redisClient.scanStream({ match: "ServerState:*", count: 100 });
+  var pipeline = redisClient.pipeline();
+  stream.on("data", function (keys) {
+    for (let i = 0; i < keys.length; i++) {
+      pipeline.del(keys[i]);
+    }
+    pipeline.exec(() => {
+      console.log("Redis stream: Removing UI server state...");
+    });
+  });
+  stream.on("end", () => {
+    console.log(
+      "Redis stream: Finishing removing UI server state. Closing the stream."
+    );
+    stream.close();
+  });
+  stream.on("error", (error) => {
+    console.log("Fail to remove UI server state : ", error);
+  });
+
   var server = express();
   var httpServer = http.createServer(server);
 

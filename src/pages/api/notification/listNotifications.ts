@@ -33,7 +33,13 @@ export default function handler(
             error: GoLangResponse.error?.error,
           },
           notifications: nts.map((nt) => {
-            // console.log(nts)
+            // let newBody=
+            // nt.body.slice(0,nt.body.indexOf("Code: ")+6)
+            // +"\n```js"+
+            // nt.body.slice(nt.body.indexOf("Code: ")+6,nt.body.indexOf("Comment"))+
+            // "```\n"+
+            // nt.body.slice(nt.body.indexOf("Comment"))
+            console.log(nt.body);
             var sender = nt.sender;
             return {
               id: nt.id,
@@ -45,10 +51,10 @@ export default function handler(
                 name: sender!.name,
               },
               allow_reply: nt.allowReply,
-              read:nt.read,
-              courseCode:nt.courseCode,
-              sectionCode:nt.sectionCode,
-              section_id:nt.sectionId,
+              read: nt.read,
+              courseCode: nt.courseCode,
+              sectionCode: nt.sectionCode,
+              section_id: nt.sectionId,
               sentAt: nt.sentAt,
             };
           }),
@@ -57,6 +63,7 @@ export default function handler(
       }
     );
   } catch (error) {
+    console.error(error.stack);
     res.json({
       success: false,
       error: nodeError(error),
@@ -67,6 +74,6 @@ export default function handler(
 
 export const config = {
   api: {
-    externalResolver: true
-  }
-}
+    externalResolver: true,
+  },
+};

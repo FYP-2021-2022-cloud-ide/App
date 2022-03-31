@@ -9,15 +9,16 @@ import {
   SuccessStringReply,
   UpdateEnvironmentRequest,
 } from "../../../proto/dockerGet/dockerGet";
+import { getCookie } from "../../../lib/cookiesHelper";
+import redisHelper from "../../../lib/redisHelper";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SuccessStringResponse>
 ) {
-  var client = grpcClient;
-  const { envId, name, section_user_id, containerId, description } = JSON.parse(
-    req.body
-  );
+  const { envId, name, section_user_id, containerId, description, sectionId } =
+    JSON.parse(req.body);
+  const userId = getCookie(req.headers.cookie, "userId");
 
   var docReq = UpdateEnvironmentRequest.fromPartial({
     sessionKey: fetchAppSession(req),
@@ -28,7 +29,13 @@ export default async function handler(
     description: description,
   });
   try {
-    client.updateEnvironment(
+    await redisHelper.insert.updateEnvironment(sectionId, {
+      title: name,
+      description: description,
+      id: envId,
+      updatedBy: userId,
+    });
+    grpcClient.updateEnvironment(
       docReq,
       function (err, GoLangResponse: SuccessStringReply) {
         res.json({
@@ -42,16 +49,24 @@ export default async function handler(
       }
     );
   } catch (error) {
+    console.error(error.stack);
     res.json({
       success: false,
       error: nodeError(error),
     });
     res.status(405).end();
+  } finally {
+    await redisHelper.remove.updateEnvironment(sectionId, {
+      title: name,
+      description: description,
+      id: envId,
+      updatedBy: userId,
+    });
   }
 }
 
 export const config = {
   api: {
-    externalResolver: true
-  }
-}
+    externalResolver: true,
+  },
+};

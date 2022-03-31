@@ -10,21 +10,29 @@ import {
   SuccessStringReply,
   TemplateIdRequest,
 } from "../../../proto/dockerGet/dockerGet";
+import redisHelper from "../../../lib/redisHelper";
+import { getCookie } from "../../../lib/cookiesHelper";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SuccessStringResponse>
 ) {
-  var client = grpcClient;
-  const { templateId, section_user_id } = JSON.parse(req.body);
-
+  const { templateId, section_user_id, sectionId, title, description } =
+    JSON.parse(req.body);
+  const userId = getCookie(req.headers.cookie, "userId");
   var docReq = TemplateIdRequest.fromPartial({
     sessionKey: fetchAppSession(req),
     templateID: templateId,
     sectionUserId: section_user_id,
   });
   try {
-    client.activateTemplate(
+    await redisHelper.insert.updateTemplate(sectionId, {
+      title: title,
+      description: description,
+      id: templateId,
+      updatedBy: userId,
+    });
+    grpcClient.activateTemplate(
       docReq,
       function (err, GoLangResponse: SuccessStringReply) {
         res.json({
@@ -38,16 +46,24 @@ export default async function handler(
       }
     );
   } catch (error) {
+    console.error(error.stack);
     res.json({
       success: false,
       error: nodeError(error),
     });
     res.status(405).end();
+  } finally {
+    await redisHelper.remove.updateTemplate(sectionId, {
+      title: title,
+      description: description,
+      id: templateId,
+      updatedBy: userId,
+    });
   }
 }
 
 export const config = {
   api: {
-    externalResolver: true
-  }
-}
+    externalResolver: true,
+  },
+};

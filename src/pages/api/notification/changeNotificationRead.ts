@@ -16,7 +16,7 @@ export default function handler(
   res: NextApiResponse<SuccessStringResponse>
 ) {
   var client = grpcClient;
-  const { userId, notificationIds ,read} = JSON.parse(req.body);
+  const { userId, notificationIds, read } = JSON.parse(req.body);
   // console.log(notificationIds)
   var docReq = ChangeNotificationReadRequest.fromPartial({
     sessionKey: fetchAppSession(req),
@@ -43,6 +43,7 @@ export default function handler(
       }
     );
   } catch (error) {
+    console.error(error.stack);
     res.json({
       success: false,
       error: nodeError(error),
@@ -53,6 +54,6 @@ export default function handler(
 
 export const config = {
   api: {
-    externalResolver: true
-  }
-}
+    externalResolver: true,
+  },
+};

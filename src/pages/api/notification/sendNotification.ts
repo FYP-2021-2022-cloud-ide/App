@@ -16,7 +16,9 @@ export default function handler(
   res: NextApiResponse<NotificationSendResponse>
 ) {
   var client = grpcClient;
-  const { title, body, sender, receiver, allowReply,sectionId } = JSON.parse(req.body);
+  const { title, body, sender, receiver, allowReply, sectionId } = JSON.parse(
+    req.body
+  );
   var docReq = SendNotificationRequest.fromPartial({
     sessionKey: fetchAppSession(req),
     title: title,
@@ -24,7 +26,7 @@ export default function handler(
     sender: sender,
     receiver: receiver,
     allowReply: allowReply,
-    sectionId:sectionId,
+    sectionId: sectionId,
   });
   try {
     client.sendNotification(
@@ -43,6 +45,7 @@ export default function handler(
       }
     );
   } catch (error) {
+    console.error(error.stack);
     res.json({
       success: false,
       error: nodeError(error),
@@ -53,6 +56,6 @@ export default function handler(
 
 export const config = {
   api: {
-    externalResolver: true
-  }
-}
+    externalResolver: true,
+  },
+};

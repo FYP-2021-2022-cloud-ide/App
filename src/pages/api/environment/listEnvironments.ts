@@ -2,9 +2,11 @@
 //remember to set the ownership after adding new api
 import type { NextApiRequest, NextApiResponse } from "next";
 import { EnvironmentListResponse, nodeError } from "../../../lib/api/api";
+import { getCookie } from "../../../lib/cookiesHelper";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 
 import { grpcClient } from "../../../lib/grpcClient";
+import redisHelper from "../../../lib/redisHelper";
 import {
   ListEnvironmentsReply,
   SectionAndSubRequest,
@@ -16,7 +18,7 @@ export default async function handler(
 ) {
   var client = grpcClient;
   const { sectionid, sub } = req.query;
-
+  const userId = getCookie(req.headers.cookie, "userId");
   var docReq = SectionAndSubRequest.fromPartial({
     sessionKey: fetchAppSession(req),
     sectionID: sectionid as string,
@@ -26,7 +28,7 @@ export default async function handler(
   try {
     client.listEnvironments(
       docReq,
-      function (err, GoLangResponse: ListEnvironmentsReply) {
+      async function (err, GoLangResponse: ListEnvironmentsReply) {
         var envs = GoLangResponse.environments;
         res.json({
           success: GoLangResponse.success,
@@ -34,7 +36,8 @@ export default async function handler(
             status: GoLangResponse.error?.status,
             error: GoLangResponse.error?.error,
           },
-          environments:
+          environments: await redisHelper.patch.environments(
+            sectionid as string,
             envs.map((env) => {
               return {
                 id: env.id,
@@ -43,12 +46,14 @@ export default async function handler(
                 libraries: env.libraries,
                 description: env.description,
               };
-            }) || [],
+            })
+          ),
         });
         res.status(200).end();
       }
     );
   } catch (error) {
+    console.error(error.stack);
     res.json({
       success: false,
       error: nodeError(error),
@@ -59,6 +64,6 @@ export default async function handler(
 
 export const config = {
   api: {
-    externalResolver: true
-  }
-}
+    externalResolver: true,
+  },
+};

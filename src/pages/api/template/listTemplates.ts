@@ -5,6 +5,7 @@ import { TemplateListResponse, nodeError } from "../../../lib/api/api";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 
 import { grpcClient } from "../../../lib/grpcClient";
+import redisHelper from "../../../lib/redisHelper";
 import {
   ListTemplatesReply,
   SectionAndSubRequest,
@@ -14,7 +15,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<TemplateListResponse>
 ) {
-  var client = grpcClient;
   const { sub, sectionid } = req.query;
   var docReq = SectionAndSubRequest.fromPartial({
     sessionKey: fetchAppSession(req),
@@ -23,9 +23,9 @@ export default async function handler(
   });
 
   try {
-    client.listTemplates(
+    grpcClient.listTemplates(
       docReq,
-      function (err, GoLangResponse: ListTemplatesReply) {
+      async function (err, GoLangResponse: ListTemplatesReply) {
         var templates = GoLangResponse.templates;
         res.json({
           success: GoLangResponse.success,
@@ -33,7 +33,8 @@ export default async function handler(
             status: GoLangResponse.error?.status,
             error: GoLangResponse.error?.error,
           },
-          templates:
+          templates: await redisHelper.patch.templates(
+            sectionid as string,
             templates.map((t) => {
               return {
                 id: t.id,
@@ -49,12 +50,14 @@ export default async function handler(
                 allow_notification: t.allowNotification,
                 containerID: t.ContainerId[0],
               };
-            }) || [],
+            })
+          ),
         });
         res.status(200).end();
       }
     );
   } catch (error) {
+    console.error(error.stack);
     res.json({
       success: false,
       error: nodeError(error),
@@ -65,6 +68,6 @@ export default async function handler(
 
 export const config = {
   api: {
-    externalResolver: true
-  }
-}
+    externalResolver: true,
+  },
+};

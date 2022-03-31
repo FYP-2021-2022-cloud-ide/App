@@ -10,23 +10,26 @@ import {
   SuccessStringReply,
   SandBoxIdRequest,
 } from "../../../proto/dockerGet/dockerGet";
+import redisHelper from "../../../lib/redisHelper";
 
-export default function handler(
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SuccessStringResponse>
 ) {
-  var client = grpcClient;
-
   const { sandboxId, userId } = JSON.parse(req.body);
-  var docReq = SandBoxIdRequest.fromPartial({
-    sessionKey: fetchAppSession(req),
-    sandBoxId: sandboxId,
-    userId: userId,
-  });
   try {
-    client.removeSandbox(
+    await redisHelper.insert.removeWorkspace(userId, {
+      id: sandboxId,
+    });
+    var docReq = SandBoxIdRequest.fromPartial({
+      sessionKey: fetchAppSession(req),
+      sandBoxId: sandboxId,
+      userId: userId,
+    });
+    grpcClient.removeSandbox(
       docReq,
-      function (err, GoLangResponse: SuccessStringReply) {
+      async function (err, GoLangResponse: SuccessStringReply) {
+        await redisHelper.remove.patchedWorkspace(userId, sandboxId);
         res.json({
           success: GoLangResponse.success,
           error: {
@@ -38,16 +41,21 @@ export default function handler(
       }
     );
   } catch (error) {
+    console.error(error.stack);
     res.json({
       success: false,
       error: nodeError(error),
     });
     res.status(405).end();
+  } finally {
+    await redisHelper.remove.removeWorkspace(userId, {
+      id: sandboxId,
+    });
   }
 }
 
 export const config = {
   api: {
-    externalResolver: true
-  }
-}
+    externalResolver: true,
+  },
+};

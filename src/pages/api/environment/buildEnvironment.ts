@@ -9,23 +9,17 @@ import {
 } from "../../../proto/dockerGet/dockerGet";
 import { grpcClient } from "../../../lib/grpcClient";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
+import { getCookie } from "../../../lib/cookiesHelper";
+import redisHelper from "../../../lib/redisHelper";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<EnvironmentAddResponse>
 ) {
   var client = grpcClient;
-  const { name, section_user_id, containerId, description } = JSON.parse(
-    req.body
-  );
-  // if (section_user_id != undefined && containerId != undefined){
-  //   {/* @ts-ignore */}
-  //   if(!(await checkInSectionBySectionUserId(req.oidc.user.sub, section_user_id)) || !(await checkHaveContainer(containerId, req.oidc.user.sub)) || !(await checkRoleBySectionUserId(req.oidc.user.sub, section_user_id, "instructor")))
-  //   {res.json(unauthorized()); return;}
-  // }else{
-  //   res.json(unauthorized())
-  //   return
-  // }
+  const { name, section_user_id, containerId, description, sectionId } =
+    JSON.parse(req.body);
+  const userId = getCookie(req.headers.cookie, "userId");
   var docReq = BuildEnvironmentRequest.fromPartial({
     sessionKey: fetchAppSession(req),
     name: name,
@@ -35,6 +29,11 @@ export default async function handler(
   });
 
   try {
+    await redisHelper.insert.createEnvironment(sectionId, {
+      title: name,
+      description: description,
+      createdBy: userId,
+    });
     client.buildEnvironment(
       docReq,
       function (err, GoLangResponse: AddEnvironmentReply) {
@@ -50,16 +49,23 @@ export default async function handler(
       }
     );
   } catch (error) {
+    console.error(error.stack);
     res.json({
       success: false,
       error: nodeError(error),
     });
     res.status(405).end();
+  } finally {
+    await redisHelper.remove.createEnvironment(sectionId, {
+      title: name,
+      description: description,
+      createdBy: userId,
+    });
   }
 }
 
 export const config = {
   api: {
-    externalResolver: true
-  }
-}
+    externalResolver: true,
+  },
+};

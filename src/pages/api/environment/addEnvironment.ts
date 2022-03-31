@@ -9,16 +9,16 @@ import {
   AddEnvironmentReply,
   AddEnvironmentRequest,
 } from "../../../proto/dockerGet/dockerGet";
+import { getCookie } from "../../../lib/cookiesHelper";
+import redisHelper from "../../../lib/redisHelper";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<EnvironmentAddResponse>
 ) {
-  var client = grpcClient;
-  const { libraries, name, section_user_id, description } = JSON.parse(
-    req.body
-  );
-
+  const { libraries, name, section_user_id, description, sectionId } =
+    JSON.parse(req.body);
+  const userId = getCookie(req.headers.cookie, "userId");
   var docReq = AddEnvironmentRequest.fromPartial({
     sessionKey: fetchAppSession(req),
     libraries: libraries,
@@ -27,7 +27,12 @@ export default async function handler(
     description: description,
   });
   try {
-    client.addEnvironment(
+    await redisHelper.insert.createEnvironment(sectionId, {
+      title: name,
+      description: description,
+      createdBy: userId,
+    });
+    grpcClient.addEnvironment(
       docReq,
       function (err, GoLangResponse: AddEnvironmentReply) {
         res.json({
@@ -42,16 +47,23 @@ export default async function handler(
       }
     );
   } catch (error) {
+    console.error(error.stack);
     res.json({
       success: false,
       error: nodeError(error),
     });
     res.status(405).end();
+  } finally {
+    await redisHelper.remove.createEnvironment(sectionId, {
+      title: name,
+      description: description,
+      createdBy: userId,
+    });
   }
 }
 
 export const config = {
   api: {
-    externalResolver: true
-  }
-}
+    externalResolver: true,
+  },
+};

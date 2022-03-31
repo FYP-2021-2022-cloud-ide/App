@@ -4,32 +4,35 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 
 import { SandboxImageAddResponse, nodeError } from "../../../lib/api/api";
-
+import { redisClient } from "../../../lib/redisClient";
+import redisHelper from "../../../lib/redisHelper";
 import { grpcClient } from "../../../lib/grpcClient";
 import {
   AddSandBoxImageReply,
   AddSandBoxImageRequest,
 } from "../../../proto/dockerGet/dockerGet";
 
-export default function handler(
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SandboxImageAddResponse>
 ) {
-  var client = grpcClient;
-
   const { description, imageId, title, userId } = JSON.parse(req.body);
-  var docReq = AddSandBoxImageRequest.fromPartial({
-    sessionKey: fetchAppSession(req),
-    description: description,
-    imageId: imageId,
-    title: title,
-    userId: userId,
-  });
-
   try {
-    client.addSandboxImage(
+    await redisHelper.insert.createSandbox(userId, {
+      title,
+      imageId,
+      description,
+    });
+    var docReq = AddSandBoxImageRequest.fromPartial({
+      sessionKey: fetchAppSession(req),
+      description: description,
+      imageId: imageId,
+      title: title,
+      userId: userId,
+    });
+    grpcClient.addSandboxImage(
       docReq,
-      function (err, GoLangResponse: AddSandBoxImageReply) {
+      async function (err, GoLangResponse: AddSandBoxImageReply) {
         res.json({
           success: GoLangResponse.success,
           error: {
@@ -42,16 +45,23 @@ export default function handler(
       }
     );
   } catch (error) {
+    console.error(error.stack);
     res.json({
       success: false,
       error: nodeError(error),
     });
     res.status(405).end();
+  } finally {
+    await redisHelper.remove.createSandbox(userId, {
+      title,
+      imageId,
+      description,
+    });
   }
 }
 
 export const config = {
   api: {
-    externalResolver: true
-  }
-}
+    externalResolver: true,
+  },
+};

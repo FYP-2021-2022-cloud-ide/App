@@ -33,6 +33,7 @@ export default async function handler(
       });
       res.status(200).end();
     } catch (error) {
+      console.error(error.stack);
       res.json({
         success: false,
         error: nodeError(error),
@@ -41,6 +42,7 @@ export default async function handler(
     }
     // })
   } catch (error) {
+    console.error(error.stack);
     let tree: DirectoryTree;
     try {
       tree = dirTree("/volumes/" + userId + "/persist");
@@ -51,6 +53,7 @@ export default async function handler(
       });
       res.status(405).end();
     } catch (error) {
+      console.error(error.stack);
       res.json({
         success: false,
         error: nodeError(error),
@@ -62,6 +65,6 @@ export default async function handler(
 
 export const config = {
   api: {
-    externalResolver: true
-  }
-}
+    externalResolver: true,
+  },
+};

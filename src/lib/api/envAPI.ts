@@ -1,17 +1,17 @@
-import { 
-  SuccessStringResponse ,
+import {
+  SuccessStringResponse,
   EnvironmentAddResponse,
-  EnvironmentListResponse
+  EnvironmentListResponse,
 } from "./api";
 
 const envAPI = {
-  environmentList: async (
-    sectionid: string,
+  listEnvironments: async (
+    sectionId: string,
     sub: string
   ): Promise<EnvironmentListResponse> => {
     var res = await fetch(
       "/api/environment/listEnvironments?sectionid=" +
-        sectionid +
+        sectionId +
         "&sub=" +
         sub,
       {
@@ -20,12 +20,21 @@ const envAPI = {
     );
     return res.json();
   },
+  /**
+   *
+   * @param libraries currently used as `<environment.value:environment.imageId>[]`
+   * @param name
+   * @param description
+   * @param section_user_id
+   * @returns
+   */
   addEnvironment: async (
     libraries: string[],
     name: string,
     description: string,
-    section_user_id: string
-  ) : Promise<EnvironmentAddResponse>=> {
+    section_user_id: string,
+    sectionId: string
+  ): Promise<EnvironmentAddResponse> => {
     var res = await fetch("/api/environment/addEnvironment", {
       method: "POST",
       body: JSON.stringify({
@@ -33,6 +42,7 @@ const envAPI = {
         name: name,
         section_user_id: section_user_id,
         description: description,
+        sectionId: sectionId,
       }),
     });
     return res.json();
@@ -42,8 +52,9 @@ const envAPI = {
     name: string,
     description: string,
     section_user_id: string,
-    containerId: string
-  ) : Promise<SuccessStringResponse>=> {
+    containerId: string,
+    sectionId: string
+  ): Promise<SuccessStringResponse> => {
     var res = await fetch("/api/environment/updateEnvironment", {
       method: "POST",
       body: JSON.stringify({
@@ -52,6 +63,7 @@ const envAPI = {
         section_user_id: section_user_id,
         containerId: containerId,
         description: description,
+        sectionId: sectionId,
       }),
     });
     return res.json();
@@ -60,8 +72,9 @@ const envAPI = {
     name: string,
     description: string,
     section_user_id: string,
-    containerId: string
-  ) : Promise<EnvironmentAddResponse>=> {
+    containerId: string,
+    sectionId: string
+  ): Promise<EnvironmentAddResponse> => {
     var res = await fetch("/api/environment/buildEnvironment", {
       method: "POST",
       body: JSON.stringify({
@@ -69,18 +82,22 @@ const envAPI = {
         section_user_id: section_user_id,
         containerId: containerId,
         description: description,
+        sectionId: sectionId,
       }),
     });
     return res.json();
   },
   removeEnvironment: async (
     envId: string,
-     section_user_id: string) : Promise<SuccessStringResponse>=> {
+    section_user_id: string,
+    sectionId: string
+  ): Promise<SuccessStringResponse> => {
     var res = await fetch("/api/environment/removeEnvironment", {
       method: "POST",
       body: JSON.stringify({
         envId: envId,
         section_user_id: section_user_id,
+        sectopmOd: sectionId,
       }),
     });
     return res.json();

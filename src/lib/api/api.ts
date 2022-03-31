@@ -31,9 +31,14 @@ export type {
   LocalFilesListResponse,
   FetchCookieResponse,
   GetUserDataResponse,
+  SystemMessageResponse,
+  SandboxImage,
   Error,
   ContainerType,
 };
+
+export { nodeError, emptyError };
+
 type SectionRole = "instructor" | "student";
 type ContainerType = "SANDBOX" | "TEMPORARY" | "TEMPLATE_WORKSPACE";
 type SuccessStringResponse = {
@@ -46,17 +51,30 @@ type Error = {
   error: string;
 };
 
-export const emptyError: Error = {
+const emptyError: Error = {
   status: "",
   error: "",
 };
 
-export const nodeError = (err): Error => {
+const nodeError = (err): Error => {
   return {
     status: "TODO",
     error: err.error,
   };
 };
+
+type SystemMessageResponse =
+  | {
+      success: true;
+      systemMessage: {
+        id: string;
+        text: string;
+      };
+    }
+  | {
+      success: false;
+      error: Error;
+    };
 
 type SectionUserInfoResponse =
   | {
@@ -87,6 +105,7 @@ type Environment = {
   libraries: string;
   environmentName: string;
   description: string;
+  status?: "CREATING" | "UPDATING" | "REMOVING" | null;
 };
 type EnvironmentListResponse =
   | { success: true; error: Error; environments: Environment[] }
@@ -116,6 +135,7 @@ type Template = {
   isExam: boolean;
   timeLimit: number;
   allow_notification: boolean;
+  status?: "CREATING" | "UPDATING" | "REMOVING" | null;
 };
 
 type TemplateListResponse =
@@ -140,6 +160,9 @@ type TemplateAddResponse =
       error: Error;
     };
 
+/**
+ * this class will be seen in the instructor page
+ */
 type StudentWorkspace = {
   // status: "NOT_STARTED_BEFORE" | "ON" | "OFF";
   status: string;
@@ -168,11 +191,30 @@ type ContainerInfo = {
 };
 
 type Container = {
+  /**
+   *  a container must have a title.
+   *  no matter it is a temporary container or a long living container
+   */
   title: string;
   subTitle: string;
-  existedTime: string;
+  startAt: string;
   containerID: string;
-  type:ContainerType;
+  type: "SANDBOX" | "TEMPLATE" | "ENV" | "STUDENT_WORKSPACE";
+  /**
+   * the id of source object, sandboxImage, template or environment.
+   * The `sourceId` can be undefined for event `ENV_CREATE`, `TEMPLATE_CREATE`, `SANDBOX_CREATE`
+   * because the temporary container is created before the source is created.
+   */
+  sourceId: string | undefined;
+  /**
+   * base on the event of the container created to determine whether this is a temporary container
+   *
+   * temporary container event : `ENV_CREATE`, `ENV_UPDATE`, `TEMPLATE_CREATE` , `TEMPLATE_UPDATE` , `SANDBOX_CREATE` , `SANDBOX_UPDATE`
+   *
+   * normal container event : `TEMPLATE_START_WORKSPACE`, `SANDBOX_START_WORKSPACE` , `WORKSPACE_START`
+   */
+  isTemporary: boolean;
+  status?: "CREATING" | "REMOVING" | null;
 };
 
 type ContainerListResponse =
@@ -198,11 +240,21 @@ type ContainerAddResponse =
     };
 
 type SandboxImage = {
-  id: string; // id in sandbox image db
+  /**
+   * id of the sandbox in the db
+   */
+  id: string;
   title: string;
   description: string;
-  imageId: string; // image id
-  sandboxesId: string; // container id
+  /**
+   *  image id
+   */
+  imageId: string;
+  /**
+   * container id
+   */
+  sandboxesId: string;
+  status: "CREATING" | "UPDATING" | "REMOVING" | null;
 };
 
 type SandboxAddResponse =

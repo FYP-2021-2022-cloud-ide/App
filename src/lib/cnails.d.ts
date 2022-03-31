@@ -25,13 +25,19 @@ export type {
 
 type SectionRole = "INSTRUCTOR" | "STUDENT";
 
-type ContainerType = "SANDBOX" | "TEMPORARY" | "TEMPLATE_WORKSPACE";
 type Environment = {
   id: string;
   imageId: string;
   libraries: string;
   name: string;
   description: string;
+  /**
+   * if the environment is `CREATING`, the create request is being processed.
+   * if the environment is `UPDATING`, the update request is being processed and user should not be able to update it.
+   * if the status is `REMOVING`, the remove request is being processed.
+   * if the status is undefined or null, user see it normally.
+   */
+  status?: "CREATING" | "REMOVING" | "UPDATING" | null;
 };
 
 type Template = {
@@ -47,6 +53,12 @@ type Template = {
   isExam: boolean;
   timeLimit: number;
   allow_notification: boolean;
+  /**
+   * if status is `CREATING`, the create request is being processed.
+   * if status is `UDPATING`, the update request is being processed and user should not be able to update it.
+   * if the status is undefined or null, card will show normally
+   */
+  status?: "CREATING" | "UPDATING" | "REMOVING" | null;
 };
 
 type Course = {
@@ -87,6 +99,13 @@ type SandboxImage = {
    * the container id of the workspace created from sandbox.
    */
   sandboxesId: string;
+  /**
+   * if the sandbox image is `CREATING`, the create request is being processed.
+   * if the sandbox image is `UPDATING`, the update request is being processed and should not let user update it
+   * if the sandbox image is `REMOVING`, the remove request is being processed.
+   * if the status is undefined or null, it will show normally.
+   */
+  status?: "CREATING" | "UPDATING" | "REMOVING" | null;
 };
 
 type ContainerList = {
@@ -95,11 +114,37 @@ type ContainerList = {
 };
 
 type Container = {
+  /**
+   *  a container must have a title.
+   *  no matter it is a temporary container or a long living container
+   */
   title: string;
   subTitle: string;
-  existedTime: string;
+  startAt: string;
   containerID: string;
-  type: ContainerType;
+  type: "SANDBOX" | "TEMPLATE" | "ENV" | "STUDENT_WORKSPACE";
+  /**
+   *  if the container is `CREATING`, the request is being processed and the container is soon be created.
+   * if the status is `REMOVING`, the remove request is being processed
+   * if the container is `undefined` or null, the container is up and can let user enter it.
+   *
+   * @remark in the `redisHelper` there is a status `RUNNING`. But it should return `undefined` to UI
+   */
+  status?: "CREATING" | "REMOVING" | null;
+  /**
+   * the id of source object, sandboxImage, template or environment.
+   * The `sourceId` can be undefined for event `ENV_CREATE`, `TEMPLATE_CREATE`, `SANDBOX_CREATE`
+   * because the temporary container is created before the source is created.
+   */
+  sourceId: string | undefined;
+  /**
+   * base on the event of the container created to determine whether this is a temporary container
+   *
+   * temporary container event : `ENV_CREATE`, `ENV_UPDATE`, `TEMPLATE_CREATE` , `TEMPLATE_UPDATE` , `SANDBOX_CREATE` , `SANDBOX_UPDATE`
+   *
+   * normal container event : `TEMPLATE_START_WORKSPACE`, `SANDBOX_START_WORKSPACE` , `WORKSPACE_START`
+   */
+  isTemporary: boolean;
 };
 
 type Workspace = Template;
@@ -150,12 +195,16 @@ type CnailsContextState = {
    * @param sub the user sub
    * @param userId the user id
    */
-  fetchContainers: (
-    sub: string,
-    userId: string
-  ) => Promise<{
+  fetchContainers: (sub: string) => Promise<{
     containers: Container[];
     containersInfo: ContainerInfo;
+  }>;
+
+  /**
+   *  a function to fetch sandbox
+   */
+  fetchSandboxImages: (userId: string) => Promise<{
+    sandboxImages: SandboxImage[];
   }>;
   /**
    * a function to fetch a new list of notification.

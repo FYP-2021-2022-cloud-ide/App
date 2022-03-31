@@ -6,10 +6,19 @@ import {
 } from "./api";
 
 const sandboxAPI = {
+  listSandboxImage: async (
+    userId: string
+  ): Promise<SandboxImageListResponse> => {
+    var res = await fetch(`/api/sandbox/listSandboxImage?userId=${userId}`, {
+      method: "GET",
+    });
+    return res.json();
+  },
   addSandbox: async (
     memLimit: Number,
     numCPU: Number,
-    sandboxImageId: string
+    sandboxImageId: string,
+    title: string
   ): Promise<SandboxAddResponse> => {
     // start a workspace
     var res = await fetch("/api/sandbox/addSandbox", {
@@ -18,6 +27,7 @@ const sandboxAPI = {
         memLimit,
         numCPU,
         sandboxImageId,
+        title,
       }),
     });
     return res.json();
@@ -37,15 +47,6 @@ const sandboxAPI = {
         title,
         userId,
       }),
-    });
-    return res.json();
-  },
-
-  listSandboxImage: async (
-    userId: string
-  ): Promise<SandboxImageListResponse> => {
-    var res = await fetch(`/api/sandbox/listSandboxImage?userId=${userId}`, {
-      method: "GET",
     });
     return res.json();
   },

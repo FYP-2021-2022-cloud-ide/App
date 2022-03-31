@@ -4,42 +4,46 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 
 import { SandboxImageListResponse, nodeError } from "../../../lib/api/api";
-
+import { redisClient } from "../../../lib/redisClient";
 import { grpcClient } from "../../../lib/grpcClient";
 import {
   ListSandBoxImageReply,
   ListSandBoxImageRequest,
 } from "../../../proto/dockerGet/dockerGet";
+import redisHelper from "../../../lib/redisHelper";
 
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<SandboxImageListResponse>
 ) {
-  var client = grpcClient;
-
   const { userId } = req.query!;
-  var docReq = ListSandBoxImageRequest.fromPartial({
-    sessionKey: fetchAppSession(req),
-    userId: userId as string,
-  });
   try {
-    client.listSandboxImage(
+    var docReq = ListSandBoxImageRequest.fromPartial({
+      sessionKey: fetchAppSession(req),
+      userId: userId as string,
+    });
+    grpcClient.listSandboxImage(
       docReq,
-      function (err, GoLangResponse: ListSandBoxImageReply) {
+      async function (err, GoLangResponse: ListSandBoxImageReply) {
         res.json({
           success: GoLangResponse.success,
           error: {
             status: GoLangResponse.error?.status,
             error: GoLangResponse.error?.error,
           },
-          sandboxImages:
-            GoLangResponse.sandboxImages.map((sandbox) => ({
-              id: sandbox.id,
-              title: sandbox.title,
-              description: sandbox.description,
-              imageId: sandbox.imageId,
-              sandboxesId: sandbox.sandboxId[0],
-            })) || [],
+          sandboxImages: await redisHelper.patch.sandboxes(
+            userId as string,
+            GoLangResponse.sandboxImages.map((sandbox) => {
+              return {
+                id: sandbox.id,
+                title: sandbox.title,
+                description: sandbox.description,
+                imageId: sandbox.imageId,
+                sandboxesId: sandbox.sandboxId[0],
+                status: null,
+              };
+            })
+          ),
         });
         res.status(200).end();
       }
@@ -56,6 +60,6 @@ export default function handler(
 
 export const config = {
   api: {
-    externalResolver: true
-  }
-}
+    externalResolver: true,
+  },
+};

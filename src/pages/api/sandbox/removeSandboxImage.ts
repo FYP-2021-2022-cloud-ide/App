@@ -10,13 +10,12 @@ import {
   SuccessStringReply,
   SandBoxImageIdRequest,
 } from "../../../proto/dockerGet/dockerGet";
+import redisHelper from "../../../lib/redisHelper";
 
-export default function handler(
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SuccessStringResponse>
 ) {
-  var client = grpcClient;
-
   const { sandboxImageId, userId } = JSON.parse(req.body);
   var docReq = SandBoxImageIdRequest.fromPartial({
     sessionKey: fetchAppSession(req),
@@ -24,7 +23,10 @@ export default function handler(
     userId: userId,
   });
   try {
-    client.removeSandboxImage(
+    await redisHelper.insert.removeSandbox(userId, {
+      id: sandboxImageId,
+    });
+    grpcClient.removeSandboxImage(
       docReq,
       function (err, GoLangResponse: SuccessStringReply) {
         res.json({
@@ -38,16 +40,21 @@ export default function handler(
       }
     );
   } catch (error) {
+    console.error(error.stack);
     res.json({
       success: false,
       error: nodeError(error),
     });
     res.status(405).end();
+  } finally {
+    redisHelper.remove.removeSandbox(userId, {
+      id: sandboxImageId,
+    });
   }
 }
 
 export const config = {
   api: {
-    externalResolver: true
-  }
-}
+    externalResolver: true,
+  },
+};

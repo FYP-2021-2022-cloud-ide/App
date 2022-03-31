@@ -15,21 +15,22 @@ const redisKeyPersistKeyExpireTime = 86400;
 
 type WorkspaceCreateData =
   | {
-      cause:
-        | "TEMPLATE_CREATE" // temp
-        | "SANDBOX_CREATE" // temp
-        | "ENV_CREATE"; // temp
+      cause: "TEMPLATE_CREATE" | "SANDBOX_CREATE" | "ENV_CREATE";
+      /**
+       * title of workspace
+       */
       title: string;
     }
   | {
-      cause:
-        | "TEMPLATE_UPDATE" // temp
-        | "SANDBOX_UPDATE" // temp
-        | "ENV_UPDATE"; // temp
+      cause: "TEMPLATE_UPDATE" | "SANDBOX_UPDATE" | "ENV_UPDATE";
       /**
        * the id of template, sandbox or env
        */
       id: string;
+      /**
+       * title of workspace
+       */
+      title: string;
     }
   | {
       cause:
@@ -40,6 +41,10 @@ type WorkspaceCreateData =
        * the id of template, sandbox or workspace
        */
       id: string;
+      /**
+       * title of workspace
+       */
+      title: string;
     };
 
 type WorkspaceRemoveData = {
@@ -113,16 +118,28 @@ type TemplateCreateData = {
   environmentId: string;
   isExam: boolean;
   timeLimit: number;
+  /**
+   * user id
+   */
+  createdBy: string;
 };
 
 type TemplateUpdateData = {
   title: string;
   description: string;
   id: string;
+  /**
+   * user id
+   */
+  updatedBy: string;
 };
 
 type TemplateRemoveData = {
   id: string;
+  /**
+   * user id
+   */
+  removedBy: string;
 };
 
 export type Template =
@@ -145,16 +162,28 @@ export type Template =
 type EnvironmentCreateData = {
   title: string;
   description: string;
+  /**
+   * user id
+   */
+  createdBy: string;
 };
 
 type EnvironmentUpdateData = {
   title: string;
   description: string;
   id: string;
+  /**
+   * user id
+   */
+  updatedBy: string;
 };
 
 type EnvironmentRemoveData = {
   id: string;
+  /**
+   * user id
+   */
+  removedBy: string;
 };
 
 export type Environment =
@@ -186,7 +215,7 @@ const insert = {
       data: data,
     });
     await redisClient.set(
-      `${userId}:sandboxes`,
+      `ServerState:${userId}:sandboxes`,
       JSON.stringify(sandboxes),
       "EX",
       redisKeyExpireTime
@@ -201,7 +230,7 @@ const insert = {
       data: data,
     });
     await redisClient.set(
-      `${userId}:sandboxes`,
+      `ServerState:${userId}:sandboxes`,
       JSON.stringify(sandboxes),
       "EX",
       redisKeyExpireTime
@@ -216,7 +245,7 @@ const insert = {
       data: data,
     });
     await redisClient.set(
-      `${userId}:sandboxes`,
+      `ServerState:${userId}:sandboxes`,
       JSON.stringify(sandboxes),
       "EX",
       redisKeyExpireTime
@@ -230,7 +259,7 @@ const insert = {
       data: data,
     } as Workspace);
     await redisClient.set(
-      `${userId}:workspaces`,
+      `ServerState:${userId}:workspaces`,
       JSON.stringify(workspaces),
       "EX",
       redisKeyPersistKeyExpireTime
@@ -247,7 +276,7 @@ const insert = {
       data: data,
     });
     await redisClient.set(
-      `${userId}:workspaces`,
+      `ServerState:${userId}:workspaces`,
       JSON.stringify(workspaces),
       "EX",
       redisKeyPersistKeyExpireTime
@@ -261,97 +290,97 @@ const insert = {
       data: data,
     });
     await redisClient.set(
-      `${userId}:workspaces`,
+      `ServerState:${userId}:workspaces`,
       JSON.stringify(workspaces),
       "EX",
       redisKeyPersistKeyExpireTime
     );
     return workspaces;
   },
-  createTemplate: async (userId: string, data: TemplateCreateData) => {
-    const templates = await list.templates(userId);
+  createTemplate: async (sectionId: string, data: TemplateCreateData) => {
+    const templates = await list.templates(sectionId);
     templates.push({
       status: "CREATING",
       cause: "TEMPLATE_CREATE",
       data: data,
     });
     await redisClient.set(
-      `${userId}:templates`,
+      `ServerState:${sectionId}:templates`,
       JSON.stringify(templates),
       "EX",
       redisKeyExpireTime
     );
     return templates;
   },
-  updateTemplate: async (userId: string, data: TemplateUpdateData) => {
-    const templates = await list.templates(userId);
+  updateTemplate: async (sectionId: string, data: TemplateUpdateData) => {
+    const templates = await list.templates(sectionId);
     templates.push({
       status: "UPDATING",
       cause: "TEMPLATE_UPDATE",
       data: data,
     });
     await redisClient.set(
-      `${userId}:templates`,
+      `ServerState:${sectionId}:templates`,
       JSON.stringify(templates),
       "EX",
       redisKeyExpireTime
     );
     return templates;
   },
-  removeTemplate: async (userId: string, data: TemplateRemoveData) => {
-    const templates = await list.templates(userId);
+  removeTemplate: async (sectionId: string, data: TemplateRemoveData) => {
+    const templates = await list.templates(sectionId);
     templates.push({
       status: "REMOVING",
       cause: "TEMPLATE_REMOVE",
       data: data,
     });
     await redisClient.set(
-      `${userId}:templates`,
+      `ServerState:${sectionId}:templates`,
       JSON.stringify(templates),
       "EX",
       redisKeyExpireTime
     );
     return templates;
   },
-  createEnvironment: async (userId: string, data: EnvironmentCreateData) => {
-    const environments = await list.environments(userId);
+  createEnvironment: async (sectionId: string, data: EnvironmentCreateData) => {
+    const environments = await list.environments(sectionId);
     environments.push({
       status: "CREATING",
       cause: "ENV_CREATE",
       data: data,
     });
     await redisClient.set(
-      `${userId}:environments`,
+      `ServerState:${sectionId}:environments`,
       JSON.stringify(environments),
       "EX",
       redisKeyExpireTime
     );
     return environments;
   },
-  updateEnvironment: async (userId: string, data: EnvironmentUpdateData) => {
-    const environments = await list.environments(userId);
+  updateEnvironment: async (sectionId: string, data: EnvironmentUpdateData) => {
+    const environments = await list.environments(sectionId);
     environments.push({
       status: "UPDATING",
       cause: "ENV_UPDATE",
       data: data,
     });
     await redisClient.set(
-      `${userId}:environments`,
+      `ServerState:${sectionId}:environments`,
       JSON.stringify(environments),
       "EX",
       redisKeyExpireTime
     );
     return environments;
   },
-  removeEnvironment: async (userId: string, data: EnvironmentRemoveData) => {
-    const environments = await list.environments(userId);
+  removeEnvironment: async (sectionId: string, data: EnvironmentRemoveData) => {
+    const environments = await list.environments(sectionId);
     environments.push({
       status: "REMOVING",
       cause: "ENV_REMOVE",
       data: data,
     });
     await redisClient.set(
-      `${userId}:environments`,
+      `ServerState:${sectionId}:environments`,
       JSON.stringify(environments),
       "EX",
       redisKeyExpireTime
@@ -372,12 +401,12 @@ const remove = {
     });
     if (sandboxes.length > 0) {
       await redisClient.set(
-        `${userId}:sandboxes`,
+        `ServerState:${userId}:sandboxes`,
         JSON.stringify(sandboxes),
         "EX",
         redisKeyExpireTime
       );
-    } else await redisClient.del(`${userId}:sandboxes`);
+    } else await redisClient.del(`ServerState:${userId}:sandboxes`);
     return sandboxes;
   },
   updateSandbox: async (userId: string, data: SandboxUpdateData) => {
@@ -387,12 +416,12 @@ const remove = {
     });
     if (sandboxes.length > 0) {
       await redisClient.set(
-        `${userId}:sandboxes`,
+        `ServerState:${userId}:sandboxes`,
         JSON.stringify(sandboxes),
         "EX",
         redisKeyExpireTime
       );
-    } else await redisClient.del(`${userId}:sandboxes`);
+    } else await redisClient.del(`ServerState:${userId}:sandboxes`);
     return sandboxes;
   },
   removeSandbox: async (userId: string, data: SandboxRemoveData) => {
@@ -402,12 +431,12 @@ const remove = {
     });
     if (sandboxes.length > 0)
       await redisClient.set(
-        `${userId}:sandboxes`,
+        `ServerState:${userId}:sandboxes`,
         JSON.stringify(sandboxes),
         "EX",
         redisKeyExpireTime
       );
-    else await redisClient.del(`${userId}:sandboxes`);
+    else await redisClient.del(`ServerState:${userId}:sandboxes`);
     return sandboxes;
   },
   createWorkspace: async (userId: string, data: WorkspaceCreateData) => {
@@ -448,12 +477,12 @@ const remove = {
     });
     if (workspaces.length > 0)
       await redisClient.set(
-        `${userId}:workspaces`,
+        `ServerState:${userId}:workspaces`,
         JSON.stringify(workspaces),
         "EX",
         redisKeyPersistKeyExpireTime
       );
-    else await redisClient.del(`${userId}:workspaces`);
+    else await redisClient.del(`ServerState:${userId}:workspaces`);
     return workspaces;
   },
 
@@ -464,12 +493,12 @@ const remove = {
     });
     if (workspaces.length > 0)
       await redisClient.set(
-        `${userId}:workspaces`,
+        `ServerState:${userId}:workspaces`,
         JSON.stringify(workspaces),
         "EX",
         redisKeyPersistKeyExpireTime
       );
-    else await redisClient.del(`${userId}:workspaces`);
+    else await redisClient.del(`ServerState:${userId}:workspaces`);
     return workspaces;
   },
   patchedWorkspace: async (userId: string, id: string) => {
@@ -479,16 +508,16 @@ const remove = {
     });
     if (workspaces.length > 0)
       await redisClient.set(
-        `${userId}:workspaces`,
+        `ServerState:${userId}:workspaces`,
         JSON.stringify(workspaces),
         "EX",
         redisKeyPersistKeyExpireTime
       );
-    else await redisClient.del(`${userId}:workspaces`);
+    else await redisClient.del(`ServerState:${userId}:workspaces`);
     return workspaces;
   },
-  createTemplate: async (userId: string, data: TemplateCreateData) => {
-    let templates = await list.templates(userId);
+  createTemplate: async (sectionId: string, data: TemplateCreateData) => {
+    let templates = await list.templates(sectionId);
     templates = templates.filter((template) => {
       return !(
         template.status == "CREATING" && data.title == template.data.title
@@ -496,84 +525,87 @@ const remove = {
     });
     if (templates.length > 0)
       await redisClient.set(
-        `${userId}:templates`,
+        `ServerState:${sectionId}:templates`,
         JSON.stringify(templates),
         "EX",
         redisKeyExpireTime
       );
-    else await redisClient.del(`${userId}:templates`);
+    else await redisClient.del(`ServerState:${sectionId}:templates`);
     return templates;
   },
-  updateTemplate: async (userId: string, data: TemplateUpdateData) => {
-    let templates = await list.templates(userId);
+  updateTemplate: async (sectionId: string, data: TemplateUpdateData) => {
+    let templates = await list.templates(sectionId);
     templates = templates.filter((template) => {
       return !(template.status == "UPDATING" && data.id == template.data.id);
     });
     if (templates.length > 0)
       await redisClient.set(
-        `${userId}:templates`,
+        `ServerState:${sectionId}:templates`,
         JSON.stringify(templates),
         "EX",
         redisKeyExpireTime
       );
-    else await redisClient.del(`${userId}:templates`);
+    else await redisClient.del(`ServerState:${sectionId}:templates`);
     return templates;
   },
-  removeTemplate: async (userId: string, data: TemplateRemoveData) => {
-    let templates = await list.templates(userId);
+  removeTemplate: async (sectionId: string, data: TemplateRemoveData) => {
+    let templates = await list.templates(sectionId);
     templates = templates.filter((template) => {
       return !(template.status == "REMOVING" && template.data.id == data.id);
     });
-    await redisClient.set(
-      `${userId}:templates`,
-      JSON.stringify(templates),
-      "EX",
-      redisKeyExpireTime
-    );
+    if (templates.length > 0)
+      await redisClient.set(
+        `ServerState:${sectionId}:templates`,
+        JSON.stringify(templates),
+        "EX",
+        redisKeyExpireTime
+      );
+    else await redisClient.del(`ServerState:${sectionId}:templates`);
+    return templates;
   },
-  createEnvironment: async (userId: string, data: EnvironmentCreateData) => {
-    let environments = await list.environments(userId);
+  createEnvironment: async (sectionId: string, data: EnvironmentCreateData) => {
+    let environments = await list.environments(sectionId);
     environments = environments.filter((env) => {
       return !(env.status == "CREATING" && env.data.title == data.title);
     });
     if (environments.length > 0)
       await redisClient.set(
-        `${userId}:environments`,
+        `ServerState:${sectionId}:environments`,
         JSON.stringify(environments),
         "EX",
         redisKeyExpireTime
       );
-    else await redisClient.del(`${userId}:environments`);
+    else await redisClient.del(`ServerState:${sectionId}:environments`);
     return environments;
   },
-  updateEnvironment: async (userId: string, data: EnvironmentUpdateData) => {
-    let environments = await list.environments(userId);
+  updateEnvironment: async (sectionId: string, data: EnvironmentUpdateData) => {
+    let environments = await list.environments(sectionId);
     environments = environments.filter((env) => {
       return !(env.status == "UPDATING" && env.data.id == data.id);
     });
     if (environments.length > 0)
       await redisClient.set(
-        `${userId}:environments`,
+        `ServerState:${sectionId}:environments`,
         JSON.stringify(environments),
         "EX",
         redisKeyExpireTime
       );
-    else await redisClient.del(`${userId}:environments`);
+    else await redisClient.del(`ServerState:${sectionId}:environments`);
     return environments;
   },
-  removeEnvironment: async (userId: string, data: EnvironmentRemoveData) => {
-    let environments = await list.environments(userId);
+  removeEnvironment: async (sectionId: string, data: EnvironmentRemoveData) => {
+    let environments = await list.environments(sectionId);
     environments = environments.filter((env) => {
       return !(env.status == "REMOVING" && env.data.id == data.id);
     });
     if (environments.length > 0)
       await redisClient.set(
-        `${userId}:environments`,
+        `ServerState:${sectionId}:environments`,
         JSON.stringify(environments),
         "EX",
         redisKeyExpireTime
       );
-    else await redisClient.del(`${userId}:environments`);
+    else await redisClient.del(`ServerState:${sectionId}:environments`);
     return environments;
   },
 };
@@ -583,19 +615,19 @@ const remove = {
  */
 const list = {
   sandboxes: async (userId: string) => {
-    const v = await redisClient.get(`${userId}:sandboxes`);
+    const v = await redisClient.get(`ServerState:${userId}:sandboxes`);
     return (v ? JSON.parse(v) : []) as Sandbox[];
   },
   workspaces: async (userId: string) => {
-    const v = await redisClient.get(`${userId}:workspaces`);
+    const v = await redisClient.get(`ServerState:${userId}:workspaces`);
     return (v ? JSON.parse(v) : []) as Workspace[];
   },
-  environments: async (userId: string) => {
-    const v = await redisClient.get(`${userId}:environments`);
+  environments: async (sectionId: string) => {
+    const v = await redisClient.get(`ServerState:${sectionId}:environments`);
     return (v ? JSON.parse(v) : []) as Environment[];
   },
-  templates: async (userId: string) => {
-    const v = await redisClient.get(`${userId}:templates`);
+  templates: async (sectionId: string) => {
+    const v = await redisClient.get(`ServerState:${sectionId}:templates`);
     return (v ? JSON.parse(v) : []) as Template[];
   },
 };
@@ -650,16 +682,19 @@ const patch = {
     return patched;
   },
   /**
-   * if the environment is creating, insert it
-   * if the environment is updating, update the value
-   * if the environment is removing, set the status to `REMOVING`
+   * if the environment is creating, insert it.
+   * if the environment is updating, update the value.
+   * if the environment is removing, set the status to `REMOVING`.
    *
-   * @param userId
+   * @param sectionId
    * @param apiEnvironments
    */
-  environments: async (userId: string, apiEnvironments: ApiEnvironment[]) => {
+  environments: async (
+    sectionId: string,
+    apiEnvironments: ApiEnvironment[]
+  ) => {
     const patched = [...apiEnvironments];
-    const environments = await list.environments(userId);
+    const environments = await list.environments(sectionId);
     for (let env of environments) {
       if (env.status == "CREATING") {
         patched.push({
@@ -697,9 +732,9 @@ const patch = {
     }
     return patched;
   },
-  templates: async (userId: string, apiTemplates: ApiTemplate[]) => {
+  templates: async (sectionId: string, apiTemplates: ApiTemplate[]) => {
     const patched = [...apiTemplates];
-    const templates = await list.templates(userId);
+    const templates = await list.templates(sectionId);
     for (let template of templates) {
       if (template.status == "CREATING") {
         patched.push({
@@ -784,7 +819,7 @@ const patch = {
         ) {
           // all the data need to be trace using the sourceId
           patched.push({
-            title: "",
+            title: workspace.data.title,
             subTitle: "",
             startAt: "",
             containerID: "",
@@ -805,7 +840,7 @@ const patch = {
         ) {
           patched.push({
             // all data need to be trace using the sourceId
-            title: "",
+            title: workspace.data.title,
             subTitle: "",
             startAt: "",
             containerID: "",
@@ -848,6 +883,7 @@ const patch = {
                 workspace.data.createData.id) ||
               undefined,
             isTemporary: workspace.data.isTemporary,
+            // if the status is running, we return the status undefined to UI
             status: undefined,
           });
         }
@@ -877,9 +913,40 @@ const patch = {
  */
 const redisHelper = {
   insert,
+  /**
+   * given the insertion data, remove it from redis
+   */
   remove,
   list,
   patch,
+};
+
+export const eventToContainerType = (
+  event:
+    | "TEMPLATE_CREATE"
+    | "SANDBOX_CREATE"
+    | "ENV_CREATE"
+    | "TEMPLATE_UPDATE"
+    | "SANDBOX_UPDATE"
+    | "ENV_UPDATE"
+    | "TEMPLATE_START_WORKSPACE"
+    | "SANDBOX_START_WORKSPACE"
+    | "WORKSPACE_START"
+): "TEMPLATE" | "ENV" | "STUDENT_WORKSPACE" | "SANDBOX" => {
+  if (
+    event == "TEMPLATE_CREATE" ||
+    event == "TEMPLATE_UPDATE" ||
+    event == "TEMPLATE_START_WORKSPACE"
+  )
+    return "TEMPLATE";
+  else if (event == "ENV_CREATE" || event == "ENV_UPDATE") return "ENV";
+  else if (
+    event == "SANDBOX_CREATE" ||
+    event == "SANDBOX_UPDATE" ||
+    event == "SANDBOX_START_WORKSPACE"
+  )
+    return "SANDBOX";
+  else return "STUDENT_WORKSPACE";
 };
 
 export default redisHelper;

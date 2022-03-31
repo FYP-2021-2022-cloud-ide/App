@@ -2,37 +2,19 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { parse } from "cookie";
 
-import crypto from "crypto";
-
 import { FetchCookieResponse } from "../../lib/api/api";
+import { decrypt } from "../../lib/cookiesHelper";
 
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<FetchCookieResponse>
 ) {
   try {
-    redisClient.get("good", (err, data) => {
-      console.log(data);
-    });
-  } catch (error) {
-    console.log(error);
-  }
-  try {
-    const decrypt = (encrypted: string) => {
-      let decipher = crypto.createDecipheriv(
-        "aes-256-cbc",
-        crypto.scryptSync(process.env.SESSIONSECRET, "GfG", 32),
-        process.env.SESSIONIV
-      );
-      let decrypted = decipher.update(encrypted, "base64", "utf8");
-      return decrypted + decipher.final("utf8");
-    };
     const { sub, name, email, userId, semesterId } = parse(req.headers.cookie!);
     if (!sub || !name || !userId)
       throw new Error(
         `something is missing in cookies. cookies: ${req.headers.cookie}`
       );
-    console.log(req.headers.cookie);
     res.json({
       success: true,
       cookies: {

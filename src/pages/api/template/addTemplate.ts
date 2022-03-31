@@ -8,12 +8,13 @@ import {
   AddTemplateReply,
   AddTemplateRequest,
 } from "../../../proto/dockerGet/dockerGet";
+import { getCookie } from "../../../lib/cookiesHelper";
+import redisHelper from "../../../lib/redisHelper";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<TemplateAddResponse>
 ) {
-  var client = grpcClient;
   const {
     templateName,
     section_user_id,
@@ -25,7 +26,9 @@ export default async function handler(
     isExam,
     timeLimit,
     allow_notification,
+    sectionId,
   } = JSON.parse(req.body);
+  const userId = getCookie(req.headers.cookie, "userId");
 
   var docReq = AddTemplateRequest.fromPartial({
     sessionKey: fetchAppSession(req),
@@ -42,7 +45,15 @@ export default async function handler(
   });
 
   try {
-    client.addTemplate(
+    await redisHelper.insert.createTemplate(sectionId, {
+      title: templateName,
+      description: description,
+      environmentId: environment_id,
+      isExam: isExam,
+      timeLimit: timeLimit,
+      createdBy: userId,
+    });
+    grpcClient.addTemplate(
       docReq,
       function (err, GoLangResponse: AddTemplateReply) {
         res.json({
@@ -57,16 +68,26 @@ export default async function handler(
       }
     );
   } catch (error) {
+    console.error(error.stack);
     res.json({
       success: false,
       error: nodeError(error),
     });
     res.status(405).end();
+  } finally {
+    await redisHelper.remove.createTemplate(sectionId, {
+      title: templateName,
+      description: description,
+      environmentId: environment_id,
+      isExam: isExam,
+      timeLimit: timeLimit,
+      createdBy: userId,
+    });
   }
 }
 
 export const config = {
   api: {
-    externalResolver: true
-  }
-}
+    externalResolver: true,
+  },
+};

@@ -67,6 +67,7 @@
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
     "styled-components": "^5.3.3",
+    "use-local-storage": "^2.3.6",
     "uuid": "^8.3.2",
     "vscode-icons-js": "^11.6.1"
   },
