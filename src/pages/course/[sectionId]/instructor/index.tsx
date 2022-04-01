@@ -37,30 +37,18 @@ import {
   UpdateTemplateFormData,
   UpdateEnvironmentFormData,
   AnnouncementFormData,
+  rootImage,
+  CPU,
+  memory
 } from "../../../../lib/forms";
 import _ from "lodash";
 import courseAPI from "../../../../lib/api/courses";
 import CardMenu from "../../../../components/CardMenu";
 import { errorToToastDescription } from "../../../../lib/errorHelper";
 import { CLICK_TO_DISMISS, CLICK_TO_REPORT } from "../../../../lib/constants";
-const registry = process.env.NEXT_PUBLIC_REGISTRY;
-const rootImage = `${registry}/codeserver:latest`;
-const CPU = 0.5;
-const memory = 800;
+import { useForceUpdate } from "../../../../components/useForceUpdate";
 
-// Returning a new object reference guarantees that a before-and-after
-//   equivalence check will always be false, resulting in a re-render, even
-//   when multiple calls to forceUpdate are batched.
 
-export function useForceUpdate(): () => void {
-  const [, dispatch] = useState<{}>(Object.create(null));
-
-  // Turn dispatch(required_parameter) into dispatch().
-  const memoizedDispatch = useCallback((): void => {
-    dispatch(Object.create(null));
-  }, [dispatch]);
-  return memoizedDispatch;
-}
 
 const InstructorContext = React.createContext({} as InstructorContextState);
 export const useInstructor = () => useContext(InstructorContext);
@@ -112,7 +100,7 @@ export const InstructorProvider = ({
         );
       }
     );
-    fetchContainers(sub, userId);
+    fetchContainers(sub);
   };
 
   useEffect(() => {
@@ -146,7 +134,7 @@ async function fetchEnvironmentsAndTemplates(
     templates: APITemplate[]
   ) => void
 ) {
-  const { environmentList: fetchEnvironments } = envAPI;
+  const { listEnvironments: fetchEnvironments } = envAPI;
   const { templateList: fetchTemplates } = templateAPI;
   const envResponse = await fetchEnvironments(sectionId, sub);
   const templateResponse = await fetchTemplates(sectionId, sub);
@@ -166,7 +154,7 @@ const EnvironmentTemplateWrapper = () => {
   const { sub } = useCnails();
   const { environments, templates, fetch, sectionUserInfo, setHighlightedEnv } =
     useInstructor();
-  const { sectionUserId } = sectionUserInfo;
+  const { sectionUserId, sectionId } = sectionUserInfo;
   const [envCreateOpen, setEnvCreateOpen] = useState(false);
   const [envUpdateOpen, setEnvUpdateOpen] = useState(false);
   const [templateCreateOpen, setTemplateCreateOpen] = useState(false);
@@ -241,7 +229,7 @@ const EnvironmentTemplateWrapper = () => {
                 comment: CLICK_TO_DISMISS,
               });
             } else {
-              const response = await removeEnvironment(env.id, sectionUserId);
+              const response = await removeEnvironment(env.id, sectionUserId, sectionId);
               if (response.success) {
                 myToast.success(
                   `environment ${env.id} is successfully removed`
@@ -277,7 +265,7 @@ const EnvironmentTemplateWrapper = () => {
             }
           }}
           onDelete={async (template) => {
-            const response = await removeTemplate(template.id, sectionUserId);
+            const response = await removeTemplate(template.id, sectionUserId, sectionId);
             if (response.success) {
               myToast.success("Template is successfully deleted.");
             }
@@ -316,7 +304,8 @@ const EnvironmentTemplateWrapper = () => {
                 sectionUserId,
                 template.id,
                 "student",
-                false
+                false,
+                template.name
               );
               myToast.dismiss(id);
               if (response.success) {
@@ -335,7 +324,10 @@ const EnvironmentTemplateWrapper = () => {
               const id = myToast.loading(`Publishing the ${template.name}...`);
               const response = await activateTemplate(
                 template.id,
-                sectionUserId
+                sectionUserId,
+                sectionId,
+                template.name,
+                template.description ,
               );
               myToast.dismiss(id);
               if (response.success) {
@@ -353,7 +345,10 @@ const EnvironmentTemplateWrapper = () => {
               );
               const response = await deactivateTemplate(
                 template.id,
-                sectionUserId
+                sectionUserId,
+                sectionId,
+                template.name,
+                template.description,
               );
               myToast.dismiss(id);
               if (response.success) {
@@ -385,10 +380,11 @@ const EnvironmentTemplateWrapper = () => {
           const id = myToast.loading("Creating the environment...");
           if (data.is_predefined) {
             const response = await addEnvironment(
-              [environment.value + ":" + environment.id],
+              [environment.value + ":" + environment.imageId],
               name,
               description,
-              sectionUserId
+              sectionUserId,
+              sectionId
             );
             myToast.dismiss(id);
             if (response.success) {
@@ -412,7 +408,9 @@ const EnvironmentTemplateWrapper = () => {
                 CPU,
                 rootImage,
                 sub,
-                "root"
+                "root",
+                "ENV_CREATE",
+                data.name
               );
               myToast.dismiss(id);
               if (response.success) {
@@ -471,7 +469,8 @@ const EnvironmentTemplateWrapper = () => {
                             name,
                             description,
                             sectionUserId,
-                            containerID
+                            containerID,
+                            sectionId ,
                           );
                           if (response.success) {
                             fetch();
@@ -483,7 +482,7 @@ const EnvironmentTemplateWrapper = () => {
                       </button>
                     </div>
                   </div>,
-                  "toaster toaster-custom",
+                  "toaster toaster-custom toaster-no-dismiss",
                   "🗂"
                 );
               }
@@ -523,7 +522,8 @@ const EnvironmentTemplateWrapper = () => {
             name,
             description,
             sectionUserId,
-            containerId
+            containerId,
+            sectionId
           );
           myToast.dismiss(id);
           if (response.success) {
@@ -555,9 +555,11 @@ const EnvironmentTemplateWrapper = () => {
           const response = await addTempContainer(
             memory,
             CPU,
-            selectedEnv.id,
+            selectedEnv.imageId,
             sub,
-            "root"
+            "root",
+            "TEMPLATE_CREATE",
+            data.name
           );
           myToast.dismiss(toastId);
           console.log(response);
@@ -618,7 +620,8 @@ const EnvironmentTemplateWrapper = () => {
                         false,
                         data.is_exam as boolean,
                         Number(data.time_limit),
-                        data.allow_notification as boolean
+                        data.allow_notification as boolean,
+                        sectionId
                       );
                       if (response.success) {
                         fetch();
@@ -630,7 +633,7 @@ const EnvironmentTemplateWrapper = () => {
                   </button>
                 </div>
               </div>,
-              "toaster-custom",
+              "toaster toaster-custom toaster-no-dismiss",
               "🗂"
             );
           }
@@ -679,7 +682,8 @@ const EnvironmentTemplateWrapper = () => {
             containerId,
             is_exam,
             Number(time_limit),
-            allow_notification
+            allow_notification,
+            sectionId
           );
           myToast.dismiss(id);
           if (response.success) {

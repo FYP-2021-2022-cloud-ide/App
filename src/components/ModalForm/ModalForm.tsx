@@ -159,7 +159,10 @@ const fromStructureToData = (sections: FormStructure): Data => {
  * A component to show a form in modal. Use this component to keep consistency in the app.
  * To use this, put the `<ModalForm>` in a component and supply a form structure.
  * 
- * a good practice that you define a type of the formData as well 
+ * a good practice that you define a type of the formData as well. 
+ * 
+ * @remark `ModalForm` is a over-complex higher order component. It could be simplified by using context. 
+ * Although this component is perfectly workable, a rework could be done to make it more user friendly and less buggy.
  */
 const ModalForm = (props: Props) => {
   const {

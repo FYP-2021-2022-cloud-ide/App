@@ -25,6 +25,7 @@ export default function handler(
     grpcClient.listSandboxImage(
       docReq,
       async function (err, GoLangResponse: ListSandBoxImageReply) {
+        console.log("list sandbox");
         res.json({
           success: GoLangResponse.success,
           error: {
@@ -45,6 +46,7 @@ export default function handler(
             })
           ),
         });
+        console.log("list sandbox done");
         res.status(200).end();
       }
     );

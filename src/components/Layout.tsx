@@ -13,12 +13,12 @@ const Layout = ({ children }: LayoutProps) => {
   const { isDark } = useTheme();
   const { sub, name, email } = useCnails();
 
+
   return (
     <Twemoji noWrapper options={{ className: "twemoji" }}>
       <div
-        className={`flex flex-row w-full justify-start h-fit min-h-[600px] ${
-          isDark && "dark"
-        }`}
+        className={`flex flex-row w-full justify-start h-fit min-h-[600px] ${isDark && "dark"
+          }`}
         id="layout"
       >
         <Head>
@@ -31,7 +31,7 @@ const Layout = ({ children }: LayoutProps) => {
         </Head>
         <SideBar></SideBar>
         <div className="flex flex-col bg-white dark:bg-gray-800 w-full  z-10 ">
-          <TopBar sub={sub} name={name} email={email}></TopBar>
+          <TopBar sub={sub} name={name} email={email} ></TopBar>
 
           <div className=" w-full grow" id="page-content">
             {children}

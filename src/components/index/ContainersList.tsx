@@ -19,7 +19,7 @@ const ContainersList = () => {
     containerQuota,
   } = useCnails();
   useEffect(() => {
-    fetchContainers(sub, userId);
+    fetchContainers(sub);
   }, []);
   const numActiveContainers = containerInfo ? containers.length : 0;
   const quota = containerQuota;
@@ -37,9 +37,8 @@ const ContainersList = () => {
           <div className="current-run-bar-outer">
             <div
               style={{ width: `${percentage}%` }}
-              className={`current-run-bar-inner ${
-                percentage >= 100 ? "bg-red-400" : "bg-green-300"
-              }`}
+              className={`current-run-bar-inner ${percentage >= 100 ? "bg-red-400" : "bg-green-300"
+                }`}
             ></div>
           </div>
         </div>

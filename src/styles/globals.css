@@ -7,6 +7,18 @@
 @tailwind components;
 @tailwind utilities;
 
+#topbar .twemoji {
+  @apply w-4 h-4 inline-block;
+}
+
+#topbar #system-message {
+  @apply bg-yellow-200 border-2 border-yellow-400 px-2 rounded-md text-yellow-600 text-sm flex flex-row items-center;
+}
+
+#topbar #close {
+  @apply ml-2;
+}
+
 .rdt_TableRow {
   @apply bg-gray-100 dark:bg-black/50 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-black/40 border-[#D5D6D8] dark:border-[#2F3947] !important;
 }
@@ -270,7 +282,7 @@
 }
 
 .toaster {
-  @apply cursor-pointer rounded text-gray-600 bg-gray-50 border border-gray-200 dark:bg-slate-900  dark:border-gray-900 dark:text-gray-300 min-w-[16rem] !important;
+  @apply cursor-pointer rounded text-gray-600 bg-gray-50 border border-gray-200 dark:bg-slate-900  dark:border-gray-900 dark:text-gray-300 min-w-[16rem]  !important;
 }
 
 .toaster-content {
@@ -356,15 +368,15 @@
 .env-card-name,
 .template-card-name,
 .sandbox-card-name {
-  @apply font-semibold max-w-full text-sm text-gray-600 dark:text-gray-300 text-left truncate;
+  @apply font-semibold max-w-full text-sm text-gray-600 dark:text-gray-300 text-left line-clamp-1;
 }
 
 .env-card-lib {
-  @apply font-medium max-w-full text-xs text-gray-600 dark:text-gray-300 text-left truncate;
+  @apply font-medium max-w-full text-xs text-gray-600 dark:text-gray-300 text-left line-clamp-1;
 }
 
 .env-card-ref {
-  @apply font-medium max-w-full text-xs text-gray-400 truncate;
+  @apply font-medium max-w-full text-xs text-gray-400 line-clamp-1;
 }
 
 .env-card-des,

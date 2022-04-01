@@ -12,6 +12,7 @@ export interface ListBoxProps {
 export interface Option {
   value: string;
   id: string;
+  imageId:string;
 }
 
 /**

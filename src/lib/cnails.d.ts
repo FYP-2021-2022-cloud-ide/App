@@ -58,7 +58,13 @@ type Template = {
    * if status is `UDPATING`, the update request is being processed and user should not be able to update it.
    * if the status is undefined or null, card will show normally
    */
-  status?: "CREATING" | "UPDATING" | "REMOVING" | null;
+  status?:
+    | "CREATING"
+    | "UPDATING"
+    | "REMOVING"
+    | "STARTING_WORKSPACE"
+    | "STOPPING_WORKSPACE"
+    | null;
 };
 
 type Course = {
@@ -105,7 +111,13 @@ type SandboxImage = {
    * if the sandbox image is `REMOVING`, the remove request is being processed.
    * if the status is undefined or null, it will show normally.
    */
-  status?: "CREATING" | "UPDATING" | "REMOVING" | null;
+  status?:
+    | "CREATING"
+    | "UPDATING"
+    | "REMOVING"
+    | "STARTING_WORKSPACE"
+    | "STOPPING_WORKSPACE"
+    | null;
 };
 
 type ContainerList = {
@@ -184,8 +196,7 @@ type CnailsContextState = {
   // isAdmin: boolean;
   notifications: Notification[];
   containers: Container[];
-  containerInfo: ContainerInfo;
-  sandboxImages: SandboxImage[];
+  setContainers: React.Dispatch<React.SetStateAction<Container[]>>;
   /**
    * a function to fetch the new container list.
    * It will update the context and hence update all affected UI.
@@ -197,15 +208,8 @@ type CnailsContextState = {
    */
   fetchContainers: (sub: string) => Promise<{
     containers: Container[];
-    containersInfo: ContainerInfo;
   }>;
 
-  /**
-   *  a function to fetch sandbox
-   */
-  fetchSandboxImages: (userId: string) => Promise<{
-    sandboxImages: SandboxImage[];
-  }>;
   /**
    * a function to fetch a new list of notification.
    * It will update the context and hence update all affected UI.

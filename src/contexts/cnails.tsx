@@ -60,15 +60,13 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
   const [bio, setBio] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
   const [containers, setContainers] = useState<Container[]>();
-  const [containerInfo, setContainerInfo] = useState<ContainerInfo>();
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [sandboxImages, setSandboxImages] = useState<SandboxImage[]>();
   const [unsubscribe, setUnsubscribe] = useState<Unsubscribe>();
   // simultaneous run quota
   const [containerQuota, setContainerQuota] = useState<number>(defaultQuota);
   const router = useRouter();
   const { listNotifications } = notificationAPI;
-  const { containerList } = containerAPI;
+  const { listContainers } = containerAPI;
   const { getEnv } = generalAPI;
   const { listSandboxImage } = sandboxAPI;
   const fetchNotifications = async (userId: string) => {
@@ -79,65 +77,21 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
     } else console.error("[ ❌ ] : fail to fetch notifications ", response);
   };
 
-  const fetchContainers = async (sub: string, userId: string) => {
-    const sandboxResponse = await listSandboxImage(userId);
-    if (sandboxResponse.success) {
-      const { sandboxImages } = sandboxResponse;
-      setSandboxImages(sandboxImages);
-      const response = await containerList(sub);
-      if (response.success) {
-        const { containers, containersInfo } = response;
-        console.log(sandboxImages, containers);
-        const patchedContainers: Container[] = containers
-          .map((c) => {
-            const sandboxImage = (sandboxImages as SandboxImage[]).find(
-              (sandboxImage) => sandboxImage.sandboxesId == c.containerID
-            );
-            if (sandboxImage) {
-              return {
-                title: sandboxImage.title,
-                subTitle: "",
-                existedTime: c.existedTime,
-                containerID: c.containerID,
-                type: c.type,
-              };
-            } else {
-              return {
-                title: c.title,
-                subTitle: c.subTitle,
-                existedTime: c.existedTime,
-                containerID: c.containerID,
-                type: c.type,
-              };
-            }
-          })
-        // .concat(
-        //   tempContainers.map((c) => {
-        //     return {
-        //       title: c.courseTitle,
-        //       subTitle: c.assignmentName,
-        //       existedTime: c.existedTime,
-        //       containerID: c.containerID,
-        //       isSandbox: false,
-        //       isTemporary: true,
-        //     };
-        //   })
-        // );
-        setContainers(patchedContainers);
-        setContainerInfo(containersInfo);
-        return {
-          containers: patchedContainers,
-          containersInfo,
-        };
-      } else
-        console.error(
-          "[ ❌ ] : fail to fetch containers' information ",
-          response
-        );
+  const fetchContainers = async (sub: string) => {
+    const response = await listContainers(sub);
+    if (response.success) {
+      const { containers } = response;
+      setContainers(containers);
+      return { containers }
     } else {
-      console.error("[ ❌ ] : fail to fetch fail sandboxes.", sandboxResponse);
+      console.error(
+        "[ ❌ ] : fail to fetch containers' information ",
+        response
+      );
     }
+
   };
+
   const ContainerQuotaFromEnv = async () => {
     const response = await getEnv();
     setContainerQuota(parseInt(response.Containers_limit));
@@ -230,7 +184,7 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
         if (await isSupported()) {
           await initMessage(sub, userId, semesterId);
         }
-        await fetchContainers(sub, userId);
+        await fetchContainers(sub);
         await fetchNotifications(userId);
         await ContainerQuotaFromEnv();
       }
@@ -256,24 +210,23 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
           // isAdmin,
           notifications,
           containers,
-          containerInfo,
+          setContainers,
           fetchNotifications,
           fetchContainers,
           containerQuota,
-          sandboxImages,
         }}
       >
         <Toaster
           position="bottom-right"
           toastOptions={{
             // this can the default duration of the toast
-            duration: 100000,
+            duration: 5000,
           }}
         >
           {(t: Toast) => {
             const classList = t.className.split(" ");
             if (classList.includes("toaster-loading")) t.duration = loadingTime;
-
+            if (classList.includes("toaster-custom")) t.duration = 60 * 60000;
             return (
               <Twemoji noWrapper options={{ className: "twemoji" }}>
                 <div

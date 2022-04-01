@@ -47,26 +47,32 @@ export default async function handler(
   };
   try {
     await redisHelper.insert.createWorkspace(userId, patch);
-    grpcClient.addTempContainer(
-      docReq,
-      async function (err, GoLangResponse: AddTempContainerReply) {
-        await redisHelper.insert.patchCreatedWorkspace(userId, {
-          id: GoLangResponse.tempContainerId,
-          type: eventToContainerType(event),
-          isTemporary: true,
-          createData: patch,
-        });
-        res.json({
-          success: GoLangResponse.success,
-          error: {
-            status: GoLangResponse.error?.status,
-            error: GoLangResponse.error?.error,
-          },
-          containerID: GoLangResponse.tempContainerId,
-        });
-        res.status(200).end();
-      }
-    );
+    const grpc = () =>
+      new Promise<void>((resolve, reject) => {
+        grpcClient.addTempContainer(
+          docReq,
+          async function (err, GoLangResponse: AddTempContainerReply) {
+            await redisHelper.insert.patchCreatedWorkspace(userId, {
+              id: GoLangResponse.tempContainerId,
+              type: eventToContainerType(event),
+              isTemporary: true,
+              createData: patch,
+            });
+            res.json({
+              success: GoLangResponse.success,
+              error: {
+                status: GoLangResponse.error?.status,
+                error: GoLangResponse.error?.error,
+              },
+              containerID: GoLangResponse.tempContainerId,
+            });
+            res.status(200).end();
+            if (err) reject(err);
+            else resolve();
+          }
+        );
+      });
+    await grpc();
   } catch (error) {
     console.error(error.stack);
     res.json({

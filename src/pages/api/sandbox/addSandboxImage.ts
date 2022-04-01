@@ -20,7 +20,7 @@ export default async function handler(
   try {
     await redisHelper.insert.createSandbox(userId, {
       title,
-      imageId,
+      id: imageId,
       description,
     });
     var docReq = AddSandBoxImageRequest.fromPartial({
@@ -54,7 +54,7 @@ export default async function handler(
   } finally {
     await redisHelper.remove.createSandbox(userId, {
       title,
-      imageId,
+      id: imageId,
       description,
     });
   }

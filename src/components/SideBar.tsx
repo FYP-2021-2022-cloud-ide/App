@@ -11,7 +11,7 @@ import { useRouter } from "next/router";
 import { useCnails } from "../contexts/cnails";
 import Logo from "./Logo";
 const SideBar = () => {
-  const { containerInfo, containerQuota, containers } = useCnails();
+  const { containerQuota, containers } = useCnails();
   const router = useRouter();
   var pages = [
     { name: "Dashboard", link: "/", icon: HomeIcon },
@@ -35,11 +35,10 @@ const SideBar = () => {
               <Link key={page.link} href={page.link}>
                 <a
                   id={page.name}
-                  className={`sidebar-btn ${
-                    isActive
+                  className={`sidebar-btn ${isActive
                       ? "text-gray-900 dark:text-gray-200"
                       : "text-gray-500 dark:text-gray-400"
-                  }`}
+                    }`}
                 >
                   <page.icon className="w-6 h-6" />
                   <div className="sidebar-text">{page.name}</div>
@@ -50,7 +49,7 @@ const SideBar = () => {
         </div>
       </div>
 
-      {containers && containerInfo && containerQuota && (
+      {containers && containerQuota && (
         <div className="w-full flex flex-col space-y-2 text-xs text-gray-500 dark:text-gray-400 select-none mb-5 px-4">
           <div
             className="tooltip tooltip-info"
@@ -67,11 +66,10 @@ const SideBar = () => {
                 style={{
                   width: `${(containers.length / containerQuota) * 100}%`,
                 }}
-                className={`current-run-bar-inner ${
-                  (containers.length / containerQuota) * 100 >= 100
+                className={`current-run-bar-inner ${(containers.length / containerQuota) * 100 >= 100
                     ? "bg-red-400"
                     : "bg-green-300"
-                }`}
+                  }`}
               ></div>
             </div>
           </div>

@@ -107,9 +107,8 @@ const TemplateBoard = ({ template }: { template: Template }) => {
                   <span className="absolute animate-ping inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                 )}
                 <span
-                  className={`relative inline-flex rounded-full h-3 w-3 ${
-                    row.status == "ON" ? "bg-green-400" : "bg-gray-400"
-                  }`}
+                  className={`relative inline-flex rounded-full h-3 w-3 ${row.status == "ON" ? "bg-green-400" : "bg-gray-400"
+                    }`}
                 ></span>
               </span>
             )}
@@ -257,29 +256,30 @@ const Wrapper = () => {
   const { environments, templates, fetch, sectionUserInfo } = useInstructor();
   const index1 = environments.findIndex((env) => env.id == envOrTemplateId);
   const index2 = templates.findIndex((t) => t.id == envOrTemplateId);
-  templates[0].name;
-  environments[0].name;
+  // templates[0].name;
+  // environments[0].name;
   return (
     <div className="w-full">
       <div className="flex flex-col px-10 w-full text-gray-600 space-y-4 mb-10">
         <Breadcrumbs
-          elements={[
-            {
-              name: "Dashboard",
-              path: "/",
-            },
-            {
-              name: `${sectionUserInfo.courseCode} (${sectionUserInfo.sectionCode})`,
-              path: `/course/${sectionId}/instructor`,
-            },
-            {
-              name:
-                index1 != -1
-                  ? environments[index1].name
-                  : templates[index2].name,
-              path: `/course/${sectionId}/instructor/${envOrTemplateId}`,
-            },
-          ]}
+          elements={[]}
+        // elements={[
+        //   {
+        //     name: "Dashboard",
+        //     path: "/",
+        //   },
+        //   {
+        //     name: `${sectionUserInfo.courseCode} (${sectionUserInfo.sectionCode})`,
+        //     path: `/course/${sectionId}/instructor`,
+        //   },
+        //   {
+        //     name:
+        //       index1 != -1
+        //         ? environments[index1].name
+        //         : templates[index2].name,
+        //     path: `/course/${sectionId}/instructor/${envOrTemplateId}`,
+        //   },
+        // ]}
         />
         {index1 != -1 && (
           <EnvBoard environment={environments[index1]}></EnvBoard>

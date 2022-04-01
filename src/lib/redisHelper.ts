@@ -5,7 +5,6 @@ import {
   Environment as ApiEnvironment,
   Container as ApiWorkspace,
 } from "./api/api";
-import { async } from "@firebase/util";
 
 /**
  * in second
@@ -20,6 +19,10 @@ type WorkspaceCreateData =
        * title of workspace
        */
       title: string;
+      /**
+       * the data for client to continue to creation process in case client lost the data
+       */
+      data?: any;
     }
   | {
       cause: "TEMPLATE_UPDATE" | "SANDBOX_UPDATE" | "ENV_UPDATE";
@@ -31,6 +34,10 @@ type WorkspaceCreateData =
        * title of workspace
        */
       title: string;
+      /**
+       * the data for client to continue to update process in case client lose the data
+       */
+      data?: any;
     }
   | {
       cause:
@@ -81,7 +88,10 @@ export type Workspace =
 
 type SandboxCreateData = {
   title: string;
-  imageId: string;
+  /**
+   * sandbox id
+   */
+  id: string;
   description: string;
 };
 
@@ -98,17 +108,14 @@ type SandboxRemoveData = {
 export type Sandbox =
   | {
       status: "CREATING";
-      cause: "SANDBOX_CREATE";
       data: SandboxCreateData;
     }
   | {
       status: "UPDATING";
-      cause: "SANDBOX_UPDATE";
       data: SandboxUpdateData;
     }
   | {
       status: "REMOVING";
-      cause: "SANDBOX_REMOVE";
       data: SandboxRemoveData;
     };
 
@@ -145,17 +152,14 @@ type TemplateRemoveData = {
 export type Template =
   | {
       status: "CREATING";
-      cause: "TEMPLATE_CREATE";
       data: TemplateCreateData;
     }
   | {
       status: "UPDATING";
-      cause: "TEMPLATE_UPDATE";
       data: TemplateUpdateData;
     }
   | {
       status: "REMOVING";
-      cause: "TEMPLATE_REMOVE";
       data: TemplateRemoveData;
     };
 
@@ -189,17 +193,14 @@ type EnvironmentRemoveData = {
 export type Environment =
   | {
       status: "CREATING";
-      cause: "ENV_CREATE";
       data: EnvironmentCreateData;
     }
   | {
       status: "UPDATING";
-      cause: "ENV_UPDATE";
       data: EnvironmentUpdateData;
     }
   | {
       status: "REMOVING";
-      cause: "ENV_REMOVE";
       data: EnvironmentRemoveData;
     };
 
@@ -211,7 +212,6 @@ const insert = {
     const sandboxes = await list.sandboxes(userId);
     sandboxes.push({
       status: "CREATING",
-      cause: "SANDBOX_CREATE",
       data: data,
     });
     await redisClient.set(
@@ -226,7 +226,6 @@ const insert = {
     const sandboxes = await list.sandboxes(userId);
     sandboxes.push({
       status: "UPDATING",
-      cause: "SANDBOX_UPDATE",
       data: data,
     });
     await redisClient.set(
@@ -241,7 +240,6 @@ const insert = {
     const sandboxes = await list.sandboxes(userId);
     sandboxes.push({
       status: "REMOVING",
-      cause: "SANDBOX_REMOVE",
       data: data,
     });
     await redisClient.set(
@@ -295,13 +293,13 @@ const insert = {
       "EX",
       redisKeyPersistKeyExpireTime
     );
+
     return workspaces;
   },
   createTemplate: async (sectionId: string, data: TemplateCreateData) => {
     const templates = await list.templates(sectionId);
     templates.push({
       status: "CREATING",
-      cause: "TEMPLATE_CREATE",
       data: data,
     });
     await redisClient.set(
@@ -316,7 +314,6 @@ const insert = {
     const templates = await list.templates(sectionId);
     templates.push({
       status: "UPDATING",
-      cause: "TEMPLATE_UPDATE",
       data: data,
     });
     await redisClient.set(
@@ -331,7 +328,6 @@ const insert = {
     const templates = await list.templates(sectionId);
     templates.push({
       status: "REMOVING",
-      cause: "TEMPLATE_REMOVE",
       data: data,
     });
     await redisClient.set(
@@ -346,7 +342,6 @@ const insert = {
     const environments = await list.environments(sectionId);
     environments.push({
       status: "CREATING",
-      cause: "ENV_CREATE",
       data: data,
     });
     await redisClient.set(
@@ -361,7 +356,6 @@ const insert = {
     const environments = await list.environments(sectionId);
     environments.push({
       status: "UPDATING",
-      cause: "ENV_UPDATE",
       data: data,
     });
     await redisClient.set(
@@ -376,7 +370,6 @@ const insert = {
     const environments = await list.environments(sectionId);
     environments.push({
       status: "REMOVING",
-      cause: "ENV_REMOVE",
       data: data,
     });
     await redisClient.set(
@@ -442,6 +435,7 @@ const remove = {
   createWorkspace: async (userId: string, data: WorkspaceCreateData) => {
     let workspaces = await list.workspaces(userId);
     // remove the CREATING workspace
+
     workspaces = workspaces.filter((workspace) => {
       if (
         data.cause == "ENV_CREATE" ||
@@ -650,15 +644,15 @@ const patch = {
         patched.push({
           id: "",
           title: sandbox.data.title,
-          description: sandbox.data.imageId,
-          imageId: sandbox.data.imageId,
+          description: sandbox.data.description,
+          imageId: sandbox.data.id,
           sandboxesId: "",
           status: "CREATING",
         });
       }
       if (sandbox.status == "UPDATING") {
         const index = patched.findIndex(
-          (si) => si.id == (sandbox.data as SandboxUpdateData).id
+          (si) => sandbox.status == "UPDATING" && si.id == sandbox.data.id
         );
         if (index != -1) {
           patched.splice(index, 1, {
@@ -672,7 +666,7 @@ const patch = {
       }
       if (sandbox.status == "REMOVING") {
         const index = patched.findIndex(
-          (si) => si.id == (sandbox.data as SandboxUpdateData).id
+          (si) => sandbox.status == "REMOVING" && si.id == sandbox.data.id
         );
         if (index != -1) {
           patched[index].status = "REMOVING";
@@ -755,7 +749,7 @@ const patch = {
       }
       if (template.status == "UPDATING") {
         const index = patched.findIndex(
-          (t) => t.id == (template.data as TemplateUpdateData).id
+          (t) => template.status == "UPDATING" && t.id == template.data.id
         );
         if (index != -1) {
           patched.splice(index, 1, {
@@ -770,7 +764,7 @@ const patch = {
       }
       if (template.status == "REMOVING") {
         const index = patched.findIndex(
-          (si) => si.id == (template.data as TemplateRemoveData).id
+          (si) => template.status == "REMOVING" && si.id == template.data.id
         );
         if (index != -1) {
           patched[index].status = "REMOVING";

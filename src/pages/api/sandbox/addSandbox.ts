@@ -25,36 +25,44 @@ export default async function handler(
       id: sandboxImageId,
       title: title,
     });
+
     var docReq = AddSandBoxRequest.fromPartial({
       sessionKey: fetchAppSession(req),
       memLimit: memLimit,
       numCPU: numCPU,
       sandBoxImageId: sandboxImageId,
     });
-    grpcClient.addSandbox(
-      docReq,
-      async function (err, GoLangResponse: AddSandBoxReply) {
-        await redisHelper.insert.patchCreatedWorkspace(userId, {
-          id: GoLangResponse.sandBoxId,
-          type: "SANDBOX",
-          isTemporary: false,
-          createData: {
-            cause: "SANDBOX_START_WORKSPACE",
-            id: sandboxImageId,
-            title: title,
-          },
-        });
-        res.json({
-          success: GoLangResponse.success,
-          error: {
-            status: GoLangResponse.error?.status,
-            error: GoLangResponse.error?.error,
-          },
-          sandboxId: GoLangResponse.sandBoxId,
-        });
-        res.status(200).end();
-      }
-    );
+    // need to wrap grpc call because grpc call is synchronize and finally will be directly carried out
+    const grpc = () =>
+      new Promise<void>((resolve, reject) => {
+        grpcClient.addSandbox(
+          docReq,
+          async function (err, GoLangResponse: AddSandBoxReply) {
+            await redisHelper.insert.patchCreatedWorkspace(userId, {
+              id: GoLangResponse.sandBoxId,
+              type: "SANDBOX",
+              isTemporary: false,
+              createData: {
+                cause: "SANDBOX_START_WORKSPACE",
+                id: sandboxImageId,
+                title: title,
+              },
+            });
+            res.json({
+              success: GoLangResponse.success,
+              error: {
+                status: GoLangResponse.error?.status,
+                error: GoLangResponse.error?.error,
+              },
+              sandboxId: GoLangResponse.sandBoxId,
+            });
+            res.status(200).end();
+            if (err) reject(err);
+            else resolve();
+          }
+        );
+      });
+    await grpc();
   } catch (error) {
     console.error(error.stack);
     res.json({

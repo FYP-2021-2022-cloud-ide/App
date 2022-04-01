@@ -1,32 +1,103 @@
-import React, { useLayoutEffect, useRef } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { ClockIcon, XIcon } from "@heroicons/react/outline";
 import Tilt from "react-parallax-tilt";
 import { useCleanTilt } from "../TemplateCard";
-import { sandboxAPI } from "../../lib/api/sandboxAPI";
+
 import { useCnails } from "../../contexts/cnails";
 import myToast from "../CustomToast";
 import { errorToToastDescription } from "../../lib/errorHelper";
 import { Container } from "../../lib/cnails";
+
+import { Error } from "../../lib/api/api";
 import { templateAPI } from "../../lib/api/templateAPI";
 import { containerAPI } from "../../lib/api/containerAPI";
-
+import { sandboxAPI } from "../../lib/api/sandboxAPI";
+import moment from "moment";
+import useInterval from "../useInterval";
 type Props = Container & { zIndex: number };
 
+/**
+ * 
+ * @param isoTime a timestamp
+ * @returns the time from the timestamp
+ */
+const getTimeDiff = (isoTime: string) => {
+  return moment.duration(moment().diff(moment(isoTime)))
+}
+
+const formatDuration = (duration: moment.Duration): string => {
+  const second = duration.asSeconds()
+  if (second < 60) {
+    return `${Math.floor(second)}s`
+  } else if (second < 3600) {
+    return `${Math.floor(duration.asMinutes())}m`
+  } else return `${Math.floor(duration.asHours())}h`
+}
+
 function ContainerCard({
-  title: courseTitle,
-  subTitle: assignmentName,
-  existedTime,
+  title,
+  subTitle,
+  startAt,
   containerID,
   type,
+  status,
+  isTemporary,
   zIndex,
 }: Props) {
+
   const { removeTempContainer } = containerAPI;
   const { removeTemplateContainer } = templateAPI;
   const { removeSandbox } = sandboxAPI;
   const { userId, sub, fetchContainers } = useCnails();
+
+  const [timeDiff, setTimeDiff] = useState(getTimeDiff(startAt))
   const { ref, cleanStyle } = useCleanTilt(
     zIndex ? `z-index : ${zIndex};` : ""
   );
+  useInterval(() => {
+    setTimeDiff(getTimeDiff(startAt))
+  }, 30 * 1000)
+
+  if (status) {
+    return (
+      <Tilt
+        onLeave={cleanStyle}
+        ref={ref}
+        tiltMaxAngleX={4}
+        tiltMaxAngleY={4}
+        tiltReverse
+      >
+        <div
+          className="flex flex-col h-full min-h-[8rem] justify-between
+        rounded-xl border-gray-200 dark:border-gray-700 border min-w-max transition-all ease-in-out duration-300 p-4 bg-gray-200 dark:bg-gray-900 select-none"
+        >
+          <div className="flex flex-row  space-x-4 items-start ">
+            {/* the indicator */}
+            <div className="mt-2">
+              <span className="relative flex h-3 w-3">
+                <span className="absolute animate-ping inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-yellow-400"></span>
+              </span>
+            </div>
+            <div className="w-full">
+              <div className="font-semibold text-sm text-gray-800 dark:text-gray-200">
+                {subTitle}
+              </div>
+              <div className="font-medium text-xs text-gray-600 dark:text-gray-300">
+                {isTemporary ? "Tempory Container" : title}
+              </div>
+            </div>
+          </div>
+          <p className="text-gray-500 text-xs">{
+            status == "CREATING" && "being created..." ||
+            status == "REMOVING" && "being removed..."
+          }</p>
+
+        </div>
+      </Tilt>
+    )
+  }
+
   return (
     <Tilt
       onLeave={cleanStyle}
@@ -42,7 +113,7 @@ function ContainerCard({
           )
         }
         className="flex flex-col h-full min-h-[8rem] justify-between
-        rounded-xl border-gray-200 dark:border-gray-700 border min-w-max transition-all ease-in-out duration-300 p-4 bg-white dark:bg-gray-600"
+        rounded-xl border-gray-200 dark:border-gray-700 border min-w-max transition-all ease-in-out duration-300 p-4 bg-white dark:bg-gray-600 select-none"
       >
         <div className="flex flex-row  space-x-4 items-start ">
           {/* the indicator */}
@@ -54,10 +125,10 @@ function ContainerCard({
           </div>
           <div className="w-full">
             <div className="font-semibold text-sm text-gray-800 dark:text-gray-200">
-              {assignmentName}
+              {subTitle}
             </div>
             <div className="font-medium text-xs text-gray-600 dark:text-gray-300">
-              {courseTitle}
+              {isTemporary ? "Tempory Container" : title}
             </div>
           </div>
           <button
@@ -65,32 +136,39 @@ function ContainerCard({
             onClick={async (e) => {
               e.stopPropagation();
               let success = false;
-              if (type == "SANDBOX") {
-                const response = await removeSandbox(containerID, userId);
-                if (response.success) {
-                  success = true;
-                }
-              } else if(type == "TEMPLATE_WORKSPACE") {
-                const response = await removeTemplateContainer(containerID, sub);
-                if (response.success) {
-                  success = true;
-                }
-              }else if(type == "TEMPORARY") {
+              let error: Error;
+              if (isTemporary) {
                 const response = await removeTempContainer(containerID, sub);
                 if (response.success) {
                   success = true;
+                } else {
+                  error = response.error
+                }
+              } else if (type == "SANDBOX") {
+                const response = await removeSandbox(containerID, userId);
+                if (response.success) {
+                  success = true;
+                } else {
+                  error = response.error
+                }
+              } else if (type == "TEMPLATE") {
+                const response = await removeTemplateContainer(containerID, sub);
+                if (response.success) {
+                  success = true;
+                } else {
+                  error = response.error
                 }
               }
 
               if (success) {
                 myToast.success("Workspace is removed.");
-                fetchContainers(sub, userId);
+                fetchContainers(sub);
               } else
                 myToast.error({
                   title: "Fail to remove workspace",
                   description: errorToToastDescription({
-                    error: "sdflsdk",
-                    status: "sdfds",
+                    error: error.error,
+                    status: error.status,
                   }),
                 });
             }}
@@ -101,9 +179,7 @@ function ContainerCard({
         <div className="w-full flex flex-row justify-end items-center space-x-1 ">
           <ClockIcon className="h-4 w-4 text-gray-600 dark:text-gray-300 "></ClockIcon>
           <div className="font-medium text-xs text-gray-600 dark:text-gray-300">
-            {existedTime.includes("m")
-              ? existedTime.split("m")[0] + "m"
-              : existedTime.split(".")[0] + "s"}
+            {formatDuration(timeDiff)}
           </div>
         </div>
       </div>

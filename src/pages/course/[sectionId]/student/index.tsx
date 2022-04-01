@@ -17,10 +17,11 @@ import myToast from "../../../../components/CustomToast";
 import exampleTemplates from "../../../../fake_data/example_template.json";
 import { errorToToastDescription } from "../../../../lib/errorHelper";
 import { CLICK_TO_REPORT } from "../../../../lib/constants";
+import {
+  CPU,
+  memory
+} from "../../../../lib/forms";
 
-const rootImage = "143.89.223.188:5000/codeserver:latest";
-const CPU = 0.5;
-const memory = 1000;
 
 const Home = () => {
   const router = useRouter();
@@ -28,7 +29,7 @@ const Home = () => {
   const [sectionUserInfo, setSectionUserInfo] = useState<SectionUserInfo>(null);
   const [workspaces, setWorkspaces] = useState<Workspace[]>(null);
   const { sub } = useCnails();
-  const { templateList,addTemplateContainer,removeTemplateContainer } = templateAPI;
+  const { templateList, addTemplateContainer, removeTemplateContainer } = templateAPI;
   const { getSectionUserInfo } = generalAPI;
   // data fetching from API
   const fetchSectionUserInfo = async () => {
@@ -99,8 +100,8 @@ const Home = () => {
               if (workspace.containerID) {
                 window.open(
                   "https://codespace.ust.dev/user/container/" +
-                    workspace.containerID +
-                    "/"
+                  workspace.containerID +
+                  "/"
                 );
               }
             }}
@@ -125,6 +126,7 @@ const Home = () => {
                     description: errorToToastDescription(response.error),
                     comment: CLICK_TO_REPORT,
                   });
+                fetchWorkspaces();
               } else {
                 const response = await removeTemplateContainer(
                   workspace.containerID,
@@ -138,6 +140,8 @@ const Home = () => {
                     description: errorToToastDescription(response.error),
                     comment: CLICK_TO_REPORT,
                   });
+
+                fetchWorkspaces();
               }
             }}
           ></WorkspacesList>
