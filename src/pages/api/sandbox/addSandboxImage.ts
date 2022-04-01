@@ -5,7 +5,6 @@ import { fetchAppSession } from "../../../lib/fetchAppSession";
 
 import { SandboxImageAddResponse, nodeError } from "../../../lib/api/api";
 import { redisClient } from "../../../lib/redisClient";
-import redisHelper from "../../../lib/redisHelper";
 import { grpcClient } from "../../../lib/grpcClient";
 import {
   AddSandBoxImageReply,
@@ -18,11 +17,6 @@ export default async function handler(
 ) {
   const { description, imageId, title, userId } = JSON.parse(req.body);
   try {
-    await redisHelper.insert.createSandbox(userId, {
-      title,
-      id: imageId,
-      description,
-    });
     var docReq = AddSandBoxImageRequest.fromPartial({
       sessionKey: fetchAppSession(req),
       description: description,
@@ -32,7 +26,7 @@ export default async function handler(
     });
     grpcClient.addSandboxImage(
       docReq,
-      async function (err, GoLangResponse: AddSandBoxImageReply) {
+      function (err, GoLangResponse: AddSandBoxImageReply) {
         res.json({
           success: GoLangResponse.success,
           error: {
@@ -51,12 +45,6 @@ export default async function handler(
       error: nodeError(error),
     });
     res.status(405).end();
-  } finally {
-    await redisHelper.remove.createSandbox(userId, {
-      title,
-      id: imageId,
-      description,
-    });
   }
 }
 

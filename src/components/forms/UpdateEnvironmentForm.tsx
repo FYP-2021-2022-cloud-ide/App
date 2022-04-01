@@ -7,6 +7,7 @@ import { errorToToastDescription } from "../../lib/errorHelper";
 import myToast from "../CustomToast";
 import { envAPI } from "../../lib/api/envAPI";
 import { getValidName } from "../../lib/formHelper"
+import { FormStructure } from "../ModalForm/types";
 
 
 
@@ -120,9 +121,7 @@ const UpdateEnvironmentForm = ({ isOpen, setOpen, target }: Props) => {
                                 environments
                                     .map((e) => e.name)
                                     .filter((n) => n != target.name)
-                                    .includes(
-                                        (data as UpdateEnvironmentFormData).update_environment.name
-                                    )
+                                    .includes(data.update_environment.name)
                             )
                                 return { ok: false, message: "Name crash" };
                             else return { ok: true };
@@ -135,7 +134,7 @@ const UpdateEnvironmentForm = ({ isOpen, setOpen, target }: Props) => {
                     },
                 },
             },
-        } : {}}
+        } as FormStructure<UpdateEnvironmentFormData> : {}}
         // onClose={async ({ update_environment: data }: UpdateEnvironmentFormData, isEnter) => {
         //     const { update_internal: containerId } = data;
         //     if (containerId != "" && !isEnter) {
@@ -148,7 +147,7 @@ const UpdateEnvironmentForm = ({ isOpen, setOpen, target }: Props) => {
         //         fetch();
         //     }
         // }}
-        onEnter={async ({ update_environment: data }: UpdateEnvironmentFormData) => {
+        onEnter={async ({ update_environment: data }) => {
             const id = myToast.loading("Updating an environment...");
             const { name, description } = data;
             const response = await updateEnvironment(

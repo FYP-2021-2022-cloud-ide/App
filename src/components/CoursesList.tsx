@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import moment from "moment";
 import { generalAPI } from "../lib/api/generalAPI";
 import { useCnails } from "../contexts/cnails";
+import myToast from "./CustomToast";
+import { errorToToastDescription } from "../lib/errorHelper";
+import { CLICK_TO_REPORT } from "../lib/constants";
 
 export interface props {
   courses: Course[];
@@ -31,6 +34,14 @@ const CoursesList = () => {
         )
       );
       setCourses(courses);
+    } else {
+      myToast.error(
+        {
+          title: "Fail to fetch courses",
+          description: errorToToastDescription(response.error),
+          comment: CLICK_TO_REPORT
+        }
+      )
     }
   };
   useEffect(() => {

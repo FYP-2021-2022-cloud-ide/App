@@ -10,6 +10,7 @@ import TempContainerToast from "../TempContainerToast"
 import { templateAPI } from "../../lib/api/templateAPI";
 import { errorToToastDescription } from "../../lib/errorHelper";
 import { CLICK_TO_REPORT } from "../../lib/constants";
+import { FormStructure } from "../ModalForm/types";
 
 export type UpdateTemplateFormData = {
     update_template: {
@@ -140,7 +141,7 @@ const UpdateTemplateForm = ({ isOpen, setOpen, target }: Props) => {
                                 templates
                                     .map((t) => t.name)
                                     .filter((n) => n != target.name)
-                                    .includes((data as UpdateTemplateFormData).update_template.name)
+                                    .includes(data.update_template.name)
                             )
                                 return { ok: false, message: "Name crash" };
                             else return { ok: true };
@@ -179,7 +180,7 @@ const UpdateTemplateForm = ({ isOpen, setOpen, target }: Props) => {
                     },
                 },
             },
-        } : {}}
+        } as FormStructure<UpdateTemplateFormData> : {}}
         title="Update Template"
         // onClose={async ({ update_template: data }: UpdateTemplateFormData, isEnter) => {
         //     const { update_internal: containerId } = data;
@@ -193,7 +194,7 @@ const UpdateTemplateForm = ({ isOpen, setOpen, target }: Props) => {
         //         fetch();
         //     }
         // }}
-        onEnter={async ({ update_template: data }: UpdateTemplateFormData) => {
+        onEnter={async ({ update_template: data }) => {
             const id = myToast.loading("Updating the template...");
             const {
                 name,

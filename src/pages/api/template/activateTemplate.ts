@@ -10,7 +10,6 @@ import {
   SuccessStringReply,
   TemplateIdRequest,
 } from "../../../proto/dockerGet/dockerGet";
-import redisHelper from "../../../lib/redisHelper";
 import { getCookie } from "../../../lib/cookiesHelper";
 
 export default async function handler(
@@ -26,12 +25,7 @@ export default async function handler(
     sectionUserId: section_user_id,
   });
   try {
-    await redisHelper.insert.updateTemplate(sectionId, {
-      title: title,
-      description: description,
-      id: templateId,
-      updatedBy: userId,
-    });
+
     grpcClient.activateTemplate(
       docReq,
       function (err, GoLangResponse: SuccessStringReply) {
@@ -52,14 +46,7 @@ export default async function handler(
       error: nodeError(error),
     });
     res.status(405).end();
-  } finally {
-    await redisHelper.remove.updateTemplate(sectionId, {
-      title: title,
-      description: description,
-      id: templateId,
-      updatedBy: userId,
-    });
-  }
+  } 
 }
 
 export const config = {

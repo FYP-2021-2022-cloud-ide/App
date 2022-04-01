@@ -8,6 +8,7 @@ import { errorToToastDescription } from "../../lib/errorHelper";
 import React from "react";
 import { useSandbox } from "../../contexts/sandbox";
 import { sandboxAPI } from "../../lib/api/sandboxAPI";
+import { FormStructure } from "../ModalForm/types";
 
 
 export type CreateSandboxFormData = {
@@ -57,7 +58,7 @@ const CreateSandboxForm = ({ isOpen, setOpen }: Props) => {
                             if (
                                 sandboxImages
                                     .map((s) => s.title)
-                                    .includes((data as CreateSandboxFormData).create_sandbox.name)
+                                    .includes(data.create_sandbox.name)
                             )
                                 return { ok: false, message: "Name crash" };
                             return { ok: true };
@@ -71,9 +72,9 @@ const CreateSandboxForm = ({ isOpen, setOpen }: Props) => {
                     },
                 },
             },
-        }}
-        onEnter={async ({ create_sandbox: data }: CreateSandboxFormData) => {
-            const environment = data.environment_choice as Option;
+        } as FormStructure<CreateSandboxFormData>}
+        onEnter={async ({ create_sandbox: data }) => {
+            const environment = data.environment_choice;
             const toastId = myToast.loading("Creating a personal workspace...");
             // set status in UI 
             setSandboxImages([...sandboxImages, {
@@ -85,9 +86,9 @@ const CreateSandboxForm = ({ isOpen, setOpen }: Props) => {
                 status: "CREATING"
             }])
             const response = await addSandboxImage(
-                data.description as string,
+                data.description,
                 environment.imageId,
-                data.name as string,
+                data.name,
                 userId
             )
             if (response.success) {

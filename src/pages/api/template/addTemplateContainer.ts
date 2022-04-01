@@ -9,7 +9,7 @@ import {
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 import { getCookie } from "../../../lib/cookiesHelper";
 import redisHelper from "../../../lib/redisHelper";
-
+import { v4 } from "uuid";
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ContainerAddResponse>
@@ -23,8 +23,9 @@ export default async function handler(
     accessRight,
     useFresh,
     title,
+    sub,
+    event, // it could be a student start workspace or instructor start template workspace
   } = JSON.parse(req.body);
-  const userId = getCookie(req.headers.cookie, "userId");
   var docReq: AddContainerRequest = AddContainerRequest.fromPartial({
     sessionKey: fetchAppSession(req),
     imageName: imageName,
@@ -35,42 +36,38 @@ export default async function handler(
     accessRight: accessRight,
     useFresh: useFresh,
   });
+  const tempId = v4();
   try {
-    await redisHelper.insert.createWorkspace(userId, {
-      cause: "TEMPLATE_START_WORKSPACE",
-      id: template_id,
-      title: title,
+    await redisHelper.insert.workspaces(sub, {
+      title,
+      tempId,
+      containerId: "",
+      cause: event,
     });
-    const grpc = () =>
-      new Promise<void>((resolve, reject) => {
-        grpcClient.addTemplateContainer(
-          docReq,
-          async function (err, GoLangResponse: AddContainerReply) {
-            await redisHelper.insert.patchCreatedWorkspace(userId, {
-              id: GoLangResponse.containerID,
-              type: "TEMPLATE",
-              isTemporary: false,
-              createData: {
-                cause: "TEMPLATE_START_WORKSPACE",
-                id: template_id,
-                title: title,
-              },
-            });
-            res.json({
-              success: GoLangResponse.success,
-              error: {
-                status: GoLangResponse.error?.status,
-                error: GoLangResponse.error?.error,
-              },
-              containerID: GoLangResponse.containerID,
-            });
-            res.status(200).end();
-            if (err) reject(err);
-            else resolve();
-          }
-        );
-      });
-    await grpc();
+    grpcClient.addTemplateContainer(
+      docReq,
+      async function (err, GoLangResponse: AddContainerReply) {
+        if (err) {
+          // the request fail so we remove it from redis
+          await redisHelper.remove.workspaces(sub, tempId);
+        } else {
+          await redisHelper.onReturn.workspaces(
+            sub,
+            tempId,
+            GoLangResponse.containerID
+          );
+        }
+        res.json({
+          success: GoLangResponse.success,
+          error: {
+            status: GoLangResponse.error?.status,
+            error: GoLangResponse.error?.error,
+          },
+          containerID: GoLangResponse.containerID,
+        });
+        res.status(200).end();
+      }
+    );
   } catch (error) {
     console.error(error.stack);
     res.json({
@@ -78,12 +75,6 @@ export default async function handler(
       error: nodeError(error),
     });
     res.status(405).end();
-  } finally {
-    await redisHelper.remove.createWorkspace(userId, {
-      cause: "TEMPLATE_START_WORKSPACE",
-      id: template_id,
-      title: title,
-    });
   }
 }
 

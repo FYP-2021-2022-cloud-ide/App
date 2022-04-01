@@ -8,6 +8,7 @@ import { envAPI } from "../../lib/api/envAPI";
 import { CLICK_TO_REPORT } from "../../lib/constants";
 import { errorToToastDescription } from "../../lib/errorHelper";
 import { useCnails } from "../../contexts/cnails";
+import { FormStructure } from "../ModalForm/types";
 
 export type CreateEnvironmentFormData = {
     create_environment: {
@@ -56,7 +57,7 @@ const CreateEnvironmentForm = ({ isOpen, setOpen }: Props) => {
                         label: "Pick the Programming Language",
                         options: envChoices,
                         conditional: (data) => {
-                            return (data as CreateEnvironmentFormData).create_environment
+                            return data.create_environment
                                 .is_predefined;
                         },
                     },
@@ -71,7 +72,7 @@ const CreateEnvironmentForm = ({ isOpen, setOpen }: Props) => {
                                 environments
                                     .map((e) => e.name)
                                     .includes(
-                                        (data as CreateEnvironmentFormData).create_environment.name
+                                        data.create_environment.name
                                     )
                             )
                                 return { ok: false, message: "Name crash" };
@@ -85,8 +86,8 @@ const CreateEnvironmentForm = ({ isOpen, setOpen }: Props) => {
                     },
                 },
             },
-        }}
-        onEnter={async ({ create_environment: data }: CreateEnvironmentFormData) => {
+        } as FormStructure<CreateEnvironmentFormData>}
+        onEnter={async ({ create_environment: data }) => {
             // console.log(data);
             const { environment_choice: environment, name, description } = data;
             const id = myToast.loading("Creating the environment...");

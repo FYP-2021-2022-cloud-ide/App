@@ -7,6 +7,7 @@ import { CPU, getEnvOptions, getValidName, memory } from "../../lib/formHelper"
 import { containerAPI } from "../../lib/api/containerAPI";
 import TempContainerToast from "../TempContainerToast"
 import { templateAPI } from "../../lib/api/templateAPI";
+import { FormStructure } from "../ModalForm/types";
 
 export type CreateTemplateFormData = {
     create_template: {
@@ -96,15 +97,15 @@ const CreateTemplateForm = ({ isOpen, setOpen }: Props) => {
                         label: "Time Limit(in minutes) ",
                         description: "Time Limit of the exam",
                         conditional: (data) => {
-                            return (data as CreateTemplateFormData).create_template
-                                .is_exam as boolean;
+                            return data.create_template
+                                .is_exam;
                         },
                     },
                 },
             },
-        }}
+        } as FormStructure<CreateTemplateFormData>}
         title="Create Template"
-        onEnter={async ({ create_template: data }: CreateTemplateFormData) => {
+        onEnter={async ({ create_template: data }) => {
             const toastId = myToast.loading("Creating a temporary workspace...");
             var selectedEnv = data.environment;
             const response = await addTempContainer(

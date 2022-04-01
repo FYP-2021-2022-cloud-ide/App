@@ -19,8 +19,8 @@ import { Notification } from "../lib/cnails";
 import moment from "moment";
 import Loader from "../components/Loader";
 import myToast from "../components/CustomToast";
-import ModalForm from "../components/ModalForm/ModalForm";
-import getMessageReplyFormStructure, { MessageReplyFormData } from "../lib/forms/messageReplyForm";
+
+
 import React from "react";
 import { useRouter } from "next/router";
 import _ from "lodash";
@@ -29,6 +29,7 @@ import PaginationComponent from "../components/table/PaginationComponent";
 import { ExpandRowToggled } from "react-data-table-component/dist/src/DataTable/types";
 import { errorToToastDescription } from "../lib/errorHelper";
 import { CLICK_TO_REPORT } from "../lib/constants";
+import MessageReplyForm from "../components/forms/MessageReplyForm";
 
 type Course = {
   fullCode: string;
@@ -64,11 +65,7 @@ const MessageTable = () => {
   const { userId, notifications, fetchNotifications } = useCnails();
   const [pending, setPending] = useState(true);
   const [replyFormOpen, setReplyFormOpen] = useState<boolean>(false);
-  const [replyTarget, setReplyTarget] = useState<
-    { id: string; name: string; sub: string }[]
-  >([]);
-  const [replySection, setReplySection] = useState<string>("");
-  const [replyTitle, setReplyTitle] = useState<string>("");
+  const [replyTarget, setReplyTarget] = useState<Notification>();
   const [readDuringUnreadFiltering, setReadDuringUnreadFiltering] = useState<
     Notification[]
   >([]);
@@ -213,10 +210,8 @@ const MessageTable = () => {
               text: "Reply",
               icon: <ReplyIcon className="w-5 h-5 text-white" />,
               onClick: () => {
-                setReplyTarget([row.sender]);
-                setReplySection(row.section_id);
-                setReplyTitle("RE: " + row.title);
                 setReplyFormOpen(true);
+                setReplyTarget(row)
               },
               shown: !row.allow_reply, //bug:this does not show when allow reply is true
             },
@@ -486,32 +481,7 @@ const MessageTable = () => {
               <></>
             )}
           </div>
-          <ModalForm
-            isOpen={replyFormOpen}
-            setOpen={setReplyFormOpen}
-            title={"Reply Message"}
-            size="lg"
-            formStructure={getMessageReplyFormStructure(replyTarget)}
-            clickOutsideToClose
-            escToClose
-            onEnter={async ({ reply_message: data }: MessageReplyFormData) => {
-              const response = await sendNotification(
-                replyTitle, //the title can change? or use "RE: <message title> // use "RE: <message title> thx
-                data.message,
-                userId,
-                replyTarget[0].id, //should pass the userid of the people to reply to
-                true,
-                replySection
-              );
-              if (response.success) {
-                fetchNotifications();
-              }
-              setReplyFormOpen(false);
-            }}
-            onClose={() => {
-              setReplyTarget([]);
-            }}
-          ></ModalForm>
+          <MessageReplyForm isOpen={replyFormOpen} setOpen={setReplyFormOpen} target={replyTarget} />
         </div>
       )}
       <button

@@ -32,7 +32,7 @@ const TempContainerToast = ({ containerId, getToastId, onOK, okBtnText, cancelBt
         <p>
             A temp workspace is created. Click the link to set up your
             workspace. After finish setup, click{" "}
-            <span className="font-bold">Finish</span>.
+            <span className="font-bold">{okBtnText ?? "OK"}</span>.
         </p>
         <a
             className="btn btn-xs border-none"

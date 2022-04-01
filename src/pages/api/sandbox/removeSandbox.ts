@@ -10,7 +10,6 @@ import {
   SuccessStringReply,
   SandBoxIdRequest,
 } from "../../../proto/dockerGet/dockerGet";
-import redisHelper from "../../../lib/redisHelper";
 
 export default async function handler(
   req: NextApiRequest,
@@ -18,35 +17,25 @@ export default async function handler(
 ) {
   const { sandboxId, userId } = JSON.parse(req.body);
   try {
-    await redisHelper.insert.removeWorkspace(userId, {
-      id: sandboxId,
-    });
     var docReq = SandBoxIdRequest.fromPartial({
       sessionKey: fetchAppSession(req),
       sandBoxId: sandboxId,
       userId: userId,
     });
-    const grpc = () =>
-      new Promise<void>((resolve, reject) => {
-        grpcClient.removeSandbox(
-          docReq,
-          async function (err, GoLangResponse: SuccessStringReply) {
-            await redisHelper.remove.patchedWorkspace(userId, sandboxId);
-            res.json({
-              success: GoLangResponse.success,
-              error: {
-                status: GoLangResponse.error?.status,
-                error: GoLangResponse.error?.error,
-              },
-            });
-            res.status(200).end();
-            console.log("remove sandbox server error : ", err);
-            if (err) reject(err);
-            else resolve();
-          }
-        );
-      });
-    await grpc();
+    grpcClient.removeSandbox(
+      docReq,
+      function (err, GoLangResponse: SuccessStringReply) {
+        res.json({
+          success: GoLangResponse.success,
+          error: {
+            status: GoLangResponse.error?.status,
+            error: GoLangResponse.error?.error,
+          },
+        });
+        res.status(200).end();
+        console.log("remove sandbox server error : ", err);
+      }
+    );
   } catch (error) {
     console.error(error.stack);
     res.json({
@@ -54,10 +43,6 @@ export default async function handler(
       error: nodeError(error),
     });
     res.status(405).end();
-  } finally {
-    await redisHelper.remove.removeWorkspace(userId, {
-      id: sandboxId,
-    });
   }
 }
 

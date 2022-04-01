@@ -1,10 +1,8 @@
 import { Option } from "../ListBox";
 
-export type Data = any;
-
 export type ValidationOutput = { ok: false; message: string } | { ok: true };
 
-export interface BaseEntry {
+export interface BaseEntry<T> {
   /**
    * type of this entry.
    */
@@ -28,14 +26,14 @@ export interface BaseEntry {
   /**
    * whether this entry should be shown
    */
-  conditional?: (data: Data) => boolean;
+  conditional?: (data: T) => boolean;
   /**
    * validate the entry data on input. If the result is not ok, the form cannot proceed.
    * You need to pay attention to where do you call this validate.
    *
    * @param data the new data
    */
-  validate?: (data: Data) => ValidationOutput;
+  validate?: (data: T) => ValidationOutput;
   /**
    * This function provides the `onChange` callback, `currentValue` and `data` for you.
    * Based on these two props, you need to determine how to render your element.
@@ -49,11 +47,11 @@ export interface BaseEntry {
   node?: (
     onChange: (newValue: any) => void,
     data: any,
-    formData: any
+    formData: T
   ) => JSX.Element;
 }
 
-export interface InputEntry extends BaseEntry {
+export interface InputEntry<T> extends BaseEntry<T> {
   type: "input";
   defaultValue: string;
   placeholder?: string;
@@ -61,7 +59,7 @@ export interface InputEntry extends BaseEntry {
   disabled?: boolean;
 }
 
-export interface TextAreaEntry extends BaseEntry {
+export interface TextAreaEntry<T> extends BaseEntry<T> {
   type: "textarea";
   defaultValue: string;
   placeholder?: string;
@@ -69,23 +67,23 @@ export interface TextAreaEntry extends BaseEntry {
   disabled?: boolean;
 }
 
-export interface ListBoxEntry extends BaseEntry {
+export interface ListBoxEntry<T> extends BaseEntry<T> {
   type: "listbox";
   defaultValue: Option;
   options: Option[];
 }
 
-export interface ToggleEntry extends BaseEntry {
+export interface ToggleEntry<T> extends BaseEntry<T> {
   type: "toggle";
   defaultValue: boolean;
 }
 
-export interface MarkdownEntry extends BaseEntry {
+export interface MarkdownEntry<T> extends BaseEntry<T> {
   type: "markdown";
   defaultValue: string;
 }
 
-export interface DateTimeEntry extends BaseEntry {
+export interface DateTimeEntry<T> extends BaseEntry<T> {
   type: "datetime";
   /**
    * the `moment` string
@@ -93,19 +91,19 @@ export interface DateTimeEntry extends BaseEntry {
   defaultValue: string;
 }
 
-export type Entry =
-  | BaseEntry
-  | InputEntry
-  | TextAreaEntry
-  | ListBoxEntry
-  | ToggleEntry
-  | MarkdownEntry
-  | DateTimeEntry;
+export type Entry<T> =
+  | BaseEntry<T>
+  | InputEntry<T>
+  | TextAreaEntry<T>
+  | ListBoxEntry<T>
+  | ToggleEntry<T>
+  | MarkdownEntry<T>
+  | DateTimeEntry<T>;
 
 /**
  * a form structure is compose of many sections
  */
-export type Section = {
+export type Section<T> = {
   /**
    * the title of this section
    */
@@ -113,19 +111,19 @@ export type Section = {
   /**
    * whether this section should be shown
    */
-  conditional?: (data: Data) => boolean;
+  conditional?: (data: T) => boolean;
   /**
    * entries in this section
    */
-  entries: { [id: string]: Entry };
+  entries: { [id: string]: Entry<T> };
 };
 
 /**
  * a form is composed of many sections
  */
-export type FormStructure = { [id: string]: Section };
+export type FormStructure<T> = { [id: string]: Section<T> };
 
-export type Props = {
+export type Props<T> = {
   /**
    * whether this section should be in a disclosure.
    * If it is not in a disclosure, its content will spread out.
@@ -157,7 +155,7 @@ export type Props = {
    * @param data the data in the form when the modal is closed
    * @param isEnter whether this form close because of enter
    */
-  onClose?: (data: Data, isEnter: boolean) => void;
+  onClose?: (data: T, isEnter: boolean) => void;
   /**
    * the title of this form
    */
@@ -169,18 +167,18 @@ export type Props = {
   /**
    * The skeleton of the form
    */
-  formStructure: FormStructure;
+  formStructure: FormStructure<T>;
   /**
    * a callback when the data of the form is change
    *
    * @param data the new data
    * @param id the id of the data which is changed. id in the form of `sectionId.entryId`
    */
-  onChange?: (data: Data, id: string) => void;
+  onChange?: (data: T, id: string) => void;
   /**
    * a callback when the form is submitted
    */
-  onEnter?: (data: Data) => void;
+  onEnter?: (data: T) => void;
   okBtnText?: string;
   cancelBtnText?: string;
 };
@@ -188,7 +186,7 @@ export type Props = {
 /**
  * T is EntryType
  */
-export type EntryProps = {
+export type EntryProps<T> = {
   /**
    * the z index to be used for styling. The upper entry usually has a higher z index than a lower entry
    */
@@ -196,7 +194,7 @@ export type EntryProps = {
   /**
    * an `Entry` object from the `FromStructure`
    */
-  entry: Entry;
+  entry: Entry<T>;
   /**
    * the section of this entry
    */
@@ -208,18 +206,18 @@ export type EntryProps = {
   /**
    * the current data
    */
-  data: Data;
+  data: T;
   /**
    * @param data new value of this entry
    */
   onChange: (data: any) => void;
 };
 
-export type SectionProps = {
+export type SectionProps<T> = {
   /**
    * the `Section` object from `FromStructure`
    */
-  section: Section;
+  section: Section<T>;
   /**
    * id of this section
    */
@@ -227,12 +225,12 @@ export type SectionProps = {
   /**
    * the current form data
    */
-  data: Data;
+  data: T;
   useDisclosure: boolean;
   /**
    * onChange callback
    *
-   * @param data the new value of a data
+   * @param data the new value of an entry
    * @param id the entry id
    */
   onChange: (data: any, id: string) => void;

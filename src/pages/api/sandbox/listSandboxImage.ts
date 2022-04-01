@@ -10,7 +10,6 @@ import {
   ListSandBoxImageReply,
   ListSandBoxImageRequest,
 } from "../../../proto/dockerGet/dockerGet";
-import redisHelper from "../../../lib/redisHelper";
 
 export default function handler(
   req: NextApiRequest,
@@ -24,27 +23,22 @@ export default function handler(
     });
     grpcClient.listSandboxImage(
       docReq,
-      async function (err, GoLangResponse: ListSandBoxImageReply) {
-        console.log("list sandbox");
+      function (err, GoLangResponse: ListSandBoxImageReply) {
         res.json({
           success: GoLangResponse.success,
           error: {
             status: GoLangResponse.error?.status,
             error: GoLangResponse.error?.error,
           },
-          sandboxImages: await redisHelper.patch.sandboxes(
-            userId as string,
-            GoLangResponse.sandboxImages.map((sandbox) => {
-              return {
-                id: sandbox.id,
-                title: sandbox.title,
-                description: sandbox.description,
-                imageId: sandbox.imageId,
-                sandboxesId: sandbox.sandboxId[0],
-                status: null,
-              };
-            })
-          ),
+          sandboxImages: GoLangResponse.sandboxImages.map((sandbox) => {
+            return {
+              id: sandbox.id,
+              title: sandbox.title,
+              description: sandbox.description,
+              imageId: sandbox.imageId,
+              sandboxesId: sandbox.sandboxId[0],
+            };
+          }),
         });
         console.log("list sandbox done");
         res.status(200).end();

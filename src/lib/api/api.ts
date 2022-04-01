@@ -1,3 +1,5 @@
+import type { Workspace as RedisWorkspace } from "../redisHelper";
+
 /**
  *
  * store all the API type
@@ -200,22 +202,7 @@ type Container = {
   subTitle: string;
   startAt: string;
   containerID: string;
-  type: "SANDBOX" | "TEMPLATE" | "ENV" | "STUDENT_WORKSPACE";
-  /**
-   * the id of source object, sandboxImage, template or environment.
-   * The `sourceId` can be undefined for event `ENV_CREATE`, `TEMPLATE_CREATE`, `SANDBOX_CREATE`
-   * because the temporary container is created before the source is created.
-   */
-  sourceId: string | undefined;
-  /**
-   * base on the event of the container created to determine whether this is a temporary container
-   *
-   * temporary container event : `ENV_CREATE`, `ENV_UPDATE`, `TEMPLATE_CREATE` , `TEMPLATE_UPDATE` , `SANDBOX_CREATE` , `SANDBOX_UPDATE`
-   *
-   * normal container event : `TEMPLATE_START_WORKSPACE`, `SANDBOX_START_WORKSPACE` , `WORKSPACE_START`
-   */
-  isTemporary: boolean;
-  status?: "CREATING" | "REMOVING" | null;
+  data?: RedisWorkspace;
 };
 
 type ContainerListResponse =
@@ -255,7 +242,6 @@ type SandboxImage = {
    * container id
    */
   sandboxesId: string;
-  status: "CREATING" | "UPDATING" | "REMOVING" | null;
 };
 
 type SandboxAddResponse =

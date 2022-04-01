@@ -6,7 +6,7 @@ import { getCookie } from "../../../lib/cookiesHelper";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 
 import { grpcClient } from "../../../lib/grpcClient";
-import redisHelper from "../../../lib/redisHelper";
+
 import {
   ListEnvironmentsReply,
   SectionAndSubRequest,
@@ -29,25 +29,13 @@ export default async function handler(
     client.listEnvironments(
       docReq,
       async function (err, GoLangResponse: ListEnvironmentsReply) {
-        var envs = GoLangResponse.environments;
         res.json({
           success: GoLangResponse.success,
           error: {
             status: GoLangResponse.error?.status,
             error: GoLangResponse.error?.error,
           },
-          environments: await redisHelper.patch.environments(
-            sectionid as string,
-            envs.map((env) => {
-              return {
-                id: env.id,
-                imageId: env.imageId,
-                environmentName: env.environmentName,
-                libraries: env.libraries,
-                description: env.description,
-              };
-            })
-          ),
+          environments: GoLangResponse.environments,
         });
         res.status(200).end();
       }

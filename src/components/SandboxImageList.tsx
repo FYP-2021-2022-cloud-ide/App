@@ -12,6 +12,7 @@ export type Props = {
   onSandboxUpdate: (sandboxImage: SandboxImage) => void;
   onSandboxStart: (sandboxImage: SandboxImage) => void;
   onSandboxStop: (sandboxImage: SandboxImage) => void;
+  onSandboxUpdateInternal: (sandboxImage: SandboxImage) => void;
 };
 
 const SandboxImageList = ({
@@ -22,6 +23,7 @@ const SandboxImageList = ({
   onSandboxUpdate,
   onSandboxStart,
   onSandboxStop,
+  onSandboxUpdateInternal,
 }: Props) => {
   return (
     <div
@@ -34,21 +36,12 @@ const SandboxImageList = ({
           <SandboxImagesCard
             key={sandboxImage.id}
             sandboxImage={sandboxImage}
-            onClick={(sandboxImage) => {
-              if (onSandboxClick) onSandboxClick(sandboxImage);
-            }}
-            onDelete={(sandboxImage) => {
-              if (onSandboxDelete) onSandboxDelete(sandboxImage);
-            }}
-            onUpdate={(sandboxImage) => {
-              if (onSandboxUpdate) onSandboxUpdate(sandboxImage);
-            }}
-            onStart={(sandboxImage) => {
-              if (onSandboxStart) onSandboxStart(sandboxImage);
-            }}
-            onStop={(sandboxImage) => {
-              if (onSandboxStop) onSandboxStop(sandboxImage);
-            }}
+            onClick={onSandboxClick}
+            onDelete={onSandboxDelete}
+            onUpdate={onSandboxUpdate}
+            onStart={onSandboxStart}
+            onStop={onSandboxStop}
+            onUpdateInternal={onSandboxUpdateInternal}
             zIndex={sandboxImages.length - index}
             id={`sandbox-card-${index}`}
           ></SandboxImagesCard>

@@ -28,29 +28,19 @@ export default async function handler(
     });
 
   try {
-    await redisHelper.insert.removeWorkspace(userId, {
-      id: containerId,
-    });
-    const grpc = () =>
-      new Promise<void>((resolve, reject) => {
-        grpcClient.removeTempContainer(
-          docReq,
-          async function (err, GoLangResponse: SuccessStringReply) {
-            await redisHelper.remove.patchedWorkspace(userId, containerId);
-            res.json({
-              success: GoLangResponse.success,
-              error: {
-                status: GoLangResponse.error?.status,
-                error: GoLangResponse.error?.error,
-              },
-            });
-            res.status(200).end();
-            if (err) reject(err);
-            else resolve();
-          }
-        );
-      });
-    await grpc();
+    grpcClient.removeTempContainer(
+      docReq,
+      function (err, GoLangResponse: SuccessStringReply) {
+        res.json({
+          success: GoLangResponse.success,
+          error: {
+            status: GoLangResponse.error?.status,
+            error: GoLangResponse.error?.error,
+          },
+        });
+        res.status(200).end();
+      }
+    );
   } catch (error) {
     console.error(error.stack);
     res.json({
@@ -58,10 +48,6 @@ export default async function handler(
       error: nodeError(error),
     });
     res.status(405).end();
-  } finally {
-    await redisHelper.remove.removeWorkspace(userId, {
-      id: containerId,
-    });
   }
 }
 

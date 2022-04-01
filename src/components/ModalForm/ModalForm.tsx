@@ -13,7 +13,6 @@ import MDE from "./entry/MDE";
 import Custom from "./entry/Custom";
 import DatePicker from "./entry/DatePicker";
 import {
-  Data,
   EntryProps,
   FormStructure,
   Props,
@@ -22,7 +21,7 @@ import {
 } from "./types";
 import { ChevronRightIcon } from "@heroicons/react/solid";
 
-const Entry = (props: EntryProps) => {
+function Entry<T>(props: EntryProps<T>) {
   const { entry, data } = props;
   if (entry.conditional) {
     if (!entry.conditional(data)) return <></>;
@@ -44,13 +43,13 @@ const Entry = (props: EntryProps) => {
   } else throw new Error("not such entry type in <ModalForm>");
 };
 
-const Section = ({
+function Section<T>({
   section,
   id: sectionId,
   data,
   onChange,
   useDisclosure,
-}: SectionProps) => {
+}: SectionProps<T>) {
   if (section.conditional) {
     if (!section.conditional(data)) return <></>;
   } else
@@ -132,8 +131,8 @@ const Section = ({
  * @param sections
  * @returns
  */
-const fromStructureToData = (sections: FormStructure): Data => {
-  let data: Data = {};
+function fromStructureToData<T>(sections: FormStructure<T>): T {
+  let data = {} as T;
   if (!sections) return data;
   Object.keys(sections).forEach((sectionId) => {
     Object.keys(sections[sectionId].entries).forEach((entryId) => {
@@ -159,7 +158,9 @@ const fromStructureToData = (sections: FormStructure): Data => {
  * A component to show a form in modal. Use this component to keep consistency in the app.
  * To use this, put the `<ModalForm>` in a component and supply a form structure.
  * 
- * a good practice that you define a type of the formData as well. 
+ * a good practice that you define a type of the formData as well. As `ModalForm` is generic, 
+ * by providing a type of form data to form structure, you can typing for `data` return as parameter when 
+ * props like `onChange` and `onEnter`.
  * 
  * @remark `ModalForm` is a over-complex higher order component. It could be simplified by using context. 
  * Although this component is perfectly workable, it is foreseed that this component will soon be deprecated. 
@@ -167,7 +168,7 @@ const fromStructureToData = (sections: FormStructure): Data => {
  * your custom entry, it is suggested not to do so unless really necessary because it defeats the purpose of
  * the modal form. The entry type are supported because they are used frequently and common in many general forms.
  */
-const ModalForm = (props: Props) => {
+function ModalForm<T>(props: Props<T>) {
   const {
     isOpen,
     setOpen,
@@ -184,8 +185,8 @@ const ModalForm = (props: Props) => {
     cancelBtnText,
     useDisclosure,
   } = props;
-  const [data, setData] = useState<Data>(fromStructureToData(formStructure));
-  const dataRef = useRef<Data>(data);
+  const [data, setData] = useState<T>(fromStructureToData(formStructure));
+  const dataRef = useRef<T>(data);
   useEffect(() => {
     setData(fromStructureToData(formStructure));
   }, [formStructure]);
@@ -244,11 +245,11 @@ const ModalForm = (props: Props) => {
                   id={sectionId}
                   data={data}
                   useDisclosure={useDisclosure}
-                  onChange={(newValue, id) => {
+                  onChange={(newValue: any, id: string) => {
                     const newData = flat.unflatten({
                       ...(flat.flatten(dataRef.current) as object),
                       [`${sectionId}.${id}`]: newValue,
-                    });
+                    }) as T;
                     setData(newData);
                     if (onChange) onChange(newData, id);
                   }}

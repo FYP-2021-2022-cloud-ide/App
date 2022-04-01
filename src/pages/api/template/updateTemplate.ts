@@ -9,8 +9,6 @@ import {
   SuccessStringReply,
   UpdateTemplateRequest,
 } from "../../../proto/dockerGet/dockerGet";
-import { getCookie } from "../../../lib/cookiesHelper";
-import redisHelper from "../../../lib/redisHelper";
 
 export default async function handler(
   req: NextApiRequest,
@@ -25,9 +23,7 @@ export default async function handler(
     isExam,
     timeLimit,
     allow_notification,
-    sectionId,
   } = JSON.parse(req.body);
-  const userId = getCookie(req.headers.cookie, "userId");
   var docReq = UpdateTemplateRequest.fromPartial({
     sessionKey: fetchAppSession(req),
     templateID: templateId,
@@ -40,12 +36,6 @@ export default async function handler(
     allowNotification: allow_notification,
   });
   try {
-    await redisHelper.insert.updateTemplate(sectionId, {
-      title: templateName,
-      description: description,
-      id: templateId,
-      updatedBy: userId,
-    });
     grpcClient.updateTemplate(
       docReq,
       function (err, GoLangResponse: SuccessStringReply) {
@@ -66,13 +56,6 @@ export default async function handler(
       error: nodeError(error),
     });
     res.status(405).end();
-  }finally { 
-    await redisHelper.remove.updateTemplate(sectionId, {
-      title: templateName,
-      description: description,
-      id: templateId,
-      updatedBy: userId,
-    });
   }
 }
 

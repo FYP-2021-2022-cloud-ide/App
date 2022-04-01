@@ -9,6 +9,7 @@ import { errorToToastDescription } from "../../lib/errorHelper";
 import React from "react";
 import { useSandbox } from "../../contexts/sandbox";
 import { sandboxAPI } from "../../lib/api/sandboxAPI";
+import { FormStructure } from "../ModalForm/types";
 
 
 export type UpdateSandboxFormData = {
@@ -123,7 +124,7 @@ const UpdateSandboxForm = ({ isOpen, setOpen, target }: Props) => {
                                 sandboxImages
                                     .map((s) => s.title)
                                     .filter((n) => n != target.title)
-                                    .includes((data as UpdateSandboxFormData).update_sandbox.name)
+                                    .includes(data.update_sandbox.name)
                             )
                                 return { ok: false, message: "Name crash" };
                             return { ok: true };
@@ -137,7 +138,7 @@ const UpdateSandboxForm = ({ isOpen, setOpen, target }: Props) => {
                     },
                 },
             },
-        } : {}}
+        } as FormStructure<UpdateSandboxFormData> : {}}
         // onClose={async ({ update_sandbox: data }: UpdateSandboxFormData, isEnter) => {
         //   if (data.update_environment != "" && !isEnter) {
         //     const containerId = data.update_environment;
@@ -167,7 +168,7 @@ const UpdateSandboxForm = ({ isOpen, setOpen, target }: Props) => {
         //     }
         //   }
         // }}
-        onEnter={async ({ update_sandbox: data }: UpdateSandboxFormData) => {
+        onEnter={async ({ update_sandbox: data }) => {
             // call some API here
             const id = myToast.loading("Updating a workspace...");
             const { name, description } = data;

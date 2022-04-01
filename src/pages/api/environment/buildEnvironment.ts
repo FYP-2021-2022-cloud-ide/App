@@ -10,7 +10,6 @@ import {
 import { grpcClient } from "../../../lib/grpcClient";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 import { getCookie } from "../../../lib/cookiesHelper";
-import redisHelper from "../../../lib/redisHelper";
 
 export default async function handler(
   req: NextApiRequest,
@@ -29,11 +28,6 @@ export default async function handler(
   });
 
   try {
-    await redisHelper.insert.createEnvironment(sectionId, {
-      title: name,
-      description: description,
-      createdBy: userId,
-    });
     client.buildEnvironment(
       docReq,
       function (err, GoLangResponse: AddEnvironmentReply) {
@@ -55,12 +49,6 @@ export default async function handler(
       error: nodeError(error),
     });
     res.status(405).end();
-  } finally {
-    await redisHelper.remove.createEnvironment(sectionId, {
-      title: name,
-      description: description,
-      createdBy: userId,
-    });
   }
 }
 

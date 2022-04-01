@@ -50,7 +50,7 @@ export default function CardMenu({ items }: Props) {
                       {({ active }) => (
                         <button
                           className={`${active ? "bg-gray-200 dark:bg-gray-800" : ""
-                            } text-left text-gray-900 dark:text-white group flex rounded-md items-center w-full px-2 py-2 text-sm capitalize select-none`}
+                            } text-left text-gray-900 dark:text-white group flex rounded-md items-center w-full px-2 py-2 text-sm capitalize select-none whitespace-nowrap`}
                           onClick={(e) => {
                             e.stopPropagation();
                             if (item.onClick) {

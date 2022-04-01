@@ -9,8 +9,6 @@ import {
   SuccessStringReply,
   UpdateEnvironmentRequest,
 } from "../../../proto/dockerGet/dockerGet";
-import { getCookie } from "../../../lib/cookiesHelper";
-import redisHelper from "../../../lib/redisHelper";
 
 export default async function handler(
   req: NextApiRequest,
@@ -18,7 +16,6 @@ export default async function handler(
 ) {
   const { envId, name, section_user_id, containerId, description, sectionId } =
     JSON.parse(req.body);
-  const userId = getCookie(req.headers.cookie, "userId");
 
   var docReq = UpdateEnvironmentRequest.fromPartial({
     sessionKey: fetchAppSession(req),
@@ -29,12 +26,6 @@ export default async function handler(
     description: description,
   });
   try {
-    await redisHelper.insert.updateEnvironment(sectionId, {
-      title: name,
-      description: description,
-      id: envId,
-      updatedBy: userId,
-    });
     grpcClient.updateEnvironment(
       docReq,
       function (err, GoLangResponse: SuccessStringReply) {
@@ -55,13 +46,6 @@ export default async function handler(
       error: nodeError(error),
     });
     res.status(405).end();
-  } finally {
-    await redisHelper.remove.updateEnvironment(sectionId, {
-      title: name,
-      description: description,
-      id: envId,
-      updatedBy: userId,
-    });
   }
 }
 

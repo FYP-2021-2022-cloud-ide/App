@@ -36,7 +36,7 @@ const containerAPI = {
       | "TEMPLATE_UPDATE"
       | "SANDBOX_CREATE"
       | "SANDBOX_UPDATE",
-    title: string
+    formData: any
   ): Promise<ContainerAddResponse> => {
     var res = await fetch("/api/container/addTempContainer", {
       method: "POST",
@@ -46,7 +46,7 @@ const containerAPI = {
         imageId,
         accessRight,
         event,
-        title,
+        formData,
         sub,
       }),
     });

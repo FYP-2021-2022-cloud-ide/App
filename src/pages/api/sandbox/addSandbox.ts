@@ -10,22 +10,23 @@ import {
   AddSandBoxRequest,
 } from "../../../proto/dockerGet/dockerGet";
 import { getCookie } from "../../../lib/cookiesHelper";
+import { v4 } from "uuid";
 import redisHelper from "../../../lib/redisHelper";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SandboxAddResponse>
 ) {
-  const { memLimit, numCPU, sandboxImageId, title } = JSON.parse(req.body);
+  const { memLimit, numCPU, sandboxImageId, title, sub } = JSON.parse(req.body);
   const userId = getCookie(req.headers.cookie, "userId");
-
+  const tempId = v4();
   try {
-    await redisHelper.insert.createWorkspace(userId, {
+    await redisHelper.insert.workspaces(sub, {
+      tempId,
+      title,
       cause: "SANDBOX_START_WORKSPACE",
-      id: sandboxImageId,
-      title: title,
+      containerId: "",
     });
-
     var docReq = AddSandBoxRequest.fromPartial({
       sessionKey: fetchAppSession(req),
       memLimit: memLimit,
@@ -33,36 +34,30 @@ export default async function handler(
       sandBoxImageId: sandboxImageId,
     });
     // need to wrap grpc call because grpc call is synchronize and finally will be directly carried out
-    const grpc = () =>
-      new Promise<void>((resolve, reject) => {
-        grpcClient.addSandbox(
-          docReq,
-          async function (err, GoLangResponse: AddSandBoxReply) {
-            await redisHelper.insert.patchCreatedWorkspace(userId, {
-              id: GoLangResponse.sandBoxId,
-              type: "SANDBOX",
-              isTemporary: false,
-              createData: {
-                cause: "SANDBOX_START_WORKSPACE",
-                id: sandboxImageId,
-                title: title,
-              },
-            });
-            res.json({
-              success: GoLangResponse.success,
-              error: {
-                status: GoLangResponse.error?.status,
-                error: GoLangResponse.error?.error,
-              },
-              sandboxId: GoLangResponse.sandBoxId,
-            });
-            res.status(200).end();
-            if (err) reject(err);
-            else resolve();
-          }
-        );
-      });
-    await grpc();
+    grpcClient.addSandbox(
+      docReq,
+      async function (err, GoLangResponse: AddSandBoxReply) {
+        if (err) {
+          // the request fail so we remove it from redis
+          await redisHelper.remove.workspaces(sub, tempId);
+        } else {
+          await redisHelper.onReturn.workspaces(
+            sub,
+            tempId,
+            GoLangResponse.sandBoxId
+          );
+        }
+        res.json({
+          success: GoLangResponse.success,
+          error: {
+            status: GoLangResponse.error?.status,
+            error: GoLangResponse.error?.error,
+          },
+          sandboxId: GoLangResponse.sandBoxId,
+        });
+        res.status(200).end();
+      }
+    );
   } catch (error) {
     console.error(error.stack);
     res.json({
@@ -70,12 +65,6 @@ export default async function handler(
       error: nodeError(error),
     });
     res.status(405).end();
-  } finally {
-    await redisHelper.remove.createWorkspace(userId, {
-      cause: "SANDBOX_START_WORKSPACE",
-      id: sandboxImageId,
-      title: title,
-    });
   }
 }
 

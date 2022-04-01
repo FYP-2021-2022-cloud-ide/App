@@ -18,7 +18,9 @@ const ContainersList = () => {
   useEffect(() => {
     fetchContainers();
   }, []);
-  var percentage = (containers.length / quota) * 100;
+
+  var numActiveContainers = containers ? containers.length : 0;
+  var percentage = containers ? (containers.length / quota) * 100 : 0;
 
   return (
     <div className=" w-full ">
@@ -26,7 +28,7 @@ const ContainersList = () => {
         <div className="current-run-title">Current Running Workspaces</div>
         <div className="flex flex-col justify-between w-32">
           <div className="current-run-percentage" id="current-run-percentage">
-            {containers.length}/{quota}
+            {numActiveContainers}/{quota}
           </div>
           <div className="current-run-bar-outer">
             <div

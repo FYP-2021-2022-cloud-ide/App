@@ -10,7 +10,6 @@ import {
   AddEnvironmentRequest,
 } from "../../../proto/dockerGet/dockerGet";
 import { getCookie } from "../../../lib/cookiesHelper";
-import redisHelper from "../../../lib/redisHelper";
 
 export default async function handler(
   req: NextApiRequest,
@@ -27,11 +26,6 @@ export default async function handler(
     description: description,
   });
   try {
-    await redisHelper.insert.createEnvironment(sectionId, {
-      title: name,
-      description: description,
-      createdBy: userId,
-    });
     grpcClient.addEnvironment(
       docReq,
       function (err, GoLangResponse: AddEnvironmentReply) {
@@ -53,12 +47,6 @@ export default async function handler(
       error: nodeError(error),
     });
     res.status(405).end();
-  } finally {
-    await redisHelper.remove.createEnvironment(sectionId, {
-      title: name,
-      description: description,
-      createdBy: userId,
-    });
   }
 }
 

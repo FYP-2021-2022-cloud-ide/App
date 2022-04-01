@@ -12,6 +12,7 @@ type Props = {
   onUpdate?: (sandboxImage: SandboxImage) => void;
   onStart?: (sandboxImage: SandboxImage) => void;
   onStop?: (sandboxImage: SandboxImage) => void;
+  onUpdateInternal?: (sandboxImage: SandboxImage) => void;
   zIndex?: number;
   id: string;
 };
@@ -23,6 +24,7 @@ const SandboxImagesCard = ({
   onUpdate,
   onStop,
   onStart,
+  onUpdateInternal,
   zIndex,
   id,
 }: Props) => {
@@ -141,6 +143,11 @@ const SandboxImagesCard = ({
                   onUpdate(sandboxImage);
                 }
               },
+            }, {
+              text: "Update Internal",
+              onClick: () => {
+                onUpdateInternal(sandboxImage);
+              }
             },
             {
               text: sandboxImage.sandboxesId ? "Stop" : "Start",

@@ -8,8 +8,6 @@ import {
   AddTemplateReply,
   AddTemplateRequest,
 } from "../../../proto/dockerGet/dockerGet";
-import { getCookie } from "../../../lib/cookiesHelper";
-import redisHelper from "../../../lib/redisHelper";
 
 export default async function handler(
   req: NextApiRequest,
@@ -28,7 +26,6 @@ export default async function handler(
     allow_notification,
     sectionId,
   } = JSON.parse(req.body);
-  const userId = getCookie(req.headers.cookie, "userId");
 
   var docReq = AddTemplateRequest.fromPartial({
     sessionKey: fetchAppSession(req),
@@ -45,14 +42,6 @@ export default async function handler(
   });
 
   try {
-    await redisHelper.insert.createTemplate(sectionId, {
-      title: templateName,
-      description: description,
-      environmentId: environment_id,
-      isExam: isExam,
-      timeLimit: timeLimit,
-      createdBy: userId,
-    });
     grpcClient.addTemplate(
       docReq,
       function (err, GoLangResponse: AddTemplateReply) {
@@ -74,15 +63,6 @@ export default async function handler(
       error: nodeError(error),
     });
     res.status(405).end();
-  } finally {
-    await redisHelper.remove.createTemplate(sectionId, {
-      title: templateName,
-      description: description,
-      environmentId: environment_id,
-      isExam: isExam,
-      timeLimit: timeLimit,
-      createdBy: userId,
-    });
   }
 }
 

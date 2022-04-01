@@ -5,7 +5,6 @@ import { TemplateListResponse, nodeError } from "../../../lib/api/api";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 
 import { grpcClient } from "../../../lib/grpcClient";
-import redisHelper from "../../../lib/redisHelper";
 import {
   ListTemplatesReply,
   SectionAndSubRequest,
@@ -33,25 +32,22 @@ export default async function handler(
             status: GoLangResponse.error?.status,
             error: GoLangResponse.error?.error,
           },
-          templates: await redisHelper.patch.templates(
-            sectionid as string,
-            templates.map((t) => {
-              return {
-                id: t.id,
-                name: t.name,
-                description: t.description,
-                imageId: t.imageId,
-                environment_id: t.environmentId,
-                assignment_config_id: t.assignmentConfigId,
-                storage: t.storage,
-                active: t.active,
-                isExam: t.isExam,
-                timeLimit: t.timeLimit,
-                allow_notification: t.allowNotification,
-                containerID: t.ContainerId[0],
-              };
-            })
-          ),
+          templates: templates.map((t) => {
+            return {
+              id: t.id,
+              name: t.name,
+              description: t.description,
+              imageId: t.imageId,
+              environment_id: t.environmentId,
+              assignment_config_id: t.assignmentConfigId,
+              storage: t.storage,
+              active: t.active,
+              isExam: t.isExam,
+              timeLimit: t.timeLimit,
+              allow_notification: t.allowNotification,
+              containerID: t.ContainerId[0],
+            };
+          }),
         });
         res.status(200).end();
       }

@@ -9,7 +9,6 @@ import {
   RemoveContainerRequest,
 } from "../../../proto/dockerGet/dockerGet";
 import { getCookie } from "../../../lib/cookiesHelper";
-import redisHelper from "../../../lib/redisHelper";
 
 export default async function handler(
   req: NextApiRequest,
@@ -23,29 +22,19 @@ export default async function handler(
     sub: sub,
   });
   try {
-    await redisHelper.insert.removeWorkspace(userId, {
-      id: containerId,
-    });
-    const grpc = () =>
-      new Promise<void>((resolve, reject) => {
-        grpcClient.removeTemplateContainer(
-          docReq,
-          async function (err, GoLangResponse: SuccessStringReply) {
-            await redisHelper.remove.patchedWorkspace(userId, containerId);
-            res.json({
-              success: GoLangResponse.success,
-              error: {
-                status: GoLangResponse.error?.status,
-                error: GoLangResponse.error?.error,
-              },
-            });
-            res.status(200).end();
-            if (err) reject(err);
-            else resolve();
-          }
-        );
-      });
-    await grpc();
+    grpcClient.removeTemplateContainer(
+      docReq,
+      function (err, GoLangResponse: SuccessStringReply) {
+        res.json({
+          success: GoLangResponse.success,
+          error: {
+            status: GoLangResponse.error?.status,
+            error: GoLangResponse.error?.error,
+          },
+        });
+        res.status(200).end();
+      }
+    );
   } catch (error) {
     console.error(error.stack);
     res.json({
@@ -53,10 +42,6 @@ export default async function handler(
       error: nodeError(error),
     });
     res.status(405).end();
-  } finally {
-    await redisHelper.insert.removeWorkspace(userId, {
-      id: containerId,
-    });
   }
 }
 

@@ -74,7 +74,7 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
   const [semesterId, setSemesterId] = useState("");
   const [bio, setBio] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
-  const [containers, setContainers] = useState<Container[]>([]);
+  const [containers, setContainers] = useState<Container[]>();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unsubscribe, setUnsubscribe] = useState<Unsubscribe>();
   // simultaneous run quota

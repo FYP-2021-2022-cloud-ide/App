@@ -13,12 +13,13 @@ import { CLICK_TO_DISMISS, CLICK_TO_REPORT } from "../lib/constants";
 import { useSandbox } from "../contexts/sandbox";
 import CreateSandboxForm from "./forms/CreateSandboxForm";
 import UpdateSandboxForm from "./forms/UpdateSandboxForm";
+import { containerAPI } from "../lib/api/containerAPI";
 
 
 
 
 export const SandboxWrapper = () => {
-  const { userId, containerQuota, containers, setContainers } =
+  const { userId, containerQuota, containers, setContainers, sub } =
     useCnails();
   const { sandboxImages, setSandboxImages, fetchSandboxImages } = useSandbox();
   const [createOpen, setCreateOpen] = useState(false);
@@ -27,7 +28,9 @@ export const SandboxWrapper = () => {
   const {
     removeSandbox,
     removeSandboxImage,
-    addSandbox } = sandboxAPI;
+    addSandbox
+  } = sandboxAPI;
+  const { addTempContainer } = containerAPI
 
   return (
     <>
@@ -147,6 +150,19 @@ export const SandboxWrapper = () => {
               comment: CLICK_TO_REPORT,
             });
           }
+
+        }}
+        onSandboxUpdateInternal={async (sandboxImage) => {
+          // give a toast 
+          const response = await addTempContainer(
+            memory,
+            CPU,
+            sandboxImage.imageId,
+            sub,
+            "root",
+            "SANDBOX_UPDATE",
+            name
+          );
         }}
       ></SandboxImageList>
       {/* create form */}

@@ -19,7 +19,7 @@ import { errorToToastDescription } from "../../../../lib/errorHelper";
 import { CLICK_TO_DISMISS, CLICK_TO_REPORT } from "../../../../lib/constants";
 import { InstructorProvider } from "../../../../contexts/instructor";
 import EnvironmentTemplateWrapper from "../../../../components/EnvironmentTemplateWrapper";
-import getAnnouncementFormStructure, { AnnouncementFormData } from "../../../../lib/forms/announmentForm";
+import AnnouncementForm from "../../../../components/forms/AnnouncementForm";
 
 
 const Home = () => {
@@ -56,8 +56,7 @@ const Home = () => {
     fetchSectionUserInfo();
   }, []);
 
-  // if the section user info is not set, don't need to go
-  // if (!sectionUserInfo) return <></>;
+
 
   return (
     <div className="w-full">
@@ -93,44 +92,20 @@ const Home = () => {
               ]}
             ></CardMenu>
           </div>
-          <InstructorProvider sectionUserInfo={sectionUserInfo}>
-            <EnvironmentTemplateWrapper></EnvironmentTemplateWrapper>
-          </InstructorProvider>
+          {
+            sectionUserInfo && <InstructorProvider sectionUserInfo={sectionUserInfo}>
+              <EnvironmentTemplateWrapper></EnvironmentTemplateWrapper>
+            </InstructorProvider>
+          }
         </div>
       ) : (
         <Loader />
       )}
-      <ModalForm
-        isOpen={announceFormOpen}
-        setOpen={setAnnounceFormOpen}
-        title={"Course Annoucement"}
-        size="lg"
-        formStructure={getAnnouncementFormStructure()}
-        clickOutsideToClose
-        escToClose
-        onEnter={async ({ course_announcement: data }: AnnouncementFormData) => {
-          console.log(data);
-          const response = await courseAPI.sendNotificationAnnouncement(
-            data.allow_reply,
-            data.announcement,
-            data.title,
-            userId,
-            sectionId
-          );
-          if (response.success)
-            myToast.success("The course announcement is sent.");
-          else
-            myToast.error({
-              title: "Fail to send course announcement",
-              description: errorToToastDescription(response.error),
-              comment: CLICK_TO_REPORT,
-            });
-          setAnnounceFormOpen(false);
-        }}
-        onClose={() => {
-          setAnnounceFormOpen(false);
-        }}
-      ></ModalForm>
+      {
+        sectionUserInfo && <InstructorProvider sectionUserInfo={sectionUserInfo}>
+          <AnnouncementForm isOpen={announceFormOpen} setOpen={setAnnounceFormOpen} />
+        </InstructorProvider>
+      }
     </div>
   );
 };

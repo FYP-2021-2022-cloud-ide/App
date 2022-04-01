@@ -10,7 +10,6 @@ import {
   SuccessStringReply,
   SandBoxImageIdRequest,
 } from "../../../proto/dockerGet/dockerGet";
-import redisHelper from "../../../lib/redisHelper";
 
 export default async function handler(
   req: NextApiRequest,
@@ -23,9 +22,6 @@ export default async function handler(
     userId: userId,
   });
   try {
-    await redisHelper.insert.removeSandbox(userId, {
-      id: sandboxImageId,
-    });
     grpcClient.removeSandboxImage(
       docReq,
       function (err, GoLangResponse: SuccessStringReply) {
@@ -46,10 +42,6 @@ export default async function handler(
       error: nodeError(error),
     });
     res.status(405).end();
-  } finally {
-    redisHelper.remove.removeSandbox(userId, {
-      id: sandboxImageId,
-    });
   }
 }
 

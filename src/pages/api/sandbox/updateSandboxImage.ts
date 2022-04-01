@@ -10,7 +10,6 @@ import {
   SuccessStringReply,
   UpdateSandBoxImageRequest,
 } from "../../../proto/dockerGet/dockerGet";
-import redisHelper from "../../../lib/redisHelper";
 
 export default async function handler(
   req: NextApiRequest,
@@ -31,15 +30,9 @@ export default async function handler(
   });
 
   try {
-    redisHelper.insert.updateSandbox(userId, {
-      title,
-      description,
-      id: sandboxImageId,
-    });
     client.updateSandboxImage(
       docReq,
-      async function (err, GoLangResponse: SuccessStringReply) {
-        // await redisClient.del(redisKey);
+      function (err, GoLangResponse: SuccessStringReply) {
         res.json({
           success: GoLangResponse.success,
           error: {
@@ -57,12 +50,6 @@ export default async function handler(
       error: nodeError(error),
     });
     res.status(405).end();
-  } finally {
-    redisHelper.remove.updateSandbox(userId, {
-      title,
-      description,
-      id: sandboxImageId,
-    });
   }
 }
 

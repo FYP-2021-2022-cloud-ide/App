@@ -52,18 +52,18 @@ export default function handler(
                 subTitle: container.subTitle,
                 startAt: container.existedTime,
                 containerID: container.containerID,
-                type:
-                  (container.type ==
-                    ListContainerReply_Container_containerType.SANDBOX &&
-                    "SANDBOX") ||
-                  (container.type ==
-                    ListContainerReply_Container_containerType.TEMPLATE_WORKSPACE &&
-                    "TEMPLATE") ||
-                  undefined,
-                sourceId: "",
-                isTemporary:
-                  container.type ==
-                  ListContainerReply_Container_containerType.TEMPORARY,
+                // type:
+                //   (container.type ==
+                //     ListContainerReply_Container_containerType.SANDBOX &&
+                //     "SANDBOX") ||
+                //   (container.type ==
+                //     ListContainerReply_Container_containerType.TEMPLATE_WORKSPACE &&
+                //     "TEMPLATE") ||
+                //   undefined,
+                // sourceId: "",
+                // isTemporary:
+                //   container.type ==
+                //   ListContainerReply_Container_containerType.TEMPORARY,
               };
             })
           ),
