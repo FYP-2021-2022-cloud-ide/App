@@ -1,9 +1,9 @@
 import CourseCard from "./CourseCard";
-import { Course } from "../../lib/cnails";
+import { Course } from "../lib/cnails";
 import { useEffect, useState } from "react";
 import moment from "moment";
-import { generalAPI } from "../../lib/api/generalAPI";
-import { useCnails } from "../../contexts/cnails";
+import { generalAPI } from "../lib/api/generalAPI";
+import { useCnails } from "../contexts/cnails";
 
 export interface props {
   courses: Course[];

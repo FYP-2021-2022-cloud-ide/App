@@ -6,7 +6,7 @@ import DataTable, {
   PaginationComponentProps,
   TableColumn,
 } from "react-data-table-component";
-import { InstructorProvider, useInstructor } from ".";
+
 import Breadcrumbs from "../../../../components/Breadcrumbs";
 import EmptyDiv from "../../../../components/EmptyDiv";
 import { useCnails } from "../../../../contexts/cnails";
@@ -19,27 +19,11 @@ import {
   StudentWorkspace,
   Template,
 } from "../../../../lib/cnails";
-import workspaceData from "../../../../fake_data/example_student_workspace.json";
+import { useInstructor, InstructorProvider } from "../../../../contexts/instructor";
+import myToast from "../../../../components/CustomToast";
+import { CLICK_TO_REPORT } from "../../../../lib/constants";
+import { errorToToastDescription } from "../../../../lib/errorHelper";
 
-const generateExampleData = (num: number): StudentWorkspace[] => {
-  let result: StudentWorkspace[] = [];
-  let temp = {
-    "0": "NOT_STARTED_BEFORE",
-    "1": "OFF",
-    "2": "ON",
-  };
-  for (let i = 0; i < num; i++) {
-    result.push({
-      status: temp[workspaceData[i].status],
-      workspaceId: workspaceData[i].workspace,
-      student: {
-        name: workspaceData[i].name,
-        sub: workspaceData[i].sub,
-      },
-    });
-  }
-  return result;
-};
 
 const TemplateBoard = ({ template }: { template: Template }) => {
   const [data, setData] = useState<StudentWorkspace[]>();
@@ -256,30 +240,28 @@ const Wrapper = () => {
   const { environments, templates, fetch, sectionUserInfo } = useInstructor();
   const index1 = environments.findIndex((env) => env.id == envOrTemplateId);
   const index2 = templates.findIndex((t) => t.id == envOrTemplateId);
-  // templates[0].name;
-  // environments[0].name;
+
   return (
     <div className="w-full">
       <div className="flex flex-col px-10 w-full text-gray-600 space-y-4 mb-10">
         <Breadcrumbs
-          elements={[]}
-        // elements={[
-        //   {
-        //     name: "Dashboard",
-        //     path: "/",
-        //   },
-        //   {
-        //     name: `${sectionUserInfo.courseCode} (${sectionUserInfo.sectionCode})`,
-        //     path: `/course/${sectionId}/instructor`,
-        //   },
-        //   {
-        //     name:
-        //       index1 != -1
-        //         ? environments[index1].name
-        //         : templates[index2].name,
-        //     path: `/course/${sectionId}/instructor/${envOrTemplateId}`,
-        //   },
-        // ]}
+          elements={[
+            {
+              name: "Dashboard",
+              path: "/",
+            },
+            {
+              name: `${sectionUserInfo.courseCode} (${sectionUserInfo.sectionCode})`,
+              path: `/course/${sectionId}/instructor`,
+            },
+            {
+              name:
+                index1 != -1
+                  ? environments[index1].name
+                  : templates[index2].name,
+              path: `/course/${sectionId}/instructor/${envOrTemplateId}`,
+            },
+          ]}
         />
         {index1 != -1 && (
           <EnvBoard environment={environments[index1]}></EnvBoard>
@@ -313,6 +295,11 @@ const Home = () => {
         sub: sub,
       });
     } else {
+      myToast.error({
+        title: "Fail to get section information",
+        description: errorToToastDescription(response.error),
+        comment: CLICK_TO_REPORT,
+      });
       router.push("/");
     }
   };

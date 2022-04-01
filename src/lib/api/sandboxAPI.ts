@@ -6,7 +6,7 @@ import {
 } from "./api";
 
 const sandboxAPI = {
-  listSandboxImage: async (
+  listSandboxImages: async (
     userId: string
   ): Promise<SandboxImageListResponse> => {
     var res = await fetch(`/api/sandbox/listSandboxImage?userId=${userId}`, {

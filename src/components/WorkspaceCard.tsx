@@ -3,7 +3,7 @@ import CardMenu, { MenuItem } from "./CardMenu";
 import { Template, Workspace } from "../lib/cnails";
 import { InformationCircleIcon } from "@heroicons/react/solid";
 import Toggle from "./Toggle";
-import { useCleanTilt } from "./TemplateCard";
+import useCleanTilt from "./useCleanTilt";
 import Tilt from "react-parallax-tilt";
 interface Props {
   workspace: Workspace;
@@ -45,9 +45,8 @@ function WorkspaceCard({ workspace, onClick, onToggleStart, zIndex }: Props) {
               <span className="absolute animate-ping inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
             )}
             <span
-              className={`relative inline-flex rounded-full h-3 w-3 ${
-                workspace.containerID ? "bg-green-400" : "bg-gray-400"
-              }`}
+              className={`relative inline-flex rounded-full h-3 w-3 ${workspace.containerID ? "bg-green-400" : "bg-gray-400"
+                }`}
             ></span>
           </span>
           <div className="env-card-content justify-between w-full">

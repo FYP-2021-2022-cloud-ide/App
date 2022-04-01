@@ -20,7 +20,7 @@ import { CLICK_TO_REPORT } from "../../../../lib/constants";
 import {
   CPU,
   memory
-} from "../../../../lib/forms";
+} from "../../../../lib/formHelper";
 
 
 const Home = () => {
@@ -29,7 +29,7 @@ const Home = () => {
   const [sectionUserInfo, setSectionUserInfo] = useState<SectionUserInfo>(null);
   const [workspaces, setWorkspaces] = useState<Workspace[]>(null);
   const { sub } = useCnails();
-  const { templateList, addTemplateContainer, removeTemplateContainer } = templateAPI;
+  const { listTemplates, addTemplateContainer, removeTemplateContainer } = templateAPI;
   const { getSectionUserInfo } = generalAPI;
   // data fetching from API
   const fetchSectionUserInfo = async () => {
@@ -58,7 +58,7 @@ const Home = () => {
    * the API need to be removed
    */
   const fetchWorkspaces = async () => {
-    const response = await templateList(sectionId, sub);
+    const response = await listTemplates(sectionId, sub);
     if (response.success) {
       response.templates = response.templates.filter(
         (template) => template.active

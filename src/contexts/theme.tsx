@@ -6,6 +6,10 @@ type ThemeState = {
   setDark: (d: boolean) => Promise<any>;
 };
 const themeContext = createContext({} as ThemeState);
+
+/**
+ * @remark A top level context. This context can be access anywhere in the app.
+ */
 export const useTheme = () => useContext(themeContext);
 
 type Props = {

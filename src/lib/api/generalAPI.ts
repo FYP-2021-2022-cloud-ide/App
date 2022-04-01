@@ -3,6 +3,7 @@ import {
   GetUserDataResponse,
   CourseListResponse,
   SuccessStringResponse,
+  GetEnvResponse,
 } from "./api";
 
 const generalAPI = {
@@ -14,7 +15,7 @@ const generalAPI = {
     var res = await fetch("/api/updateUserData", {
       method: "POST",
       body: JSON.stringify({
-        sub:sub,
+        sub: sub,
         darkMode: darkMode,
         bio: bio,
       }),
@@ -48,15 +49,11 @@ const generalAPI = {
     );
     return res.json();
   },
-  
-  getEnv: async (
-  ): Promise<any> => {
-    var res = await fetch(
-      "/api/getEnv",
-      {
-        method: "GET",
-      }
-    );
+
+  getEnv: async (): Promise<GetEnvResponse> => {
+    var res = await fetch("/api/getEnv", {
+      method: "GET",
+    });
     return res.json();
   },
 };

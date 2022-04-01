@@ -20,14 +20,13 @@ import moment from "moment";
 import Loader from "../components/Loader";
 import myToast from "../components/CustomToast";
 import ModalForm from "../components/ModalForm/ModalForm";
-import { getMessageReplyFormStructure, MessageReplyFormData } from "../lib/forms";
+import getMessageReplyFormStructure, { MessageReplyFormData } from "../lib/forms/messageReplyForm";
 import React from "react";
 import { useRouter } from "next/router";
 import _ from "lodash";
 import { MyMarkDown } from "../components/MyMarkdown";
 import PaginationComponent from "../components/table/PaginationComponent";
 import { ExpandRowToggled } from "react-data-table-component/dist/src/DataTable/types";
-import { async } from "@firebase/util";
 import { errorToToastDescription } from "../lib/errorHelper";
 import { CLICK_TO_REPORT } from "../lib/constants";
 
@@ -96,7 +95,7 @@ const MessageTable = () => {
     notificationAPI;
   useEffect(() => {
     async function temp() {
-      await fetchNotifications(userId);
+      await fetchNotifications();
       setPending(false);
     }
     temp();
@@ -196,7 +195,7 @@ const MessageTable = () => {
                   if (!response.success) {
                     console.error("fail to read messages");
                   }
-                  await fetchNotifications(userId);
+                  await fetchNotifications();
                 } else {
                   const response = await changeNotificationRead(
                     userId,
@@ -206,7 +205,7 @@ const MessageTable = () => {
                   if (!response.success) {
                     console.error("fail to unread messages");
                   }
-                  await fetchNotifications(userId);
+                  await fetchNotifications();
                 }
               },
             },
@@ -230,7 +229,7 @@ const MessageTable = () => {
                   setSelectedRows(selectedRows.filter((r) => r.id != row.id));
                   myToast.success(`A message has been removed.`);
                 }
-                await fetchNotifications(userId);
+                await fetchNotifications();
               },
             },
           ];
@@ -298,7 +297,7 @@ const MessageTable = () => {
       );
       if (!response.success) console.error("fail to read messages");
       // should not fetch notification here because it will refresh the table and make row disappear
-      await fetchNotifications(userId);
+      await fetchNotifications();
     }
   };
 
@@ -402,7 +401,7 @@ const MessageTable = () => {
                         <RefreshIcon className="w-5 h-5 text-white"></RefreshIcon>
                       ),
                       onClick: async () => {
-                        await fetchNotifications(userId);
+                        await fetchNotifications();
                       },
                     },
                     {
@@ -421,7 +420,7 @@ const MessageTable = () => {
                             `${selectedRows.length} messages has been removed.`
                           );
                         }
-                        await fetchNotifications(userId);
+                        await fetchNotifications();
                       },
                       shown: selectedRows.length != 0,
                     },
@@ -441,7 +440,7 @@ const MessageTable = () => {
                         if (!response.success) {
                           console.error("fail to read messages");
                         }
-                        await fetchNotifications(userId);
+                        await fetchNotifications();
                       },
                       shown: selectedRows.length != 0,
                     },
@@ -461,7 +460,7 @@ const MessageTable = () => {
                         if (!response.success) {
                           console.error("fail to unread messages");
                         }
-                        await fetchNotifications(userId);
+                        await fetchNotifications();
                       },
                       shown: selectedRows.length != 0,
                     },
@@ -505,7 +504,7 @@ const MessageTable = () => {
                 replySection
               );
               if (response.success) {
-                fetchNotifications(userId);
+                fetchNotifications();
               }
               setReplyFormOpen(false);
             }}
@@ -529,7 +528,7 @@ const MessageTable = () => {
             "e2de12fe-ba9c-4ded-8496-8428446b96d4"
           );
           if (response.success) {
-            fetchNotifications(userId);
+            fetchNotifications();
           } else {
             myToast.error({
               title: "Fail to send message",
@@ -545,7 +544,7 @@ const MessageTable = () => {
   );
 };
 
-export default function Messages() {
+export default function Home() {
   return (
     <div className="px-10 mb-10">
       <p className="text-3xl  font-bold mb-2 text-gray-600 dark:text-gray-300">

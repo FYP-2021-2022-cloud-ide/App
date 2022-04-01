@@ -1,29 +1,23 @@
-import React, { useContext, useState, useEffect, useRef } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   getMessaging,
-  MessagePayload,
   onMessage,
   isSupported,
   Unsubscribe,
 } from "firebase/messaging";
 import { firebaseCloudMessaging } from "../lib/webpush";
-import { Toast, ToastBar, Toaster } from "react-hot-toast";
-import myToast, { loadingTime } from "../components/CustomToast";
+import myToast from "../components/CustomToast";
 import {
-  CnailsContextState,
   Container,
-  ContainerInfo,
   Notification,
-  SandboxImage,
 } from "../lib/cnails";
 import { useRouter } from "next/router";
 import { notificationAPI } from "../lib/api/notificationAPI";
 import { generalAPI } from "../lib/api/generalAPI";
 import { containerAPI } from "../lib/api/containerAPI";
-import { FetchCookieResponse, Error } from "../lib/api/api";
-import Twemoji from "react-twemoji";
+import { FetchCookieResponse } from "../lib/api/api";
 import _ from "lodash";
-import { sandboxAPI } from "../lib/api/sandboxAPI";
+import CustomToaster from "../components/CustomToaster";
 
 const defaultQuota = Number(3); // process.env.CONTAINERSLIMIT
 
@@ -31,24 +25,45 @@ interface CnailsProviderProps {
   children: JSX.Element;
 }
 
-async function fetchSandboxes(
-  userId: string,
-  onFailCallBack?: (error: Error) => void,
-  onSuccessCallBack?: (sandboxes: SandboxImage[]) => void
-) {
-  if (!userId) {
-    throw new Error("user id is undefined ");
-  }
-  const { listSandboxImage } = sandboxAPI;
-  const response = await listSandboxImage(userId);
-  if (!response.success && onFailCallBack) {
-    onFailCallBack(response.error);
-  } else if (response.success && onSuccessCallBack) {
-    onSuccessCallBack(response.sandboxImages);
-  }
-}
+type CnailsContextState = {
+  sub: string;
+  name: string;
+  email: string;
+  userId: string;
+  semesterId: string;
+  // bio: string;
+  // isAdmin: boolean;
+  notifications: Notification[];
+  containers: Container[];
+  setContainers: React.Dispatch<React.SetStateAction<Container[]>>;
+  /**
+   * a function to fetch the new container list.
+   * It will update the context and hence update all affected UI.
+   * Therefore, even if this function will return an array of containers, 
+   * using the returned value is not suggested. You should use the `containers`
+   * from the context instead.
+   */
+  fetchContainers: () => Promise<Container[]>;
+
+  /**
+   * a function to fetch a new list of notification.
+   * It will update the context and hence update all affected UI.
+   * Therefore, even if this function will return an array of notifications, 
+   * using the returned value is not suggested. You should use the `notifications`
+   * from the context instead. 
+   */
+  fetchNotifications: () => Promise<Notification[]>;
+  containerQuota: number;
+};
 
 const CnailsContext = React.createContext({} as CnailsContextState);
+
+/**
+ * It provides all users data, containers and notifications info to whole app. 
+ * It run an init function fetch all these data when it renders.
+ * 
+ * @remark Top level context. It can be accessed anywhere in the app. 
+ */
 export const useCnails = () => useContext(CnailsContext);
 
 export const CnailsProvider = ({ children }: CnailsProviderProps) => {
@@ -59,7 +74,7 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
   const [semesterId, setSemesterId] = useState("");
   const [bio, setBio] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
-  const [containers, setContainers] = useState<Container[]>();
+  const [containers, setContainers] = useState<Container[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unsubscribe, setUnsubscribe] = useState<Unsubscribe>();
   // simultaneous run quota
@@ -68,29 +83,36 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
   const { listNotifications } = notificationAPI;
   const { listContainers } = containerAPI;
   const { getEnv } = generalAPI;
-  const { listSandboxImage } = sandboxAPI;
-  const fetchNotifications = async (userId: string) => {
+  const _fetchNotifications = async (userId: string) => {
     const response = await listNotifications(userId);
     if (response.success) {
       setNotifications(response.notifications);
       return response.notifications;
     } else console.error("[ ❌ ] : fail to fetch notifications ", response);
   };
+  const fetchNotifications = async () => {
+    return await _fetchNotifications(userId)
+  }
 
-  const fetchContainers = async (sub: string) => {
+  /**
+   * internal fetchContainer 
+   */
+  const _fetchContainers = async (sub: string) => {
     const response = await listContainers(sub);
     if (response.success) {
       const { containers } = response;
       setContainers(containers);
-      return { containers }
+      return containers
     } else {
       console.error(
         "[ ❌ ] : fail to fetch containers' information ",
         response
       );
     }
-
   };
+  const fetchContainers = async () => {
+    return await _fetchContainers(sub)
+  }
 
   const ContainerQuotaFromEnv = async () => {
     const response = await getEnv();
@@ -162,7 +184,7 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
         }
         const s = onMessage(messaging, async (message) => {
           setTimeout(async () => {
-            await fetchNotifications(userId);
+            await _fetchNotifications(userId);
             myToast.notification("You have a new notification", () => {
               router.push("/messages");
             });
@@ -184,8 +206,8 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
         if (await isSupported()) {
           await initMessage(sub, userId, semesterId);
         }
-        await fetchContainers(sub);
-        await fetchNotifications(userId);
+        await _fetchContainers(sub);
+        await _fetchNotifications(userId);
         await ContainerQuotaFromEnv();
       }
     }
@@ -216,47 +238,7 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
           containerQuota,
         }}
       >
-        <Toaster
-          position="bottom-right"
-          toastOptions={{
-            // this can the default duration of the toast
-            duration: 5000,
-          }}
-        >
-          {(t: Toast) => {
-            const classList = t.className.split(" ");
-            if (classList.includes("toaster-loading")) t.duration = loadingTime;
-            if (classList.includes("toaster-custom")) t.duration = 60 * 60000;
-            return (
-              <Twemoji noWrapper options={{ className: "twemoji" }}>
-                <div
-                  onClick={() => {
-                    if (!classList.includes("toaster-no-dismiss"))
-                      myToast.dismiss(t.id);
-                    // dirty
-                    if (myToast.onClickCallbacks[t.id]) {
-                      myToast.onClickCallbacks[t.id]();
-                      delete myToast.onClickCallbacks[t.id];
-                    }
-                  }}
-                >
-                  <ToastBar toast={t}>
-                    {({ icon, message }) => {
-                      return (
-                        <div className="toaster-content">
-                          {icon}
-                          <div className="toaster-text">
-                            {(message as JSX.Element).props.children}
-                          </div>
-                        </div>
-                      );
-                    }}
-                  </ToastBar>
-                </div>
-              </Twemoji>
-            );
-          }}
-        </Toaster>
+        <CustomToaster />
         {children}
       </CnailsContext.Provider>
     );

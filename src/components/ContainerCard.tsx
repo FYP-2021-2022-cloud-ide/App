@@ -1,19 +1,19 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { ClockIcon, XIcon } from "@heroicons/react/outline";
 import Tilt from "react-parallax-tilt";
-import { useCleanTilt } from "../TemplateCard";
+import useCleanTilt from "./useCleanTilt";
 
-import { useCnails } from "../../contexts/cnails";
-import myToast from "../CustomToast";
-import { errorToToastDescription } from "../../lib/errorHelper";
-import { Container } from "../../lib/cnails";
+import { useCnails } from "../contexts/cnails";
+import myToast from "./CustomToast";
+import { errorToToastDescription } from "../lib/errorHelper";
+import { Container } from "../lib/cnails";
 
-import { Error } from "../../lib/api/api";
-import { templateAPI } from "../../lib/api/templateAPI";
-import { containerAPI } from "../../lib/api/containerAPI";
-import { sandboxAPI } from "../../lib/api/sandboxAPI";
+import { Error } from "../lib/api/api";
+import { templateAPI } from "../lib/api/templateAPI";
+import { containerAPI } from "../lib/api/containerAPI";
+import { sandboxAPI } from "../lib/api/sandboxAPI";
 import moment from "moment";
-import useInterval from "../useInterval";
+import useInterval from "./useInterval";
 type Props = Container & { zIndex: number };
 
 /**
@@ -162,7 +162,7 @@ function ContainerCard({
 
               if (success) {
                 myToast.success("Workspace is removed.");
-                fetchContainers(sub);
+                fetchContainers();
               } else
                 myToast.error({
                   title: "Fail to remove workspace",

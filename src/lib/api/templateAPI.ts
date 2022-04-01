@@ -7,7 +7,7 @@ import {
 } from "./api";
 
 const templateAPI = {
-  templateList: async (
+  listTemplates: async (
     sectionid: string,
     sub: string
   ): Promise<TemplateListResponse> => {

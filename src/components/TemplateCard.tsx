@@ -10,29 +10,8 @@ import { Template } from "../lib/cnails";
 import myToast from "./CustomToast";
 import Tilt from "react-parallax-tilt";
 import { EyeIcon, EyeOffIcon } from "@heroicons/react/solid";
-import { useInstructor } from "../pages/course/[sectionId]/instructor";
-
-export const useCleanTilt = (preserve: string = "") => {
-  const ref = useRef<Tilt>();
-  const cleanStyle = () => {
-    const id = setTimeout(() => {
-      if (ref.current) {
-        //@ts-ignore
-        let node = ref.current.wrapperEl.node as HTMLDivElement;
-        if (node.getAttribute("style") != preserve) {
-          node.setAttribute("style", preserve);
-          cleanStyle();
-        }
-      }
-    }, 10);
-    return id;
-  };
-  useLayoutEffect(() => {
-    const id = cleanStyle();
-    return () => clearTimeout(id);
-  });
-  return { ref, cleanStyle };
-};
+import { useInstructor } from "../contexts/instructor";
+import useCleanTilt from "./useCleanTilt";
 
 interface Props {
   template: Template;
@@ -70,9 +49,8 @@ const EmbeddedWorkspaceCard = ({
           <span className="absolute animate-ping inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
         )}
         <span
-          className={`relative inline-flex rounded-full h-3 w-3 ${
-            template.containerID ? "bg-green-400" : "bg-gray-400"
-          }`}
+          className={`relative inline-flex rounded-full h-3 w-3 ${template.containerID ? "bg-green-400" : "bg-gray-400"
+            }`}
         ></span>
       </span>
       <div className="env-card-content min-h-[32px]">
@@ -97,7 +75,6 @@ function TemplateCard({
   onToggleFreshSave,
   zIndex,
 }: Props) {
-  const [useFreshSave, setUseFreshSave] = useState(false);
   const { environments, highlightedEnv, setHighlightedEnv } = useInstructor();
   const { ref, cleanStyle } = useCleanTilt(
     zIndex ? `z-index : ${zIndex};` : ""
@@ -129,13 +106,6 @@ function TemplateCard({
         }
       },
     });
-  // if (onInspect)
-  //   meunItems.push({
-  //     text: "Inspect",
-  //     onClick: () => {
-  //       onInspect(template);
-  //     },
-  //   });
   if (onToggleActivation) {
     meunItems.push({
       text: template.active ? "Unpublish" : "Publish",
@@ -179,13 +149,12 @@ function TemplateCard({
         onClick={() => {
           if (onClick) onClick(template);
         }}
-        className={`template-card  transition-all duration-300 ease-in ${
-          highlightedEnv && highlightedEnv.id === template.environment_id
-            ? "bg-yellow-300/80 shadow-yellow-300 shadow-xl"
-            : template.active
+        className={`template-card  transition-all duration-300 ease-in ${highlightedEnv && highlightedEnv.id === template.environment_id
+          ? "bg-yellow-300/80 shadow-yellow-300 shadow-xl"
+          : template.active
             ? "bg-white dark:bg-gray-600 shadow-sm"
             : "bg-gray-200 dark:bg-gray-900 shadow-sm"
-        }`}
+          }`}
       >
         <div className="env-card-content justify-between w-full">
           <div>

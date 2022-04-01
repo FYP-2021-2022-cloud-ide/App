@@ -34,6 +34,7 @@ export type {
   SystemMessageResponse,
   SandboxImage,
   Error,
+  GetEnvResponse,
   ContainerType,
 };
 
@@ -427,3 +428,11 @@ type GetUserDataResponse =
       success: false;
       error: Error;
     };
+
+type GetEnvResponse = {
+  FirebaseApiKey: string;
+  FirebaseProjectId: string;
+  FirebaseMessagingSenderId: string;
+  FirebaseAppId: string;
+  Containers_limit: string;
+};

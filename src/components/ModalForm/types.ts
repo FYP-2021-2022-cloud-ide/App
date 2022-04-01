@@ -114,6 +114,9 @@ export type Section = {
    * whether this section should be shown
    */
   conditional?: (data: Data) => boolean;
+  /**
+   * entries in this section
+   */
   entries: { [id: string]: Entry };
 };
 

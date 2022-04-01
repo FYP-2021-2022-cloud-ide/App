@@ -162,7 +162,10 @@ const fromStructureToData = (sections: FormStructure): Data => {
  * a good practice that you define a type of the formData as well. 
  * 
  * @remark `ModalForm` is a over-complex higher order component. It could be simplified by using context. 
- * Although this component is perfectly workable, a rework could be done to make it more user friendly and less buggy.
+ * Although this component is perfectly workable, it is foreseed that this component will soon be deprecated. 
+ * @remark this component suppose to be use to aid the creation of a form. Although it is possible to create 
+ * your custom entry, it is suggested not to do so unless really necessary because it defeats the purpose of
+ * the modal form. The entry type are supported because they are used frequently and common in many general forms.
  */
 const ModalForm = (props: Props) => {
   const {

@@ -2,8 +2,8 @@ import React from "react";
 import Link from "next/link";
 import moment from "moment";
 import Tilt from "react-parallax-tilt";
-import { Course } from "../../lib/cnails";
-import { useCleanTilt } from "../TemplateCard";
+import { Course } from "../lib/cnails";
+import useCleanTilt from "./useCleanTilt";
 
 export interface CourseProps {
   link: string;
@@ -37,8 +37,7 @@ function CourseCard({ link, course, zIndex }: CourseProps) {
               </div>
 
               <p className="course-card-last-update">
-                Last update:
-                {" " + moment(course.lastUpdateTime).format("YYYY-MM-DD")}
+                {`Last update: ${moment(course.lastUpdateTime).format("YYYY-MM-DD")}`}
               </p>
             </div>
           </div>

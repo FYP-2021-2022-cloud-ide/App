@@ -1,7 +1,7 @@
 import ContainerCard from "./ContainerCard";
-import EmptyDiv from "../EmptyDiv";
-import { Container, ContainerInfo } from "../../lib/cnails";
-import { useCnails } from "../../contexts/cnails";
+import EmptyDiv from "./EmptyDiv";
+import { Container, ContainerInfo } from "../lib/cnails";
+import { useCnails } from "../contexts/cnails";
 import { useEffect } from "react";
 
 type Props = {
@@ -11,20 +11,14 @@ type Props = {
 
 const ContainersList = () => {
   const {
-    sub,
-    userId,
     containers,
-    containerInfo,
     fetchContainers,
-    containerQuota,
+    containerQuota: quota,
   } = useCnails();
   useEffect(() => {
-    fetchContainers(sub);
+    fetchContainers();
   }, []);
-  const numActiveContainers = containerInfo ? containers.length : 0;
-  const quota = containerQuota;
-
-  var percentage = (numActiveContainers / quota) * 100;
+  var percentage = (containers.length / quota) * 100;
 
   return (
     <div className=" w-full ">
@@ -32,7 +26,7 @@ const ContainersList = () => {
         <div className="current-run-title">Current Running Workspaces</div>
         <div className="flex flex-col justify-between w-32">
           <div className="current-run-percentage" id="current-run-percentage">
-            {numActiveContainers}/{quota}
+            {containers.length}/{quota}
           </div>
           <div className="current-run-bar-outer">
             <div
