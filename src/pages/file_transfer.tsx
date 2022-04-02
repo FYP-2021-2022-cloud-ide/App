@@ -6,7 +6,7 @@ import { CustomData } from "../components/FTree/CustomNode";
 import FTree, { MyTreeMethods } from "../components/FTree/FTree";
 import path, { dirname } from "path";
 import { localFileAPI } from "../lib/api/localFile";
-
+import { InformationCircleIcon } from "@heroicons/react/solid"
 import {
   isBlacklisted,
   status,
@@ -22,6 +22,8 @@ import classNames from "../lib/classnames";
 import styles from "../styles/file_tree.module.css";
 import { errorToToastDescription } from "../lib/errorHelper";
 import { CLICK_TO_DISMISS, CLICK_TO_REPORT } from "../lib/constants";
+import { usePopperTooltip } from "react-popper-tooltip";
+import ReactDOM from "react-dom";
 
 export default function Page() {
   const { userId, sub } = useCnails();
@@ -47,12 +49,20 @@ export default function Page() {
    * the ref to the node which is currently under node actions
    */
   const targetNodeRef = useRef<NodeModel<CustomData>>();
+  const {
+    getArrowProps,
+    getTooltipProps,
+    setTooltipRef,
+    setTriggerRef,
+    visible,
+  } = usePopperTooltip();
 
   // for modal form
   const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] =
     useState<boolean>(false);
   const [isEditNameModalOpen, setIsEditNameModalOpen] =
     useState<boolean>(false);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState<boolean>(false);
 
   const fetchRoot = async (sub: string) => {
     googleFilesRef.current = await expandGoogleFolder(
@@ -84,9 +94,31 @@ export default function Page() {
       <div className="grid grid-cols-2 text-black max-h-screen h-full min-h-fit gap-6 px-10 mb-10 bottom-0 w-full">
         {/* local  */}
         <div className=" flex flex-col ">
-          <p className="text-gray-600 font-bold text-xl dark:text-gray-300 h-fit">
-            Personal Volume
-          </p>
+          <div className="flex flex-row space-x-2 items-center">
+            <p className="text-gray-600 font-bold text-xl dark:text-gray-300 h-fit">
+              Personal Volume
+            </p>
+            <div ref={setTriggerRef}>
+              <InformationCircleIcon className="tooltip-icon" />
+            </div>
+            {visible &&
+              ReactDOM.createPortal(
+                <div
+                  ref={setTooltipRef}
+                  {...getTooltipProps({
+                    className: "tooltip-container",
+                  })}
+                >
+                  You can drag and drop files and folders to the personal volume. You can also drag and drop files between the personal volume and the cloud volume.
+                  <div
+                    {...getArrowProps({
+                      className: "tooltip-arrow",
+                    })}
+                  />
+                </div>,
+                document.body
+              )}
+          </div>
           <FTree
             ref={ref1}
             rootId={`/volumes/${userId}/persist`}
@@ -296,9 +328,11 @@ export default function Page() {
                   },
                 },
                 // {
-                //   text: "get info",
-                //   onClick: () => {},
-                // },
+                //   text: "Upload files",
+                //   onClick: () => {
+                //     setIsUploadModalOpen(true);
+                //   }
+                // }
               ];
             }}
             rootActions={[
@@ -477,43 +511,59 @@ export default function Page() {
         }}
       ></ModalForm>
 
-      {targetNodeRef.current && (
-        <ModalForm
-          isOpen={isEditNameModalOpen}
-          setOpen={setIsEditNameModalOpen}
-          clickOutsideToClose
-          escToClose
-          title="Edit Name"
-          formStructure={{
-            edit_name: {
-              entries: {
-                name: {
-                  type: "input",
-                  defaultValue: targetNodeRef.current.text,
+      {
+        targetNodeRef.current && (
+          <ModalForm
+            isOpen={isEditNameModalOpen}
+            setOpen={setIsEditNameModalOpen}
+            clickOutsideToClose
+            escToClose
+            title="Edit Name"
+            formStructure={{
+              edit_name: {
+                entries: {
+                  name: {
+                    type: "input",
+                    defaultValue: targetNodeRef.current.text,
+                  },
                 },
               },
-            },
-          }}
-          onEnter={async ({ edit_name: data }: {
-            edit_name: {
-              name: string
-            }
-          }) => {
-            const node = targetNodeRef.current;
-            const newName = data.name;
-            progressRef1.current = status.loading;
-            const response = await moveFile(
-              userId,
-              node.data.filePath,
-              `${path.dirname(node.data.filePath)}/${newName}`
-            );
-            progressRef1.current = "";
-            targetNodeRef.current = null
-            if (response.success) await rerenderPersonalVolume(response.tree);
-            else alert(response.error.status);
-          }}
-        ></ModalForm>
-      )}
+            }}
+            onEnter={async ({ edit_name: data }: {
+              edit_name: {
+                name: string
+              }
+            }) => {
+              const node = targetNodeRef.current;
+              const newName = data.name;
+              progressRef1.current = status.loading;
+              const response = await moveFile(
+                userId,
+                node.data.filePath,
+                `${path.dirname(node.data.filePath)}/${newName}`
+              );
+              progressRef1.current = "";
+              targetNodeRef.current = null
+              if (response.success) await rerenderPersonalVolume(response.tree);
+              else alert(response.error.status);
+            }}
+          ></ModalForm>
+        )
+      }
+      {/* upload modal  */}
+      <ModalForm
+        isOpen={isUploadModalOpen}
+        setOpen={setIsUploadModalOpen}
+        clickOutsideToClose
+        escToClose
+        title="Upload Files"
+        formStructure={{
+
+        }}
+        onEnter={() => {
+
+        }}
+      ></ModalForm>
     </>
   );
 }

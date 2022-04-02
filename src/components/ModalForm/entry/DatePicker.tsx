@@ -1,13 +1,9 @@
-import { useRef, useState } from "react";
+
 import { DateTimeEntry, EntryProps } from "../types";
-import styles from "./DatePicker.module.css";
-import classNames from "../../../lib/classnames";
-import { usePopper } from "react-popper";
-import { InformationCircleIcon } from "@heroicons/react/solid";
 import Custom from "./Custom";
 
-const component = (props: EntryProps) => {
-  const entry = props.entry as DateTimeEntry;
+function Component<T>(props: EntryProps<T>) {
+  const entry = props.entry as DateTimeEntry<T>;
   if (entry.type != "datetime") return <></>;
   return (
     <Custom
@@ -28,4 +24,4 @@ const component = (props: EntryProps) => {
   );
 };
 
-export default component;
+export default Component;

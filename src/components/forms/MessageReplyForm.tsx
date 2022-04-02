@@ -9,6 +9,7 @@ export type MessageReplyFormData = {
     reply_message: {
         target: string;
         message: string;
+        allow_reply: boolean;
     };
 };
 
@@ -41,6 +42,12 @@ const MessageReplyForm = ({ isOpen, setOpen, target: notification }: Props) => {
                         type: "markdown",
                         defaultValue: "",
                     },
+                    allow_reply: {
+                        label: "Allow reply",
+                        type: "toggle",
+                        tooltip: "Whether the receiver and reply your message",
+                        defaultValue: true,
+                    }
                 },
             },
         } as FormStructure<MessageReplyFormData> : {}}
@@ -52,7 +59,7 @@ const MessageReplyForm = ({ isOpen, setOpen, target: notification }: Props) => {
                 data.message,
                 userId,
                 notification.sender.id, //should pass the userid of the people to reply to
-                true,
+                data.allow_reply,
                 notification.section_id
             );
             if (response.success) {

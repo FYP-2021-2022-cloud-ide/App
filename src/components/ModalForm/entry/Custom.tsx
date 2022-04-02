@@ -6,7 +6,7 @@ import { usePopperTooltip } from "react-popper-tooltip";
 import styles from "./Tooltip.module.css";
 import classNames from "../../../lib/classnames";
 
-const Label = ({ entry }: EntryProps) => {
+function Label<T>({ entry }: EntryProps<T>) {
   const {
     getArrowProps,
     getTooltipProps,
@@ -56,7 +56,7 @@ const Label = ({ entry }: EntryProps) => {
   );
 };
 
-const component = (props: EntryProps) => {
+function component<T>(props: EntryProps<T>) {
   const { zIndex, id, entry, sectionId, data, onChange } = props;
   return (
     <div
