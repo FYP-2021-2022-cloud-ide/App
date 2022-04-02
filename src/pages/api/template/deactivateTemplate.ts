@@ -3,7 +3,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 
-import { SuccessStringResponse, nodeError } from "../../../lib/api/api";
+import {
+  SuccessStringResponse,
+  nodeError,
+  DeactivateTemplateRequest,
+} from "../../../lib/api/api";
 
 import { grpcClient } from "../../../lib/grpcClient";
 import {
@@ -16,8 +20,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SuccessStringResponse>
 ) {
-  const { templateId, section_user_id, sectionId, title, description } =
-    JSON.parse(req.body);
+  const { templateId, section_user_id } = JSON.parse(
+    req.body
+  ) as DeactivateTemplateRequest;
   const userId = getCookie(req.headers.cookie, "userId");
   var docReq = TemplateIdRequest.fromPartial({
     sessionKey: fetchAppSession(req),

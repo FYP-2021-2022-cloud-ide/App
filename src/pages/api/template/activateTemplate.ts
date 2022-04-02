@@ -3,29 +3,31 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 
-import { SuccessStringResponse, nodeError } from "../../../lib/api/api";
+import {
+  SuccessStringResponse,
+  nodeError,
+  ActivateTemplateRequest,
+} from "../../../lib/api/api";
 
 import { grpcClient } from "../../../lib/grpcClient";
 import {
   SuccessStringReply,
   TemplateIdRequest,
 } from "../../../proto/dockerGet/dockerGet";
-import { getCookie } from "../../../lib/cookiesHelper";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SuccessStringResponse>
 ) {
-  const { templateId, section_user_id, sectionId, title, description } =
-    JSON.parse(req.body);
-  const userId = getCookie(req.headers.cookie, "userId");
+  const { templateId, section_user_id } = JSON.parse(
+    req.body
+  ) as ActivateTemplateRequest;
   var docReq = TemplateIdRequest.fromPartial({
     sessionKey: fetchAppSession(req),
     templateID: templateId,
     sectionUserId: section_user_id,
   });
   try {
-
     grpcClient.activateTemplate(
       docReq,
       function (err, GoLangResponse: SuccessStringReply) {
@@ -46,7 +48,7 @@ export default async function handler(
       error: nodeError(error),
     });
     res.status(405).end();
-  } 
+  }
 }
 
 export const config = {

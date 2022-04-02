@@ -2,7 +2,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 
-import { SuccessStringResponse, nodeError } from "../../../lib/api/api";
+import {
+  SuccessStringResponse,
+  nodeError,
+  EnvironmentUpdateRequest,
+} from "../../../lib/api/api";
 
 import { grpcClient } from "../../../lib/grpcClient";
 import {
@@ -14,8 +18,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SuccessStringResponse>
 ) {
-  const { envId, name, section_user_id, containerId, description, sectionId } =
-    JSON.parse(req.body);
+  const { envId, name, section_user_id, containerId, description } = JSON.parse(
+    req.body
+  ) as EnvironmentUpdateRequest;
 
   var docReq = UpdateEnvironmentRequest.fromPartial({
     sessionKey: fetchAppSession(req),

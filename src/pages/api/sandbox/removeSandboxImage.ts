@@ -3,7 +3,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 
-import { SuccessStringResponse, nodeError } from "../../../lib/api/api";
+import {
+  SuccessStringResponse,
+  nodeError,
+  RemoveSandboxImageRequest,
+} from "../../../lib/api/api";
 
 import { grpcClient } from "../../../lib/grpcClient";
 import {
@@ -15,7 +19,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SuccessStringResponse>
 ) {
-  const { sandboxImageId, userId } = JSON.parse(req.body);
+  const { sandboxImageId, userId } = JSON.parse(
+    req.body
+  ) as RemoveSandboxImageRequest;
   var docReq = SandBoxImageIdRequest.fromPartial({
     sessionKey: fetchAppSession(req),
     sandBoxImageId: sandboxImageId,

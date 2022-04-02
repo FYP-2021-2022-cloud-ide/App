@@ -1,8 +1,12 @@
 import {
+  SandboxAddRequest,
   SandboxAddResponse,
+  AddSandboxImageRequest,
   SandboxImageAddResponse,
   SandboxImageListResponse,
+  RemoveSandboxRequest,
   SuccessStringResponse,
+  UpdateSandboxImageRequest,
 } from "./api";
 
 const sandboxAPI = {
@@ -14,65 +18,39 @@ const sandboxAPI = {
     });
     return res.json();
   },
-  addSandbox: async (
-    memLimit: Number,
-    numCPU: Number,
-    sandboxImageId: string,
-    title: string
-  ): Promise<SandboxAddResponse> => {
+  addSandbox: async (req: SandboxAddRequest): Promise<SandboxAddResponse> => {
     // start a workspace
     var res = await fetch("/api/sandbox/addSandbox", {
       method: "POST",
-      body: JSON.stringify({
-        memLimit,
-        numCPU,
-        sandboxImageId,
-        title,
-      }),
+      body: JSON.stringify(req),
     });
     return res.json();
   },
   // add predefined image
   addSandboxImage: async (
-    description: string,
-    imageId: string,
-    title: string,
-    userId: string
+    req: AddSandboxImageRequest
   ): Promise<SandboxImageAddResponse> => {
     var res = await fetch("/api/sandbox/addSandboxImage", {
       method: "POST",
-      body: JSON.stringify({
-        description,
-        imageId,
-        title,
-        userId,
-      }),
+      body: JSON.stringify(req),
     });
     return res.json();
   },
   removeSandbox: async (
-    sandboxId: string,
-    userId: string
+    req: RemoveSandboxRequest
   ): Promise<SuccessStringResponse> => {
     var res = await fetch("/api/sandbox/removeSandbox", {
       method: "POST",
-      body: JSON.stringify({
-        sandboxId,
-        userId,
-      }),
+      body: JSON.stringify(req),
     });
     return res.json();
   },
   removeSandboxImage: async (
-    sandboxImageId: string,
-    userId: string
+    req: RemoveSandboxRequest
   ): Promise<SuccessStringResponse> => {
     var res = await fetch("/api/sandbox/removeSandboxImage", {
       method: "POST",
-      body: JSON.stringify({
-        sandboxImageId,
-        userId,
-      }),
+      body: JSON.stringify(req),
     });
     return res.json();
   },
@@ -81,20 +59,12 @@ const sandboxAPI = {
    * if the `tempContainerId` is an empty string, only db data will be updated
    */
   updateSandboxImage: async (
-    sandboxImageId: string,
-    title: string,
-    description: string,
-    tempContainerId: string,
-    userId: string
+    req: UpdateSandboxImageRequest
   ): Promise<SuccessStringResponse> => {
     var res = await fetch("/api/sandbox/updateSandboxImage", {
       method: "POST",
       body: JSON.stringify({
-        sandboxImageId,
-        description,
-        tempContainerId,
-        title,
-        userId,
+        req,
       }),
     });
     return res.json();

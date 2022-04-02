@@ -46,6 +46,7 @@ const EnvironmentTemplateWrapper = () => {
     const {
         removeEnvironment,
     } = envAPI;
+    const { addTempContainer } = containerAPI
 
     // if environments or templates has not fetch, don't need to go down
     if (!environments || !templates) return <></>;
@@ -74,7 +75,11 @@ const EnvironmentTemplateWrapper = () => {
                                 comment: CLICK_TO_DISMISS,
                             });
                         } else {
-                            const response = await removeEnvironment(env.id, sectionUserId, sectionId);
+                            const response = await removeEnvironment({
+                                envId: env.id,
+                                section_user_id: sectionUserId,
+                                sectionId: sectionId
+                            });
                             if (response.success) {
                                 myToast.success(
                                     `environment ${env.id} is successfully removed`
@@ -92,6 +97,23 @@ const EnvironmentTemplateWrapper = () => {
                             setHighlightedEnv(env);
                             forceUpdate();
                         } else myToast.warning(`No template is using ${env.name}.`);
+                    }}
+                    onEnvUpdateInternal={async (env) => {
+                        const response = await addTempContainer(
+                            {
+                                memLimit: memory,
+                                numCPU: CPU,
+                                imageId: env.imageId,
+                                sub: sub,
+                                accessRight: "root",
+                                event: "ENV_CREATE",
+                                title: env.name,
+                                formData: {
+                                    name: env.name,
+                                    description: env.description
+                                }
+                            }
+                        );
                     }}
                 ></EnvironmentList>
                 <TemplateList

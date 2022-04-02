@@ -57,11 +57,13 @@ const AnnouncementForm = ({ isOpen, setOpen }: Props) => {
         onEnter={async ({ course_announcement: data }) => {
             console.log(data);
             const response = await courseAPI.sendNotificationAnnouncement(
-                data.allow_reply,
-                data.announcement,
-                data.title,
-                userId,
-                sectionUserInfo.sectionId
+                {
+                    allowReply: data.allow_reply,
+                    body: data.announcement,
+                    title: data.title,
+                    senderId: userId,
+                    sectionId: sectionUserInfo.sectionId
+                }
             );
             if (response.success)
                 myToast.success("The course announcement is sent.");

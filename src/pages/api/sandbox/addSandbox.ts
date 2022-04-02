@@ -2,14 +2,16 @@
 //remember to set the ownership after adding new api
 import type { NextApiRequest, NextApiResponse } from "next";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
-import { SandboxAddResponse, nodeError } from "../../../lib/api/api";
-import { redisClient } from "../../../lib/redisClient";
+import {
+  SandboxAddResponse,
+  nodeError,
+  SandboxAddRequest,
+} from "../../../lib/api/api";
 import { grpcClient } from "../../../lib/grpcClient";
 import {
   AddSandBoxReply,
   AddSandBoxRequest,
 } from "../../../proto/dockerGet/dockerGet";
-import { getCookie } from "../../../lib/cookiesHelper";
 import { v4 } from "uuid";
 import redisHelper from "../../../lib/redisHelper";
 
@@ -17,8 +19,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SandboxAddResponse>
 ) {
-  const { memLimit, numCPU, sandboxImageId, title, sub } = JSON.parse(req.body);
-  const userId = getCookie(req.headers.cookie, "userId");
+  const { memLimit, numCPU, sandboxImageId, title, sub } = JSON.parse(
+    req.body
+  ) as SandboxAddRequest;
   const tempId = v4();
   try {
     await redisHelper.insert.workspaces(sub, {
@@ -37,7 +40,7 @@ export default async function handler(
     grpcClient.addSandbox(
       docReq,
       async function (err, GoLangResponse: AddSandBoxReply) {
-        if (err) {
+        if (err || !GoLangResponse.success) {
           // the request fail so we remove it from redis
           await redisHelper.remove.workspaces(sub, tempId);
         } else {

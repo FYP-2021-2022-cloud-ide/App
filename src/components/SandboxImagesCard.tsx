@@ -33,7 +33,6 @@ const SandboxImagesCard = ({
   );
 
   if (sandboxImage.status) {
-
     return <Tilt
       onLeave={cleanStyle}
       ref={ref}

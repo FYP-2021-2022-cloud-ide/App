@@ -1,7 +1,11 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { grpcClient } from "../../../lib/grpcClient";
-import { ContainerAddResponse, nodeError } from "../../../lib/api/api";
+import {
+  AddTemplateContainerRequest,
+  ContainerAddResponse,
+  nodeError,
+} from "../../../lib/api/api";
 import {
   AddContainerReply,
   AddContainerRequest,
@@ -25,7 +29,7 @@ export default async function handler(
     title,
     sub,
     event, // it could be a student start workspace or instructor start template workspace
-  } = JSON.parse(req.body);
+  } = JSON.parse(req.body) as AddTemplateContainerRequest;
   var docReq: AddContainerRequest = AddContainerRequest.fromPartial({
     sessionKey: fetchAppSession(req),
     imageName: imageName,

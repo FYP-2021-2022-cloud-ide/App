@@ -62,6 +62,7 @@ const remove = {
 
 const insert = {
   workspaces: async (sub: string, workspace: Workspace) => {
+    console.log(workspace);
     const workspaces = await list.workspaces(sub);
     workspaces.push(workspace);
     await redisClient.set(
@@ -105,6 +106,7 @@ const patch = {
   workspaces: async (sub: string, containers: Container[]) => {
     let patched = [...containers];
     let workspaces = await list.workspaces(sub);
+
     // check if workspaces in redis are not valid anymore
     // this could happens when container Id is not empty (workspace have been created) but not found in containers
     workspaces = workspaces.filter(
@@ -112,12 +114,16 @@ const patch = {
         w.containerId == "" ||
         containers.some((c) => c.containerID == w.containerId)
     );
-    await redisClient.set(
-      `ServerState:${sub}:workspaces`,
-      JSON.stringify(workspaces),
-      "EX",
-      redisKeyExpireTime
-    );
+    if (workspaces.length == 0) {
+      await redisClient.del(`ServerState:${sub}:workspaces`);
+    } else {
+      await redisClient.set(
+        `ServerState:${sub}:workspaces`,
+        JSON.stringify(workspaces),
+        "EX",
+        redisKeyExpireTime
+      );
+    }
 
     // now as long as workspace has container id, you must find it in the container array. patch the data.
     for (let workspace of workspaces) {
@@ -128,7 +134,7 @@ const patch = {
           subTitle: "",
           startAt: "",
           containerID: "",
-          data: workspace,
+          redisPatch: workspace,
         });
       } else {
         // the workspace has been created because there is container id
@@ -141,7 +147,7 @@ const patch = {
         }
         patched.splice(index, 1, {
           ...patched[index],
-          data: workspace,
+          redisPatch: workspace,
         });
       }
     }

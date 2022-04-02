@@ -2,7 +2,7 @@ import { CubeTransparentIcon } from "@heroicons/react/outline";
 import { PlusCircleIcon, PlusIcon } from "@heroicons/react/solid";
 import { SandboxImage } from "../lib/cnails";
 import EmptyDiv from "./EmptyDiv";
-import SandboxImagesCard from "./SandboImagesCard";
+import SandboxImagesCard from "./SandboxImagesCard";
 
 export type Props = {
   sandboxImages: SandboxImage[];

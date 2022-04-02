@@ -1,6 +1,8 @@
 import {
+  ContainerAddRequest,
   ContainerAddResponse,
   ContainerListResponse,
+  ContainerRemoveRequest,
   SuccessStringResponse,
 } from "./api";
 
@@ -12,56 +14,21 @@ const containerAPI = {
     return res.json();
   },
 
-  /**
-   *
-   * @param memLimit
-   * @param numCPU
-   * @param imageName
-   * @param sub
-   * @param accessRight
-   * @param event
-   * @param data
-   * @returns
-   */
   addTempContainer: async (
-    memLimit: Number,
-    numCPU: Number,
-    imageId: string,
-    sub: string,
-    accessRight: string,
-    event:
-      | "ENV_CREATE"
-      | "ENV_UPDATE"
-      | "TEMPLATE_CREATE"
-      | "TEMPLATE_UPDATE"
-      | "SANDBOX_CREATE"
-      | "SANDBOX_UPDATE",
-    formData: any
+    containerAddRequest: ContainerAddRequest
   ): Promise<ContainerAddResponse> => {
     var res = await fetch("/api/container/addTempContainer", {
       method: "POST",
-      body: JSON.stringify({
-        memLimit,
-        numCPU,
-        imageId,
-        accessRight,
-        event,
-        formData,
-        sub,
-      }),
+      body: JSON.stringify(containerAddRequest),
     });
     return res.json();
   },
   removeTempContainer: async (
-    containerId: string,
-    sub: string
+    req: ContainerRemoveRequest
   ): Promise<SuccessStringResponse> => {
     var res = await fetch("/api/container/removeTempContainer", {
       method: "POST",
-      body: JSON.stringify({
-        containerId,
-        sub,
-      }),
+      body: JSON.stringify(req),
     });
     return res.json();
   },

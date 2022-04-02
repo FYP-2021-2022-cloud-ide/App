@@ -3,23 +3,23 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 
-import { SuccessStringResponse, nodeError } from "../../../lib/api/api";
+import {
+  SuccessStringResponse,
+  nodeError,
+  ContainerRemoveRequest,
+} from "../../../lib/api/api";
 
 import { grpcClient } from "../../../lib/grpcClient";
 import {
   SuccessStringReply,
   RemoveTempContainerRequest,
 } from "../../../proto/dockerGet/dockerGet";
-import redisHelper from "../../../lib/redisHelper";
-import { getCookie } from "../../../lib/cookiesHelper";
-import { redis } from "googleapis/build/src/apis/redis";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SuccessStringResponse>
 ) {
-  const { containerId, sub } = JSON.parse(req.body);
-  const userId = getCookie(req.headers.cookie, "userId");
+  const { containerId, sub } = JSON.parse(req.body) as ContainerRemoveRequest;
   var docReq: RemoveTempContainerRequest =
     RemoveTempContainerRequest.fromPartial({
       sessionKey: fetchAppSession(req),

@@ -10,6 +10,7 @@ type Props = {
   onDelete?: (environment: Environment) => void;
   onUpdate?: (environment: Environment) => void;
   onHighlight?: (environment: Environment) => void;
+  onUpdateInternal?: (environment: Environment) => void;
   zIndex?: number;
 };
 
@@ -19,6 +20,7 @@ function EnvironmentCard({
   onDelete,
   onUpdate,
   onHighlight,
+  onUpdateInternal,
   zIndex,
 }: Props) {
   const { ref, cleanStyle } = useCleanTilt(
@@ -29,27 +31,30 @@ function EnvironmentCard({
     menuItems.push({
       text: "Delete",
       onClick: () => {
-        if (onDelete) {
-          onDelete(environment);
-        }
+        onDelete(environment);
       },
     });
   if (onUpdate)
     menuItems.push({
       text: "Update",
       onClick: () => {
-        if (onUpdate) {
-          onUpdate(environment);
-        }
+        onUpdate(environment);
       },
     });
   if (onHighlight)
     menuItems.push({
       text: "Highlight templates",
       onClick: () => {
-        if (onHighlight) onHighlight(environment);
+        onHighlight(environment);
       },
     });
+  if (onUpdateInternal)
+    menuItems.push({
+      text: "Update Internal",
+      onClick: () => {
+        onUpdateInternal(environment)
+      }
+    })
 
   return (
     <Tilt

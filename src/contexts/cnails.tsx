@@ -18,6 +18,7 @@ import { containerAPI } from "../lib/api/containerAPI";
 import { FetchCookieResponse } from "../lib/api/api";
 import _ from "lodash";
 import CustomToaster from "../components/CustomToaster";
+import { getType, isTemporary } from "../lib/containerHelper";
 
 const defaultQuota = Number(3); // process.env.CONTAINERSLIMIT
 
@@ -100,7 +101,20 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
   const _fetchContainers = async (sub: string) => {
     const response = await listContainers(sub);
     if (response.success) {
-      const { containers } = response;
+      const containers = response.containers.map(container => (container.redisPatch ? {
+        ...container,
+        isTemporary: isTemporary(container),
+        data: container.redisPatch,
+        type: getType(container),
+        status: container.containerID ? "DEFAULT" : "CREATING",
+      } as Container : { // if the response isn't right
+        ...container,
+        isTemporary: false,
+        data: {},
+        type: "ENV",
+        status: "DEFAULT"
+      }) as Container)
+      console.log(containers)
       setContainers(containers);
       return containers
     } else {

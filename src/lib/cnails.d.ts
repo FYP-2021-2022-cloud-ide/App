@@ -107,15 +107,14 @@ type SandboxImage = {
    * if the sandbox image is `CREATING`, the create request is being processed.
    * if the sandbox image is `UPDATING`, the update request is being processed and should not let user update it
    * if the sandbox image is `REMOVING`, the remove request is being processed.
-   * if the status is undefined or null, it will show normally.
    */
-  status?:
+  status:
     | "CREATING"
     | "UPDATING"
     | "REMOVING"
     | "STARTING_WORKSPACE"
     | "STOPPING_WORKSPACE"
-    | null;
+    | "Default";
 };
 
 type ContainerList = {
@@ -140,13 +139,7 @@ type Container = {
    *
    * @remark in the `redisHelper` there is a status `RUNNING`. But it should return `undefined` to UI
    */
-  status?: "CREATING" | "REMOVING" | null;
-  /**
-   * the id of source object, sandboxImage, template or environment.
-   * The `sourceId` can be undefined for event `ENV_CREATE`, `TEMPLATE_CREATE`, `SANDBOX_CREATE`
-   * because the temporary container is created before the source is created.
-   */
-  sourceId: string | undefined;
+  status: "CREATING" | "REMOVING" | "DEFAULT";
   /**
    * base on the event of the container created to determine whether this is a temporary container
    *
@@ -155,6 +148,10 @@ type Container = {
    * normal container event : `TEMPLATE_START_WORKSPACE`, `SANDBOX_START_WORKSPACE` , `WORKSPACE_START`
    */
   isTemporary: boolean;
+  /**
+   * the redis patch data
+   */
+  data: any;
 };
 
 type Workspace = Template;

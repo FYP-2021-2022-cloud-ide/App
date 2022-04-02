@@ -1,7 +1,11 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 
-import { EnvironmentAddResponse, nodeError } from "../../../lib/api/api";
+import {
+  EnvironmentAddResponse,
+  EnvironmentBuildRequest,
+  nodeError,
+} from "../../../lib/api/api";
 
 import {
   AddEnvironmentReply,
@@ -15,10 +19,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<EnvironmentAddResponse>
 ) {
-  var client = grpcClient;
-  const { name, section_user_id, containerId, description, sectionId } =
-    JSON.parse(req.body);
-  const userId = getCookie(req.headers.cookie, "userId");
+  const { name, section_user_id, containerId, description } = JSON.parse(
+    req.body
+  ) as EnvironmentBuildRequest;
   var docReq = BuildEnvironmentRequest.fromPartial({
     sessionKey: fetchAppSession(req),
     name: name,
@@ -28,7 +31,7 @@ export default async function handler(
   });
 
   try {
-    client.buildEnvironment(
+    grpcClient.buildEnvironment(
       docReq,
       function (err, GoLangResponse: AddEnvironmentReply) {
         res.json({

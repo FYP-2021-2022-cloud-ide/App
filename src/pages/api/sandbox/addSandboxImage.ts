@@ -3,7 +3,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 
-import { SandboxImageAddResponse, nodeError } from "../../../lib/api/api";
+import {
+  SandboxImageAddResponse,
+  nodeError,
+  AddSandboxImageRequest,
+} from "../../../lib/api/api";
 import { redisClient } from "../../../lib/redisClient";
 import { grpcClient } from "../../../lib/grpcClient";
 import {
@@ -15,7 +19,10 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SandboxImageAddResponse>
 ) {
-  const { description, imageId, title, userId } = JSON.parse(req.body);
+  const { description, imageId, title, userId } = JSON.parse(
+    req.body
+  ) as AddSandboxImageRequest;
+
   try {
     var docReq = AddSandBoxImageRequest.fromPartial({
       sessionKey: fetchAppSession(req),

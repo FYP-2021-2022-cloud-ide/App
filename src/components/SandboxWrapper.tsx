@@ -19,9 +19,9 @@ import { containerAPI } from "../lib/api/containerAPI";
 
 
 export const SandboxWrapper = () => {
-  const { userId, containerQuota, containers, setContainers, sub } =
+  const { userId, containerQuota, containers, setContainers, sub, fetchContainers } =
     useCnails();
-  const { sandboxImages, setSandboxImages, fetchSandboxImages } = useSandbox();
+  const { sandboxImages, setSandboxImages, fetchSandboxImages, } = useSandbox();
   const [createOpen, setCreateOpen] = useState(false);
   const [updateOpen, setUpdateOpen] = useState(false);
   const [updateTarget, setUpdateTarget] = useState<SandboxImage>();
@@ -111,12 +111,18 @@ export const SandboxWrapper = () => {
                 startAt: "",
                 containerID: "",
                 type: "SANDBOX",
-                sourceId: sandboxImage.id,
                 isTemporary: false,
+                data: {}
               }
             ]
           })
-          const response = await addSandbox(memory, CPU, sandboxImage.id, sandboxImage.title);
+          const response = await addSandbox({
+            memLimit: memory,
+            numCPU: CPU,
+            sandboxImageId: sandboxImage.id,
+            title: sandboxImage.title,
+            sub: sub
+          });
           myToast.dismiss(id);
           if (response.success) {
             myToast.success(
@@ -130,6 +136,7 @@ export const SandboxWrapper = () => {
             });
           }
           await fetchSandboxImages();
+          await fetchContainers();
         }}
         onSandboxStop={async (sandboxImage) => {
           const toastId = myToast.loading(`Stopping a workspace...`);
@@ -154,15 +161,14 @@ export const SandboxWrapper = () => {
         }}
         onSandboxUpdateInternal={async (sandboxImage) => {
           // give a toast 
-          const response = await addTempContainer(
-            memory,
-            CPU,
-            sandboxImage.imageId,
-            sub,
-            "root",
-            "SANDBOX_UPDATE",
-            name
-          );
+          // const response = await addTempContainer(
+          //   memory,
+          //   CPU,
+          //   sandboxImage.imageId,
+          //   sub,
+          //   "root",
+          //   "SANDBOX_UPDATE"
+          // );
         }}
       ></SandboxImageList>
       {/* create form */}

@@ -3,7 +3,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 
-import { SuccessStringResponse, nodeError } from "../../../lib/api/api";
+import {
+  SuccessStringResponse,
+  nodeError,
+  AnnouncementRequest,
+} from "../../../lib/api/api";
 
 import { grpcClient } from "../../../lib/grpcClient";
 import {
@@ -16,12 +20,14 @@ export default function handler(
   res: NextApiResponse<SuccessStringResponse>
 ) {
   var client = grpcClient;
-  const { title, body, sender, sectionId, allowReply } = JSON.parse(req.body);
+  const { title, body, senderId, sectionId, allowReply } = JSON.parse(
+    req.body
+  ) as AnnouncementRequest;
   var docReq = SendNotificationAnnouncementRequest.fromPartial({
     sessionKey: fetchAppSession(req),
     allowReply: allowReply,
     body: body,
-    sender: sender,
+    sender: senderId,
     title: title,
     sectionId: sectionId,
   });

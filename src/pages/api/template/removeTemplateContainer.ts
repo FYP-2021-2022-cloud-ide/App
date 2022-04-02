@@ -3,7 +3,11 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 import { grpcClient } from "../../../lib/grpcClient";
 
-import { SuccessStringResponse, nodeError } from "../../../lib/api/api";
+import {
+  SuccessStringResponse,
+  nodeError,
+  RemoveTemplateContainerRequest,
+} from "../../../lib/api/api";
 import {
   SuccessStringReply,
   RemoveContainerRequest,
@@ -14,7 +18,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SuccessStringResponse>
 ) {
-  const { containerId, sub } = JSON.parse(req.body);
+  const { containerId, sub } = JSON.parse(
+    req.body
+  ) as RemoveTemplateContainerRequest;
   const userId = getCookie(req.headers.cookie, "userId");
   var docReq: RemoveContainerRequest = RemoveContainerRequest.fromPartial({
     sessionKey: fetchAppSession(req),

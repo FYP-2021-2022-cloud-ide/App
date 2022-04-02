@@ -44,6 +44,9 @@ export default function CardMenu({ items }: Props) {
                     return item.conditional();
                   }
                 })
+                .sort((a, b) => {
+                  return a.text.localeCompare(b.text)
+                })
                 .map((item) => {
                   return (
                     <Menu.Item key={item.text}>

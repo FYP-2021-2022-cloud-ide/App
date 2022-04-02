@@ -1,7 +1,11 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
-import { TemplateAddResponse, nodeError } from "../../../lib/api/api";
+import {
+  TemplateAddResponse,
+  nodeError,
+  AddTemplateRequest as NextRequest,
+} from "../../../lib/api/api";
 
 import { grpcClient } from "../../../lib/grpcClient";
 import {
@@ -24,8 +28,7 @@ export default async function handler(
     isExam,
     timeLimit,
     allow_notification,
-    sectionId,
-  } = JSON.parse(req.body);
+  } = JSON.parse(req.body) as NextRequest;
 
   var docReq = AddTemplateRequest.fromPartial({
     sessionKey: fetchAppSession(req),

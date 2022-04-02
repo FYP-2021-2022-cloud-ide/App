@@ -15,6 +15,7 @@ export interface Props {
   onEnvDelete?: (environment: Environment) => void;
   onEnvUpdate?: (environment: Environment) => void;
   onEnvHighlight?: (environment: Environment) => void;
+  onEnvUpdateInternal?: (environmnet: Environment) => void;
 }
 
 const EnvironmentList = ({
@@ -23,6 +24,7 @@ const EnvironmentList = ({
   onEnvClick,
   onEnvDelete,
   onEnvHighlight,
+  onEnvUpdateInternal,
   onEnvUpdate,
 }: Props) => {
   return (
@@ -51,18 +53,11 @@ const EnvironmentList = ({
                   <EnvironmentCard
                     key={environment.id}
                     environment={environment}
-                    onClick={(environment) => {
-                      if (onEnvClick) onEnvClick(environment);
-                    }}
-                    onDelete={(environment) => {
-                      if (onEnvDelete) onEnvDelete(environment);
-                    }}
-                    onUpdate={(environment) => {
-                      if (onEnvUpdate) onEnvUpdate(environment);
-                    }}
-                    onHighlight={(environment) => {
-                      if (onEnvHighlight) onEnvHighlight(environment);
-                    }}
+                    onClick={onEnvClick}
+                    onDelete={onEnvDelete}
+                    onUpdate={onEnvUpdate}
+                    onHighlight={onEnvHighlight}
+                    onUpdateInternal={onEnvUpdateInternal}
                     zIndex={environments.length - index}
                   ></EnvironmentCard>
                 );

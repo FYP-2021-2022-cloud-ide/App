@@ -6,6 +6,7 @@ import { fetchAppSession } from "../../../lib/fetchAppSession";
 import {
   TemplateGetStudentWorkspaceResponse,
   nodeError,
+  GetTemplateStudentWorkspaceRequest,
 } from "../../../lib/api/api";
 
 import { grpcClient } from "../../../lib/grpcClient";
@@ -18,8 +19,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<TemplateGetStudentWorkspaceResponse>
 ) {
-  var client = grpcClient;
-  const { templateId, section_user_id } = JSON.parse(req.body);
+  const { templateId, section_user_id } = JSON.parse(
+    req.body
+  ) as GetTemplateStudentWorkspaceRequest;
   // console.log(templateId, section_user_id)
   var docReq = TemplateIdRequest.fromPartial({
     sessionKey: fetchAppSession(req),
@@ -27,28 +29,26 @@ export default async function handler(
     sectionUserId: section_user_id,
   });
   try {
-    client.getTemplateStudentWorkspace(
+    grpcClient.getTemplateStudentWorkspace(
       docReq,
       function (err, GoLangResponse: TemplateGetStudentWorkspaceReply) {
-        var studentWorkspaces = GoLangResponse.StudentWorkspaces;
         res.json({
           success: GoLangResponse.success,
           error: {
             status: GoLangResponse.error?.status,
             error: GoLangResponse.error?.error,
           },
-          studentWorkspaces:
-            studentWorkspaces.map((s) => {
-              return {
-                status: s.status,
-                workspaceId: s.workspaceId,
-                student: {
-                  name: s.student.name,
-                  sub: s.student.sub,
-                  userId: s.student.userId,
-                },
-              };
-            }) || [],
+          studentWorkspaces: GoLangResponse.StudentWorkspaces.map((s) => {
+            return {
+              status: s.status,
+              workspaceId: s.workspaceId,
+              student: {
+                name: s.student.name,
+                sub: s.student.sub,
+                userId: s.student.userId,
+              },
+            };
+          }),
         });
 
         res.status(200).end();

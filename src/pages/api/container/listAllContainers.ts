@@ -14,7 +14,6 @@ import {
   ContainerType,
 } from "../../../lib/api/api";
 import redisHelper from "../../../lib/redisHelper";
-import { getCookie } from "../../../lib/cookiesHelper";
 
 export default function handler(
   req: NextApiRequest,
@@ -22,7 +21,6 @@ export default function handler(
 ) {
   try {
     const { sub } = req.query;
-    const userId = getCookie(req.headers.cookie, "userId");
     grpcClient.listAllContainers(
       {
         sessionKey: fetchAppSession(req),
@@ -44,7 +42,7 @@ export default function handler(
           },
 
           containers: await redisHelper.patch.workspaces(
-            userId,
+            sub as string,
             containers.map((container) => {
               // console.log(listContainerReply_Container_containerTypeToJSON(containers.type))
               return {

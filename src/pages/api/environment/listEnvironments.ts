@@ -2,7 +2,6 @@
 //remember to set the ownership after adding new api
 import type { NextApiRequest, NextApiResponse } from "next";
 import { EnvironmentListResponse, nodeError } from "../../../lib/api/api";
-import { getCookie } from "../../../lib/cookiesHelper";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 
 import { grpcClient } from "../../../lib/grpcClient";
@@ -16,9 +15,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<EnvironmentListResponse>
 ) {
-  var client = grpcClient;
   const { sectionid, sub } = req.query;
-  const userId = getCookie(req.headers.cookie, "userId");
   var docReq = SectionAndSubRequest.fromPartial({
     sessionKey: fetchAppSession(req),
     sectionID: sectionid as string,
@@ -26,7 +23,7 @@ export default async function handler(
   });
 
   try {
-    client.listEnvironments(
+    grpcClient.listEnvironments(
       docReq,
       async function (err, GoLangResponse: ListEnvironmentsReply) {
         res.json({

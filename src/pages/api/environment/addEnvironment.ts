@@ -3,7 +3,11 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 import { grpcClient } from "../../../lib/grpcClient";
 
-import { EnvironmentAddResponse, nodeError } from "../../../lib/api/api";
+import {
+  EnvironmentAddRequest,
+  EnvironmentAddResponse,
+  nodeError,
+} from "../../../lib/api/api";
 
 import {
   AddEnvironmentReply,
@@ -15,8 +19,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<EnvironmentAddResponse>
 ) {
-  const { libraries, name, section_user_id, description, sectionId } =
-    JSON.parse(req.body);
+  const { libraries, name, section_user_id, description } = JSON.parse(
+    req.body
+  ) as EnvironmentAddRequest;
   const userId = getCookie(req.headers.cookie, "userId");
   var docReq = AddEnvironmentRequest.fromPartial({
     sessionKey: fetchAppSession(req),

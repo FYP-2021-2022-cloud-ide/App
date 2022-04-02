@@ -12,6 +12,7 @@ export type {
   SectionRole,
   CourseListResponse,
   Environment,
+  SandboxAddRequest,
   EnvironmentListResponse,
   EnvironmentAddResponse,
   Template,
@@ -38,6 +39,7 @@ export type {
   Error,
   GetEnvResponse,
   ContainerType,
+  ContainerAddRequest,
 };
 
 export { nodeError, emptyError };
@@ -202,7 +204,7 @@ type Container = {
   subTitle: string;
   startAt: string;
   containerID: string;
-  data?: RedisWorkspace;
+  redisPatch?: RedisWorkspace;
 };
 
 type ContainerListResponse =
@@ -421,4 +423,167 @@ type GetEnvResponse = {
   FirebaseMessagingSenderId: string;
   FirebaseAppId: string;
   Containers_limit: string;
+};
+
+type SandboxAddRequest = {
+  memLimit: number;
+  numCPU: number;
+  sandboxImageId: string;
+  title: string;
+  sub: string;
+};
+
+type ContainerAddRequest = {
+  memLimit: number;
+  numCPU: number;
+  imageId: string;
+  sub: string;
+  accessRight: string;
+  event:
+    | "ENV_CREATE"
+    | "ENV_UPDATE"
+    | "TEMPLATE_CREATE"
+    | "TEMPLATE_UPDATE"
+    | "SANDBOX_CREATE"
+    | "SANDBOX_UPDATE";
+  title: string;
+  formData: any;
+};
+
+export type ContainerRemoveRequest = {
+  containerId: string;
+  sub: string;
+};
+
+export type EnvironmentListRequest = {
+  sectionId: string;
+  sub: string;
+};
+
+export type EnvironmentAddRequest = {
+  libraries: string[];
+  name: string;
+  description: string;
+  section_user_id: string;
+};
+
+export type EnvironmentUpdateRequest = {
+  envId: string;
+  name: string;
+  description: string;
+  section_user_id: string;
+  containerId: string;
+};
+
+export type EnvironmentBuildRequest = {
+  name: string;
+  description: string;
+  section_user_id: string;
+  containerId: string;
+};
+
+export type EnvironmentRemoveRequest = {
+  envId: string;
+  section_user_id: string;
+};
+
+export type AnnouncementRequest = {
+  allowReply: boolean;
+  body: string;
+  title: string;
+  senderId: string;
+  sectionId: string;
+};
+
+export type AddSandboxImageRequest = {
+  description: string;
+  imageId: string;
+  title: string;
+  userId: string;
+};
+
+export type RemoveSandboxRequest = {
+  sandboxId: string;
+  userId: string;
+};
+
+export type RemoveSandboxImageRequest = {
+  sandboxImageId: string;
+  userId: string;
+};
+
+export type UpdateSandboxImageRequest = {
+  sandboxImageId: string;
+  title: string;
+  description: string;
+  tempContainerId: string;
+  userId: string;
+};
+
+export type ListTemplatesRequest = {
+  sectionid: string;
+  sub: string;
+};
+
+export type AddTemplateRequest = {
+  templateName: string;
+  description: string;
+  section_user_id: string;
+  environment_id: string;
+  assignment_config_id: string;
+  containerId: string;
+  active: boolean;
+  isExam: boolean;
+  timeLimit: number;
+  allow_notification: boolean;
+  sectionId: string;
+};
+export type UpdateTemplateRequest = {
+  templateId: string;
+  templateName: string;
+  description: string;
+  section_user_id: string;
+  containerId: string;
+  isExam: boolean;
+  timeLimit: number;
+  allow_notification: boolean;
+  sectionId: string;
+};
+
+export type ActivateTemplateRequest = {
+  templateId: string;
+  section_user_id: string;
+};
+
+export type DeactivateTemplateRequest = {
+  templateId: string;
+  section_user_id: string;
+};
+
+export type RemoveTemplateRequest = {
+  templateId: string;
+  section_user_id: string;
+};
+
+export type GetTemplateStudentWorkspaceRequest = {
+  templateId: string;
+  section_user_id: string;
+};
+
+export type AddTemplateContainerRequest = {
+  imageName: string;
+  memLimit: number;
+  numCPU: number;
+  section_user_id: string;
+  template_id: string;
+  accessRight: string;
+  useFresh: boolean;
+  title: string;
+  sub: string;
+  event: "WORKSPACE_START" | "TEMPLATE_START_WORKSPACE";
+};
+
+export type RemoveTemplateContainerRequest = {
+  containerId: string;
+  sub: string;
 };

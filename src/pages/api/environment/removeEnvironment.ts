@@ -2,7 +2,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 
-import { SuccessStringResponse, nodeError } from "../../../lib/api/api";
+import {
+  SuccessStringResponse,
+  nodeError,
+  EnvironmentRemoveRequest,
+} from "../../../lib/api/api";
 
 import { grpcClient } from "../../../lib/grpcClient";
 import {
@@ -14,7 +18,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SuccessStringResponse>
 ) {
-  const { envId, section_user_id, sectionId } = JSON.parse(req.body); //console.log(body)
+  const { envId, section_user_id } = JSON.parse(
+    req.body
+  ) as EnvironmentRemoveRequest;
   var docReq = EnvironmentIdRequest.fromPartial({
     sessionKey: fetchAppSession(req),
     environmentID: envId,

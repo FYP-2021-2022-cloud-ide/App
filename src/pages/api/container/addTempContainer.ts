@@ -3,7 +3,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 
-import { ContainerAddResponse, nodeError } from "../../../lib/api/api";
+import {
+  ContainerAddRequest,
+  ContainerAddResponse,
+  nodeError,
+} from "../../../lib/api/api";
 
 import { grpcClient } from "../../../lib/grpcClient";
 import {
@@ -27,7 +31,7 @@ export default async function handler(
     formData,
     title,
     sub,
-  } = JSON.parse(req.body);
+  } = JSON.parse(req.body) as ContainerAddRequest;
   var docReq: AddTempContainerRequest = AddTempContainerRequest.fromPartial({
     sessionKey: fetchAppSession(req),
     accessRight: accessRight,
@@ -49,7 +53,7 @@ export default async function handler(
     grpcClient.addTempContainer(
       docReq,
       async function (err, GoLangResponse: AddTempContainerReply) {
-        if (err) {
+        if (err || !GoLangResponse.success) {
           // the request fail so we remove it from redis
           await redisHelper.remove.workspaces(sub, tempId);
         } else {

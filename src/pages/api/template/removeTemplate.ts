@@ -1,7 +1,11 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
-import { SuccessStringResponse, nodeError } from "../../../lib/api/api";
+import {
+  SuccessStringResponse,
+  nodeError,
+  RemoveTemplateRequest,
+} from "../../../lib/api/api";
 
 import { grpcClient } from "../../../lib/grpcClient";
 import {
@@ -13,7 +17,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SuccessStringResponse>
 ) {
-  const { templateId, section_user_id, sectionId } = JSON.parse(req.body);
+  const { templateId, section_user_id } = JSON.parse(
+    req.body
+  ) as RemoveTemplateRequest;
 
   var docReq = TemplateIdRequest.fromPartial({
     sessionKey: fetchAppSession(req),

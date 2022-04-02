@@ -9,6 +9,8 @@ import { CLICK_TO_REPORT } from "../../lib/constants";
 import { errorToToastDescription } from "../../lib/errorHelper";
 import { useCnails } from "../../contexts/cnails";
 import { FormStructure } from "../ModalForm/types";
+import { env } from "process";
+import { EnvironmentBuildRequest } from "../../lib/api/api";
 
 export type CreateEnvironmentFormData = {
     create_environment: {
@@ -93,12 +95,15 @@ const CreateEnvironmentForm = ({ isOpen, setOpen }: Props) => {
             const id = myToast.loading("Creating the environment...");
             if (data.is_predefined) {
                 const response = await addEnvironment(
-                    [environment.value + ":" + environment.imageId],
-                    name,
-                    description,
-                    sectionUserInfo.sectionUserId,
-                    sectionUserInfo.sectionId
+                    {
+                        libraries: [environment.value + ":" + environment.imageId],
+                        name: name,
+                        description: description,
+                        section_user_id: sectionUserInfo.sectionUserId,
+                        sectionId: sectionUserInfo.sectionId
+                    }
                 );
+
                 myToast.dismiss(id);
                 if (response.success) {
                     const { environmentID } = response;
@@ -117,13 +122,22 @@ const CreateEnvironmentForm = ({ isOpen, setOpen }: Props) => {
             if (!data.is_predefined) {
                 try {
                     const response = await addTempContainer(
-                        memory,
-                        CPU,
-                        rootImage,
-                        sub,
-                        "root",
-                        "ENV_CREATE",
-                        data.name
+                        {
+                            memLimit: memory,
+                            numCPU: CPU,
+                            imageId: rootImage,
+                            sub: sub,
+                            accessRight: "root",
+                            event: "ENV_CREATE",
+                            title: data.name,
+                            formData: {
+                                name: data.name,
+                                description: data.description,
+                                section_user_id: sectionUserInfo.sectionUserId,
+                                containerId: "",
+                                sectionId: sectionUserInfo.sectionId
+                            } as EnvironmentBuildRequest
+                        }
                     );
                     myToast.dismiss(id);
                     if (response.success) {
@@ -154,8 +168,10 @@ const CreateEnvironmentForm = ({ isOpen, setOpen }: Props) => {
                                             // cancel the build
                                             myToast.dismiss(customToastId);
                                             const response = await removeTempContainer(
-                                                containerID,
-                                                sub
+                                                {
+                                                    containerId: containerID,
+                                                    sub: sub
+                                                }
                                             );
                                             if (response.success)
                                                 console.log("remove temp container", containerID);
@@ -179,11 +195,13 @@ const CreateEnvironmentForm = ({ isOpen, setOpen }: Props) => {
                                                 "Building your custom environment..."
                                             );
                                             const response = await buildEnvironment(
-                                                name,
-                                                description,
-                                                sectionUserInfo.sectionUserId,
-                                                containerID,
-                                                sectionUserInfo.sectionId ,
+                                                {
+                                                    name: name,
+                                                    description: description,
+                                                    section_user_id: sectionUserInfo.sectionUserId,
+                                                    containerId: containerID,
+                                                    sectionId: sectionUserInfo.sectionId,
+                                                }
                                             );
                                             if (response.success) {
                                                 fetch();
