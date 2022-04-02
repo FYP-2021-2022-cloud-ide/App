@@ -348,15 +348,15 @@
 }
 
 .env-card {
-  @apply border border-gray-200 dark:border-gray-700 shadow-sm rounded-lg bg-white dark:bg-gray-600 px-4 py-4 min-h-[9rem] h-48 flex flex-row items-start justify-between;
+  @apply border border-gray-200 dark:border-gray-700 shadow-sm rounded-lg bg-white dark:bg-gray-600 p-3 min-h-[9rem] h-56 flex flex-row items-start justify-between;
 }
 
 .template-card {
-  @apply cursor-pointer border border-gray-200 dark:border-gray-700 rounded-lg  px-4 py-4 min-h-[9rem] h-48 flex flex-row items-start justify-between;
+  @apply cursor-pointer border border-gray-200 dark:border-gray-700 rounded-lg  p-3 min-h-[9rem] h-56 flex flex-row items-start justify-between;
 }
 
 .sandbox-card {
-  @apply border border-gray-200 dark:border-gray-700 shadow-sm rounded-lg bg-white dark:bg-gray-600 px-4 py-4 min-h-[9rem] h-32 flex flex-row items-start justify-between;
+  @apply border border-gray-200 dark:border-gray-700 shadow-sm rounded-lg bg-white dark:bg-gray-600 p-3 min-h-[9rem] h-32 flex flex-row items-start justify-between;
 }
 
 .env-card-content,

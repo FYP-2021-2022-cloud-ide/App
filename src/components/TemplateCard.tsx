@@ -9,7 +9,7 @@ import Menu, { MenuItem } from "./CardMenu";
 import { Template } from "../lib/cnails";
 import myToast from "./CustomToast";
 import Tilt from "react-parallax-tilt";
-import { EyeIcon, EyeOffIcon } from "@heroicons/react/solid";
+import { EyeIcon, EyeOffIcon, AcademicCapIcon } from "@heroicons/react/solid";
 import { useInstructor } from "../contexts/instructor";
 import useCleanTilt from "./useCleanTilt";
 
@@ -38,7 +38,7 @@ const EmbeddedWorkspaceCard = ({
 }) => {
   return (
     <div
-      className="rounded  bg-blue-200/20 dark:bg-black/30 p-2 flex flex-row space-x-2"
+      className="rounded  bg-blue-200/20 dark:bg-black/30 p-2 flex flex-row space-x-2 "
       onClick={(e) => {
         e.stopPropagation();
         if (onClick) onClick();
@@ -171,33 +171,44 @@ function TemplateCard({
             )}
             <p className="template-card-des">{template.description}</p>
           </div>
-          {template.containerID && (
-            <EmbeddedWorkspaceCard
-              template={template}
-              onClick={() => {
-                if (onWorkspaceCardClick) {
-                  onWorkspaceCardClick(template);
-                }
-              }}
-            />
-          )}
-        </div>
-
-        <div className="flex flex-col justify-between h-full items-center">
-          <Menu items={meunItems}></Menu>
-          <div className="flex flex-col">
-            {template.active ? (
-              <div title="The template is published.">
-                <EyeIcon className="w-5 h-5 text-gray-400 "></EyeIcon>
-              </div>
-            ) : (
-              <div title="The template is not published.">
-                <EyeOffIcon className="w-5 h-5 text-gray-400 "></EyeOffIcon>
-              </div>
+          <div className="flex flex-col space-y-1">
+            {template.containerID && (
+              <EmbeddedWorkspaceCard
+                template={template}
+                onClick={() => {
+                  if (onWorkspaceCardClick) {
+                    onWorkspaceCardClick(template);
+                  }
+                }}
+              />
             )}
+            <div className="flex flex-row space-x-2">
+              {
+                template.isExam ? <div className="flex flex-row items-center">
+                  <AcademicCapIcon className="w-3 h-3 text-gray-400" />
+                  <span className="text-2xs text-gray-400">Exam</span>
+                </div> : <></>
+              }
+              {template.active ? (
+                <div className="flex flex-row  items-center">
+                  <EyeIcon className="w-3 h-3 text-gray-400 "></EyeIcon>
+                  <span className="text-2xs text-gray-400">Published</span>
+                </div>
+              ) : (
+                <div className="flex flex-row  items-center">
+                  <EyeOffIcon className="w-3 h-3 text-gray-400 "></EyeOffIcon>
+                  <span className="text-2xs text-gray-400 ">Not Published</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
+
+        {/* <div className="flex flex-col justify-between h-full items-center"> */}
+        <Menu items={meunItems}></Menu>
+
       </div>
+      {/* </div> */}
     </Tilt>
   );
 }
