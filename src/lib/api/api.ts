@@ -536,7 +536,6 @@ export type AddTemplateRequest = {
   isExam: boolean;
   timeLimit: number;
   allow_notification: boolean;
-  sectionId: string;
 };
 export type UpdateTemplateRequest = {
   templateId: string;
@@ -547,7 +546,6 @@ export type UpdateTemplateRequest = {
   isExam: boolean;
   timeLimit: number;
   allow_notification: boolean;
-  sectionId: string;
 };
 
 export type ActivateTemplateRequest = {

@@ -2,7 +2,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 
-import { SuccessStringResponse, nodeError } from "../../../lib/api/api";
+import {
+  SuccessStringResponse,
+  nodeError,
+  UpdateTemplateRequest as NextRequest,
+} from "../../../lib/api/api";
 
 import { grpcClient } from "../../../lib/grpcClient";
 import {
@@ -23,7 +27,7 @@ export default async function handler(
     isExam,
     timeLimit,
     allow_notification,
-  } = JSON.parse(req.body);
+  } = JSON.parse(req.body) as NextRequest;
   var docReq = UpdateTemplateRequest.fromPartial({
     sessionKey: fetchAppSession(req),
     templateID: templateId,

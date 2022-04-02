@@ -78,7 +78,6 @@ const EnvironmentTemplateWrapper = () => {
                             const response = await removeEnvironment({
                                 envId: env.id,
                                 section_user_id: sectionUserId,
-                                sectionId: sectionId
                             });
                             if (response.success) {
                                 myToast.success(
@@ -132,7 +131,10 @@ const EnvironmentTemplateWrapper = () => {
                         }
                     }}
                     onDelete={async (template) => {
-                        const response = await removeTemplate(template.id, sectionUserId, sectionId);
+                        const response = await removeTemplate({
+                            templateId: template.id,
+                            section_user_id: sectionUserId
+                        });
                         if (response.success) {
                             myToast.success("Template is successfully deleted.");
                         }
@@ -153,7 +155,10 @@ const EnvironmentTemplateWrapper = () => {
                     }}
                     onToggle={async (template) => {
                         if (template.containerID) {
-                            const response = await removeTemplateContainer(template.containerID, sub);
+                            const response = await removeTemplateContainer({
+                                containerId: template.containerID,
+                                sub: sub
+                            });
                             if (response.success) {
                                 myToast.success("Template workspace is successfully stopped. ");
                             } else
@@ -165,15 +170,20 @@ const EnvironmentTemplateWrapper = () => {
                         } else {
                             const id = myToast.loading("Starting workspace...");
                             const response = await addTemplateContainer(
-                                template.imageId,
-                                memory,
-                                CPU,
-                                sectionUserId,
-                                template.id,
-                                "student",
-                                false,
-                                template.name
+                                {
+                                    imageName: template.imageId,
+                                    memLimit: memory,
+                                    numCPU: CPU,
+                                    section_user_id: sectionUserId,
+                                    template_id: template.id,
+                                    accessRight: "student",
+                                    useFresh: false,
+                                    title: template.name,
+                                    sub: sub,
+                                    event: "TEMPLATE_START_WORKSPACE"
+                                }
                             );
+
                             myToast.dismiss(id);
                             if (response.success) {
                                 myToast.success("Template workspace is successfully started.");
@@ -190,11 +200,10 @@ const EnvironmentTemplateWrapper = () => {
                         if (!template.active) {
                             const id = myToast.loading(`Publishing the ${template.name}...`);
                             const response = await activateTemplate(
-                                template.id,
-                                sectionUserId,
-                                sectionId,
-                                template.name,
-                                template.description ,
+                                {
+                                    templateId: template.id,
+                                    section_user_id: sectionUserId
+                                }
                             );
                             myToast.dismiss(id);
                             if (response.success) {
@@ -211,11 +220,10 @@ const EnvironmentTemplateWrapper = () => {
                                 `Unpublishing the ${template.name}...`
                             );
                             const response = await deactivateTemplate(
-                                template.id,
-                                sectionUserId,
-                                sectionId,
-                                template.name,
-                                template.description,
+                                {
+                                    templateId: template.id,
+                                    section_user_id: sectionUserId
+                                }
                             );
                             myToast.dismiss(id);
                             if (response.success) {

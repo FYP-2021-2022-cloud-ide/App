@@ -62,7 +62,9 @@ export const InstructorProvider = ({
     const [highlightedEnv, setHighlightedEnv] = useState<Environment>(null);
 
     const fetchEnvironments = async () => {
-        const response = await listEnvironments(sectionUserInfo.sectionId, sub);
+        const response = await listEnvironments({
+            sectionId: sectionUserInfo.sectionId, sub: sub
+        });
         if (response.success) {
             const environments = response.environments.map((e) => ({
                 ...e,
@@ -80,7 +82,9 @@ export const InstructorProvider = ({
     }
 
     const fetchTemplates = async () => {
-        const response = await listTemplates(sectionUserInfo.sectionId, sub);
+        const response = await listTemplates({
+            sectionid: sectionUserInfo.sectionId, sub: sub
+        });
         if (response.success) {
             const templates = response.templates.map((t) => ({
                 id: t.id,

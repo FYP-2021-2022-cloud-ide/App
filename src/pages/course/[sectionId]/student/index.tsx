@@ -58,7 +58,10 @@ const Home = () => {
    * the API need to be removed
    */
   const fetchWorkspaces = async () => {
-    const response = await listTemplates(sectionId, sub);
+    const response = await listTemplates({
+      sectionid: sectionId,
+      sub: sub
+    });
     if (response.success) {
       response.templates = response.templates.filter(
         (template) => template.active
@@ -109,13 +112,25 @@ const Home = () => {
               if (start) {
                 const id = myToast.loading("Starting workspace...");
                 const response = await addTemplateContainer(
-                  workspace.imageId,
-                  memory,
-                  CPU,
-                  sectionUserInfo.sectionUserId,
-                  workspace.id,
-                  "student",
-                  false
+                  {
+                    imageName: workspace.imageId,
+                    memLimit: memory,
+                    numCPU: CPU,
+                    section_user_id: sectionUserInfo.sectionUserId,
+                    template_id: workspace.id,
+                    accessRight: "student",
+                    useFresh: false,
+                    title: workspace.name,
+                    sub: sub,
+                    event: "WORKSPACE_START"
+                  }
+                  // workspace.imageId,
+                  //                   memory,
+                  //                   CPU,
+                  //                   sectionUserInfo.sectionUserId,
+                  //                   workspace.id,
+                  //                   "student",
+                  //                   false
                 );
                 myToast.dismiss(id);
                 if (response.success) {
@@ -129,8 +144,10 @@ const Home = () => {
                 fetchWorkspaces();
               } else {
                 const response = await removeTemplateContainer(
-                  workspace.containerID,
-                  sub
+                  {
+                    containerId: workspace.containerID,
+                    sub: sub
+                  }
                 );
                 if (response.success) {
                   myToast.success("Workspace is successfully stopped.");

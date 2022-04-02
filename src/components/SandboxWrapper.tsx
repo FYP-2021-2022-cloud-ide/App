@@ -72,7 +72,10 @@ export const SandboxWrapper = () => {
             } else return s
           }))
 
-          const response = await removeSandboxImage(sandboxImage.id, userId);
+          const response = await removeSandboxImage({
+            sandboxId: sandboxImage.id,
+            userId: userId
+          });
           myToast.dismiss(id);
           if (response.success) {
             myToast.success(
@@ -141,8 +144,10 @@ export const SandboxWrapper = () => {
         onSandboxStop={async (sandboxImage) => {
           const toastId = myToast.loading(`Stopping a workspace...`);
           const response = await removeSandbox(
-            sandboxImage.sandboxesId,
-            userId
+            {
+              sandboxId: sandboxImage.sandboxesId,
+              userId: userId
+            }
           );
           myToast.dismiss(toastId);
           if (response.success) {

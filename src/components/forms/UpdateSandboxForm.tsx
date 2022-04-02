@@ -189,11 +189,13 @@ const UpdateSandboxForm = ({ isOpen, setOpen, target }: Props) => {
             }))
 
             const response = await updateSandboxImage(
-                target.id,
-                name,
-                description,
-                "",
-                userId
+                {
+                    sandboxImageId: target.id,
+                    title: data.name,
+                    description: data.description,
+                    tempContainerId: "",
+                    userId: userId
+                }
             )
             if (response.success)
                 myToast.success("workspace is successfully updated.");

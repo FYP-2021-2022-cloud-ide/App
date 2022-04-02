@@ -51,7 +51,7 @@ export default async function handler(
     grpcClient.addTemplateContainer(
       docReq,
       async function (err, GoLangResponse: AddContainerReply) {
-        if (err) {
+        if (err || !GoLangResponse.success) {
           // the request fail so we remove it from redis
           await redisHelper.remove.workspaces(sub, tempId);
         } else {

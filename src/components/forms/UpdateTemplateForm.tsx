@@ -205,15 +205,16 @@ const UpdateTemplateForm = ({ isOpen, setOpen, target }: Props) => {
             } = data;
 
             const response = await updateTemplate(
-                target.id,
-                name,
-                description,
-                sectionUserInfo.sectionUserId,
-                "",
-                is_exam,
-                Number(time_limit),
-                allow_notification,
-                sectionUserInfo.sectionId
+                {
+                    templateId: target.id,
+                    templateName: name,
+                    description: description,
+                    section_user_id: sectionUserInfo.sectionUserId,
+                    containerId: "",
+                    isExam: is_exam,
+                    timeLimit: Number(time_limit),
+                    allow_notification: allow_notification
+                }
             );
             myToast.dismiss(id);
             if (response.success) {

@@ -8,6 +8,7 @@ import { containerAPI } from "../../lib/api/containerAPI";
 import TempContainerToast from "../TempContainerToast"
 import { templateAPI } from "../../lib/api/templateAPI";
 import { FormStructure } from "../ModalForm/types";
+import { AddTemplateRequest } from "../../lib/api/api";
 
 export type CreateTemplateFormData = {
     create_template: {
@@ -107,16 +108,40 @@ const CreateTemplateForm = ({ isOpen, setOpen }: Props) => {
         title="Create Template"
         onEnter={async ({ create_template: data }) => {
             const toastId = myToast.loading("Creating a temporary workspace...");
-            var selectedEnv = data.environment;
+            const formData: AddTemplateRequest = {
+                templateName: data.name,
+                description: data.description,
+                section_user_id: sectionUserInfo.sectionUserId,
+                environment_id: data.environment.id,
+                assignment_config_id: "",
+                containerId: "",
+                active: false,
+                isExam: data.is_exam,
+                timeLimit: Number(data.time_limit),
+                allow_notification: data.allow_notification,
+            }
             const response = await addTempContainer(
-                memory,
-                CPU,
-                selectedEnv.imageId,
-                sub,
-                "root",
-                "TEMPLATE_CREATE",
-                data.name
+                {
+                    memLimit: memory,
+                    numCPU: CPU,
+                    imageId: data.environment.imageId,
+                    sub: sub,
+                    accessRight: "root",
+                    event: "TEMPLATE_CREATE",
+                    title: data.name,
+                    formData: {
+
+                    } as AddTemplateRequest
+                }
             );
+
+            // memory,
+            // CPU,
+            // selectedEnv.imageId,
+            // sub,
+            // "root",
+            // "TEMPLATE_CREATE",
+            // data.name
             myToast.dismiss(toastId);
             console.log(response);
             if (response.success) {
@@ -126,17 +151,18 @@ const CreateTemplateForm = ({ isOpen, setOpen }: Props) => {
                         async () => {
                             const id = myToast.loading("Building your template...");
                             const response = await addTemplate(
-                                data.name as string,
-                                data.description as string,
-                                sectionUserInfo.sectionUserId,
-                                data.environment.id,
-                                "",
-                                containerID,
-                                false,
-                                data.is_exam as boolean,
-                                Number(data.time_limit),
-                                data.allow_notification as boolean,
-                                sectionUserInfo.sectionId
+                                {
+                                    templateName: data.name,
+                                    description: data.description,
+                                    section_user_id: sectionUserInfo.sectionUserId,
+                                    environment_id: data.environment.id,
+                                    assignment_config_id: "",
+                                    containerId: containerID,
+                                    active: false,
+                                    isExam: data.is_exam,
+                                    timeLimit: Number(data.time_limit),
+                                    allow_notification: data.allow_notification,
+                                }
                             );
                             if (response.success) {
                                 fetch();

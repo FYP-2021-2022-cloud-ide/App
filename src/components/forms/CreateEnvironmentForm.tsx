@@ -100,7 +100,6 @@ const CreateEnvironmentForm = ({ isOpen, setOpen }: Props) => {
                         name: name,
                         description: description,
                         section_user_id: sectionUserInfo.sectionUserId,
-                        sectionId: sectionUserInfo.sectionId
                     }
                 );
 
@@ -200,7 +199,6 @@ const CreateEnvironmentForm = ({ isOpen, setOpen }: Props) => {
                                                     description: description,
                                                     section_user_id: sectionUserInfo.sectionUserId,
                                                     containerId: containerID,
-                                                    sectionId: sectionUserInfo.sectionId,
                                                 }
                                             );
                                             if (response.success) {

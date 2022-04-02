@@ -149,14 +149,14 @@ const UpdateEnvironmentForm = ({ isOpen, setOpen, target }: Props) => {
         // }}
         onEnter={async ({ update_environment: data }) => {
             const id = myToast.loading("Updating an environment...");
-            const { name, description } = data;
             const response = await updateEnvironment(
-                target.id,
-                name,
-                description,
-                sectionUserInfo.sectionUserId,
-                "",
-                sectionUserInfo.sectionId
+                {
+                    envId: target.id,
+                    name: data.name,
+                    description: data.description,
+                    section_user_id: sectionUserInfo.sectionUserId,
+                    containerId: ""
+                }
             );
             myToast.dismiss(id);
             if (response.success) {

@@ -86,10 +86,12 @@ const CreateSandboxForm = ({ isOpen, setOpen }: Props) => {
                 status: "CREATING"
             }])
             const response = await addSandboxImage(
-                data.description,
-                environment.imageId,
-                data.name,
-                userId
+                {
+                    description: data.description,
+                    imageId: environment.imageId,
+                    title: data.name,
+                    userId: userId
+                }
             )
             if (response.success) {
                 myToast.success(`Workspace is successfully created.`);

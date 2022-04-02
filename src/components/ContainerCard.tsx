@@ -14,6 +14,7 @@ import { containerAPI } from "../lib/api/containerAPI";
 import { sandboxAPI } from "../lib/api/sandboxAPI";
 import moment from "moment";
 import useInterval from "./useInterval";
+import { CLICK_TO_REPORT } from "../lib/constants";
 type Props = Container & { zIndex: number };
 
 /**
@@ -135,41 +136,24 @@ function ContainerCard({
             title="remove workspace"
             onClick={async (e) => {
               e.stopPropagation();
-              let success = false;
-              let error: Error;
-              if (isTemporary) {
-                const response = await removeTempContainer(containerID, sub);
-                if (response.success) {
-                  success = true;
-                } else {
-                  error = response.error
-                }
-              } else if (type == "SANDBOX") {
-                const response = await removeSandbox(containerID, userId);
-                if (response.success) {
-                  success = true;
-                } else {
-                  error = response.error
-                }
-              } else if (type == "TEMPLATE") {
-                const response = await removeTemplateContainer(containerID, sub);
-                if (response.success) {
-                  success = true;
-                } else {
-                  error = response.error
-                }
-              }
 
-              if (success) {
+              const response = isTemporary ? await removeTempContainer({
+                containerId: containerID, sub: sub
+              }) : type == "SANDBOX" ? await removeSandbox({
+                sandboxId: containerID, userId: userId
+              }) : await removeTemplateContainer({
+                containerId: containerID,
+                sub: sub
+              })
+
+              if (response.success) {
                 myToast.success("Workspace is removed.");
                 fetchContainers();
               } else
                 myToast.error({
                   title: "Fail to remove workspace",
-                  description: errorToToastDescription({
-                    error: error.error,
-                    status: error.status,
-                  }),
+                  description: errorToToastDescription(response.error),
+                  comment: CLICK_TO_REPORT
                 });
             }}
           >
@@ -183,7 +167,7 @@ function ContainerCard({
           </div>
         </div>
       </div>
-    </Tilt>
+    </Tilt >
   );
 }
 

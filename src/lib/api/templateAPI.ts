@@ -12,6 +12,7 @@ import {
   RemoveTemplateRequest,
   GetTemplateStudentWorkspaceRequest,
   AddTemplateContainerRequest,
+  RemoveTemplateContainerRequest,
 } from "./api";
 
 const templateAPI = {
@@ -96,7 +97,7 @@ const templateAPI = {
     return res.json();
   },
   removeTemplateContainer: async (
-    req: RemoveTemplateRequest
+    req: RemoveTemplateContainerRequest
   ): Promise<SuccessStringResponse> => {
     var res = await fetch("/api/template/removeTemplateContainer", {
       method: "POST",

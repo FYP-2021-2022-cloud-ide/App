@@ -52,7 +52,10 @@ const TempContainerToast = ({ containerId, getToastId, onOK, okBtnText, cancelBt
                 onClick={async () => {
                     // cancel the build
                     myToast.dismiss(getToastId());
-                    const response = await removeTempContainer(containerId, sub);
+                    const response = await removeTempContainer({
+                        containerId: containerId,
+                        sub: sub
+                    });
                     if (response.success)
                         console.log("remove temporary workspace", containerId);
                     else
