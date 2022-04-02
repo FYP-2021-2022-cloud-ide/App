@@ -7,6 +7,7 @@ import {
   RemoveSandboxRequest,
   SuccessStringResponse,
   UpdateSandboxImageRequest,
+  RemoveSandboxImageRequest,
 } from "./api";
 
 const sandboxAPI = {
@@ -46,7 +47,7 @@ const sandboxAPI = {
     return res.json();
   },
   removeSandboxImage: async (
-    req: RemoveSandboxRequest
+    req: RemoveSandboxImageRequest
   ): Promise<SuccessStringResponse> => {
     var res = await fetch("/api/sandbox/removeSandboxImage", {
       method: "POST",
@@ -63,9 +64,7 @@ const sandboxAPI = {
   ): Promise<SuccessStringResponse> => {
     var res = await fetch("/api/sandbox/updateSandboxImage", {
       method: "POST",
-      body: JSON.stringify({
-        req,
-      }),
+      body: JSON.stringify(req),
     });
     return res.json();
   },

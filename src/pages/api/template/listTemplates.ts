@@ -24,7 +24,7 @@ export default async function handler(
   try {
     grpcClient.listTemplates(
       docReq,
-      async function (err, GoLangResponse: ListTemplatesReply) {
+      function (err, GoLangResponse: ListTemplatesReply) {
         var templates = GoLangResponse.templates;
         res.json({
           success: GoLangResponse.success,

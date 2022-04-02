@@ -11,7 +11,6 @@ import {
   AddContainerRequest,
 } from "../../../proto/dockerGet/dockerGet";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
-import { getCookie } from "../../../lib/cookiesHelper";
 import redisHelper from "../../../lib/redisHelper";
 import { v4 } from "uuid";
 export default async function handler(

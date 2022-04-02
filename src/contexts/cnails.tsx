@@ -107,13 +107,13 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
         data: container.redisPatch,
         type: getType(container),
         status: container.containerID ? "DEFAULT" : "CREATING",
-      } as Container : { // if the response isn't right
+      } as Container : {
         ...container,
-        isTemporary: false,
+        isTemporary: undefined,
+        type: "UNKNOWN",
         data: {},
-        type: "ENV",
         status: "DEFAULT"
-      }) as Container)
+      } as unknown as Container))
       console.log(containers)
       setContainers(containers);
       return containers

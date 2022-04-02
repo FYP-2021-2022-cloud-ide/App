@@ -433,22 +433,40 @@ type SandboxAddRequest = {
   sub: string;
 };
 
+type EventFormDataPair =
+  | {
+      event: "ENV_CREATE";
+      formData: EnvironmentBuildRequest;
+    }
+  | {
+      event: "ENV_UPDATE";
+      formData: EnvironmentUpdateRequest;
+    }
+  | {
+      event: "TEMPLATE_CREATE";
+      formData: AddTemplateRequest;
+    }
+  | {
+      event: "TEMPLATE_UPDATE";
+      formData: UpdateTemplateRequest;
+    }
+  | {
+      event: "SANDBOX_CREATE";
+      formData: any;
+    }
+  | {
+      event: "SANDBOX_UPDATE";
+      formData: UpdateSandboxImageRequest;
+    };
+
 type ContainerAddRequest = {
   memLimit: number;
   numCPU: number;
   imageId: string;
   sub: string;
   accessRight: string;
-  event:
-    | "ENV_CREATE"
-    | "ENV_UPDATE"
-    | "TEMPLATE_CREATE"
-    | "TEMPLATE_UPDATE"
-    | "SANDBOX_CREATE"
-    | "SANDBOX_UPDATE";
   title: string;
-  formData: any;
-};
+} & EventFormDataPair;
 
 export type ContainerRemoveRequest = {
   containerId: string;

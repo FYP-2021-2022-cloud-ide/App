@@ -1,4 +1,5 @@
 import { MessagePayload } from "firebase/messaging";
+import { Workspace as RedisPatch } from "./redisHelper";
 
 /**
  *
@@ -114,7 +115,7 @@ type SandboxImage = {
     | "REMOVING"
     | "STARTING_WORKSPACE"
     | "STOPPING_WORKSPACE"
-    | "Default";
+    | "DEFAULT";
 };
 
 type ContainerList = {
@@ -151,7 +152,7 @@ type Container = {
   /**
    * the redis patch data
    */
-  data: any;
+  data: RedisPatch;
 };
 
 type Workspace = Template;

@@ -59,7 +59,7 @@ function ContainerCard({
     setTimeDiff(getTimeDiff(startAt))
   }, 30 * 1000)
 
-  if (status) {
+  if (status != "DEFAULT") {
     return (
       <Tilt
         onLeave={cleanStyle}
@@ -126,10 +126,10 @@ function ContainerCard({
           </div>
           <div className="w-full">
             <div className="font-semibold text-sm text-gray-800 dark:text-gray-200">
-              {subTitle}
+              {title == "" ? "UNKNOWN" : title}
             </div>
             <div className="font-medium text-xs text-gray-600 dark:text-gray-300">
-              {isTemporary ? "Tempory Container" : title}
+              {isTemporary ? "Temporary Workspace" : subTitle}
             </div>
           </div>
           <button
@@ -157,7 +157,7 @@ function ContainerCard({
                 });
             }}
           >
-            <XIcon className="w-3 h-3 text-gray-700 dark:text-gray-300 hover:text-blue-500" />
+            <XIcon className="w-3 h-3 text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400" />
           </button>
         </div>
         <div className="w-full flex flex-row justify-end items-center space-x-1 ">

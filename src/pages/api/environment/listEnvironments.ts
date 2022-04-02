@@ -25,7 +25,7 @@ export default async function handler(
   try {
     grpcClient.listEnvironments(
       docReq,
-      async function (err, GoLangResponse: ListEnvironmentsReply) {
+      function (err, GoLangResponse: ListEnvironmentsReply) {
         res.json({
           success: GoLangResponse.success,
           error: {

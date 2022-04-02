@@ -14,6 +14,10 @@ import { useSandbox } from "../contexts/sandbox";
 import CreateSandboxForm from "./forms/CreateSandboxForm";
 import UpdateSandboxForm from "./forms/UpdateSandboxForm";
 import { containerAPI } from "../lib/api/containerAPI";
+import { SandboxAddRequest } from "../lib/api/api";
+import { Workspace as RedisPatch } from "../lib/redisHelper";
+import TempContainerToast from "./TempContainerToast";
+
 
 
 
@@ -28,9 +32,61 @@ export const SandboxWrapper = () => {
   const {
     removeSandbox,
     removeSandboxImage,
-    addSandbox
+    addSandbox,
+    updateSandboxImage
   } = sandboxAPI;
   const { addTempContainer } = containerAPI
+
+  const changeSandboxToRemoving = (sandboxImage: SandboxImage) => {
+    setSandboxImages(sandboxImages.map(s => {
+      if (s.id == sandboxImage.id) {
+        return {
+          id: sandboxImage.id,
+          title: sandboxImage.title,
+          description: sandboxImage.description,
+          imageId: sandboxImage.imageId,
+          sandboxesId: sandboxImage.sandboxesId,
+          status: "REMOVING"
+        }
+      } else return s
+    }))
+  }
+  const addCreatingWorkspace = (sandboxImage: SandboxImage, event: "SANDBOX_START_WORKSPACE" | "SANDBOX_UPDATE" | "SANDBOX_CREATE") => {
+    setContainers(containers => {
+      return [
+        ...containers,
+        {
+          title: sandboxImage.title,
+          status: "CREATING",
+          subTitle: "",
+          startAt: "",
+          containerID: "",
+          type: "SANDBOX",
+          isTemporary: event != "SANDBOX_START_WORKSPACE",
+          data: {
+            tempId: "",
+            cause: event,
+            containerId: "",
+            title: sandboxImage.title,
+            data: sandboxImage.id
+          }
+        }
+      ]
+    })
+  }
+  const changeContainerToRemoving = (sandboxImage: SandboxImage) => {
+    setContainers(containers => {
+      return containers.map(container => {
+        if (container.data.cause == "SANDBOX_START_WORKSPACE" && container.containerID == sandboxImage.sandboxesId) {
+          return {
+            ...container,
+            status: "REMOVING"
+          }
+        } else return container
+      })
+    })
+  }
+
 
   return (
     <>
@@ -59,21 +115,9 @@ export const SandboxWrapper = () => {
             return;
           }
           const id = myToast.loading(`Removing ${sandboxImage.title}...`);
-          setSandboxImages(sandboxImages.map(s => {
-            if (s.id == sandboxImage.id) {
-              return {
-                id: sandboxImage.id,
-                title: sandboxImage.title,
-                description: sandboxImage.description,
-                imageId: sandboxImage.imageId,
-                sandboxesId: sandboxImage.sandboxesId,
-                status: "REMOVING"
-              }
-            } else return s
-          }))
-
+          changeSandboxToRemoving(sandboxImage)
           const response = await removeSandboxImage({
-            sandboxId: sandboxImage.id,
+            sandboxImageId: sandboxImage.id,
             userId: userId
           });
           myToast.dismiss(id);
@@ -87,7 +131,7 @@ export const SandboxWrapper = () => {
               description: errorToToastDescription(response.error),
             });
           }
-          fetchSandboxImages();
+          await fetchSandboxImages();
         }}
         onSandboxUpdate={(sandbox) => {
           setUpdateOpen(true);
@@ -103,22 +147,7 @@ export const SandboxWrapper = () => {
             return;
           }
           const id = myToast.loading(`Starting a workspace....`);
-          // create a loading 
-          setContainers(containers => {
-            return [
-              ...containers,
-              {
-                title: sandboxImage.title,
-                status: "CREATING",
-                subTitle: "",
-                startAt: "",
-                containerID: "",
-                type: "SANDBOX",
-                isTemporary: false,
-                data: {}
-              }
-            ]
-          })
+          addCreatingWorkspace(sandboxImage, "SANDBOX_START_WORKSPACE")
           const response = await addSandbox({
             memLimit: memory,
             numCPU: CPU,
@@ -138,11 +167,12 @@ export const SandboxWrapper = () => {
               comment: CLICK_TO_REPORT,
             });
           }
-          await fetchSandboxImages();
           await fetchContainers();
+          await fetchSandboxImages();
         }}
         onSandboxStop={async (sandboxImage) => {
           const toastId = myToast.loading(`Stopping a workspace...`);
+          changeContainerToRemoving(sandboxImage)
           const response = await removeSandbox(
             {
               sandboxId: sandboxImage.sandboxesId,
@@ -154,7 +184,7 @@ export const SandboxWrapper = () => {
             myToast.success(
               `Workspace ${sandboxImage.title} is successfully stopped.`
             );
-            fetchSandboxImages();
+            await fetchSandboxImages();
           } else {
             myToast.error({
               title: "Fail to stop workspace",
@@ -162,18 +192,65 @@ export const SandboxWrapper = () => {
               comment: CLICK_TO_REPORT,
             });
           }
-
         }}
         onSandboxUpdateInternal={async (sandboxImage) => {
-          // give a toast 
-          // const response = await addTempContainer(
-          //   memory,
-          //   CPU,
-          //   sandboxImage.imageId,
-          //   sub,
-          //   "root",
-          //   "SANDBOX_UPDATE"
-          // );
+          const id = myToast.loading("Creating a temporary workspace...")
+          addCreatingWorkspace(sandboxImage, "SANDBOX_UPDATE")
+          const response = await addTempContainer({
+            memLimit: 0,
+            numCPU: 0,
+            imageId: sandboxImage.imageId,
+            sub: sub,
+            accessRight: "root",
+            title: sandboxImage.title,
+            event: "SANDBOX_UPDATE",
+            formData: {
+              sandboxImageId: sandboxImage.id,
+              title: sandboxImage.title,
+              description: sandboxImage.description,
+              tempContainerId: "",
+              userId: userId
+            }
+          })
+          myToast.dismiss(id)
+          if (response.success) {
+            const containerId = response.containerID
+            const id = myToast.custom(
+              <TempContainerToast
+                containerId={containerId}
+                getToastId={() => id}
+                onOK={async () => {
+                  const response = await updateSandboxImage(
+                    {
+                      sandboxImageId: sandboxImage.id,
+                      title: sandboxImage.title,
+                      description: sandboxImage.description,
+                      tempContainerId: containerId,
+                      userId: userId
+                    }
+                  )
+                  if (response.success)
+                    myToast.success("workspace is successfully updated.");
+                  else
+                    myToast.error({
+                      title: "Fail to update workspace",
+                      description: errorToToastDescription(response.error),
+                      comment: CLICK_TO_REPORT,
+                    });
+                  await fetchSandboxImages()
+                  myToast.dismiss(id);
+                }}
+              ></TempContainerToast>,
+              "toaster toaster-custom toast-no-dismiss",
+              "🗂"
+            )
+          } else {
+            myToast.error({
+              title: "Fail to create temporary workspace",
+              description: errorToToastDescription(response.error),
+              comment: CLICK_TO_REPORT
+            })
+          }
         }}
       ></SandboxImageList>
       {/* create form */}

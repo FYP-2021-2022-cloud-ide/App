@@ -109,7 +109,9 @@ const EnvironmentTemplateWrapper = () => {
                                 title: env.name,
                                 formData: {
                                     name: env.name,
-                                    description: env.description
+                                    description: env.description,
+                                    containerId: "",
+                                    section_user_id: sectionUserId
                                 }
                             }
                         );

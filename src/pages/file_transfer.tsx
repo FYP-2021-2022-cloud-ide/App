@@ -309,9 +309,7 @@ export default function Page() {
                 },
               },
             ]}
-            onContextMenuClose={() => {
-              targetNodeRef.current = null;
-            }}
+            onContextMenuClose={() => { }}
           ></FTree>
         </div>
         {/* cloud  */}
@@ -419,9 +417,7 @@ export default function Page() {
                 if (dragSource == undefined) return true;
                 else return false;
               }}
-              onContextMenuClose={() => {
-                targetNodeRef.current = null;
-              }}
+              onContextMenuClose={() => { }}
             ></FTree>
           )}
         </div>
@@ -472,6 +468,7 @@ export default function Page() {
             folderPath = `${path.dirname(node.data.filePath)}/${folderName}`;
           }
           progressRef1.current = status.loading;
+          console.log(folderPath, node)
           const response = await makeFolder(userId, folderPath);
           progressRef1.current = "";
           targetNodeRef.current = null;
@@ -511,6 +508,7 @@ export default function Page() {
               `${path.dirname(node.data.filePath)}/${newName}`
             );
             progressRef1.current = "";
+            targetNodeRef.current = null
             if (response.success) await rerenderPersonalVolume(response.tree);
             else alert(response.error.status);
           }}

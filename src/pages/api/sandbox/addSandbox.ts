@@ -29,6 +29,7 @@ export default async function handler(
       title,
       cause: "SANDBOX_START_WORKSPACE",
       containerId: "",
+      data: sandboxImageId,
     });
     var docReq = AddSandBoxRequest.fromPartial({
       sessionKey: fetchAppSession(req),

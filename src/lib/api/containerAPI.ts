@@ -21,6 +21,7 @@ const containerAPI = {
       method: "POST",
       body: JSON.stringify(containerAddRequest),
     });
+    console.log(await res.json());
     return res.json();
   },
   removeTempContainer: async (

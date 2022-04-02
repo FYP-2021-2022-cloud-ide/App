@@ -134,8 +134,8 @@ const CreateEnvironmentForm = ({ isOpen, setOpen }: Props) => {
                                 description: data.description,
                                 section_user_id: sectionUserInfo.sectionUserId,
                                 containerId: "",
-                                sectionId: sectionUserInfo.sectionId
-                            } as EnvironmentBuildRequest
+
+                            }
                         }
                     );
                     myToast.dismiss(id);

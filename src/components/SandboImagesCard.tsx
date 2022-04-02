@@ -32,7 +32,7 @@ const SandboxImagesCard = ({
     zIndex ? `z-index : ${zIndex};` : ""
   );
 
-  if (sandboxImage.status) {
+  if (sandboxImage.status != "DEFAULT") {
     return <Tilt
       onLeave={cleanStyle}
       ref={ref}
