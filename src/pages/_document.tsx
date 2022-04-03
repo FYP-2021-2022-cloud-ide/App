@@ -35,7 +35,14 @@ class AppDocument extends Document {
           sizes="16x16"
           href="/favicon-16x16.png"
         />
-
+        {/* <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap"
+          rel="stylesheet"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap"
+          rel="stylesheet"
+        /> */}
         <meta name="msapplication-TileColor" content="#282c30" />
         <meta name="theme-color" content="#282c30" />
       </Head>
