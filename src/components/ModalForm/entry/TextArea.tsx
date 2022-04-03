@@ -31,7 +31,7 @@ const TextArea = memo(
   () => true
 );
 
-function component<T>(props: EntryProps<T>) {
+function Component<T>(props: EntryProps<T>) {
   const entry = props.entry as TextAreaEntry<T>;
   if (entry.type != "textarea") return <></>;
   return (
@@ -56,4 +56,4 @@ function component<T>(props: EntryProps<T>) {
     ></Custom>
   );
 };
-export default component;
+export default Component;

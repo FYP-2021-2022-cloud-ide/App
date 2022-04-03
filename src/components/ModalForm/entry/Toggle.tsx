@@ -2,7 +2,7 @@ import { EntryProps, ToggleEntry } from "../types";
 import Toggle from "../../Toggle";
 import Custom from "./Custom";
 
-function component <T>(props: EntryProps<T>) {
+function Component<T>(props: EntryProps<T>) {
   const entry = props.entry as ToggleEntry<T>;
   if (entry.type != "toggle") return <></>;
   return (
@@ -22,4 +22,4 @@ function component <T>(props: EntryProps<T>) {
   );
 };
 
-export default component;
+export default Component;

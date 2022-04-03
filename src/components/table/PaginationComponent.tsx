@@ -98,7 +98,7 @@ const PaginationComponent = (
     props;
   useEffect(() => {
     onChangeRowsPerPage(15, currentPage);
-  }, []);
+  }, [currentPage, onChangeRowsPerPage]);
   return (
     <div className="flex flex-row bg-gray-100 dark:bg-black/50 rounded-b-md p-2 justify-between items-center rdt_pagination">
       <div className="flex flex-row items-center space-x-2">

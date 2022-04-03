@@ -15,7 +15,6 @@ export const MyMarkDown = memo(
     return (
       <div className="react-markdown">
         <ReactMarkdown
-          children={text}
           remarkPlugins={[
             remarkGfm,
             remarkFrontMatter,
@@ -29,7 +28,6 @@ export const MyMarkDown = memo(
               console.log(document.body.classList.contains("dark"));
               return !inline ? (
                 <SyntaxHighlighter
-                  children={String(children).replace(/\n$/, "")}
                   language={match ? match[1] : undefined}
                   style={
                     document.body.classList.contains("dark") ? okaidia : prism
@@ -37,7 +35,7 @@ export const MyMarkDown = memo(
                   PreTag="div"
                   showLineNumbers
                   {...props}
-                />
+                >{String(children).replace(/\n$/, "")}</SyntaxHighlighter>
               ) : (
                 <code className={className} {...props}>
                   {children}
@@ -52,7 +50,7 @@ export const MyMarkDown = memo(
               );
             },
           }}
-        />
+        >{text}</ReactMarkdown>
       </div>
     );
   },

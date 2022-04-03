@@ -54,7 +54,7 @@ const Input = memo(
   () => true
 );
 
-function component<T>(props: EntryProps<T>) {
+function Component<T>(props: EntryProps<T>) {
   const { sectionId, id } = props;
   const entry = props.entry as InputEntry<T>;
   if (entry.type != "input") return <></>;
@@ -95,4 +95,4 @@ function component<T>(props: EntryProps<T>) {
   );
 };
 
-export default component;
+export default Component;

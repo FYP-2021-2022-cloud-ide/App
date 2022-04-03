@@ -14,13 +14,7 @@ class AppDocument extends Document {
   }
 
   render() {
-    return <Temp></Temp>;
-  }
-}
-
-const Temp = () => {
-  return (
-    <Html>
+    return <Html>
       <Head>
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" />
@@ -57,7 +51,7 @@ const Temp = () => {
         <NextScript></NextScript>
       </body>
     </Html>
-  );
-};
+  }
+}
 
 export default AppDocument;

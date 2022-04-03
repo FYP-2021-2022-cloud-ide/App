@@ -56,7 +56,7 @@ function Label<T>({ entry }: EntryProps<T>) {
   );
 };
 
-function component<T>(props: EntryProps<T>) {
+function Component<T>(props: EntryProps<T>) {
   const { zIndex, id, entry, sectionId, data, onChange } = props;
   return (
     <div
@@ -70,4 +70,4 @@ function component<T>(props: EntryProps<T>) {
   );
 };
 
-export default component;
+export default Component;

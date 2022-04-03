@@ -2,7 +2,7 @@ import ListBox from "../../ListBox";
 import { EntryProps, ListBoxEntry } from "../types";
 import Custom from "./Custom";
 
-function component<T>(props: EntryProps) {
+function Component<T>(props: EntryProps<T>) {
   const entry = props.entry as ListBoxEntry<T>;
   if (entry.type != "listbox") return <></>;
   return (
@@ -22,4 +22,4 @@ function component<T>(props: EntryProps) {
   );
 };
 
-export default component;
+export default Component;

@@ -39,7 +39,7 @@ const TempContainerToast = ({ containerId, getToastId, onOK, okBtnText, cancelBt
             }
         }, 2000)
         return () => clearTimeout(timeout)
-    }, [containers])
+    }, [containers, containerId, getToastId])
 
     return <div className="flex flex-col space-y-2">
         <p>

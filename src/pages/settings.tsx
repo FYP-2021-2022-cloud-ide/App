@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useTheme,setCookie } from '../contexts/theme';
+import { useTheme } from '../contexts/theme';
 import { UserIcon } from '@heroicons/react/solid';
 import { useCnails } from '../contexts/cnails';
-import{generalAPI} from '../lib/api/generalAPI'
+import { generalAPI } from '../lib/api/generalAPI'
 export default function Setting() {
-    const {  sub,name,email,bio } = useCnails();
-    const {  updateUserData } = generalAPI;
-    const {isDark}=useTheme();
-    const[newBio,setNewBio]=useState(bio);
+    const { sub, name, email } = useCnails();
+    const { updateUserData } = generalAPI;
+    const { isDark } = useTheme();
+    // const[newBio,setNewBio]=useState(bio);
     return (
         <div className="flex flex-col space-y-3 items-center mt-10 ">
             <div className="w-3/4 flex flex-row">
@@ -38,14 +38,14 @@ export default function Setting() {
                     <p className="text-gray-600 dark:text-gray-300 font-bold mt-5">Public Email </p>
                     <input className="w-80 border border-gray-200 text-gray-500 bg-gray-200 dark:bg-gray-700 dark:border-gray-800 dark:text-gray-500 focus:border focus:outline-none p-1 px-3 rounded-md mt-2" readOnly value={email}></input>
                     <p className="text-gray-600 dark:text-gray-300 font-bold mt-5 mb-2">Bio</p>
-                    <textarea className="w-full h-40 border border-gray-200 text-gray-500 dark:border-gray-700 dark:text-gray-300  bg-white dark:bg-gray-900 focus:border focus:outline-none p-1 px-3 rounded-md min-h-16 "  placeholder="some description"
+                    {/* <textarea className="w-full h-40 border border-gray-200 text-gray-500 dark:border-gray-700 dark:text-gray-300  bg-white dark:bg-gray-900 focus:border focus:outline-none p-1 px-3 rounded-md min-h-16 "  placeholder="some description"
                       value={newBio}
                       onChange={(e) => setNewBio(e.target.value)}></textarea>
                     <button className="rounded-md bg-green-500 text-white w-36 py-2 mt-10"
                      onClick={async()=>{
                         setCookie("bio",newBio)
                         const response = await updateUserData(sub, isDark,newBio)
-                    }}>Save Change</button>
+                    }}>Save Change</button> */}
                 </div>
             </div>
         </div>

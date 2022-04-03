@@ -25,9 +25,10 @@ const FrontMatter = ({ attributes }: { attributes?: unknown }) => {
     <div className="flex flex-row space-x-2 mb-4">
       {Object.keys(flattened)
         .filter((a) => validFrontmatter.includes(a))
-        .map((a) => {
+        .map((a ,index) => {
           return (
             <div
+            key={index }
               className={`flex rounded bg-blue-500 select-none overflow-hidden frontmatter-badge-${a.replace(
                 ".",
                 "-"
@@ -109,7 +110,7 @@ const MDE = memo(
   () => true
 );
 
-function component(props: EntryProps<T>) {
+function Component<T>(props: EntryProps<T>) {
   const [focusTrapActive, setFocusTrapActive] = useState(false);
   const mdeRef = useRef<EasyMDE>();
   const entry = props.entry as MarkdownEntry<T>;
@@ -195,4 +196,4 @@ function component(props: EntryProps<T>) {
   );
 };
 
-export default component;
+export default Component;
