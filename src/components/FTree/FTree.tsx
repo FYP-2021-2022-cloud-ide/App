@@ -43,10 +43,6 @@ export type Props = {
    */
   rootId?: string | number;
   /**
-   * this callback will be called on drop but is called before react dropzone prepare the files. This callback is called before stage 2.
-   */
-  fastDropCallback?: () => void;
-  /**
    *  will only be called in the target tree if in-tree moving. Return the new tree data such that the tree will rerender base on this data.
    *
    * @param treeData the treeData that suppose to be after this move
@@ -230,7 +226,6 @@ const ButtonGroups = ({
 const FTree = React.forwardRef(
   (
     {
-      fastDropCallback,
       rootId,
       canDrop,
       handleDropzone,
@@ -267,9 +262,6 @@ const FTree = React.forwardRef(
         }
       },
     });
-    const patchGetRootProps = () => {
-      return handleDropzone ? getRootProps() : {};
-    };
 
     const lastActiveNodeRef = useRef<string>();
     const nodeOpenRef = useRef<string[]>();
@@ -332,9 +324,8 @@ const FTree = React.forwardRef(
         </div>
         {/* the tree */}
         <div
-          {...patchGetRootProps()}
+          {...getRootProps()}
           className="h-full  min-h-[300px] max-h-[80vh] relative"
-          onDrop={fastDropCallback}
           onContextMenu={(event: React.MouseEvent) => {
             event.preventDefault();
             event.stopPropagation();
@@ -404,14 +395,14 @@ const FTree = React.forwardRef(
                   handleDrop={
                     handleDropzone
                       ? async (acceptedFiles, fileRejections, event) => {
-                          const data = await handleDropzone(
-                            acceptedFiles,
-                            fileRejections,
-                            event,
-                            node
-                          );
-                          await getFilesAndRerender(data);
-                        }
+                        const data = await handleDropzone(
+                          acceptedFiles,
+                          fileRejections,
+                          event,
+                          node
+                        );
+                        await getFilesAndRerender(data);
+                      }
                       : undefined
                   }
                   onToggle={async () => {

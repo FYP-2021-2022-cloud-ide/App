@@ -58,7 +58,7 @@ const TopBar = ({ sub, name, email }: props) => {
     })()
   }, [])
 
-  
+
   const router = useRouter();
   const SearchBar = () => {
     return (
@@ -116,16 +116,14 @@ const TopBar = ({ sub, name, email }: props) => {
             ]}
           ></UserMenu>
           <NotiButton />
-          <Link href="">
-            <a id="help_doc_btn" title="Help and docs">
-              <QuestionMarkCircleIcon
-                className="top-bar-icon"
-                onClick={() => {
-                  window.open("https://brenkysbwim.gitbook.io/cnails/");
-                }}
-              ></QuestionMarkCircleIcon>
-            </a>
-          </Link>
+          <button id="help_doc_btn" title="Help and docs">
+            <QuestionMarkCircleIcon
+              className="top-bar-icon"
+              onClick={() => {
+                window.open("https://brenkysbwim.gitbook.io/cnails/");
+              }}
+            ></QuestionMarkCircleIcon>
+          </button>
           <div id="change_theme_btn" title="Change Theme">
             {!isDark ? (
               <SunIcon

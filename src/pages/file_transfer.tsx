@@ -24,6 +24,7 @@ import { errorToToastDescription } from "../lib/errorHelper";
 import { CLICK_TO_DISMISS, CLICK_TO_REPORT } from "../lib/constants";
 import { usePopperTooltip } from "react-popper-tooltip";
 import ReactDOM from "react-dom";
+import useInterval from "../components/useInterval";
 
 export default function Page() {
   const { userId, sub } = useCnails();
@@ -81,6 +82,11 @@ export default function Page() {
     fetchRoot(sub);
   }, [ref2.current]);
 
+  useInterval(() => {
+    fetchRoot(sub);
+  }, 10000)
+
+
   const rerenderPersonalVolume = async (data: directoryTree.DirectoryTree) => {
     await ref1.current.getFilesAndRerender(convertDirectoryTree(data));
   };
@@ -122,9 +128,6 @@ export default function Page() {
           <FTree
             ref={ref1}
             rootId={`/volumes/${userId}/persist`}
-            fastDropCallback={() => {
-              progressRef1.current = status.preparing;
-            }}
             handleDropzone={async (
               acceptedFiles,
               _fileRejections,
