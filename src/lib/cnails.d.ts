@@ -31,12 +31,23 @@ type Environment = {
   name: string;
   description: string;
   /**
+   * if the environment is updating the internal, there will be a temporary container id
+   */
+  temporaryContainerId?: string;
+  /**
    * if the environment is `CREATING`, the create request is being processed.
    * if the environment is `UPDATING`, the update request is being processed and user should not be able to update it.
    * if the status is `REMOVING`, the remove request is being processed.
    * if the status is undefined or null, user see it normally.
    */
-  status?: "CREATING" | "REMOVING" | "UPDATING" | null;
+  status:
+    | "CREATING"
+    | "REMOVING"
+    | "UPDATING"
+    | "STARTING_UPDATE_WORKSPACE"
+    | "UPDATING_INTERNAL"
+    | "STOPPING_UPDATE_WORKSPACE"
+    | "DEFAULT";
 };
 
 type Template = {
@@ -63,7 +74,8 @@ type Template = {
     | "REMOVING"
     | "STARTING_WORKSPACE"
     | "STOPPING_WORKSPACE"
-    | null;
+    | "UPDATING_INTERNAL"
+    | "DEFAULT";
 };
 
 type Course = {

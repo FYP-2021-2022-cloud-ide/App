@@ -8,7 +8,10 @@ import { containerAPI } from "../../lib/api/containerAPI";
 import TempContainerToast from "../TempContainerToast"
 import { templateAPI } from "../../lib/api/templateAPI";
 import { FormStructure } from "../ModalForm/types";
-import { AddTemplateRequest } from "../../lib/api/api";
+import { AddTemplateRequest, TemplateAddResponse } from "../../lib/api/api";
+import { Template } from "../../lib/cnails";
+import { errorToToastDescription } from "../../lib/errorHelper";
+import { CLICK_TO_REPORT } from "../../lib/constants";
 
 export type CreateTemplateFormData = {
     create_template: {
@@ -27,8 +30,9 @@ export type Props = {
 }
 
 const CreateTemplateForm = ({ isOpen, setOpen }: Props) => {
-    const { environments, templates, sectionUserInfo, fetch } = useInstructor()
-    const { sub } = useCnails()
+
+    const { sub, fetchContainers, setContainers } = useCnails()
+    const { environments, templates, sectionUserInfo, fetch, fetchTemplates } = useInstructor()
     const { addTempContainer } = containerAPI;
     const { addTemplate } = templateAPI;
     const envOptions = getEnvOptions(environments)
@@ -36,6 +40,31 @@ const CreateTemplateForm = ({ isOpen, setOpen }: Props) => {
         templates.map((t) => t.name),
         "Assignment Template"
     )
+    const addCreatingWorkspace = (req: AddTemplateRequest) => {
+        setContainers(containers => {
+            return [
+                ...containers,
+                {
+                    title: req.templateName,
+                    status: "CREATING",
+                    subTitle: "",
+                    startAt: "",
+                    containerID: "",
+                    type: "SANDBOX",
+                    isTemporary: true,
+                    redisPatch: {
+                        tempId: "",
+                        cause: "TEMPLATE_CREATE",
+                        containerId: "",
+                        sourceId: "",
+                        title: req.templateName,
+                    }
+                }
+            ]
+        })
+    }
+
+
     return <ModalForm
         clickOutsideToClose
         escToClose
@@ -108,7 +137,7 @@ const CreateTemplateForm = ({ isOpen, setOpen }: Props) => {
         title="Create Template"
         onEnter={async ({ create_template: data }) => {
             const toastId = myToast.loading("Creating a temporary workspace...");
-            const formData: AddTemplateRequest = {
+            const templateRequest: AddTemplateRequest = {
                 templateName: data.name,
                 description: data.description,
                 section_user_id: sectionUserInfo.sectionUserId,
@@ -120,6 +149,7 @@ const CreateTemplateForm = ({ isOpen, setOpen }: Props) => {
                 timeLimit: Number(data.time_limit),
                 allow_notification: data.allow_notification,
             }
+            addCreatingWorkspace(templateRequest)
             const response = await addTempContainer(
                 {
                     memLimit: memory,
@@ -130,50 +160,57 @@ const CreateTemplateForm = ({ isOpen, setOpen }: Props) => {
                     event: "TEMPLATE_CREATE",
                     title: data.name,
                     sourceId: "",
-                    formData: {
-
-                    } as AddTemplateRequest
+                    formData: templateRequest
                 }
             );
-
-            // memory,
-            // CPU,
-            // selectedEnv.imageId,
-            // sub,
-            // "root",
-            // "TEMPLATE_CREATE",
-            // data.name
             myToast.dismiss(toastId);
-            console.log(response);
+            await fetchContainers();
             if (response.success) {
                 const { containerID } = response;
                 const customToastId = myToast.custom(
-                    <TempContainerToast getToastId={() => customToastId} containerId={containerID} onOK={
-                        async () => {
-                            const id = myToast.loading("Building your template...");
-                            const response = await addTemplate(
-                                {
-                                    templateName: data.name,
-                                    description: data.description,
-                                    section_user_id: sectionUserInfo.sectionUserId,
-                                    environment_id: data.environment.id,
-                                    assignment_config_id: "",
-                                    containerId: containerID,
-                                    active: false,
-                                    isExam: data.is_exam,
-                                    timeLimit: Number(data.time_limit),
-                                    allow_notification: data.allow_notification,
+                    <TempContainerToast
+                        getToastId={() => customToastId}
+                        containerId={containerID}
+                        onOK={
+                            async () => {
+                                const id = myToast.loading("Building your template...");
+                                const response = await addTemplate(
+                                    {
+                                        templateName: data.name,
+                                        description: data.description,
+                                        section_user_id: sectionUserInfo.sectionUserId,
+                                        environment_id: data.environment.id,
+                                        assignment_config_id: "",
+                                        containerId: containerID,
+                                        active: false,
+                                        isExam: data.is_exam,
+                                        timeLimit: Number(data.time_limit),
+                                        allow_notification: data.allow_notification,
+                                    }
+                                );
+                                if (response.success) {
+                                    myToast.success("Template is created successfully");
+                                } else {
+                                    myToast.error({
+                                        title: "Fail to create template",
+                                        description: errorToToastDescription(response.error),
+                                        comment: CLICK_TO_REPORT
+                                    })
                                 }
-                            );
-                            if (response.success) {
-                                fetch();
+                                await fetchContainers()
+                                await fetchTemplates()
                                 myToast.dismiss(id);
                             }
-                        }
-                    } />,
+                        } />,
                     "toaster toaster-custom toaster-no-dismiss",
                     "🗂"
                 );
+            } else {
+                myToast.error({
+                    title: "Fail to create temporary workspace",
+                    description: errorToToastDescription(response.error),
+                    comment: CLICK_TO_REPORT
+                })
             }
         }}
     ></ModalForm>

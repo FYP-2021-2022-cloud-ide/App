@@ -5,7 +5,7 @@ import { SandboxImageListResponse } from "../lib/api/api";
 import { sandboxAPI } from "../lib/api/sandboxAPI";
 import { SandboxImage } from "../lib/cnails";
 import { errorToToastDescription } from "../lib/errorHelper";
-import { patchSandboxes } from "../lib/sandboxHelper";
+import { apiSandboxesToUiSandboxes, patchSandboxes } from "../lib/sandboxHelper";
 import { useCnails } from "./cnails";
 
 type SandboxContextState = {
@@ -34,13 +34,10 @@ export const SandboxProvider = ({
     const { cancelablePromise } = useCancelablePromise()
     const { listSandboxImages } = sandboxAPI
     async function fetchSandboxImages() {
-        console.log("fetch")
-        const afterResponse = (response: SandboxImageListResponse) => {
+        const afterResponse = (response: SandboxImageListResponse, mount: boolean = true) => {
             if (response.success) {
-                console.log(response)
-                const sandboxImages = patchSandboxes(response.sandboxImages as SandboxImage[], containers)
-                console.log(sandboxImages)
-                setSandboxImages(sandboxImages);
+                const sandboxImages = patchSandboxes(apiSandboxesToUiSandboxes(response.sandboxImages), containers)
+                if (mount) setSandboxImages(sandboxImages);
                 return sandboxImages
             } else {
                 myToast.error({
@@ -52,11 +49,10 @@ export const SandboxProvider = ({
         let response: SandboxImageListResponse;
         try {
             response = await cancelablePromise(listSandboxImages(userId));
-            console.log("cakked", response)
             return afterResponse(response)
         } catch (error) {
             if (error.isCanceled) {
-                return afterResponse(error.value as SandboxImageListResponse)
+                return afterResponse(error.value as SandboxImageListResponse, false)
             }
             else {
                 console.error(error)
@@ -65,17 +61,22 @@ export const SandboxProvider = ({
 
     }
 
+    /** 
+     * this hook will change the status of the sandboxes base on the change in containers
+     */
     useEffect(() => {
-        if (sandboxImages != undefined) {
-            setSandboxImages(sandboxImages => {
-                console.log(patchSandboxes(sandboxImages, containers))
-                return patchSandboxes(sandboxImages, containers)
-            })
+        if (sandboxImages && containers) {
+            setSandboxImages(sandboxImages => patchSandboxes(sandboxImages, containers))
         }
     }, [containers])
 
+    /**
+     * this hook will fetch the sandboxes on render
+     */
     useEffect(() => {
-        fetchSandboxImages()
+        if (containers) {
+            fetchSandboxImages()
+        }
     }, [])
 
     if (!sandboxImages) return <></>;

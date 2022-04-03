@@ -65,7 +65,9 @@ export function useCancelablePromise(cancelable = makeCancelable) {
 
   return {
     /**
-     * use this wrap a Promise which will throw an error with `error.isCanceled` is `true` and `error.value` which is the canceled but returned value when unmount
+     * use this wrap a Promise which will throw an error with `error.isCanceled` is `true`
+     * and `error.value` which is the canceled but returned value when unmount.
+     * If your set Image is
      *
      */
     cancelablePromise,

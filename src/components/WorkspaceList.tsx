@@ -7,10 +7,14 @@ import EmptyDiv from "./EmptyDiv";
 interface props {
   workspaces: Workspace[];
   onClick?: (workspace: Workspace) => void;
-  onToggleStart?: (workspace: Workspace, start: boolean) => void;
+  // onToggleStart?: (workspace: Workspace, start: boolean) => void;
+  menuItems: (workspace: Workspace) => {
+    text: string | ((workspace: Workspace) => string),
+    onClick: (workspace: Workspace) => void | Promise<void>,
+  }[];
 }
 
-const WorkspacesList = ({ workspaces, onClick, onToggleStart }: props) => {
+const WorkspacesList = ({ workspaces, onClick, menuItems }: props) => {
   return (
     <div className="flex flex-col justify-start w-full">
       <div className="course-list-title">
@@ -31,10 +35,11 @@ const WorkspacesList = ({ workspaces, onClick, onToggleStart }: props) => {
                   onClick={() => {
                     if (onClick) onClick(workspace);
                   }}
-                  onToggleStart={() => {
-                    if (onToggleStart)
-                      onToggleStart(workspace, !Boolean(workspace.containerID));
-                  }}
+                  menuItems={menuItems}
+                  // onToggleStart={() => {
+                  //   if (onToggleStart)
+                  //     onToggleStart(workspace, !Boolean(workspace.containerID));
+                  // }}
                   zIndex={workspaces.length - index}
                 ></WorkspaceCard>
               );

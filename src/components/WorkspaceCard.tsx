@@ -1,29 +1,23 @@
 import React from "react";
 import CardMenu, { MenuItem } from "./CardMenu";
-import { Template, Workspace } from "../lib/cnails";
-import { InformationCircleIcon } from "@heroicons/react/solid";
-import Toggle from "./Toggle";
+import { Workspace } from "../lib/cnails";
 import useCleanTilt from "./useCleanTilt";
 import Tilt from "react-parallax-tilt";
 interface Props {
   workspace: Workspace;
   onClick?: () => void;
-  onToggleStart?: () => void;
+  menuItems: (workspace: Workspace) => {
+    text: string | ((workspace: Workspace) => string),
+    onClick: (workspace: Workspace) => void,
+  }[];
+  // onToggleStart?: () => void;
   zIndex?: number;
 }
 
-function WorkspaceCard({ workspace, onClick, onToggleStart, zIndex }: Props) {
+function WorkspaceCard({ workspace, onClick, menuItems, zIndex }: Props) {
   const { ref, cleanStyle } = useCleanTilt(
     zIndex ? `z-index : ${zIndex};` : ""
   );
-  var menuItems: MenuItem[] = [
-    {
-      text: workspace.containerID ? "Stop" : "Start",
-      onClick: () => {
-        if (onToggleStart) onToggleStart();
-      },
-    },
-  ];
 
   return (
     <Tilt
@@ -37,10 +31,10 @@ function WorkspaceCard({ workspace, onClick, onToggleStart, zIndex }: Props) {
         onClick={async (e) => {
           if (onClick) onClick();
         }}
-        className="env-card"
+        className="env-card select-none"
       >
         <div className="flex flex-row min-w-0 space-x-2">
-          <span className="relative flex h-2 w-3 mt-3">
+          <span className="relative flex h-3 w-3 mt-3">
             {workspace.containerID && (
               <span className="absolute animate-ping inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
             )}
@@ -63,7 +57,10 @@ function WorkspaceCard({ workspace, onClick, onToggleStart, zIndex }: Props) {
             </div>
           </div>
         </div>
-        <CardMenu items={menuItems}></CardMenu>
+        <CardMenu items={menuItems(workspace).map(item => ({
+          text: typeof item.text == "string" ? item.text : item.text(workspace),
+          onClick: () => item.onClick(workspace)
+        }))}></CardMenu>
       </div>
     </Tilt>
   );

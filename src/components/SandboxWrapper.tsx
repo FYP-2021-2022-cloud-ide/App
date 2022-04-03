@@ -253,7 +253,7 @@ export const SandboxWrapper = () => {
                         myToast.dismiss(id);
                       }}
                     ></TempContainerToast>,
-                    "toaster toaster-custom toast-no-dismiss",
+                    "toaster toaster-custom toaster-no-dismiss",
                     "🗂"
                   )
                 } else {

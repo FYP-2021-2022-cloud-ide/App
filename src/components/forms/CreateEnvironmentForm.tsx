@@ -11,6 +11,7 @@ import { useCnails } from "../../contexts/cnails";
 import { FormStructure } from "../ModalForm/types";
 import { env } from "process";
 import { EnvironmentBuildRequest } from "../../lib/api/api";
+import TempContainerToast from "../TempContainerToast";
 
 export type CreateEnvironmentFormData = {
     create_environment: {
@@ -27,8 +28,8 @@ export type Props = {
 }
 
 const CreateEnvironmentForm = ({ isOpen, setOpen }: Props) => {
-    const { sub } = useCnails()
-    const { environments, sectionUserInfo, fetch } = useInstructor()
+    const { sub, fetchContainers } = useCnails()
+    const { environments, sectionUserInfo, fetch, fetchEnvironments } = useInstructor()
     const { addTempContainer, removeTempContainer } = containerAPI
     const { addEnvironment, buildEnvironment } = envAPI
     const validName = getValidName(
@@ -134,86 +135,54 @@ const CreateEnvironmentForm = ({ isOpen, setOpen }: Props) => {
                                 description: data.description,
                                 section_user_id: sectionUserInfo.sectionUserId,
                                 containerId: "",
-
                             }
                         }
                     );
                     myToast.dismiss(id);
+                    await fetchContainers()
                     if (response.success) {
                         const { containerID } = response;
                         const customToastId = myToast.custom(
-                            <div className="flex flex-col space-y-2">
-                                <p>
-                                    A temporary workspace is created. Click the link to open a
-                                    new window where set up your workspace. After finish
-                                    setup, click <span className="font-bold">Finish</span>.
-                                </p>
-                                <a
-                                    className="btn btn-xs"
-                                    href={
-                                        "https://codespace.ust.dev/user/container/" +
-                                        containerID +
-                                        "/"
+                            <TempContainerToast
+                                getToastId={() => customToastId}
+                                containerId={containerID}
+                                onOK={async () => {
+                                    // build succeed
+                                    myToast.dismiss(customToastId);
+                                    const id = myToast.loading(
+                                        "Building your custom environment..."
+                                    );
+                                    const response = await buildEnvironment(
+                                        {
+                                            name: name,
+                                            description: description,
+                                            section_user_id: sectionUserInfo.sectionUserId,
+                                            containerId: containerID,
+                                        }
+                                    );
+                                    if (response.success) {
+                                        myToast.success("Environment is created successfully.")
+                                    } else {
+                                        myToast.error({
+                                            title: "Fail to build environment",
+                                            description: errorToToastDescription(response.error),
+                                            comment: CLICK_TO_REPORT
+                                        })
                                     }
-                                    target="_blank"
-                                    rel="noreferrer"
-                                >
-                                    Set up workspace
-                                </a>
-                                <div className="flex flex-row space-x-2">
-                                    <button
-                                        className="btn btn-primary btn-xs"
-                                        onClick={async () => {
-                                            // cancel the build
-                                            myToast.dismiss(customToastId);
-                                            const response = await removeTempContainer(
-                                                {
-                                                    containerId: containerID,
-                                                    sub: sub
-                                                }
-                                            );
-                                            if (response.success)
-                                                console.log("remove temp container", containerID);
-                                            else
-                                                console.log(
-                                                    "fail to remove temp container",
-                                                    response.error.status,
-                                                    containerID,
-                                                    sub
-                                                );
-                                        }}
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        className="btn btn-primary btn-xs"
-                                        onClick={async () => {
-                                            // build succeed
-                                            myToast.dismiss(customToastId);
-                                            const id = myToast.loading(
-                                                "Building your custom environment..."
-                                            );
-                                            const response = await buildEnvironment(
-                                                {
-                                                    name: name,
-                                                    description: description,
-                                                    section_user_id: sectionUserInfo.sectionUserId,
-                                                    containerId: containerID,
-                                                }
-                                            );
-                                            if (response.success) {
-                                                fetch();
-                                                myToast.dismiss(id);
-                                            }
-                                        }}
-                                    >
-                                        Finish
-                                    </button>
-                                </div>
-                            </div>,
+                                    await fetchContainers()
+                                    await fetchEnvironments()
+                                    myToast.dismiss(id);
+                                }}
+                            ></TempContainerToast>,
                             "toaster toaster-custom toaster-no-dismiss",
                             "🗂"
                         );
+                    } else {
+                        myToast.error({
+                            title: "Fail to create temporary workspace",
+                            description: errorToToastDescription(response.error),
+                            comment: CLICK_TO_REPORT,
+                        })
                     }
                 } catch (error) {
                     myToast.error(error.message);
@@ -226,3 +195,4 @@ const CreateEnvironmentForm = ({ isOpen, setOpen }: Props) => {
 }
 
 export default CreateEnvironmentForm
+

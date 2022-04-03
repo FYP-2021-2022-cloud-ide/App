@@ -18,6 +18,7 @@ type Props = {
      * when to do if user click OK
      */
     onOK: () => void | Promise<void>;
+    setUpWorkspaceText?: string;
     cancelBtnText?: string;
     okBtnText?: string;
 }
@@ -42,22 +43,22 @@ const TempContainerToast = ({ containerId, getToastId, onOK, okBtnText, cancelBt
 
     return <div className="flex flex-col space-y-2">
         <p>
-            A temp workspace is created. Click the link to set up your
-            workspace. After finish setup, click{" "}
-            <span className="font-bold">{okBtnText ?? "OK"}</span>.
+            A temporary workspace is created. Click the link to enter the IDE to set up. After finish setup, click{" "}
+            <span className="font-bold">{okBtnText ?? "OK"}</span>. It will commit all your changes in IDE. If you click{" "}
+            <span className="font-bold">{cancelBtnText ?? "Cancel"}</span>, all your changes in the IDE will not be saved.
         </p>
-        <a
+        <button
             className="btn btn-xs border-none"
-            href={
-                "https://codespace.ust.dev/user/container/" +
-                containerId +
-                "/"
-            }
-            target="_blank"
-            rel="noreferrer"
+            onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                window.open(
+                    `https://codespace.ust.dev/user/container/${containerId}/`
+                )
+            }}
         >
             Set up workspace
-        </a>
+        </button>
         <div className="flex flex-row space-x-2">
             <button
                 className="btn btn-xs bg-gray-500 text-white hover:bg-gray-400 dark:bg-gray-400 dark:hover:bg-gray-500 border-none"
@@ -92,6 +93,6 @@ const TempContainerToast = ({ containerId, getToastId, onOK, okBtnText, cancelBt
                 {okBtnText ?? "OK"}
             </button>
         </div>
-    </div>
+    </div >
 }
 export default TempContainerToast;

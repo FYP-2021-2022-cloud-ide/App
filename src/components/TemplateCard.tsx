@@ -35,11 +35,12 @@ const EmbeddedWorkspaceCard = ({
 }) => {
   return (
     <div
-      className="rounded  bg-blue-200/20 dark:bg-black/30 p-2 flex flex-row space-x-2 "
+      className="rounded  border bg-white hover:bg-gray-100 dark:bg-black dark:hover:bg-gray-900 p-2 flex flex-row space-x-2 border-gray-300 dark:border-gray-800"
       onClick={(e) => {
         e.stopPropagation();
         if (onClick) onClick();
       }}
+      title="Workspace is running..."
     >
       <span className="relative flex h-3 w-3">
         {template.containerID && (

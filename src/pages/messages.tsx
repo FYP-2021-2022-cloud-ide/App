@@ -319,7 +319,7 @@ const MessageTable = () => {
         <EmptyDiv message="You have no notifications."></EmptyDiv>
       ) : (
         // only if user have notifications
-        <div className="flex flex-row space-x-2">
+        <div className="flex flex-row space-x-2 text-gray-600 dark:text-gray-300">
           <div className="min-w-[12rem] h-min  flex flex-col space-y-2 p-3 border rounded-md text-xs bg-gray-100 dark:bg-black/50   border-[#D5D6D8] dark:border-[#2F3947] ">
             <p className="text-lg font-bold">Facet</p>
             <label htmlFor="only not read" className="whitespace-nowrap">

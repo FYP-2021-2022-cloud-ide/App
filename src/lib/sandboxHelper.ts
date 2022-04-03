@@ -1,12 +1,28 @@
 import { Container, SandboxImage } from "./cnails";
+import { SandboxImage as ApiSandboxImage } from "./api/api";
+
+/**
+ *
+ * @param sandboxImages
+ * @returns
+ */
+export const apiSandboxesToUiSandboxes = (sandboxImages: ApiSandboxImage[]) => {
+  return sandboxImages.map<SandboxImage>((sandboxImage) => ({
+    ...sandboxImage,
+    status: "DEFAULT",
+  }));
+};
 
 export const patchSandboxes = (
   sandboxImages: SandboxImage[],
   containers: Container[]
 ) => {
-  const temp = sandboxImages.map((si) => {
+  return sandboxImages.map<SandboxImage>((si) => {
     for (let container of containers) {
-      if (!container.data.data && container.data.sourceId == si.id) {
+      if (
+        !container.redisPatch.data &&
+        container.redisPatch.sourceId == si.id
+      ) {
         // it is a normal workspace
         if (container.containerID == "")
           return {
@@ -27,7 +43,7 @@ export const patchSandboxes = (
             };
         }
       }
-      if (container.data.sourceId == si.id) {
+      if (container.redisPatch.sourceId == si.id) {
         // it is a temporary workspace
         if (container.containerID == "")
           return {
@@ -49,12 +65,11 @@ export const patchSandboxes = (
         }
       }
     }
-    // the container not found
+    // no sandbox is related to this environment
     return {
       ...si,
       sandboxesId: "",
       status: "DEFAULT",
     };
-  }) as SandboxImage[]; // otherwise the returned array will have status : string which is not compatible with SandboxImage
-  return temp;
+  }); // otherwise the returned array will have status : string which is not compatible with SandboxImage
 };

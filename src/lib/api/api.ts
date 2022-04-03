@@ -110,7 +110,6 @@ type Environment = {
   libraries: string;
   environmentName: string;
   description: string;
-  status?: "CREATING" | "UPDATING" | "REMOVING" | null;
 };
 type EnvironmentListResponse =
   | { success: true; error: Error; environments: Environment[] }
@@ -140,7 +139,6 @@ type Template = {
   isExam: boolean;
   timeLimit: number;
   allow_notification: boolean;
-  status?: "CREATING" | "UPDATING" | "REMOVING" | null;
 };
 
 type TemplateListResponse =

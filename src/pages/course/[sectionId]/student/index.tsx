@@ -8,29 +8,33 @@ import Breadcrumbs from "../../../../components/Breadcrumbs";
 import { templateAPI } from "../../../../lib/api/templateAPI";
 import { generalAPI } from "../../../../lib/api/generalAPI";
 import {
+  Container,
   SectionRole,
   SectionUserInfo,
-  Template,
   Workspace,
 } from "../../../../lib/cnails";
 import myToast from "../../../../components/CustomToast";
-import exampleTemplates from "../../../../fake_data/example_template.json";
 import { errorToToastDescription } from "../../../../lib/errorHelper";
 import { CLICK_TO_REPORT } from "../../../../lib/constants";
 import {
   CPU,
   memory
 } from "../../../../lib/formHelper";
+import { apiTemplatesToUiTemplates, patchTemplates } from "../../../../lib/templateHelper";
+import { TemplateListResponse } from "../../../../lib/api/api";
+import { useCancelablePromise } from "../../../../components/useCancelablePromise";
 
 
 const Home = () => {
   const router = useRouter();
   const sectionId = router.query.sectionId as string;
   const [sectionUserInfo, setSectionUserInfo] = useState<SectionUserInfo>(null);
-  const [workspaces, setWorkspaces] = useState<Workspace[]>(null);
-  const { sub } = useCnails();
+  const [workspaces, setWorkspaces] = useState<Workspace[]>();
+  const { sub, fetchContainers, containers } = useCnails();
   const { listTemplates, addTemplateContainer, removeTemplateContainer } = templateAPI;
   const { getSectionUserInfo } = generalAPI;
+  const { cancelablePromise } = useCancelablePromise();
+
   // data fetching from API
   const fetchSectionUserInfo = async () => {
     const response = await getSectionUserInfo(sectionId, sub);
@@ -55,24 +59,53 @@ const Home = () => {
   };
 
   /**
+   * the hook will change the status of workspace base on the change in containers
+   */
+  useEffect(() => {
+    if (workspaces && containers) {
+      setWorkspaces(workspace => patchTemplates(workspace, containers))
+    }
+  }, [containers])
+
+  /**
    * the API need to be removed
    */
-  const fetchWorkspaces = async () => {
-    const response = await listTemplates({
-      sectionid: sectionId,
-      sub: sub
-    });
-    if (response.success) {
-      response.templates = response.templates.filter(
-        (template) => template.active
-      );
-      setWorkspaces(response.templates);
-      // setWorkspaces(exampleTemplates);
+  const fetchWorkspaces = async (_containers: Container[] = containers) => {
+    const afterResponse = (response: TemplateListResponse, mount: boolean = true) => {
+      if (response.success) {
+        const workspaces = patchTemplates(apiTemplatesToUiTemplates(response.templates.filter(template => template.active)), _containers)
+        if (mount) setWorkspaces(workspaces)
+        return workspaces
+      } else {
+        myToast.error({
+          title: "Fail to fetch workspace.",
+          description: errorToToastDescription(response.error),
+          comment: CLICK_TO_REPORT,
+        });
+      }
+    }
+    try {
+      const response = await cancelablePromise(listTemplates({
+        sectionid: sectionId,
+        sub: sub
+      }))
+      return afterResponse(response)
+    } catch (error) {
+      if (error.isCanceled) {
+        return afterResponse(error.value as TemplateListResponse, false)
+      } else {
+        console.error(error)
+      }
     }
   };
+  const fetch = async () => {
+    await fetchSectionUserInfo();
+    const containers = await fetchContainers();
+    await fetchWorkspaces(containers);
+  }
+
   useEffect(() => {
-    fetchSectionUserInfo();
-    if (sectionId != undefined) fetchWorkspaces();
+    fetch()
   }, []);
 
   return (
@@ -108,59 +141,58 @@ const Home = () => {
                 );
               }
             }}
-            onToggleStart={async (workspace, start) => {
-              if (start) {
-                const id = myToast.loading("Starting workspace...");
-                const response = await addTemplateContainer(
-                  {
-                    imageName: workspace.imageId,
-                    memLimit: memory,
-                    numCPU: CPU,
-                    section_user_id: sectionUserInfo.sectionUserId,
-                    template_id: workspace.id,
-                    accessRight: "student",
-                    useFresh: false,
-                    title: workspace.name,
-                    sub: sub,
-                    event: "WORKSPACE_START"
-                  }
-                  // workspace.imageId,
-                  //                   memory,
-                  //                   CPU,
-                  //                   sectionUserInfo.sectionUserId,
-                  //                   workspace.id,
-                  //                   "student",
-                  //                   false
-                );
-                myToast.dismiss(id);
-                if (response.success) {
-                  myToast.success("Workspace is successfully started.");
-                } else
-                  myToast.error({
-                    title: `Fail to start workspace`,
-                    description: errorToToastDescription(response.error),
-                    comment: CLICK_TO_REPORT,
-                  });
-                fetchWorkspaces();
-              } else {
-                const response = await removeTemplateContainer(
-                  {
-                    containerId: workspace.containerID,
-                    sub: sub
-                  }
-                );
-                if (response.success) {
-                  myToast.success("Workspace is successfully stopped.");
-                } else
-                  myToast.error({
-                    title: `Fail to stop workspace`,
-                    description: errorToToastDescription(response.error),
-                    comment: CLICK_TO_REPORT,
-                  });
+            menuItems={(workspace) => ([
+              {
+                text: workspace.containerID ? "Stop workspace" : "Start workspace",
+                onClick: async () => {
+                  if (!workspace.containerID) {
+                    const id = myToast.loading("Starting workspace...");
+                    const response = await addTemplateContainer(
+                      {
+                        imageName: workspace.imageId,
+                        memLimit: memory,
+                        numCPU: CPU,
+                        section_user_id: sectionUserInfo.sectionUserId,
+                        template_id: workspace.id,
+                        accessRight: "student",
+                        useFresh: false,
+                        title: workspace.name,
+                        sub: sub,
+                        event: "WORKSPACE_START"
+                      }
+                    );
+                    myToast.dismiss(id);
+                    if (response.success) {
+                      myToast.success("Workspace is successfully started.");
+                    } else
+                      myToast.error({
+                        title: `Fail to start workspace`,
+                        description: errorToToastDescription(response.error),
+                        comment: CLICK_TO_REPORT,
+                      });
+                  } else {
+                    const id = myToast.loading("Stopping workspace...")
+                    const response = await removeTemplateContainer(
+                      {
+                        containerId: workspace.containerID,
+                        sub: sub
+                      }
+                    );
+                    myToast.dismiss(id)
+                    if (response.success) {
+                      myToast.success("Workspace is successfully stopped.");
+                    } else
+                      myToast.error({
+                        title: `Fail to stop workspace`,
+                        description: errorToToastDescription(response.error),
+                        comment: CLICK_TO_REPORT,
+                      });
 
-                fetchWorkspaces();
+                  }
+                  await fetchContainers();
+                }
               }
-            }}
+            ])}
           ></WorkspacesList>
         </div>
       ) : (
