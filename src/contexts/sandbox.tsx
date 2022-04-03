@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import myToast from "../components/CustomToast";
+import { useCancelablePromise } from "../components/useCancelablePromise";
+import { SandboxImageListResponse } from "../lib/api/api";
 import { sandboxAPI } from "../lib/api/sandboxAPI";
 import { SandboxImage } from "../lib/cnails";
 import { errorToToastDescription } from "../lib/errorHelper";
@@ -21,6 +23,7 @@ type SandboxContextState = {
 
 const SandboxContext = createContext({} as SandboxContextState)
 export const useSandbox = () => useContext(SandboxContext)
+
 export const SandboxProvider = ({
     children,
 }: {
@@ -28,35 +31,46 @@ export const SandboxProvider = ({
 }) => {
     const { userId, containers } = useCnails()
     const [sandboxImages, setSandboxImages] = useState<SandboxImage[]>();
+    const { cancelablePromise } = useCancelablePromise()
     const { listSandboxImages } = sandboxAPI
     async function fetchSandboxImages() {
-        const response = await listSandboxImages(userId);
-        if (response.success) {
-            const sandboxImages = response.sandboxImages.map(si => {
-                if (containers.some(container => container.data.cause == "SANDBOX_START_WORKSPACE" && container.data.data == si.id)) {
-                    return {
-                        ...si,
-                        status: "STARTING_WORKSPACE"
-                    }
-                } else return {
-                    ...si,
-                    status: "DEFAULT"
-                }
-            }) as SandboxImage[]
-            // console.log(sandboxImages)
-            setSandboxImages(sandboxImages);
-            return sandboxImages
-        } else {
-            myToast.error({
-                title: "Personal workspaces cannot be fetched",
-                description: errorToToastDescription(response.error),
-            });
+        console.log("fetch")
+        const afterResponse = (response: SandboxImageListResponse) => {
+            if (response.success) {
+                console.log(response)
+                const sandboxImages = patchSandboxes(response.sandboxImages as SandboxImage[], containers)
+                console.log(sandboxImages)
+                setSandboxImages(sandboxImages);
+                return sandboxImages
+            } else {
+                myToast.error({
+                    title: "Personal workspaces cannot be fetched",
+                    description: errorToToastDescription(response.error),
+                });
+            }
         }
+        let response: SandboxImageListResponse;
+        try {
+            response = await cancelablePromise(listSandboxImages(userId));
+            console.log("cakked", response)
+            return afterResponse(response)
+        } catch (error) {
+            if (error.isCanceled) {
+                return afterResponse(error.value as SandboxImageListResponse)
+            }
+            else {
+                console.error(error)
+            }
+        }
+
     }
 
     useEffect(() => {
         if (sandboxImages != undefined) {
-            setSandboxImages(sandboxImages => patchSandboxes(sandboxImages, containers))
+            setSandboxImages(sandboxImages => {
+                console.log(patchSandboxes(sandboxImages, containers))
+                return patchSandboxes(sandboxImages, containers)
+            })
         }
     }, [containers])
 

@@ -7,54 +7,26 @@ import useCleanTilt from "./useCleanTilt";
 type Props = {
   environment: Environment;
   onClick?: (environment: Environment) => void;
-  onDelete?: (environment: Environment) => void;
-  onUpdate?: (environment: Environment) => void;
-  onHighlight?: (environment: Environment) => void;
-  onUpdateInternal?: (environment: Environment) => void;
+  menuItems: {
+    text: string | ((environment: Environment) => string)
+    onClick: (environment: Environment) => void;
+  }[];
   zIndex?: number;
 };
 
 function EnvironmentCard({
   environment,
   onClick,
-  onDelete,
-  onUpdate,
-  onHighlight,
-  onUpdateInternal,
+  // onDelete,
+  // onUpdate,
+  // onHighlight,
+  // onUpdateInternal,
+  menuItems,
   zIndex,
 }: Props) {
   const { ref, cleanStyle } = useCleanTilt(
     zIndex ? `z-index : ${zIndex};` : ""
   );
-  const menuItems = [];
-  if (onDelete)
-    menuItems.push({
-      text: "Delete",
-      onClick: () => {
-        onDelete(environment);
-      },
-    });
-  if (onUpdate)
-    menuItems.push({
-      text: "Update",
-      onClick: () => {
-        onUpdate(environment);
-      },
-    });
-  if (onHighlight)
-    menuItems.push({
-      text: "Highlight templates",
-      onClick: () => {
-        onHighlight(environment);
-      },
-    });
-  if (onUpdateInternal)
-    menuItems.push({
-      text: "Update Internal",
-      onClick: () => {
-        onUpdateInternal(environment)
-      }
-    })
 
   return (
     <Tilt
@@ -76,7 +48,10 @@ function EnvironmentCard({
           {/* <div className="env-card-ref">{environment.imageId}</div> */}
           <p className="env-card-des">{environment.description}</p>
         </div>
-        <CardMenu items={menuItems}></CardMenu>
+        <CardMenu items={menuItems.map(item => ({
+          text: typeof item.text == "string" ? item.text : item.text(environment),
+          onClick: () => item.onClick(environment)
+        }))}></CardMenu>
       </div>
     </Tilt>
   );

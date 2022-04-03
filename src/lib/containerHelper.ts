@@ -29,7 +29,8 @@ export const getType = (
     return "TEMPLATE";
   if (
     container.redisPatch.cause == "SANDBOX_CREATE" ||
-    container.redisPatch.cause == "SANDBOX_UPDATE"
+    container.redisPatch.cause == "SANDBOX_UPDATE" ||
+    container.redisPatch.cause == "SANDBOX_START_WORKSPACE"
   )
     return "SANDBOX";
   return "STUDENT_WORKSPACE";

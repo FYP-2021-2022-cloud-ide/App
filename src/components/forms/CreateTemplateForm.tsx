@@ -129,6 +129,7 @@ const CreateTemplateForm = ({ isOpen, setOpen }: Props) => {
                     accessRight: "root",
                     event: "TEMPLATE_CREATE",
                     title: data.name,
+                    sourceId: "",
                     formData: {
 
                     } as AddTemplateRequest

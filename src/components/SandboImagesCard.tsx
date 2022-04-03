@@ -5,14 +5,14 @@ import Tilt from "react-parallax-tilt";
 import { SandboxImage } from "../lib/cnails";
 import useCleanTilt from "./useCleanTilt";
 
+
 type Props = {
   sandboxImage: SandboxImage;
   onClick?: (sandboxImage: SandboxImage) => void;
-  onDelete?: (sandboxImage: SandboxImage) => void;
-  onUpdate?: (sandboxImage: SandboxImage) => void;
-  onStart?: (sandboxImage: SandboxImage) => void;
-  onStop?: (sandboxImage: SandboxImage) => void;
-  onUpdateInternal?: (sandboxImage: SandboxImage) => void;
+  menuItems: (sandboxImage: SandboxImage) => {
+    text: string | ((sandboxImage: SandboxImage) => string),
+    onClick: (sandboxImage: SandboxImage) => void;
+  }[];
   zIndex?: number;
   id: string;
 };
@@ -20,11 +20,7 @@ type Props = {
 const SandboxImagesCard = ({
   sandboxImage,
   onClick,
-  onDelete,
-  onUpdate,
-  onStop,
-  onStart,
-  onUpdateInternal,
+  menuItems,
   zIndex,
   id,
 }: Props) => {
@@ -40,16 +36,32 @@ const SandboxImagesCard = ({
       tiltMaxAngleY={4}
       tiltReverse
     >
-      <div id={id} className="sandbox-card select-none" title="creating personal workspace...">
+      <div id={id} className="sandbox-card select-none" title="creating personal workspace..." onClick={
+        () => {
+          if (sandboxImage.sandboxesId) {
+            window.open(
+              "https://codespace.ust.dev/user/container/" +
+              sandboxImage.sandboxesId +
+              "/"
+            );
+          }
+          if (onClick) onClick(sandboxImage);
+        }
+      } >
         {/* the indicator */}
         <div className="mt-2 mr-2">
           <span className="relative flex h-3 w-3">
-            {(sandboxImage.status == "STARTING_WORKSPACE" || sandboxImage.status == "STOPPING_WORKSPACE") && (
-              <span className="absolute animate-ping inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+            {(sandboxImage.status == "STARTING_WORKSPACE" || sandboxImage.status == "STOPPING_WORKSPACE" || sandboxImage.status == "UPDATING_INTERNAL") && (
+              <span className={`absolute animate-ping inline-flex h-full w-full rounded-full opacity-75 ${sandboxImage.status == "STARTING_WORKSPACE" && "bg-yellow-400" ||
+                sandboxImage.status == "STOPPING_WORKSPACE" && "bg-yellow-400" ||
+                sandboxImage.status == "UPDATING_INTERNAL" && "bg-green-400"
+                }`}></span>
             )}
             <span
               id="indicator"
-              className={`relative inline-flex rounded-full h-3 w-3 ${(sandboxImage.status == "STARTING_WORKSPACE" || sandboxImage.status == "STOPPING_WORKSPACE") ? "bg-yellow-400" : "bg-gray-400"
+              className={`relative inline-flex rounded-full h-3 w-3 ${sandboxImage.status == "STARTING_WORKSPACE" && "bg-yellow-400" ||
+                sandboxImage.status == "STOPPING_WORKSPACE" && "bg-yellow-400" ||
+                sandboxImage.status == "UPDATING_INTERNAL" && "bg-green-400"
                 }`}
             ></span>
           </span>
@@ -77,7 +89,8 @@ const SandboxImagesCard = ({
             sandboxImage.status == "UPDATING" && "being updated..." ||
             sandboxImage.status == "REMOVING" && "being removed..." ||
             sandboxImage.status == "STARTING_WORKSPACE" && "workspace is starting..." ||
-            sandboxImage.status == "STOPPING_WORKSPACE" && "workspace is stopping..."
+            sandboxImage.status == "STOPPING_WORKSPACE" && "workspace is stopping..." ||
+            sandboxImage.status == "UPDATING_INTERNAL" && "internal being upated..."
           }</p>
         </div>
       </div>
@@ -97,72 +110,49 @@ const SandboxImagesCard = ({
         className={`sandbox-card select-none ${sandboxImage.sandboxesId ? "cursor-pointer" : ""
           } `}
         onClick={() => {
+          if (sandboxImage.sandboxesId) {
+            window.open(
+              "https://codespace.ust.dev/user/container/" +
+              sandboxImage.sandboxesId +
+              "/"
+            );
+          }
           if (onClick) onClick(sandboxImage);
         }}
       >
-        <div className="sandbox-card-content grow">
-          <div className=" flex flex-row items-start space-x-2 ">
-            {/* the indicator */}
-            <div className="mt-2">
-              <span className="relative flex h-3 w-3">
-                {sandboxImage.sandboxesId && (
-                  <span className="absolute animate-ping inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                )}
-                <span
-                  id="indicator"
-                  className={`relative inline-flex rounded-full h-3 w-3 ${sandboxImage.sandboxesId ? "bg-green-400" : "bg-gray-400"
-                    }`}
-                ></span>
-              </span>
-            </div>
-            <div className=" ">
-              <p id="sandbox-name" className="sandbox-card-name ">
-                {sandboxImage.title}
-              </p>
-              <p id="sandbox-description" className="sandbox-card-des">
-                {sandboxImage.description}
-              </p>
+        <div className="flex flex-col justify-between h-full">
+          <div className="sandbox-card-content grow">
+            <div className=" flex flex-row items-start space-x-2 ">
+              {/* the indicator */}
+              <div className="mt-2">
+                <span className="relative flex h-3 w-3">
+                  {sandboxImage.sandboxesId && (
+                    <span className="absolute animate-ping inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  )}
+                  <span
+                    id="indicator"
+                    className={`relative inline-flex rounded-full h-3 w-3 ${sandboxImage.sandboxesId ? "bg-green-400" : "bg-gray-400"
+                      }`}
+                  ></span>
+                </span>
+              </div>
+              <div className=" ">
+                <p id="sandbox-name" className="sandbox-card-name ">
+                  {sandboxImage.title}
+                </p>
+                <p id="sandbox-description" className="sandbox-card-des">
+                  {sandboxImage.description}
+                </p>
+              </div>
             </div>
           </div>
+          {/* {sandboxImage.status == "UPDATING_INTERNAL" && <p className="text-gray-500 dark:text-gray-300 text-2xs">Internal is updating</p>} */}
         </div>
         <CardMenu
-          items={[
-            {
-              text: "Delete",
-              onClick: () => {
-                if (onDelete) {
-                  onDelete(sandboxImage);
-                }
-              },
-            },
-            {
-              text: "Update",
-              onClick: () => {
-                if (onUpdate) {
-                  onUpdate(sandboxImage);
-                }
-              },
-            }, {
-              text: "Update Internal",
-              onClick: () => {
-                onUpdateInternal(sandboxImage);
-              }
-            },
-            {
-              text: sandboxImage.sandboxesId ? "Stop" : "Start",
-              onClick: sandboxImage.sandboxesId
-                ? () => {
-                  if (onStop) {
-                    onStop(sandboxImage);
-                  }
-                }
-                : () => {
-                  if (onStart) {
-                    onStart(sandboxImage);
-                  }
-                },
-            },
-          ]}
+          items={menuItems(sandboxImage).map(item => ({
+            text: typeof item.text == "string" ? item.text : item.text(sandboxImage),
+            onClick: () => item.onClick(sandboxImage)
+          }))}
         />
       </div>
     </Tilt>

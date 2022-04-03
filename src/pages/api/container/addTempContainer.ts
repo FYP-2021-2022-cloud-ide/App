@@ -30,6 +30,7 @@ export default async function handler(
     event,
     formData,
     title,
+    sourceId,
     sub,
   } = JSON.parse(req.body) as ContainerAddRequest;
   var docReq: AddTempContainerRequest = AddTempContainerRequest.fromPartial({
@@ -49,11 +50,12 @@ export default async function handler(
       containerId: "",
       title: title,
       data: formData,
+      sourceId: sourceId,
     });
     grpcClient.addTempContainer(
       docReq,
       async function (err, GoLangResponse: AddTempContainerReply) {
-        if (err || !GoLangResponse.success) {
+        if (err || !GoLangResponse || !GoLangResponse.success) {
           // the request fail so we remove it from redis
           await redisHelper.remove.workspaces(sub, tempId);
         } else {

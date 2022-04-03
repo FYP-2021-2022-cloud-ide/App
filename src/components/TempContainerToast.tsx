@@ -1,4 +1,5 @@
 import { data } from "cypress/types/jquery";
+import { useEffect } from "react";
 import { useCnails } from "../contexts/cnails";
 import { containerAPI } from "../lib/api/containerAPI";
 import addTemplate from "../pages/api/template/addTemplate";
@@ -26,8 +27,19 @@ type Props = {
  * An `onOK` props need is needed to know that what to do if user click ok button. 
  */
 const TempContainerToast = ({ containerId, getToastId, onOK, okBtnText, cancelBtnText }: Props) => {
-    const { sub } = useCnails();
+    const { sub, fetchContainers, containers } = useCnails();
     const { removeTempContainer } = containerAPI;
+
+    useEffect(() => {
+        // if the container is closed somewhere else
+        const timeout = setTimeout(() => {
+            if (!containers.some(container => container.containerID == containerId)) {
+                myToast.dismiss(getToastId());
+            }
+        }, 2000)
+        return () => clearTimeout(timeout)
+    }, [containers])
+
     return <div className="flex flex-col space-y-2">
         <p>
             A temp workspace is created. Click the link to set up your
@@ -65,6 +77,7 @@ const TempContainerToast = ({ containerId, getToastId, onOK, okBtnText, cancelBt
                             containerId,
                             sub
                         );
+                    await fetchContainers();
                 }}
             >
                 {cancelBtnText ?? "Cancel"}

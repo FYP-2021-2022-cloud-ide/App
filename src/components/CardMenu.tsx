@@ -61,7 +61,10 @@ export default function CardMenu({ items }: Props) {
                             }
                           }}
                         >
-                          {item.text}
+                          {item.icon ?? <></>}
+                          <span>
+                            {item.text}
+                          </span>
                         </button>
                       )}
                     </Menu.Item>

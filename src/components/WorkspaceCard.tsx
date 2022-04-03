@@ -40,7 +40,7 @@ function WorkspaceCard({ workspace, onClick, onToggleStart, zIndex }: Props) {
         className="env-card"
       >
         <div className="flex flex-row min-w-0 space-x-2">
-          <span className="relative flex h-2 w-3">
+          <span className="relative flex h-2 w-3 mt-3">
             {workspace.containerID && (
               <span className="absolute animate-ping inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
             )}

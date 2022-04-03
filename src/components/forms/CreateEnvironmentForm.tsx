@@ -34,7 +34,6 @@ const CreateEnvironmentForm = ({ isOpen, setOpen }: Props) => {
     const validName = getValidName(
         environments.map((env) => env.name),
         "Environment",
-        0
     );
     return <ModalForm
         isOpen={isOpen}
@@ -128,6 +127,7 @@ const CreateEnvironmentForm = ({ isOpen, setOpen }: Props) => {
                             sub: sub,
                             accessRight: "root",
                             event: "ENV_CREATE",
+                            sourceId: "",
                             title: data.name,
                             formData: {
                                 name: data.name,

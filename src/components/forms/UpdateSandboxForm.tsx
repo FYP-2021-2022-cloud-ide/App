@@ -134,6 +134,7 @@ const UpdateSandboxForm = ({ isOpen, setOpen, target }: Props) => {
                         type: "textarea",
                         defaultValue: target?.description,
                         placeholder: "e.g. This workspace is about ...",
+                        tooltip: "A short description of the programming environment of this sandbox.",
                         label: "Description (Optional)",
                     },
                 },

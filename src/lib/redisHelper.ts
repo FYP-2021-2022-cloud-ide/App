@@ -1,13 +1,26 @@
 import { redisClient } from "./redisClient";
 import { Container } from "./api/api";
+import moment from "moment";
 
 const redisKeyExpireTime = 86400;
+const creationTimeout = 120;
+
+/**
+ *
+ * @param isoTime a timestamp
+ * @returns the time from the timestamp
+ */
+const getTimeDiff = (isoTime: string) => {
+  return moment.duration(moment().diff(moment(isoTime)));
+};
 
 export type Workspace = {
   /**
    * a temp id to identify the workspace before the container id is returned
    */
   tempId: string;
+  requestAt?: string;
+  sourceId: string;
   /**
    * it is the event of this creation
    */
@@ -62,8 +75,8 @@ const remove = {
 
 const insert = {
   workspaces: async (sub: string, workspace: Workspace) => {
-    console.log(workspace);
     const workspaces = await list.workspaces(sub);
+    workspace.requestAt = moment().toISOString();
     workspaces.push(workspace);
     await redisClient.set(
       `ServerState:${sub}:workspaces`,
@@ -109,9 +122,11 @@ const patch = {
 
     // check if workspaces in redis are not valid anymore
     // this could happens when container Id is not empty (workspace have been created) but not found in containers
+    // the patch will also be removed if the container id doesn't arrive in 2 minutes
     workspaces = workspaces.filter(
       (w) =>
-        w.containerId == "" ||
+        (w.containerId == "" &&
+          getTimeDiff(w.requestAt).asSeconds() < creationTimeout) ||
         containers.some((c) => c.containerID == w.containerId)
     );
     if (workspaces.length == 0) {

@@ -15,8 +15,6 @@ import CreateTemplateForm from "./forms/CreateTemplateForm"
 import UpdateTemplateForm from "./forms/UpdateTemplateForm"
 import myToast from "./CustomToast";
 import EnvironmentList from "./EnvironmentList";
-import ModalForm from "./ModalForm/ModalForm";
-import TempContainerToast from "./TempContainerToast";
 import TemplateList from "./TemplateList";
 import { useForceUpdate } from "./useForceUpdate";
 
@@ -63,59 +61,74 @@ const EnvironmentTemplateWrapper = () => {
                         // router.push(`${router.asPath}/${env.id}`);
                         // console.log(router.asPath);
                     }}
-                    onEnvDelete={async (env) => {
-                        const numTemplates = templates.filter(
-                            (t) => t.environment_id === env.id
-                        ).length;
-                        if (numTemplates != 0) {
-                            myToast.error({
-                                title: "Fail to remove environment",
-                                description: `${numTemplates} template${numTemplates > 1 ? "s are" : " is"
-                                    } still using ${env.name}.`,
-                                comment: CLICK_TO_DISMISS,
-                            });
-                        } else {
-                            const response = await removeEnvironment({
-                                envId: env.id,
-                                section_user_id: sectionUserId,
-                            });
-                            if (response.success) {
-                                myToast.success(
-                                    `environment ${env.id} is successfully removed`
-                                );
-                            }
-                        }
-                        fetch();
-                    }}
-                    onEnvUpdate={(env) => {
-                        setEnvUpdateOpen(true);
-                        setEnvUpdateTarget(env);
-                    }}
-                    onEnvHighlight={(env) => {
-                        if (templates.some((t) => t.environment_id === env.id)) {
-                            setHighlightedEnv(env);
-                            forceUpdate();
-                        } else myToast.warning(`No template is using ${env.name}.`);
-                    }}
-                    onEnvUpdateInternal={async (env) => {
-                        const response = await addTempContainer(
+                    menuItems={
+                        [
                             {
-                                memLimit: memory,
-                                numCPU: CPU,
-                                imageId: env.imageId,
-                                sub: sub,
-                                accessRight: "root",
-                                event: "ENV_CREATE",
-                                title: env.name,
-                                formData: {
-                                    name: env.name,
-                                    description: env.description,
-                                    containerId: "",
-                                    section_user_id: sectionUserId
+                                text: "Delete",
+                                onClick: async (env) => {
+                                    const numTemplates = templates.filter(
+                                        (t) => t.environment_id === env.id
+                                    ).length;
+                                    if (numTemplates != 0) {
+                                        myToast.error({
+                                            title: "Fail to remove environment",
+                                            description: `${numTemplates} template${numTemplates > 1 ? "s are" : " is"
+                                                } still using ${env.name}.`,
+                                            comment: CLICK_TO_DISMISS,
+                                        });
+                                    } else {
+                                        const response = await removeEnvironment({
+                                            envId: env.id,
+                                            section_user_id: sectionUserId,
+                                        });
+                                        if (response.success) {
+                                            myToast.success(
+                                                `environment ${env.id} is successfully removed`
+                                            );
+                                        }
+                                    }
+                                    fetch();
+                                }
+                            },
+                            {
+                                text: "Update Info",
+                                onClick: (env) => {
+                                    setEnvUpdateOpen(true);
+                                    setEnvUpdateTarget(env);
+                                }
+                            }, {
+                                text: "Highlight Templates",
+                                onClick: (env) => {
+                                    if (templates.some((t) => t.environment_id === env.id)) {
+                                        setHighlightedEnv(env);
+                                        forceUpdate();
+                                    } else myToast.warning(`No template is using ${env.name}.`);
+                                }
+                            }, {
+                                text: "Update Internal",
+                                onClick: async (env) => {
+                                    const response = await addTempContainer(
+                                        {
+                                            memLimit: memory,
+                                            numCPU: CPU,
+                                            imageId: env.imageId,
+                                            sub: sub,
+                                            accessRight: "root",
+                                            event: "ENV_CREATE",
+                                            title: env.name,
+                                            sourceId: env.id,
+                                            formData: {
+                                                name: env.name,
+                                                description: env.description,
+                                                containerId: "",
+                                                section_user_id: sectionUserId
+                                            }
+                                        }
+                                    );
                                 }
                             }
-                        );
-                    }}
+                        ]
+                    }
                 ></EnvironmentList>
                 <TemplateList
                     templates={templates}
@@ -132,20 +145,116 @@ const EnvironmentTemplateWrapper = () => {
                             setTemplateCreateOpen(true);
                         }
                     }}
-                    onDelete={async (template) => {
-                        const response = await removeTemplate({
-                            templateId: template.id,
-                            section_user_id: sectionUserId
-                        });
-                        if (response.success) {
-                            myToast.success("Template is successfully deleted.");
+                    menuItems={[
+                        {
+                            text: "Delete",
+                            onClick: async (template) => {
+                                const response = await removeTemplate({
+                                    templateId: template.id,
+                                    section_user_id: sectionUserId
+                                });
+                                if (response.success) {
+                                    myToast.success("Template is successfully deleted.");
+                                }
+                                await fetch();
+                            }
+                        },
+                        {
+                            text: "Update",
+                            onClick: (template) => {
+                                setTemplateUpdateTarget(template);
+                                setTemplateUpdateOpen(true);
+                            }
+                        }, {
+                            text: (template) => template.containerID ? "Stop workspace" : "Start workspace",
+                            onClick: async (template) => {
+                                if (template.containerID) {
+                                    const response = await removeTemplateContainer({
+                                        containerId: template.containerID,
+                                        sub: sub
+                                    });
+                                    if (response.success) {
+                                        myToast.success("Template workspace is successfully stopped. ");
+                                    } else
+                                        myToast.error({
+                                            title: `Fail to stop template workspace`,
+                                            description: errorToToastDescription(response.error),
+                                            comment: CLICK_TO_REPORT,
+                                        });
+                                } else {
+                                    const id = myToast.loading("Starting workspace...");
+                                    const response = await addTemplateContainer(
+                                        {
+                                            imageName: template.imageId,
+                                            memLimit: memory,
+                                            numCPU: CPU,
+                                            section_user_id: sectionUserId,
+                                            template_id: template.id,
+                                            accessRight: "student",
+                                            useFresh: false,
+                                            title: template.name,
+                                            sub: sub,
+                                            event: "TEMPLATE_START_WORKSPACE"
+                                        }
+                                    );
+
+                                    myToast.dismiss(id);
+                                    if (response.success) {
+                                        myToast.success("Template workspace is successfully started.");
+                                    } else
+                                        myToast.error({
+                                            title: `Fail to start template workspace`,
+                                            description: errorToToastDescription(response.error),
+                                            comment: CLICK_TO_REPORT,
+                                        });
+                                }
+                                fetch();
+                            }
+                        }, {
+                            text: (template) => template.active ? "Unpublish" : "Publish",
+                            onClick: async (template) => {
+                                if (!template.active) {
+                                    const id = myToast.loading(`Publishing the ${template.name}...`);
+                                    const response = await activateTemplate(
+                                        {
+                                            templateId: template.id,
+                                            section_user_id: sectionUserId
+                                        }
+                                    );
+                                    myToast.dismiss(id);
+                                    if (response.success) {
+                                        myToast.success(`${template.name} is published.`);
+                                    } else {
+                                        myToast.error({
+                                            title: `Fail to publish template`,
+                                            description: errorToToastDescription(response.error),
+                                            comment: CLICK_TO_REPORT,
+                                        });
+                                    }
+                                } else {
+                                    const id = myToast.loading(
+                                        `Unpublishing the ${template.name}...`
+                                    );
+                                    const response = await deactivateTemplate(
+                                        {
+                                            templateId: template.id,
+                                            section_user_id: sectionUserId
+                                        }
+                                    );
+                                    myToast.dismiss(id);
+                                    if (response.success) {
+                                        myToast.success(`${template.name} is unpublished.`);
+                                    } else
+                                        myToast.error({
+                                            title: `Fail to unpublish template`,
+                                            description: errorToToastDescription(response.error),
+                                            comment: CLICK_TO_REPORT,
+                                        });
+                                }
+                                fetch();
+                            }
                         }
-                        fetch();
-                    }}
-                    onUpdate={(template) => {
-                        setTemplateUpdateTarget(template);
-                        setTemplateUpdateOpen(true);
-                    }}
+                    ]}
                     onWorkspaceCardClick={(template) => {
                         if (template.containerID) {
                             window.open(
@@ -154,90 +263,6 @@ const EnvironmentTemplateWrapper = () => {
                                 "/"
                             );
                         }
-                    }}
-                    onToggle={async (template) => {
-                        if (template.containerID) {
-                            const response = await removeTemplateContainer({
-                                containerId: template.containerID,
-                                sub: sub
-                            });
-                            if (response.success) {
-                                myToast.success("Template workspace is successfully stopped. ");
-                            } else
-                                myToast.error({
-                                    title: `Fail to stop template workspace`,
-                                    description: errorToToastDescription(response.error),
-                                    comment: CLICK_TO_REPORT,
-                                });
-                        } else {
-                            const id = myToast.loading("Starting workspace...");
-                            const response = await addTemplateContainer(
-                                {
-                                    imageName: template.imageId,
-                                    memLimit: memory,
-                                    numCPU: CPU,
-                                    section_user_id: sectionUserId,
-                                    template_id: template.id,
-                                    accessRight: "student",
-                                    useFresh: false,
-                                    title: template.name,
-                                    sub: sub,
-                                    event: "TEMPLATE_START_WORKSPACE"
-                                }
-                            );
-
-                            myToast.dismiss(id);
-                            if (response.success) {
-                                myToast.success("Template workspace is successfully started.");
-                            } else
-                                myToast.error({
-                                    title: `Fail to start template workspace`,
-                                    description: errorToToastDescription(response.error),
-                                    comment: CLICK_TO_REPORT,
-                                });
-                        }
-                        fetch();
-                    }}
-                    onToggleActivation={async (template) => {
-                        if (!template.active) {
-                            const id = myToast.loading(`Publishing the ${template.name}...`);
-                            const response = await activateTemplate(
-                                {
-                                    templateId: template.id,
-                                    section_user_id: sectionUserId
-                                }
-                            );
-                            myToast.dismiss(id);
-                            if (response.success) {
-                                myToast.success(`${template.name} is published.`);
-                            } else {
-                                myToast.error({
-                                    title: `Fail to publish template`,
-                                    description: errorToToastDescription(response.error),
-                                    comment: CLICK_TO_REPORT,
-                                });
-                            }
-                        } else {
-                            const id = myToast.loading(
-                                `Unpublishing the ${template.name}...`
-                            );
-                            const response = await deactivateTemplate(
-                                {
-                                    templateId: template.id,
-                                    section_user_id: sectionUserId
-                                }
-                            );
-                            myToast.dismiss(id);
-                            if (response.success) {
-                                myToast.success(`${template.name} is unpublished.`);
-                            } else
-                                myToast.error({
-                                    title: `Fail to unpublish template`,
-                                    description: errorToToastDescription(response.error),
-                                    comment: CLICK_TO_REPORT,
-                                });
-                        }
-                        fetch();
                     }}
                     environments={environments}
                     sectionUserID={sectionUserId}

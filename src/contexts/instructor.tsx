@@ -33,7 +33,7 @@ type InstructorContextState = {
      * This is called when the context first render in `useEffect()`.
      *
      */
-    fetch: () => void;
+    fetch: () => Promise<void>;
     sectionUserInfo: SectionUserInfo;
     highlightedEnv: Environment;
     setHighlightedEnv: React.Dispatch<React.SetStateAction<Environment>>;

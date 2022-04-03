@@ -115,6 +115,7 @@ type SandboxImage = {
     | "REMOVING"
     | "STARTING_WORKSPACE"
     | "STOPPING_WORKSPACE"
+    | "UPDATING_INTERNAL"
     | "DEFAULT";
 };
 
@@ -152,7 +153,7 @@ type Container = {
   /**
    * the redis patch data
    */
-  data: RedisPatch;
+  redisPatch: RedisPatch;
 };
 
 type Workspace = Template;

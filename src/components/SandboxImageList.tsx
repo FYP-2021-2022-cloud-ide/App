@@ -7,23 +7,18 @@ import SandboxImagesCard from "./SandboImagesCard";
 export type Props = {
   sandboxImages: SandboxImage[];
   onCreateBtnClick: () => void;
-  onSandboxClick: (sandboxImage: SandboxImage) => void;
-  onSandboxDelete: (sandboxImage: SandboxImage) => void;
-  onSandboxUpdate: (sandboxImage: SandboxImage) => void;
-  onSandboxStart: (sandboxImage: SandboxImage) => void;
-  onSandboxStop: (sandboxImage: SandboxImage) => void;
-  onSandboxUpdateInternal: (sandboxImage: SandboxImage) => void;
+  onSandboxClick?: (sandboxImage: SandboxImage) => void;
+  menuItems: (sandboxImage: SandboxImage) => {
+    text: string | ((sandboxImage: SandboxImage) => string),
+    onClick: (sandboxImage: SandboxImage) => void;
+  }[];
 };
 
 const SandboxImageList = ({
   sandboxImages,
   onCreateBtnClick,
   onSandboxClick,
-  onSandboxDelete,
-  onSandboxUpdate,
-  onSandboxStart,
-  onSandboxStop,
-  onSandboxUpdateInternal,
+  menuItems,
 }: Props) => {
   return (
     <div
@@ -37,11 +32,7 @@ const SandboxImageList = ({
             key={sandboxImage.id}
             sandboxImage={sandboxImage}
             onClick={onSandboxClick}
-            onDelete={onSandboxDelete}
-            onUpdate={onSandboxUpdate}
-            onStart={onSandboxStart}
-            onStop={onSandboxStop}
-            onUpdateInternal={onSandboxUpdateInternal}
+            menuItems={menuItems}
             zIndex={sandboxImages.length - index}
             id={`sandbox-card-${index}`}
           ></SandboxImagesCard>

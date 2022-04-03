@@ -12,20 +12,17 @@ export interface Props {
   environments: Environment[];
   onEnvCreateBtnClick: () => void;
   onEnvClick?: (environment: Environment) => void;
-  onEnvDelete?: (environment: Environment) => void;
-  onEnvUpdate?: (environment: Environment) => void;
-  onEnvHighlight?: (environment: Environment) => void;
-  onEnvUpdateInternal?: (environmnet: Environment) => void;
+  menuItems: {
+    text: string | ((environment: Environment) => string)
+    onClick: (environment: Environment) => void;
+  }[];
 }
 
 const EnvironmentList = ({
   environments,
   onEnvCreateBtnClick,
   onEnvClick,
-  onEnvDelete,
-  onEnvHighlight,
-  onEnvUpdateInternal,
-  onEnvUpdate,
+  menuItems
 }: Props) => {
   return (
     <div className="env-list-container">
@@ -54,10 +51,7 @@ const EnvironmentList = ({
                     key={environment.id}
                     environment={environment}
                     onClick={onEnvClick}
-                    onDelete={onEnvDelete}
-                    onUpdate={onEnvUpdate}
-                    onHighlight={onEnvHighlight}
-                    onUpdateInternal={onEnvUpdateInternal}
+                    menuItems={menuItems}
                     zIndex={environments.length - index}
                   ></EnvironmentCard>
                 );

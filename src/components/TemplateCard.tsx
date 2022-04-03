@@ -17,15 +17,12 @@ interface Props {
   template: Template;
   highlighted?: Boolean;
   onClick?: (template: Template) => void;
-  onDelete?: (template: Template) => void;
-  // return the newValue
-  onToggle?: (template: Template, open: boolean) => void;
-  // return the new value
-  onToggleActivation?: (template: Template, active: boolean) => void;
-  onToggleFreshSave?: (freshSave: boolean) => void;
-  onInspect?: (template: Template) => void;
   onWorkspaceCardClick?: (template: Template) => void;
-  onUpdate?: (template: Template) => void;
+  menuItems: {
+    text: string | ((template: Template) => string),
+    onClick: (template: Template) => void;
+  }[]
+
   zIndex?: number;
 }
 
@@ -66,13 +63,8 @@ function TemplateCard({
   template,
   highlighted: _highlighted = false,
   onClick,
-  onUpdate,
-  onDelete,
-  onToggle,
-  onToggleActivation,
-  onInspect,
   onWorkspaceCardClick,
-  onToggleFreshSave,
+  menuItems,
   zIndex,
 }: Props) {
   const { environments, highlightedEnv, setHighlightedEnv } = useInstructor();
@@ -82,42 +74,11 @@ function TemplateCard({
   const belong = environments.findIndex(
     (e) => e.id === template.environment_id
   );
-  var meunItems: MenuItem[] = [];
-  if (onDelete)
-    meunItems.push({
-      text: "Delete",
-      onClick: () => {
-        onDelete(template);
-      },
-    });
-  if (onUpdate)
-    meunItems.push({
-      text: "Update",
-      onClick: () => {
-        onUpdate(template);
-      },
-    });
-  if (onToggle)
-    meunItems.push({
-      text: template.containerID ? "Stop workspace" : "Start workspace",
-      onClick: () => {
-        if (onToggle) {
-          onToggle(template, !Boolean(template.containerID));
-        }
-      },
-    });
-  if (onToggleActivation) {
-    meunItems.push({
-      text: template.active ? "Unpublish" : "Publish",
-      onClick: () => {
-        onToggleActivation(template, !template.active);
-      },
-    });
-  }
+
   if (template.active)
-    meunItems.push({
+    menuItems.push({
       text: "Share link",
-      onClick: () => {
+      onClick: (template) => {
         myToast.success("link to copied to clipboard.");
         navigator.clipboard.writeText(
           "https://codespace.ust.dev/quickAssignmentInit/" + template.id
@@ -205,7 +166,10 @@ function TemplateCard({
         </div>
 
         {/* <div className="flex flex-col justify-between h-full items-center"> */}
-        <Menu items={meunItems}></Menu>
+        <Menu items={menuItems.map(item => ({
+          text: typeof item.text == "string" ? item.text : item.text(template),
+          onClick: () => item.onClick(template)
+        }))}></Menu>
 
       </div>
       {/* </div> */}

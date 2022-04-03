@@ -5,32 +5,56 @@ export const patchSandboxes = (
   containers: Container[]
 ) => {
   const temp = sandboxImages.map((si) => {
-    if (
-      containers.some(
-        (container) =>
-          container.data.cause == "SANDBOX_START_WORKSPACE" &&
-          container.data.data == si.id
-      )
-    ) {
-      return {
-        ...si,
-        status: "STARTING_WORKSPACE",
-      };
-    } else if (
-      containers.some(
-        (container) =>
-          container.status == "REMOVING" && container.data.data == si.id
-      )
-    ) {
-      return {
-        ...si,
-        status: "REMOVING_WORKSPACE",
-      };
-    } else
-      return {
-        ...si,
-        status: "DEFAULT",
-      };
-  }) as SandboxImage[];
+    for (let container of containers) {
+      if (!container.data.data && container.data.sourceId == si.id) {
+        // it is a normal workspace
+        if (container.containerID == "")
+          return {
+            ...si,
+            status: "STARTING_WORKSPACE",
+          };
+        else {
+          if (container.status == "REMOVING")
+            return {
+              ...si,
+              status: "STOPPING_WORKSPACE",
+            };
+          else
+            return {
+              ...si,
+              sandboxesId: container.containerID,
+              status: "DEFAULT",
+            };
+        }
+      }
+      if (container.data.sourceId == si.id) {
+        // it is a temporary workspace
+        if (container.containerID == "")
+          return {
+            ...si,
+            status: "STARTING_WORKSPACE",
+          };
+        else {
+          if (container.status == "REMOVING") {
+            return {
+              ...si,
+              status: "STOPPING_WORKSPACE",
+            };
+          } else
+            return {
+              ...si,
+              sandboxesId: container.containerID,
+              status: "UPDATING_INTERNAL",
+            };
+        }
+      }
+    }
+    // the container not found
+    return {
+      ...si,
+      sandboxesId: "",
+      status: "DEFAULT",
+    };
+  }) as SandboxImage[]; // otherwise the returned array will have status : string which is not compatible with SandboxImage
   return temp;
 };

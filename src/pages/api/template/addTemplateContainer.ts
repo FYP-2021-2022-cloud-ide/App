@@ -44,13 +44,14 @@ export default async function handler(
     await redisHelper.insert.workspaces(sub, {
       title,
       tempId,
+      sourceId: template_id,
       containerId: "",
       cause: event,
     });
     grpcClient.addTemplateContainer(
       docReq,
       async function (err, GoLangResponse: AddContainerReply) {
-        if (err || !GoLangResponse.success) {
+        if (err || !GoLangResponse || !GoLangResponse.success) {
           // the request fail so we remove it from redis
           await redisHelper.remove.workspaces(sub, tempId);
         } else {

@@ -1,8 +1,10 @@
 import { Toaster, Toast, ToastBar } from "react-hot-toast";
 import Twemoji from "react-twemoji";
+import { useCnails } from "../contexts/cnails";
 import myToast, { loadingTime } from "./CustomToast";
 
 const CustomToaster = () => {
+
     return <Toaster
         position="bottom-right"
         toastOptions={{

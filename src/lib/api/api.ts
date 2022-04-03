@@ -466,6 +466,10 @@ type ContainerAddRequest = {
   sub: string;
   accessRight: string;
   title: string;
+  /**
+   * the id of the env, template or workspace
+   */
+  sourceId: string;
 } & EventFormDataPair;
 
 export type ContainerRemoveRequest = {

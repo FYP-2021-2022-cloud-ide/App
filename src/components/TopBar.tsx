@@ -57,6 +57,8 @@ const TopBar = ({ sub, name, email }: props) => {
       }
     })()
   }, [])
+
+  
   const router = useRouter();
   const SearchBar = () => {
     return (

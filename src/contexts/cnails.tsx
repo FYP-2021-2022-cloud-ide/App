@@ -19,6 +19,7 @@ import { FetchCookieResponse } from "../lib/api/api";
 import _ from "lodash";
 import CustomToaster from "../components/CustomToaster";
 import { getType, isTemporary } from "../lib/containerHelper";
+import useInterval from "../components/useInterval";
 
 const defaultQuota = Number(3); // process.env.CONTAINERSLIMIT
 
@@ -101,22 +102,25 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
   const _fetchContainers = async (sub: string) => {
     const response = await listContainers(sub);
     if (response.success) {
-      const containers = response.containers.map(container => (container.redisPatch ? {
+      const newContainers = response.containers.map(container => (container.redisPatch ? {
         ...container,
         isTemporary: isTemporary(container),
-        data: container.redisPatch,
+        redisPatch: container.redisPatch,
         type: getType(container),
         status: container.containerID ? "DEFAULT" : "CREATING",
       } as Container : {
         ...container,
-        isTemporary: undefined,
+        isTemporary: false,
         type: "UNKNOWN",
-        data: {},
+        redisPatch: {},
         status: "DEFAULT"
       } as unknown as Container))
-      console.log(containers)
-      setContainers(containers);
-      return containers
+      if (!_.isEqual(containers, newContainers)) {
+        console.log("containers are different", newContainers)
+        setContainers(newContainers);
+      }
+
+      return newContainers
     } else {
       console.error(
         "[ ❌ ] : fail to fetch containers' information ",
@@ -230,6 +234,13 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
       if (unsubscribe) unsubscribe();
     };
   }, []);
+
+  /**
+   * container will be fetch every 10 seconds 
+   */
+  useInterval(() => {
+    _fetchContainers(sub)
+  }, 10000)
 
   if (sub == "" || userId == "") {
     return <></>;

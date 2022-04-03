@@ -15,12 +15,11 @@ import {
   SandBoxIdRequest,
 } from "../../../proto/dockerGet/dockerGet";
 
-export default async function handler(
+export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<SuccessStringResponse>
 ) {
   const { sandboxId, userId } = JSON.parse(req.body) as RemoveSandboxRequest;
-  console.log(sandboxId, userId);
   try {
     var docReq = SandBoxIdRequest.fromPartial({
       sessionKey: fetchAppSession(req),

@@ -11,14 +11,19 @@ export type Props = {
   environments: Environment[];
   sectionUserID: string;
   highlightedEnv?: Environment;
+  onWorkspaceCardClick?: (template: Template) => void;
   onCreate?: () => void;
   onClick?: (template: Template) => void;
-  onDelete?: (template: Template) => void;
-  onUpdate?: (template: Template) => void;
-  onToggle?: (template: Template, open: boolean) => void;
-  onWorkspaceCardClick?: (template: Template) => void;
-  onInspect?: (template: Template) => void;
-  onToggleActivation?: (template: Template, active: boolean) => void;
+  menuItems: {
+    text: string | ((template: Template) => string),
+    onClick: (template: Template) => void;
+  }[]
+
+  // onDelete?: (template: Template) => void;
+  // onUpdate?: (template: Template) => void;
+  // onToggle?: (template: Template, open: boolean) => void;
+  // onInspect?: (template: Template) => void;
+  // onToggleActivation?: (template: Template, active: boolean) => void;
 };
 
 const TemplateList = ({
@@ -26,12 +31,9 @@ const TemplateList = ({
   highlightedEnv,
   onClick,
   onCreate,
-  onDelete,
-  onToggle,
-  onToggleActivation,
+
   onWorkspaceCardClick,
-  onInspect,
-  onUpdate,
+  menuItems
 }: Props) => {
   return (
     <div className="flex flex-col w-full">
@@ -57,7 +59,7 @@ const TemplateList = ({
               .map((template, index) => {
                 const highlighted = Boolean(
                   highlightedEnv &&
-                    template.environment_id === highlightedEnv.id
+                  template.environment_id === highlightedEnv.id
                 );
                 return (
                   <TemplateCard
@@ -67,26 +69,11 @@ const TemplateList = ({
                     onClick={() => {
                       if (onClick) onClick(template);
                     }}
-                    onDelete={() => {
-                      if (onDelete) onDelete(template);
-                    }}
-                    onToggle={(template, open) => {
-                      if (onToggle) onToggle(template, open);
-                    }}
-                    onUpdate={(template) => {
-                      if (onUpdate) onUpdate(template);
-                    }}
                     onWorkspaceCardClick={(template) => {
                       if (onWorkspaceCardClick) onWorkspaceCardClick(template);
                     }}
-                    onInspect={(template) => {
-                      if (onInspect) onInspect(template);
-                    }}
-                    onToggleActivation={(template, active) => {
-                      if (onToggleActivation)
-                        onToggleActivation(template, active);
-                    }}
                     zIndex={templates.length - index}
+                    menuItems={menuItems}
                   ></TemplateCard>
                 );
               })}
