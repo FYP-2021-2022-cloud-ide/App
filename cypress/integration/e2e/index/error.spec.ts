@@ -10,7 +10,7 @@ describe("Error test", () => {
   });
 
   before(() => {
-    cy.login(cookies);
+    cy.login();
     cy.visit(hostname);
   });
   beforeEach(() => {
