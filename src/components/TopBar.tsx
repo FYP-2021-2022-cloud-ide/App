@@ -15,6 +15,7 @@ import { useRouter } from "next/router";
 import useLocalStorage from "use-local-storage";
 import { useEffect } from "react";
 import { SystemMessageResponse } from "../lib/api/api";
+import useInterval from "./useInterval";
 
 
 interface props {
@@ -40,7 +41,10 @@ const TopBar = ({ sub, name, email }: props) => {
     show: false,
   })
 
-  useEffect(() => {
+  /**
+   * this hook fetch system message every one minute.
+   */
+  useInterval(() => {
     (async () => {
       const response = await (await fetch("/api/getSystemMessage")).json() as SystemMessageResponse
       if (response.success == true) {
@@ -56,7 +60,7 @@ const TopBar = ({ sub, name, email }: props) => {
         console.error(response.error)
       }
     })()
-  }, [])
+  }, 1000 * 60)
 
 
   const router = useRouter();

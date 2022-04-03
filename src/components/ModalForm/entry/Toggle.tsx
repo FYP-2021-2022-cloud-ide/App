@@ -2,8 +2,8 @@ import { EntryProps, ToggleEntry } from "../types";
 import Toggle from "../../Toggle";
 import Custom from "./Custom";
 
-const component = (props: EntryProps) => {
-  const entry = props.entry as ToggleEntry;
+function component <T>(props: EntryProps<T>) {
+  const entry = props.entry as ToggleEntry<T>;
   if (entry.type != "toggle") return <></>;
   return (
     <Custom

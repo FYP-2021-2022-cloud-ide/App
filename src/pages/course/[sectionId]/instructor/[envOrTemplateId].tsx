@@ -34,10 +34,10 @@ const TemplateBoard = ({ template }: { template: Template }) => {
     // setData(
     //   generateExampleData(template.active ? Math.ceil(Math.random() * 200) : 0)
     // );
-    const response = await getTemplateStudentWorkspace(
-      template.id,
-      sectionUserInfo.sectionUserId
-    );
+    const response = await getTemplateStudentWorkspace({
+      templateId: template.id,
+      section_user_id:sectionUserInfo.sectionUserId
+    });
     if (response.success) {
       setData(
         response.studentWorkspaces.map((w) => ({

@@ -54,9 +54,9 @@ const Input = memo(
   () => true
 );
 
-const component = (props: EntryProps) => {
+function component<T>(props: EntryProps<T>) {
   const { sectionId, id } = props;
-  const entry = props.entry as InputEntry;
+  const entry = props.entry as InputEntry<T>;
   if (entry.type != "input") return <></>;
   return (
     <Custom

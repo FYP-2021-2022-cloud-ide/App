@@ -30,7 +30,7 @@ export default function handler(
         // console.log(GoLangResponse.containerInfo == undefined);
         var containersInfo = GoLangResponse.containerInfo;
         var containers = GoLangResponse.containers;
-        console.log(containers);
+        // console.log(containers);
         res.json({
           success: GoLangResponse.success,
           error: {

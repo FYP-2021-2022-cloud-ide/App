@@ -1,12 +1,9 @@
 import { Template } from "../../lib/cnails";
-import { Option } from "../ListBox"
 import { useCnails } from "../../contexts/cnails"
 import { useInstructor } from "../../contexts/instructor"
 import ModalForm from "../ModalForm/ModalForm"
 import myToast from "../CustomToast";
-import { CPU, getEnvOptions, getValidName, memory } from "../../lib/formHelper"
-import { containerAPI } from "../../lib/api/containerAPI";
-import TempContainerToast from "../TempContainerToast"
+import { getValidName } from "../../lib/formHelper"
 import { templateAPI } from "../../lib/api/templateAPI";
 import { errorToToastDescription } from "../../lib/errorHelper";
 import { CLICK_TO_REPORT } from "../../lib/constants";

@@ -2,8 +2,8 @@ import ListBox from "../../ListBox";
 import { EntryProps, ListBoxEntry } from "../types";
 import Custom from "./Custom";
 
-const component = (props: EntryProps) => {
-  const entry = props.entry as ListBoxEntry;
+function component<T>(props: EntryProps) {
+  const entry = props.entry as ListBoxEntry<T>;
   if (entry.type != "listbox") return <></>;
   return (
     <Custom

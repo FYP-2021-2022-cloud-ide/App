@@ -166,7 +166,6 @@ export default function Page() {
                 : `/volumes/${userId}/persist`;
               formData.append("filePath", target);
               let data = await uploadFiles(userId, formData);
-              console.log(data);
               progressRef1.current = "";
               if (data.success) return undefined;
               else {
@@ -197,7 +196,6 @@ export default function Page() {
             }}
             handleMoveFromAnotherTree={async (_treeData, dropTarget) => {
               progressRef1.current = status.transfering;
-              console.log("something");
               const getTarget = () => {
                 if (!dropTarget) return ref1.current.rootId;
                 if (dropTarget && dropTarget.droppable)

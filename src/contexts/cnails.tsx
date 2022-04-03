@@ -20,6 +20,8 @@ import _ from "lodash";
 import CustomToaster from "../components/CustomToaster";
 import { getType, isTemporary } from "../lib/containerHelper";
 import useInterval from "../components/useInterval";
+import Modal from "../components/Modal";
+
 
 const defaultQuota = Number(3); // process.env.CONTAINERSLIMIT
 
@@ -265,6 +267,7 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
       >
         <CustomToaster />
         {children}
+
       </CnailsContext.Provider>
     );
   }

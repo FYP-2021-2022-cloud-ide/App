@@ -33,13 +33,6 @@ export default function handler(
             error: GoLangResponse.error?.error,
           },
           notifications: nts.map((nt) => {
-            // let newBody=
-            // nt.body.slice(0,nt.body.indexOf("Code: ")+6)
-            // +"\n```js"+
-            // nt.body.slice(nt.body.indexOf("Code: ")+6,nt.body.indexOf("Comment"))+
-            // "```\n"+
-            // nt.body.slice(nt.body.indexOf("Comment"))
-            console.log(nt.body);
             var sender = nt.sender;
             return {
               id: nt.id,

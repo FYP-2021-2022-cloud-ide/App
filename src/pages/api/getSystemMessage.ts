@@ -10,8 +10,8 @@ export default async function handler(
   res.json({
     success: true,
     systemMessage: {
-      id: "00002",
-      text: "The personal workspace is being maintained. Try something else.",
+      id: "00003",
+      text: "The instructor page under maintained. The personal workspace part should be the most stable.",
     },
   });
   res.status(200).end();

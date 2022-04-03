@@ -1,6 +1,5 @@
-import { InformationCircleIcon } from "@heroicons/react/solid";
-import { memo, useEffect, useRef } from "react";
-import { EntryProps, TextAreaEntry, ValidationOutput } from "../types";
+import { memo } from "react";
+import { EntryProps, TextAreaEntry } from "../types";
 import Custom from "./Custom";
 
 const TextArea = memo(
@@ -32,8 +31,8 @@ const TextArea = memo(
   () => true
 );
 
-const component = (props: EntryProps) => {
-  const entry = props.entry as TextAreaEntry;
+function component<T>(props: EntryProps<T>) {
+  const entry = props.entry as TextAreaEntry<T>;
   if (entry.type != "textarea") return <></>;
   return (
     <Custom

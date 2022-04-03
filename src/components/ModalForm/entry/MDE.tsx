@@ -109,10 +109,10 @@ const MDE = memo(
   () => true
 );
 
-const component = (props: EntryProps) => {
+function component(props: EntryProps<T>) {
   const [focusTrapActive, setFocusTrapActive] = useState(false);
   const mdeRef = useRef<EasyMDE>();
-  const entry = props.entry as MarkdownEntry;
+  const entry = props.entry as MarkdownEntry<T>;
   useEffect(() => {
     if (focusTrapActive) {
       const handleTab = (event: KeyboardEvent) => {

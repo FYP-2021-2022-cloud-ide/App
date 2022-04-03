@@ -16,8 +16,7 @@ export const patchTemplates = (
     for (let container of containers) {
       if (
         !container.redisPatch.data &&
-        container.redisPatch.sourceId &&
-        template.id
+        container.redisPatch.sourceId == template.id
       ) {
         // it is a template workspace
         if (container.containerID == "")
