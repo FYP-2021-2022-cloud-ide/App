@@ -1,17 +1,11 @@
 import { Template } from "../../lib/cnails";
-import { useCnails } from "../../contexts/cnails"
 import { useInstructor } from "../../contexts/instructor"
 import ModalForm from "../ModalForm/ModalForm"
-import myToast from "../CustomToast";
 import { getValidName } from "../../lib/formHelper"
-import { templateAPI } from "../../lib/api/templateAPI";
-import { errorToToastDescription } from "../../lib/errorHelper";
-import { CLICK_TO_REPORT } from "../../lib/constants";
 import { FormStructure } from "../ModalForm/types";
 
 export type UpdateTemplateFormData = {
     update_template: {
-        // update_internal: string;
         name: string;
         description: string;
         allow_notification: boolean;
@@ -28,9 +22,7 @@ export type Props = {
 }
 
 const UpdateTemplateForm = ({ isOpen, setOpen, target }: Props) => {
-    const { sub } = useCnails()
-    const { templates, fetch, sectionUserInfo } = useInstructor();
-    const { updateTemplate } = templateAPI
+    const { templates, updateTemplateInfo } = useInstructor();
     const validName = getValidName(
         templates.map((t) => t.name),
         "Assignment Template",
@@ -45,88 +37,6 @@ const UpdateTemplateForm = ({ isOpen, setOpen, target }: Props) => {
         formStructure={target ? {
             update_template: {
                 entries: {
-                    // update_internal: {
-                    //   type: "custom",
-                    //   defaultValue: "",
-                    //   label: "Update internal",
-                    //   tooltip: "Open a temp workspace for you to update the template.",
-                    //   validate: (data) => {
-                    //     if (
-                    //       (data as UpdateTemplateFormData).update_template
-                    //         .update_internal == "loading"
-                    //     ) {
-                    //       return {
-                    //         ok: false,
-                    //         message: "temporary workspace is creating...",
-                    //       };
-                    //     } else {
-                    //       return { ok: true };
-                    //     }
-                    //   },
-                    //   node: (onChange, currentValue, formData) => {
-                    //     const { addTempContainer } = containerAPI;
-                    //     return (
-                    //       <div>
-                    //         {currentValue != "" ? (
-                    //           <a
-                    //             className="text-xs text-blue-500 underline justify-center"
-                    //             href={
-                    //               "https://codespace.ust.dev/user/container/" +
-                    //               currentValue +
-                    //               "/"
-                    //             }
-                    //             target="_blank"
-                    //             rel="noreferrer"
-                    //           >
-                    //             Go to temp workspace
-                    //           </a>
-                    //         ) : (
-                    //           <button
-                    //             className="btn btn-wide btn-sm dark:btn-primary"
-                    //             onClick={async (e) => {
-                    //               const btn = e.currentTarget;
-                    //               btn.classList.add("loading");
-                    //               btn.textContent = "Loading";
-                    //               onChange("loading");
-                    //               const {
-                    //                 update_template: { name },
-                    //               } = formData as UpdateTemplateFormData;
-                    //               const response = await addTempContainer(
-                    //                 memory,
-                    //                 CPU,
-                    //                 target.imageId,
-                    //                 sub,
-                    //                 "root",
-                    //                 "TEMPLATE_UPDATE",
-                    //                 name
-                    //               );
-                    //               console.log(response);
-                    //               btn.classList.remove("loading");
-                    //               btn.textContent = "Click me";
-                    //               if (response.success) {
-                    //                 const link =
-                    //                   "https://codespace.ust.dev/user/container/" +
-                    //                   response.containerID +
-                    //                   "/";
-
-                    //                 window.open(link);
-                    //                 onChange(response.containerID);
-                    //               } else
-                    //                 myToast.error({
-                    //                   title:
-                    //                     "Fail to remove temporary workspace for this template",
-                    //                   description: errorToToastDescription(response.error),
-                    //                   comment: CLICK_TO_REPORT,
-                    //                 });
-                    //             }}
-                    //           >
-                    //             Click me
-                    //           </button>
-                    //         )}
-                    //       </div>
-                    //     );
-                    //   },
-                    // },
                     name: {
                         type: "input",
                         defaultValue: target.name,
@@ -172,27 +82,18 @@ const UpdateTemplateForm = ({ isOpen, setOpen, target }: Props) => {
                         label: "Time Limit(in minutes) ",
                         description: "Time Limit of the exam",
                         conditional: (data) => {
-                            return (data as UpdateTemplateFormData).update_template.is_exam;
+                            return data.update_template.is_exam;
                         },
+                        validate: (data) => {
+                            return Number(data.update_template.time_limit) > 0 ? { ok: true } : { ok: false, message: "Time limit must be positive." }
+                        }
                     },
                 },
             },
         } as FormStructure<UpdateTemplateFormData> : {}}
         title="Update Template"
-        // onClose={async ({ update_template: data }: UpdateTemplateFormData, isEnter) => {
-        //     const { update_internal: containerId } = data;
-        //     if (containerId != "" && !isEnter) {
-        //         // remove the temp container
-        //         const response = await removeTempContainer(containerId, sub);
-        //         if (response.success)
-        //             console.log("temp container is successfully removed.");
-        //         else
-        //             console.error("fail to remove temp container", containerId, sub);
-        //         fetch();
-        //     }
-        // }}
         onEnter={async ({ update_template: data }) => {
-            const id = myToast.loading("Updating the template...");
+
             const {
                 name,
                 description,
@@ -200,30 +101,7 @@ const UpdateTemplateForm = ({ isOpen, setOpen, target }: Props) => {
                 time_limit,
                 is_exam,
             } = data;
-
-            const response = await updateTemplate(
-                {
-                    templateId: target.id,
-                    templateName: name,
-                    description: description,
-                    section_user_id: sectionUserInfo.sectionUserId,
-                    containerId: "",
-                    isExam: is_exam,
-                    timeLimit: Number(time_limit),
-                    allow_notification: allow_notification
-                }
-            );
-            myToast.dismiss(id);
-            if (response.success) {
-                myToast.success("Template is updated.");
-            } else {
-                myToast.error({
-                    title: "Fail to update template",
-                    description: errorToToastDescription(response.error),
-                    comment: CLICK_TO_REPORT,
-                });
-            }
-            fetch();
+            await updateTemplateInfo(target.id, name, description, is_exam, Number(time_limit), allow_notification)
         }}
     ></ModalForm>
 }

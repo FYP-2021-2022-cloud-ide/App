@@ -16,6 +16,7 @@ import courseAPI from "../lib/api/courses";
 
 type InstructorContextState = {
     environments: Environment[];
+    getEnvironment: (id: string) => Environment;
     setEnvironments: React.Dispatch<React.SetStateAction<Environment[]>>;
     /**
    * a function to fetch the new environment list.
@@ -26,6 +27,7 @@ type InstructorContextState = {
    */
     fetchEnvironments: () => Promise<Environment[]>
     templates: Template[];
+    getTemplate: (id: string) => Template;
     setTemplates: React.Dispatch<React.SetStateAction<Template[]>>;
     /**
    * a function to fetch the new template list.
@@ -55,6 +57,16 @@ type InstructorContextState = {
      * it refers the libraries. 
      */
     createEnvironment: (name: string, description: string, id: string | string[]) => Promise<void>;
+    /**
+     * @param envId the update target 
+     * @param name new name 
+     * @param description new description
+     */
+    updateEnvironmentInfo: (envId: string, name: string, description: string) => Promise<void>;
+    updateEnvironmentInternal: (envId: string, containerId: string) => Promise<void>;
+    createTemplate: (name: string, description: string, environmentId: string, containerId: string, active: boolean, isExam: boolean, timeLimit: number, allowNotification: boolean) => Promise<void>
+    updateTemplateInfo: (templateId: string, name: string, description: string, isExam: boolean, timeLimit: number, allowNotification: boolean) => Promise<void>
+    updateTemplateInternal: (templateId: string, containerId: string) => Promise<void>
 };
 
 
@@ -72,10 +84,8 @@ export const InstructorProvider = ({
     children: JSX.Element;
     sectionUserInfo: SectionUserInfo;
 }) => {
-    const { listEnvironments, addEnvironment, buildEnvironment } = envAPI;
-    const { listTemplates } = templateAPI;
     const { sub, userId } = useCnails();
-    const { containers, setContainers, fetchContainers } = useContainers();
+    const { containers, fetchContainers } = useContainers();
     const { sendNotificationAnnouncement } = courseAPI
     const { fetchMessages } = useMessaging()
     const [environments, setEnvironments] = useState<Environment[]>();
@@ -83,6 +93,8 @@ export const InstructorProvider = ({
     const [highlightedEnv, setHighlightedEnv] = useState<Environment>();
     const { cancelablePromise } = useCancelablePromise();
 
+    const getEnvironment = (id: string) => environments.find(env => env.id == id)
+    const getTemplate = (id: string) => templates.find(t => t.id == id);
     const fetchEnvironments = async (_containers: Container[] = containers) => {
         const afterResponse = (response: EnvironmentListResponse, mount: boolean = true) => {
             if (response.success) {
@@ -98,7 +110,7 @@ export const InstructorProvider = ({
             }
         }
         try {
-            const response = await cancelablePromise(listEnvironments({
+            const response = await cancelablePromise(envAPI.listEnvironments({
                 sectionId: sectionUserInfo.sectionId, sub: sub
             }));
             return afterResponse(response)
@@ -126,7 +138,7 @@ export const InstructorProvider = ({
                 });
             }
         }
-        const response = await listTemplates({
+        const response = await templateAPI.listTemplates({
             sectionid: sectionUserInfo.sectionId, sub: sub
         });
         return afterResponse(response)
@@ -158,7 +170,7 @@ export const InstructorProvider = ({
         let response: EnvironmentAddResponse
         if (typeof id == "string") {
             // this is a custom environment 
-            response = await buildEnvironment(
+            response = await envAPI.buildEnvironment(
                 {
                     name: name,
                     description: description,
@@ -168,13 +180,14 @@ export const InstructorProvider = ({
             );
         } else {
             // this is a predefined environment 
-            response = await addEnvironment({
+            response = await envAPI.addEnvironment({
                 libraries: id,
                 name: name,
                 description: description,
                 section_user_id: sectionUserInfo.sectionUserId,
             })
         }
+        myToast.dismiss(toastId);
         if (response.success) {
             myToast.success("Environment is created successfully.")
         } else {
@@ -184,12 +197,100 @@ export const InstructorProvider = ({
                 comment: CLICK_TO_REPORT
             })
         }
+        // we need the fetchContainers() because the build environment api 
+        // not only create a env but also remove the temp container 
+        // therefore these two places need rerender.
+        await fetchContainers()
         await fetchEnvironments();
+
+    }
+
+    const updateEnvironmentInfo = async (envId: string, name: string, description: string) => {
+        const id = myToast.loading("Updating an environment...")
+        const response = await envAPI.updateEnvironment(
+            {
+                envId,
+                name,
+                description,
+                section_user_id: sectionUserInfo.sectionUserId,
+                containerId: ""
+            }
+        );
+        myToast.dismiss(id);
+        if (response.success) {
+            myToast.success("Environment is updated.");
+        } else {
+            myToast.error({
+                title: "Fail to update environment",
+                description: errorToToastDescription(response.error),
+                comment: CLICK_TO_REPORT,
+            });
+        }
+        await fetchEnvironments()
+    }
+
+    const updateEnvironmentInternal = async (envId: string, containerId: string) => {
+
+    }
+
+    const createTemplate = async (name: string, description: string, environmentId: string, containerId: string, active: boolean, isExam: boolean, timeLimit: number, allowNotification: boolean) => {
+        const id = myToast.loading("Building your template...");
+        const response = await templateAPI.addTemplate(
+            {
+                templateName: name,
+                description: description,
+                section_user_id: sectionUserInfo.sectionUserId,
+                environment_id: environmentId,
+                assignment_config_id: "",
+                containerId: containerId,
+                active: active,
+                isExam: isExam,
+                timeLimit: Number(timeLimit),
+                allow_notification: allowNotification,
+            }
+        );
+        myToast.dismiss(id);
+        if (response.success) {
+            myToast.success("Template is created successfully");
+        } else {
+            myToast.error({
+                title: "Fail to create template",
+                description: errorToToastDescription(response.error),
+                comment: CLICK_TO_REPORT
+            })
+        }
+        await fetchContainers();
+        await fetchTemplates()
+    }
+
+    const updateTemplateInfo = async (templateId: string, name: string, description: string, isExam: boolean, timeLimit: number, allowNotification: boolean) => {
+        const toastId = myToast.loading("Updating the template...");
+        const response = await templateAPI.updateTemplate(
+            {
+                templateId,
+                templateName: name,
+                description,
+                section_user_id: sectionUserInfo.sectionUserId,
+                containerId: "",
+                isExam,
+                timeLimit,
+                allow_notification: allowNotification
+            }
+        );
         myToast.dismiss(toastId);
+        if (response.success) {
+            myToast.success("Template is updated.");
+        } else {
+            myToast.error({
+                title: "Fail to update template",
+                description: errorToToastDescription(response.error),
+                comment: CLICK_TO_REPORT,
+            });
+        }
+        await fetchTemplates()
     }
 
     const fetch = async () => {
-        const containers = await fetchContainers();
         await fetchEnvironments(containers);
         await fetchTemplates(containers)
     };
@@ -217,9 +318,11 @@ export const InstructorProvider = ({
         <InstructorContext.Provider
             value={{
                 environments,
+                getEnvironment,
                 setEnvironments,
                 fetchEnvironments,
                 templates,
+                getTemplate,
                 setTemplates,
                 fetchTemplates,
                 fetch,
@@ -228,6 +331,9 @@ export const InstructorProvider = ({
                 setHighlightedEnv,
                 broadcastAnnouncement,
                 createEnvironment,
+                updateEnvironmentInfo,
+                createTemplate,
+                updateTemplateInfo,
             }}
         >
             {children}

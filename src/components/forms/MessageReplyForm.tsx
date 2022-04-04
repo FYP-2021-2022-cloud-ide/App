@@ -1,6 +1,3 @@
-import { useCnails } from "../../contexts/cnails";
-import { notificationAPI } from "../../lib/api/notificationAPI";
-
 import ModalForm from "../ModalForm/ModalForm";
 import { FormStructure } from "../ModalForm/types";
 import { Message } from "../../lib/cnails";
@@ -25,7 +22,6 @@ type Props = {
 }
 
 const MessageReplyForm = ({ isOpen, setOpen, target }: Props) => {
-    const { userId } = useCnails();
     const { sendMessage } = useMessaging()
     return <ModalForm
         isOpen={isOpen}

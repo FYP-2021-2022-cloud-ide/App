@@ -30,6 +30,7 @@ type Props = {
 
 /**
  * The temp container toast to keep the consistency. When cancel button is clicked, the temp container will be removed. 
+ * The remove container API is called in this component so you don't need to handle this yourself.
  * An `onOK` props need is needed to know that what to do if user click ok button. 
  * 
  * @remark you don't need to handle the `toast.dismiss` by yourself because the component helped you do that

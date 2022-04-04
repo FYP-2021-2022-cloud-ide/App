@@ -13,6 +13,7 @@ import { Template } from "../../lib/cnails";
 import { errorToToastDescription } from "../../lib/errorHelper";
 import { CLICK_TO_REPORT } from "../../lib/constants";
 import { useWarning } from "../../contexts/warning";
+import { useContainers } from "../../contexts/containers";
 
 export type CreateTemplateFormData = {
     create_template: {
@@ -32,39 +33,38 @@ export type Props = {
 
 const CreateTemplateForm = ({ isOpen, setOpen }: Props) => {
 
-    const { sub, fetchContainers, setContainers } = useCnails()
-    const { environments, templates, sectionUserInfo, fetch, fetchTemplates } = useInstructor()
+    const { sub } = useCnails()
+    const { setContainers, createContainer } = useContainers();
+    const { environments, templates, sectionUserInfo, createTemplate } = useInstructor()
     const { waitForConfirm } = useWarning();
-    const { addTempContainer } = containerAPI;
-    const { addTemplate } = templateAPI;
     const envOptions = getEnvOptions(environments)
     const validName = getValidName(
         templates.map((t) => t.name),
         "Assignment Template"
     )
-    const addCreatingWorkspace = (req: AddTemplateRequest) => {
-        setContainers(containers => {
-            return [
-                ...containers,
-                {
-                    title: req.templateName,
-                    status: "CREATING",
-                    subTitle: "",
-                    startAt: "",
-                    containerID: "",
-                    type: "SANDBOX",
-                    isTemporary: true,
-                    redisPatch: {
-                        tempId: "",
-                        cause: "TEMPLATE_CREATE",
-                        containerId: "",
-                        sourceId: "",
-                        title: req.templateName,
-                    }
-                }
-            ]
-        })
-    }
+    // const addCreatingWorkspace = (req: AddTemplateRequest) => {
+    //     setContainers(containers => {
+    //         return [
+    //             ...containers,
+    //             {
+    //                 title: req.templateName,
+    //                 status: "CREATING",
+    //                 subTitle: "",
+    //                 startAt: "",
+    //                 containerId: "",
+    //                 type: "SANDBOX",
+    //                 isTemporary: true,
+    //                 redisPatch: {
+    //                     tempId: "",
+    //                     cause: "TEMPLATE_CREATE",
+    //                     containerId: "",
+    //                     sourceId: "",
+    //                     title: req.templateName,
+    //                 }
+    //             }
+    //         ]
+    //     })
+    // }
 
 
     return <ModalForm
@@ -101,13 +101,6 @@ const CreateTemplateForm = ({ isOpen, setOpen }: Props) => {
                         defaultValue: "",
                         label: "Description (Optional)",
                     },
-                    // schedule_publish: {
-                    //   label: "Schedule publishig period",
-                    //   description: "choose a date time period",
-                    //   tooltip: "do something",
-                    //   type: "datetime",
-                    //   defaultValue: moment().format("YYYY-MM-DDTHH:mm"),
-                    // },
                     allow_notification: {
                         type: "toggle",
                         defaultValue: false,
@@ -126,33 +119,23 @@ const CreateTemplateForm = ({ isOpen, setOpen }: Props) => {
                     time_limit: {
                         type: "input",
                         defaultValue: "60",
-                        label: "Time Limit(in minutes) ",
+                        label: "Time Limit (in minutes) ",
                         description: "Time Limit of the exam",
                         conditional: (data) => {
                             return data.create_template
                                 .is_exam;
                         },
+                        validate: (data) => {
+                            return Number(data.create_template.time_limit) > 0 ? { ok: true } : { ok: false, message: "Time limit must be positive." }
+                        }
                     },
                 },
             },
         } as FormStructure<CreateTemplateFormData>}
         title="Create Template"
         onEnter={async ({ create_template: data }) => {
-            const toastId = myToast.loading("Creating a temporary workspace...");
-            const templateRequest: AddTemplateRequest = {
-                templateName: data.name,
-                description: data.description,
-                section_user_id: sectionUserInfo.sectionUserId,
-                environment_id: data.environment.id,
-                assignment_config_id: "",
-                containerId: "",
-                active: false,
-                isExam: data.is_exam,
-                timeLimit: Number(data.time_limit),
-                allow_notification: data.allow_notification,
-            }
-            addCreatingWorkspace(templateRequest)
-            const response = await addTempContainer(
+            const { name, description, environment, allow_notification, is_exam, time_limit } = data
+            await createContainer(
                 {
                     memLimit: memory,
                     numCPU: CPU,
@@ -162,61 +145,37 @@ const CreateTemplateForm = ({ isOpen, setOpen }: Props) => {
                     event: "TEMPLATE_CREATE",
                     title: data.name,
                     sourceId: "",
-                    formData: templateRequest
+                    formData: {
+                        templateName: data.name,
+                        description: data.description,
+                        section_user_id: sectionUserInfo.sectionUserId,
+                        environment_id: data.environment.id,
+                        assignment_config_id: "",
+                        containerId: "",
+                        active: false,
+                        isExam: data.is_exam,
+                        timeLimit: Number(data.time_limit),
+                        allow_notification: data.allow_notification,
+                    }
+                }, containerId => {
+                    const toastId = myToast.custom(
+                        <TempContainerToast
+                            getToastId={() => toastId}
+                            containerId={containerId}
+                            onCancel={async () => {
+                                return await waitForConfirm("Are you sure you want to cancel the commmit? All you changes in the workspace will not be saved and no template will be created.")
+                            }}
+                            onOK={
+                                async () => {
+                                    createTemplate(name, description, environment.id, containerId, false, is_exam, Number(time_limit), allow_notification)
+                                }
+                            } />,
+                        "toaster toaster-custom toaster-no-dismiss",
+                        "🗂"
+                    );
                 }
             );
-            myToast.dismiss(toastId);
-            await fetchContainers();
-            if (response.success) {
-                const { containerId: containerID } = response;
-                const customToastId = myToast.custom(
-                    <TempContainerToast
-                        getToastId={() => customToastId}
-                        containerId={containerID}
-                        onCancel={async () => {
-                            return await waitForConfirm("Are you sure you want to cancel the commmit? All you changes in the workspace will not be saved and no template will be created.")
-                        }}
-                        onOK={
-                            async () => {
-                                const id = myToast.loading("Building your template...");
-                                const response = await addTemplate(
-                                    {
-                                        templateName: data.name,
-                                        description: data.description,
-                                        section_user_id: sectionUserInfo.sectionUserId,
-                                        environment_id: data.environment.id,
-                                        assignment_config_id: "",
-                                        containerId: containerID,
-                                        active: false,
-                                        isExam: data.is_exam,
-                                        timeLimit: Number(data.time_limit),
-                                        allow_notification: data.allow_notification,
-                                    }
-                                );
-                                if (response.success) {
-                                    myToast.success("Template is created successfully");
-                                } else {
-                                    myToast.error({
-                                        title: "Fail to create template",
-                                        description: errorToToastDescription(response.error),
-                                        comment: CLICK_TO_REPORT
-                                    })
-                                }
-                                await fetchContainers()
-                                await fetchTemplates()
-                                myToast.dismiss(id);
-                            }
-                        } />,
-                    "toaster toaster-custom toaster-no-dismiss",
-                    "🗂"
-                );
-            } else {
-                myToast.error({
-                    title: "Fail to create temporary workspace",
-                    description: errorToToastDescription(response.error),
-                    comment: CLICK_TO_REPORT
-                })
-            }
+
         }}
     ></ModalForm>
 }

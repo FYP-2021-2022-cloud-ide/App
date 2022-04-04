@@ -26,9 +26,7 @@ export type Props = {
 }
 
 const CreateSandboxForm = ({ isOpen, setOpen }: Props) => {
-    const { userId } = useCnails();
-    const { sandboxImages, setSandboxImages, fetchSandboxImages } = useSandbox();
-    const { addSandboxImage } = sandboxAPI;
+    const { sandboxImages, createSandboxImage } = useSandbox();
     const validName = getValidName(
         sandboxImages.map((s) => s.title),
         "Personal workspace"
@@ -74,37 +72,7 @@ const CreateSandboxForm = ({ isOpen, setOpen }: Props) => {
             },
         } as FormStructure<CreateSandboxFormData>}
         onEnter={async ({ create_sandbox: data }) => {
-            const environment = data.environment_choice;
-            const toastId = myToast.loading("Creating a personal workspace...");
-            // set status in UI 
-            setSandboxImages([...sandboxImages, {
-                id: "",
-                title: data.name,
-                description: data.description,
-                imageId: environment.imageId,
-                containerId: "",
-                status: "CREATING"
-            }])
-            const response = await addSandboxImage(
-                {
-                    description: data.description,
-                    imageId: environment.imageId,
-                    title: data.name,
-                    userId: userId
-                }
-            )
-            if (response.success) {
-                myToast.success(`Workspace is successfully created.`);
-            } else {
-                // myToast.dismiss(toastId);
-                myToast.error({
-                    title: "Fail to create workspace",
-                    description: errorToToastDescription(response.error),
-                    comment: CLICK_TO_REPORT,
-                });
-            }
-            await fetchSandboxImages()
-            myToast.dismiss(toastId);
+            await createSandboxImage(data.name, data.description, data.environment_choice.imageId)
         }}
     ></ModalForm>
 }
