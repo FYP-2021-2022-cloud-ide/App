@@ -183,7 +183,7 @@ const UpdateSandboxForm = ({ isOpen, setOpen, target }: Props) => {
                         title: name,
                         description: description,
                         imageId: "",
-                        sandboxesId: "",
+                        containerId: "",
                         status: "UPDATING"
                     }
                 } else return sandboxImage

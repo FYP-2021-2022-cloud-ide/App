@@ -168,7 +168,7 @@ const CreateTemplateForm = ({ isOpen, setOpen }: Props) => {
             myToast.dismiss(toastId);
             await fetchContainers();
             if (response.success) {
-                const { containerID } = response;
+                const { containerId: containerID } = response;
                 const customToastId = myToast.custom(
                     <TempContainerToast
                         getToastId={() => customToastId}

@@ -16,7 +16,7 @@ export type {
   ContainerInfo,
   SandboxImage,
   ContainerList,
-  Notification,
+  Message,
   ActionType,
   Workspace,
   StudentWorkspace,
@@ -57,7 +57,7 @@ type Template = {
   imageId: string;
   assignment_config_id: string;
   storage: string;
-  containerID?: string;
+  containerId?: string;
   environment_id: string;
   active: boolean;
   isExam: boolean;
@@ -97,10 +97,6 @@ type SectionUserInfo = {
   sub: string;
 };
 
-/**
- * @remark the naming convention of sandbox in the backend is poor.
- * pay attention to the difference in `id` , `imageId`, `sandboxesId`
- */
 type SandboxImage = {
   /**
    * the id of this sandbox in the database, you need to use this in `removeSandboxImage`
@@ -115,7 +111,7 @@ type SandboxImage = {
   /**
    * the container id of the workspace created from sandbox.
    */
-  sandboxesId: string;
+  containerId: string;
   /**
    * if the sandbox image is `CREATING`, the create request is being processed.
    * if the sandbox image is `UPDATING`, the update request is being processed and should not let user update it
@@ -144,7 +140,7 @@ type Container = {
   title: string;
   subTitle: string;
   startAt: string;
-  containerID: string;
+  containerId: string;
   type: "SANDBOX" | "TEMPLATE" | "ENV" | "STUDENT_WORKSPACE";
   /**
    *  if the container is `CREATING`, the request is being processed and the container is soon be created.
@@ -178,7 +174,7 @@ type ContainerInfo = {
   containersTotal: number;
 };
 
-type Notification = {
+type Message = {
   id: string;
   courseCode?: string;
   sectionCode?: string;

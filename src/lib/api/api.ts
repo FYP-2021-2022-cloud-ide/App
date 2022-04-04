@@ -22,7 +22,6 @@ export type {
   Container,
   ContainerListResponse,
   ContainerAddResponse,
-  SandboxAddResponse,
   SandboxImageAddResponse,
   SandboxImageListResponse,
   NotificationListResponse,
@@ -134,7 +133,7 @@ type Template = {
   environment_id: string;
   assignment_config_id: string;
   storage: string;
-  containerID: string;
+  containerId: string;
   active: boolean;
   isExam: boolean;
   timeLimit: number;
@@ -201,7 +200,7 @@ type Container = {
   title: string;
   subTitle: string;
   startAt: string;
-  containerID: string;
+  containerId: string;
   redisPatch?: RedisWorkspace;
 };
 
@@ -220,7 +219,7 @@ type ContainerAddResponse =
   | {
       success: true;
       error: Error;
-      containerID: string;
+      containerId: string;
     }
   | {
       success: false;
@@ -241,19 +240,8 @@ type SandboxImage = {
   /**
    * container id
    */
-  sandboxesId: string;
+  containerId: string;
 };
-
-type SandboxAddResponse =
-  | {
-      success: true;
-      error: Error;
-      sandboxId: string;
-    }
-  | {
-      success: false;
-      error: Error;
-    };
 
 type SandboxImageListResponse =
   | {
@@ -429,6 +417,7 @@ type SandboxAddRequest = {
   sandboxImageId: string;
   title: string;
   sub: string;
+  event: "SANDBOX_START_WORKSPACE";
 };
 
 type EventFormDataPair =
@@ -523,7 +512,7 @@ export type AddSandboxImageRequest = {
 };
 
 export type RemoveSandboxRequest = {
-  sandboxId: string;
+  containerId: string;
   userId: string;
 };
 

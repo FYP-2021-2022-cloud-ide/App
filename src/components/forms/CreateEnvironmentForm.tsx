@@ -3,16 +3,11 @@ import { Option } from "../ListBox";
 import ModalForm from "../ModalForm/ModalForm"
 import { useInstructor } from "../../contexts/instructor"
 import myToast from "../CustomToast";
-import { containerAPI } from "../../lib/api/containerAPI";
-import { envAPI } from "../../lib/api/envAPI";
-import { CLICK_TO_REPORT } from "../../lib/constants";
-import { errorToToastDescription } from "../../lib/errorHelper";
 import { useCnails } from "../../contexts/cnails";
 import { FormStructure } from "../ModalForm/types";
-import { env } from "process";
-import { EnvironmentBuildRequest } from "../../lib/api/api";
 import TempContainerToast from "../TempContainerToast";
 import { useWarning } from "../../contexts/warning";
+import { useContainers } from "../../contexts/containers";
 
 export type CreateEnvironmentFormData = {
     create_environment: {
@@ -29,11 +24,10 @@ export type Props = {
 }
 
 const CreateEnvironmentForm = ({ isOpen, setOpen }: Props) => {
-    const { sub, fetchContainers } = useCnails()
-    const { environments, sectionUserInfo, fetch, fetchEnvironments } = useInstructor()
+    const { sub } = useCnails()
+    const { createContainer } = useContainers()
+    const { environments, sectionUserInfo, createEnvironment } = useInstructor()
     const { waitForConfirm } = useWarning()
-    const { addTempContainer, removeTempContainer } = containerAPI
-    const { addEnvironment, buildEnvironment } = envAPI
     const validName = getValidName(
         environments.map((env) => env.name),
         "Environment",
@@ -94,109 +88,43 @@ const CreateEnvironmentForm = ({ isOpen, setOpen }: Props) => {
         onEnter={async ({ create_environment: data }) => {
             // console.log(data);
             const { environment_choice: environment, name, description } = data;
-            const id = myToast.loading("Creating the environment...");
-            if (data.is_predefined) {
-                const response = await addEnvironment(
-                    {
-                        libraries: [environment.value + ":" + environment.imageId],
-                        name: name,
-                        description: description,
-                        section_user_id: sectionUserInfo.sectionUserId,
-                    }
-                );
-
-                myToast.dismiss(id);
-                if (response.success) {
-                    const { environmentID } = response;
-                    myToast.success(
-                        `Environment (${environmentID}) is successfully created.`
-                    );
-                    fetch();
-                } else {
-                    myToast.error({
-                        title: `Fail to create environment`,
-                        description: errorToToastDescription(response.error),
-                        comment: CLICK_TO_REPORT,
-                    });
-                }
-            }
+            if (data.is_predefined)
+                await createEnvironment(name, description, [`${environment.value}:${environment.imageId}`])
             if (!data.is_predefined) {
-                try {
-                    const response = await addTempContainer(
-                        {
-                            memLimit: memory,
-                            numCPU: CPU,
-                            imageId: rootImage,
-                            sub: sub,
-                            accessRight: "root",
-                            event: "ENV_CREATE",
-                            sourceId: "",
-                            title: data.name,
-                            formData: {
-                                name: data.name,
-                                description: data.description,
-                                section_user_id: sectionUserInfo.sectionUserId,
-                                containerId: "",
-                            }
-                        }
-                    );
-                    myToast.dismiss(id);
-                    await fetchContainers()
-                    if (response.success) {
-                        const { containerID } = response;
-                        const customToastId = myToast.custom(
-                            <TempContainerToast
-                                getToastId={() => customToastId}
-                                containerId={containerID}
-                                onCancel={async () => {
-                                    return await waitForConfirm("Are you sure you want to cancel the commit? All your changes in the workspace will not be saved and no environment will be built.")
-                                }}
-                                onOK={async () => {
-                                    // build succeed
-                                    myToast.dismiss(customToastId);
-                                    const id = myToast.loading(
-                                        "Building your custom environment..."
-                                    );
-                                    const response = await buildEnvironment(
-                                        {
-                                            name: name,
-                                            description: description,
-                                            section_user_id: sectionUserInfo.sectionUserId,
-                                            containerId: containerID,
-                                        }
-                                    );
-                                    if (response.success) {
-                                        myToast.success("Environment is created successfully.")
-                                    } else {
-                                        myToast.error({
-                                            title: "Fail to build environment",
-                                            description: errorToToastDescription(response.error),
-                                            comment: CLICK_TO_REPORT
-                                        })
-                                    }
-                                    await fetchContainers()
-                                    await fetchEnvironments()
-                                    myToast.dismiss(id);
-                                }}
-                            ></TempContainerToast>,
-                            "toaster toaster-custom toaster-no-dismiss",
-                            "🗂"
-                        );
-                    } else {
-                        myToast.error({
-                            title: "Fail to create temporary workspace",
-                            description: errorToToastDescription(response.error),
-                            comment: CLICK_TO_REPORT,
-                        })
+                await createContainer({
+                    memLimit: memory,
+                    numCPU: CPU,
+                    imageId: rootImage,
+                    sub: sub,
+                    accessRight: "root",
+                    event: "ENV_CREATE",
+                    sourceId: "",
+                    title: data.name,
+                    formData: {
+                        name: data.name,
+                        description: data.description,
+                        section_user_id: sectionUserInfo.sectionUserId,
+                        containerId: "",
                     }
-                } catch (error) {
-                    myToast.error(error.message);
-                } finally {
-                    myToast.dismiss(id);
-                }
+                }, (containerId) => {
+                    const customToastId = myToast.custom(
+                        <TempContainerToast
+                            getToastId={() => customToastId}
+                            containerId={containerId}
+                            onCancel={async () => {
+                                return await waitForConfirm("Are you sure you want to cancel the commit? All your changes in the workspace will not be saved and no environment will be built.")
+                            }}
+                            onOK={async () => {
+                                await createEnvironment(name, description, containerId)
+                            }}
+                        ></TempContainerToast>,
+                        "toaster toaster-custom toaster-no-dismiss",
+                        "🗂"
+                    );
+                })
             }
         }}
-    ></ModalForm>
+    ></ModalForm >
 }
 
 export default CreateEnvironmentForm

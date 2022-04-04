@@ -71,7 +71,7 @@ export default async function handler(
             status: GoLangResponse.error?.status,
             error: GoLangResponse.error?.error,
           },
-          containerID: GoLangResponse.tempContainerId,
+          containerId: GoLangResponse.tempContainerId,
         });
         res.status(200).end();
       }

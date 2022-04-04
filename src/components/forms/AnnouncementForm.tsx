@@ -1,16 +1,11 @@
-import { useCnails } from "../../contexts/cnails";
 import { useInstructor } from "../../contexts/instructor";
-import courseAPI from "../../lib/api/courses";
-import { CLICK_TO_REPORT } from "../../lib/constants";
-import { errorToToastDescription } from "../../lib/errorHelper";
-import myToast from "../CustomToast";
 import ModalForm from "../ModalForm/ModalForm";
 import { FormStructure } from "../ModalForm/types";
 
 export type AnnouncementFormData = {
     course_announcement: {
         title: string;
-        announcement: string;
+        content: string;
         allow_reply: boolean;
     }
 }
@@ -21,8 +16,7 @@ export type Props = {
 }
 
 const AnnouncementForm = ({ isOpen, setOpen }: Props) => {
-    const { userId } = useCnails();
-    const { sectionUserInfo } = useInstructor()
+    const { broadcastAnnouncement } = useInstructor()
     return <ModalForm
         isOpen={isOpen}
         setOpen={setOpen}
@@ -55,24 +49,7 @@ const AnnouncementForm = ({ isOpen, setOpen }: Props) => {
         clickOutsideToClose
         escToClose
         onEnter={async ({ course_announcement: data }) => {
-            console.log(data);
-            const response = await courseAPI.sendNotificationAnnouncement(
-                {
-                    allowReply: data.allow_reply,
-                    body: data.announcement,
-                    title: data.title,
-                    senderId: userId,
-                    sectionId: sectionUserInfo.sectionId
-                }
-            );
-            if (response.success)
-                myToast.success("The course announcement is sent.");
-            else
-                myToast.error({
-                    title: "Fail to send course announcement",
-                    description: errorToToastDescription(response.error),
-                    comment: CLICK_TO_REPORT,
-                });
+            await broadcastAnnouncement(data.title, data.content, data.allow_reply);
         }}
     ></ModalForm>
 }

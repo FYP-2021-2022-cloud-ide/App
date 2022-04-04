@@ -15,6 +15,7 @@ import { sandboxAPI } from "../lib/api/sandboxAPI";
 import moment from "moment";
 import useInterval from "./useInterval";
 import { CLICK_TO_REPORT } from "../lib/constants";
+import { useContainers } from "../contexts/containers";
 type Props = Container & { zIndex: number };
 
 /**
@@ -39,7 +40,7 @@ function ContainerCard({
   title,
   subTitle,
   startAt,
-  containerID,
+  containerId,
   type,
   status,
   isTemporary,
@@ -49,7 +50,8 @@ function ContainerCard({
   const { removeTempContainer } = containerAPI;
   const { removeTemplateContainer } = templateAPI;
   const { removeSandbox } = sandboxAPI;
-  const { userId, sub, fetchContainers } = useCnails();
+  const { userId, sub } = useCnails();
+  const { fetchContainers } = useContainers()
 
   const [timeDiff, setTimeDiff] = useState(getTimeDiff(startAt))
   const { ref, cleanStyle } = useCleanTilt(
@@ -110,7 +112,7 @@ function ContainerCard({
       <div
         onClick={() =>
           window.open(
-            "https://codespace.ust.dev/user/container/" + containerID + "/"
+            "https://codespace.ust.dev/user/container/" + containerId + "/"
           )
         }
         className="flex flex-col h-full min-h-[8rem] justify-between
@@ -138,11 +140,11 @@ function ContainerCard({
               e.stopPropagation();
 
               const response = isTemporary ? await removeTempContainer({
-                containerId: containerID, sub: sub
+                containerId, sub: sub
               }) : type == "SANDBOX" ? await removeSandbox({
-                sandboxId: containerID, userId: userId
+                containerId, userId: userId
               }) : await removeTemplateContainer({
-                containerId: containerID,
+                containerId,
                 sub: sub
               })
 

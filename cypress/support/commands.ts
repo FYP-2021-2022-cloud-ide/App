@@ -26,7 +26,7 @@
 
 import { recurse } from "cypress-recurse";
 import {
-  SandboxAddResponse,
+  ContainerAddResponse,
   SandboxImageListResponse,
   SuccessStringResponse,
 } from "../../src/lib/api/api";
@@ -141,7 +141,7 @@ Cypress.Commands.add("createPersonalWorkspace", () => {
       cy.get(".modal-form").should("not.exist");
       cy.wait("@addSandboxImage", { responseTimeout: c.responseTimeout }).then(
         (interception) => {
-          const response = interception.response.body as SandboxAddResponse;
+          const response = interception.response.body as ContainerAddResponse;
           expect(response.success).eq(true);
           // the loading toast should disappear
           cy.get(".toaster-loading").should("not.exist");

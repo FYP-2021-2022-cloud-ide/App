@@ -19,7 +19,9 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<SuccessStringResponse>
 ) {
-  const { sandboxId, userId } = JSON.parse(req.body) as RemoveSandboxRequest;
+  const { containerId: sandboxId, userId } = JSON.parse(
+    req.body
+  ) as RemoveSandboxRequest;
   try {
     var docReq = SandBoxIdRequest.fromPartial({
       sessionKey: fetchAppSession(req),

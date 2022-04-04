@@ -9,7 +9,10 @@ import { templateAPI } from "../lib/api/templateAPI";
 import { apiEnvironmentToUiEnvironment, patchEnvironments } from "../lib/environmentHelper";
 import { apiTemplatesToUiTemplates, patchTemplates } from "../lib/templateHelper"
 import { useCancelablePromise } from "../components/useCancelablePromise";
-import { EnvironmentListResponse, TemplateListResponse } from "../lib/api/api";
+import { EnvironmentAddResponse, EnvironmentListResponse, TemplateListResponse } from "../lib/api/api";
+import { useContainers } from "./containers";
+import { useMessaging } from "./messaging";
+import courseAPI from "../lib/api/courses";
 
 type InstructorContextState = {
     environments: Environment[];
@@ -44,6 +47,14 @@ type InstructorContextState = {
     sectionUserInfo: SectionUserInfo;
     highlightedEnv: Environment;
     setHighlightedEnv: React.Dispatch<React.SetStateAction<Environment>>;
+    broadcastAnnouncement: (title: string, content: string, allowReply: boolean) => Promise<void>;
+
+    /**
+     * this can create a predefined environment or build a custom environment 
+     * @param id if this is a string, it is a container id. If this is a string[], 
+     * it refers the libraries. 
+     */
+    createEnvironment: (name: string, description: string, id: string | string[]) => Promise<void>;
 };
 
 
@@ -61,9 +72,12 @@ export const InstructorProvider = ({
     children: JSX.Element;
     sectionUserInfo: SectionUserInfo;
 }) => {
-    const { listEnvironments } = envAPI;
+    const { listEnvironments, addEnvironment, buildEnvironment } = envAPI;
     const { listTemplates } = templateAPI;
-    const { sub, fetchContainers, containers } = useCnails();
+    const { sub, userId } = useCnails();
+    const { containers, setContainers, fetchContainers } = useContainers();
+    const { sendNotificationAnnouncement } = courseAPI
+    const { fetchMessages } = useMessaging()
     const [environments, setEnvironments] = useState<Environment[]>();
     const [templates, setTemplates] = useState<Template[]>();
     const [highlightedEnv, setHighlightedEnv] = useState<Environment>();
@@ -118,6 +132,62 @@ export const InstructorProvider = ({
         return afterResponse(response)
     }
 
+    const broadcastAnnouncement = async (title: string, content: string, allowReply: boolean) => {
+        const response = await sendNotificationAnnouncement(
+            {
+                title,
+                body: content,
+                allowReply,
+                senderId: userId,
+                sectionId: sectionUserInfo.sectionId
+            }
+        );
+        if (response.success)
+            myToast.success("The course announcement is sent.");
+        else
+            myToast.error({
+                title: "Fail to send course announcement",
+                description: errorToToastDescription(response.error),
+                comment: CLICK_TO_REPORT,
+            });
+        await fetchMessages()
+    }
+
+    const createEnvironment = async (name: string, description: string, id: string | string[]) => {
+        const toastId = myToast.loading(typeof id == "string" ? "Building a custom environment..." : "Creating the environment...");
+        let response: EnvironmentAddResponse
+        if (typeof id == "string") {
+            // this is a custom environment 
+            response = await buildEnvironment(
+                {
+                    name: name,
+                    description: description,
+                    section_user_id: sectionUserInfo.sectionUserId,
+                    containerId: id,
+                }
+            );
+        } else {
+            // this is a predefined environment 
+            response = await addEnvironment({
+                libraries: id,
+                name: name,
+                description: description,
+                section_user_id: sectionUserInfo.sectionUserId,
+            })
+        }
+        if (response.success) {
+            myToast.success("Environment is created successfully.")
+        } else {
+            myToast.error({
+                title: "Fail to create environment.",
+                description: errorToToastDescription(response.error),
+                comment: CLICK_TO_REPORT
+            })
+        }
+        await fetchEnvironments();
+        myToast.dismiss(toastId);
+    }
+
     const fetch = async () => {
         const containers = await fetchContainers();
         await fetchEnvironments(containers);
@@ -156,6 +226,8 @@ export const InstructorProvider = ({
                 sectionUserInfo,
                 highlightedEnv,
                 setHighlightedEnv,
+                broadcastAnnouncement,
+                createEnvironment,
             }}
         >
             {children}

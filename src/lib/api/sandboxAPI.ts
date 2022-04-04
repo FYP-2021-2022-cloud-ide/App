@@ -1,6 +1,6 @@
 import {
   SandboxAddRequest,
-  SandboxAddResponse,
+  ContainerAddResponse,
   AddSandboxImageRequest,
   SandboxImageAddResponse,
   SandboxImageListResponse,
@@ -19,7 +19,7 @@ const sandboxAPI = {
     });
     return res.json();
   },
-  addSandbox: async (req: SandboxAddRequest): Promise<SandboxAddResponse> => {
+  addSandbox: async (req: SandboxAddRequest): Promise<ContainerAddResponse> => {
     // start a workspace
     var res = await fetch("/api/sandbox/addSandbox", {
       method: "POST",

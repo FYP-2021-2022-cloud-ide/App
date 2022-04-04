@@ -4,10 +4,8 @@ import {
   useCallback,
   memo,
   Fragment,
-  forwardRef,
 } from "react";
 import { ReplyIcon } from "@heroicons/react/outline";
-import { useCnails } from "../contexts/cnails";
 import EmptyDiv from "../components/EmptyDiv";
 import { notificationAPI } from "../lib/api/notificationAPI";
 import { RefreshIcon, TrashIcon } from "@heroicons/react/solid";
@@ -15,7 +13,7 @@ import DataTable, {
   TableColumn,
   createTheme,
 } from "react-data-table-component";
-import { Notification } from "../lib/cnails";
+import { Message } from "../lib/cnails";
 import moment from "moment";
 import Loader from "../components/Loader";
 import myToast from "../components/CustomToast";
@@ -27,16 +25,15 @@ import _ from "lodash";
 import { MyMarkDown } from "../components/MyMarkdown";
 import PaginationComponent from "../components/table/PaginationComponent";
 import { ExpandRowToggled } from "react-data-table-component/dist/src/DataTable/types";
-import { errorToToastDescription } from "../lib/errorHelper";
-import { CLICK_TO_REPORT } from "../lib/constants";
 import MessageReplyForm from "../components/forms/MessageReplyForm";
+import { useMessaging } from "../contexts/messaging";
 
 type Course = {
   fullCode: string;
   id: string;
 };
 
-const notificationToCourse = (notification: Notification): Course => {
+const notificationToCourse = (notification: Message): Course => {
   return notification.section_id
     ? {
       fullCode: `${notification.courseCode} (${notification.sectionCode})`,
@@ -46,7 +43,7 @@ const notificationToCourse = (notification: Notification): Course => {
 };
 
 const ExpandedComponent = memo(
-  ({ data }: { data: Notification }) => {
+  ({ data }: { data: Message }) => {
     return (
       <div className=" bg-gray-50 dark:bg-black/20 p-2 dark:text-gray-300 border-b border-[#D5D6D8] dark:border-[#2F3947] ">
         <MyMarkDown text={data.body} />
@@ -61,22 +58,22 @@ const ExpandedComponent = memo(
 const MessageTable = () => {
   const router = useRouter();
   const target = router.query.id;
-  const [selectedRows, setSelectedRows] = useState<Notification[]>([]);
-  const { userId, notifications, fetchNotifications } = useCnails();
+  const [selectedRows, setSelectedRows] = useState<Message[]>([]);
+  const { messages, fetchMessages, changeMessagesRead, deleteMessages } = useMessaging();
   const [pending, setPending] = useState(true);
   const [replyFormOpen, setReplyFormOpen] = useState<boolean>(false);
-  const [replyTarget, setReplyTarget] = useState<Notification>();
+  const [replyTarget, setReplyTarget] = useState<Message>();
   const [readDuringUnreadFiltering, setReadDuringUnreadFiltering] = useState<
-    Notification[]
+    Message[]
   >([]);
   const [onlyUnread, setOnlyUnread] = useState<boolean>(false);
   const [onlyCourses, setOnlyCourses] = useState<string[]>([]);
-  let filterNotifications = notifications
-    .filter((notification) => {
+  let filterNotifications = messages
+    .filter((message) => {
       return (
-        readDuringUnreadFiltering.some((j) => j.id == notification.id) ||
+        readDuringUnreadFiltering.some((j) => j.id == message.id) ||
         !onlyUnread ||
-        (onlyUnread && !notification.read)
+        (onlyUnread && !message.read)
       );
     })
     .filter((notification) => {
@@ -88,22 +85,21 @@ const MessageTable = () => {
       );
     });
 
-  const { removeNotification, sendNotification, changeNotificationRead } =
-    notificationAPI;
-  useEffect(() => {
-    async function temp() {
-      await fetchNotifications();
-      setPending(false);
-    }
-    temp();
-  }, []);
+  const { removeNotification, sendNotification } = notificationAPI;
+  // useEffect(() => {
+  //   async function temp() {
+  //     await fetchMessages();
+  //     setPending(false);
+  //   }
+  //   temp();
+  // }, []);
   useEffect(() => {
     const cell = document.querySelector(
       "div[data-column-id='Read']"
     ) as HTMLElement;
     if (cell) cell.style.padding = "0px";
   });
-  const columns: TableColumn<Notification>[] = [
+  const columns: TableColumn<Message>[] = [
     {
       id: "Read",
       name: <></>,
@@ -183,27 +179,7 @@ const MessageTable = () => {
                 </div>
               ),
               onClick: async () => {
-                if (!row.read) {
-                  const response = await changeNotificationRead(
-                    userId,
-                    [row.id],
-                    true
-                  );
-                  if (!response.success) {
-                    console.error("fail to read messages");
-                  }
-                  await fetchNotifications();
-                } else {
-                  const response = await changeNotificationRead(
-                    userId,
-                    [row.id],
-                    false
-                  );
-                  if (!response.success) {
-                    console.error("fail to unread messages");
-                  }
-                  await fetchNotifications();
-                }
+                await changeMessagesRead([row.id], !row.read)
               },
             },
             {
@@ -219,12 +195,8 @@ const MessageTable = () => {
               text: "Delete message",
               icon: <TrashIcon className="w-5 h-5 text-white"></TrashIcon>,
               onClick: async () => {
-                const response = await removeNotification(userId, [row.id]);
-                if (response.success) {
-                  setSelectedRows(selectedRows.filter((r) => r.id != row.id));
-                  myToast.success(`A message has been removed.`);
-                }
-                await fetchNotifications();
+                setSelectedRows(selectedRows.filter((r) => r.id != row.id));
+                await deleteMessages([row.id])
               },
             },
           ];
@@ -267,33 +239,25 @@ const MessageTable = () => {
   );
 
   const getCourses = (): Course[] => {
-    if (notifications.length == 0) return [];
-    const courses = _.groupBy(notifications, (notification) => {
+    if (messages.length == 0) return [];
+    const courses = _.groupBy(messages, (notification) => {
       return JSON.stringify(notificationToCourse(notification));
     });
     return Object.keys(courses).map((course) => JSON.parse(course));
   };
 
-  const onRowExpandToggled: ExpandRowToggled<Notification> = async (
+  const onRowExpandToggled: ExpandRowToggled<Message> = async (
     expand,
-    notification
+    message
   ) => {
     // read notification
     if (expand && onlyUnread)
       setReadDuringUnreadFiltering([
         ...readDuringUnreadFiltering,
-        notification,
+        message,
       ]);
-    if (expand && !notification.read) {
-      const response = await changeNotificationRead(
-        userId,
-        [notification.id],
-        true
-      );
-      if (!response.success) console.error("fail to read messages");
-      // should not fetch notification here because it will refresh the table and make row disappear
-      await fetchNotifications();
-    }
+    if (expand && !message.read)
+      await changeMessagesRead([message.id], false)
   };
 
   createTheme(
@@ -315,7 +279,7 @@ const MessageTable = () => {
   }
   return (
     <>
-      {notifications.length == 0 ? (
+      {messages.length == 0 ? (
         <EmptyDiv message="You have no notifications."></EmptyDiv>
       ) : (
         // only if user have notifications
@@ -383,9 +347,7 @@ const MessageTable = () => {
               expandableRows
               pagination
               // To pre-select rows based on your data
-              expandableRowExpanded={(row) => {
-                return target != null && row.id == target;
-              }}
+              expandableRowExpanded={(row) => target != null && row.id == target}
               paginationComponent={(props) => (
                 <PaginationComponent
                   options={[15, 20, 30, 50]}
@@ -396,7 +358,7 @@ const MessageTable = () => {
                         <RefreshIcon className="w-5 h-5 text-white"></RefreshIcon>
                       ),
                       onClick: async () => {
-                        await fetchNotifications();
+                        await fetchMessages();
                       },
                     },
                     {
@@ -405,17 +367,7 @@ const MessageTable = () => {
                         <TrashIcon className="w-5 h-5 text-white"></TrashIcon>
                       ),
                       onClick: async () => {
-                        const response = await removeNotification(
-                          userId,
-                          selectedRows.map((r) => r.id)
-                        );
-                        if (response.success) {
-                          setSelectedRows([]);
-                          myToast.success(
-                            `${selectedRows.length} messages has been removed.`
-                          );
-                        }
-                        await fetchNotifications();
+                        await deleteMessages(selectedRows.map((r) => r.id))
                       },
                       shown: selectedRows.length != 0,
                     },
@@ -427,15 +379,7 @@ const MessageTable = () => {
                         </div>
                       ),
                       onClick: async () => {
-                        const response = await changeNotificationRead(
-                          userId,
-                          selectedRows.map((row) => row.id),
-                          true
-                        );
-                        if (!response.success) {
-                          console.error("fail to read messages");
-                        }
-                        await fetchNotifications();
+                        await changeMessagesRead(selectedRows.map((r) => r.id), true)
                       },
                       shown: selectedRows.length != 0,
                     },
@@ -447,15 +391,7 @@ const MessageTable = () => {
                         </div>
                       ),
                       onClick: async () => {
-                        const response = await changeNotificationRead(
-                          userId,
-                          selectedRows.map((row) => row.id),
-                          false
-                        );
-                        if (!response.success) {
-                          console.error("fail to unread messages");
-                        }
-                        await fetchNotifications();
+                        await changeMessagesRead(selectedRows.map((r) => r.id), false)
                       },
                       shown: selectedRows.length != 0,
                     },
@@ -468,9 +404,7 @@ const MessageTable = () => {
               expandableRowsHideExpander
               onRowExpandToggled={onRowExpandToggled}
               theme="cnails-dark"
-              selectableRowSelected={(row) => {
-                return selectedRows.map((n) => n.id).includes(row.id);
-              }}
+              selectableRowSelected={(row) => selectedRows.map((n) => n.id).includes(row.id)}
               expandableRowsComponent={ExpandedComponent}
             />
             {filterNotifications.length == 0 ? (
@@ -484,7 +418,7 @@ const MessageTable = () => {
           <MessageReplyForm isOpen={replyFormOpen} setOpen={setReplyFormOpen} target={replyTarget} />
         </div>
       )}
-      <button
+      {/* <button
         className="bg-green-500 text-white px-2 rounded h-min"
         onClick={async () => {
           const response = await sendNotification(
@@ -509,7 +443,7 @@ const MessageTable = () => {
         }}
       >
         Send test message
-      </button>
+      </button> */}
     </>
   );
 };

@@ -1,9 +1,10 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useCnails } from "./cnails";
 import { generalAPI } from "../lib/api/generalAPI";
+import useLocalStorage from "use-local-storage"
 type ThemeState = {
   isDark: boolean;
-  setDark: (d: boolean) => Promise<any>;
+  setDark: (d: boolean) => Promise<void>;
 };
 const themeContext = createContext({} as ThemeState);
 
@@ -18,7 +19,7 @@ type Props = {
 
 export const ThemeProvider = ({ children }: Props) => {
   const { sub } = useCnails();
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useLocalStorage("darkMode", false)
 
   useEffect(() => {
     if (dark) {
@@ -44,7 +45,7 @@ export const ThemeProvider = ({ children }: Props) => {
         isDark: dark,
         setDark: async (d: boolean) => {
           setDark(d);
-          await generalAPI.updateUserData(sub, d, ""); //expect description
+          await generalAPI.updateUserData(sub, d, "");
         },
       }}
     >

@@ -24,7 +24,7 @@ export const patchSandboxes = (
         container.redisPatch.sourceId == si.id
       ) {
         // it is a normal workspace
-        if (container.containerID == "")
+        if (container.containerId == "")
           return {
             ...si,
             status: "STARTING_WORKSPACE",
@@ -38,14 +38,14 @@ export const patchSandboxes = (
           else
             return {
               ...si,
-              sandboxesId: container.containerID,
+              containerId: container.containerId,
               status: "DEFAULT",
             };
         }
       }
       if (container.redisPatch.sourceId == si.id) {
         // it is a temporary workspace
-        if (container.containerID == "")
+        if (container.containerId == "")
           return {
             ...si,
             status: "STARTING_WORKSPACE",
@@ -59,7 +59,7 @@ export const patchSandboxes = (
           } else
             return {
               ...si,
-              sandboxesId: container.containerID,
+              containerId: container.containerId,
               status: "UPDATING_INTERNAL",
             };
         }
@@ -68,7 +68,7 @@ export const patchSandboxes = (
     // no sandbox is related to this environment
     return {
       ...si,
-      sandboxesId: "",
+      containerId: "",
       status: "DEFAULT",
     };
   }); // otherwise the returned array will have status : string which is not compatible with SandboxImage

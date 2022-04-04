@@ -23,6 +23,7 @@ import {
 import { apiTemplatesToUiTemplates, patchTemplates } from "../../../../lib/templateHelper";
 import { TemplateListResponse } from "../../../../lib/api/api";
 import { useCancelablePromise } from "../../../../components/useCancelablePromise";
+import { useContainers } from "../../../../contexts/containers";
 
 
 const Home = () => {
@@ -30,7 +31,8 @@ const Home = () => {
   const sectionId = router.query.sectionId as string;
   const [sectionUserInfo, setSectionUserInfo] = useState<SectionUserInfo>(null);
   const [workspaces, setWorkspaces] = useState<Workspace[]>();
-  const { sub, fetchContainers, containers } = useCnails();
+  const { sub, } = useCnails();
+  const { fetchContainers, containers } = useContainers()
   const { listTemplates, addTemplateContainer, removeTemplateContainer } = templateAPI;
   const { getSectionUserInfo } = generalAPI;
   const { cancelablePromise } = useCancelablePromise();
@@ -133,19 +135,19 @@ const Home = () => {
           <WorkspacesList
             workspaces={workspaces}
             onClick={(workspace) => {
-              if (workspace.containerID) {
+              if (workspace.containerId) {
                 window.open(
                   "https://codespace.ust.dev/user/container/" +
-                  workspace.containerID +
+                  workspace.containerId +
                   "/"
                 );
               }
             }}
             menuItems={(workspace) => ([
               {
-                text: workspace.containerID ? "Stop workspace" : "Start workspace",
+                text: workspace.containerId ? "Stop workspace" : "Start workspace",
                 onClick: async () => {
-                  if (!workspace.containerID) {
+                  if (!workspace.containerId) {
                     const id = myToast.loading("Starting workspace...");
                     const response = await addTemplateContainer(
                       {
@@ -174,7 +176,7 @@ const Home = () => {
                     const id = myToast.loading("Stopping workspace...")
                     const response = await removeTemplateContainer(
                       {
-                        containerId: workspace.containerID,
+                        containerId: workspace.containerId,
                         sub: sub
                       }
                     );

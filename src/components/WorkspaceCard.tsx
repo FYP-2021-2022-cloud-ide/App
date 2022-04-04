@@ -35,11 +35,11 @@ function WorkspaceCard({ workspace, onClick, menuItems, zIndex }: Props) {
       >
         <div className="flex flex-row min-w-0 space-x-2">
           <span className="relative flex h-3 w-3 mt-3">
-            {workspace.containerID && (
+            {workspace.containerId && (
               <span className="absolute animate-ping inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
             )}
             <span
-              className={`relative inline-flex rounded-full h-3 w-3 ${workspace.containerID ? "bg-green-400" : "bg-gray-400"
+              className={`relative inline-flex rounded-full h-3 w-3 ${workspace.containerId ? "bg-green-400" : "bg-gray-400"
                 }`}
             ></span>
           </span>

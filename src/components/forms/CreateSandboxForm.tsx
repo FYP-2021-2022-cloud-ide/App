@@ -82,7 +82,7 @@ const CreateSandboxForm = ({ isOpen, setOpen }: Props) => {
                 title: data.name,
                 description: data.description,
                 imageId: environment.imageId,
-                sandboxesId: "",
+                containerId: "",
                 status: "CREATING"
             }])
             const response = await addSandboxImage(

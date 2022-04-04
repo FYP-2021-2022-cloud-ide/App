@@ -50,6 +50,7 @@ export default function Page() {
    * the ref to the node which is currently under node actions
    */
   const targetNodeRef = useRef<NodeModel<CustomData>>();
+  const uploadInputRef = useRef<HTMLInputElement>();
   const {
     getArrowProps,
     getTooltipProps,
@@ -328,12 +329,13 @@ export default function Page() {
                     setIsCreateFolderModalOpen(true);
                   },
                 },
-                // {
-                //   text: "Upload files",
-                //   onClick: () => {
-                //     setIsUploadModalOpen(true);
-                //   }
-                // }
+                {
+                  text: "Upload files",
+                  onClick: () => {
+                    if (uploadInputRef.current)
+                      uploadInputRef.current.click()
+                  }
+                }
               ];
             }}
             rootActions={[
@@ -346,6 +348,13 @@ export default function Page() {
             ]}
             onContextMenuClose={() => { }}
           ></FTree>
+          <input ref={uploadInputRef} type="file" multiple className="hidden" onChange={(e) => {
+            console.log(targetNodeRef.current)
+            e.stopPropagation();
+            e.preventDefault();
+            console.log(e.target.files)
+            targetNodeRef.current = null
+          }}></input>
         </div>
         {/* cloud  */}
         <div className="flex flex-col">
@@ -551,20 +560,6 @@ export default function Page() {
           ></ModalForm>
         )
       }
-      {/* upload modal  */}
-      <ModalForm
-        isOpen={isUploadModalOpen}
-        setOpen={setIsUploadModalOpen}
-        clickOutsideToClose
-        escToClose
-        title="Upload Files"
-        formStructure={{
-
-        }}
-        onEnter={() => {
-
-        }}
-      ></ModalForm>
     </>
   );
 }

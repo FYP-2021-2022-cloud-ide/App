@@ -3,12 +3,13 @@ import { notificationAPI } from "../../lib/api/notificationAPI";
 
 import ModalForm from "../ModalForm/ModalForm";
 import { FormStructure } from "../ModalForm/types";
-import { Notification } from "../../lib/cnails";
+import { Message } from "../../lib/cnails";
+import { useMessaging } from "../../contexts/messaging";
 
 export type MessageReplyFormData = {
     reply_message: {
         target: string;
-        message: string;
+        content: string;
         allow_reply: boolean;
     };
 };
@@ -17,24 +18,27 @@ export type MessageReplyFormData = {
 type Props = {
     isOpen: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    target: Notification
+    /**
+     * the message to reply 
+     */
+    target: Message
 }
 
-const MessageReplyForm = ({ isOpen, setOpen, target: notification }: Props) => {
-    const { userId, fetchNotifications } = useCnails();
-    const { sendNotification } = notificationAPI
+const MessageReplyForm = ({ isOpen, setOpen, target }: Props) => {
+    const { userId } = useCnails();
+    const { sendMessage } = useMessaging()
     return <ModalForm
         isOpen={isOpen}
         setOpen={setOpen}
         title={"Reply Message"}
         size="lg"
-        formStructure={notification ? {
+        formStructure={target ? {
             reply_message: {
                 entries: {
                     target: {
                         label: "Reply to",
                         type: "input",
-                        defaultValue: notification.sender.name,
+                        defaultValue: target.sender.name,
                         disabled: true,
                     },
                     message: {
@@ -54,17 +58,13 @@ const MessageReplyForm = ({ isOpen, setOpen, target: notification }: Props) => {
         clickOutsideToClose
         escToClose
         onEnter={async ({ reply_message: data }: MessageReplyFormData) => {
-            const response = await sendNotification(
-                `RE: ${notification.title}`, //the title can change? or use "RE: <message title> // use "RE: <message title> thx
-                data.message,
-                userId,
-                notification.sender.id, //should pass the userid of the people to reply to
+            await sendMessage(
+                `RE: ${target.title}`, //the title can change? or use "RE: <message title> // use "RE: <message title> thx
+                data.content,
+                target.sender.id, //should pass the userid of the people to reply to
+                target.section_id,
                 data.allow_reply,
-                notification.section_id
             );
-            if (response.success) {
-                await fetchNotifications();
-            }
         }}
     ></ModalForm>
 }

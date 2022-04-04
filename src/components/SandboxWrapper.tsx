@@ -45,7 +45,7 @@ export const SandboxWrapper = () => {
           title: sandboxImage.title,
           description: sandboxImage.description,
           imageId: sandboxImage.imageId,
-          sandboxesId: sandboxImage.sandboxesId,
+          containerId: sandboxImage.containerId,
           status: "REMOVING"
         }
       } else return s
@@ -77,7 +77,7 @@ export const SandboxWrapper = () => {
   const changeContainerToRemoving = (sandboxImage: SandboxImage) => {
     setContainers(containers => {
       return containers.map(container => {
-        if (container.redisPatch.cause == "SANDBOX_START_WORKSPACE" && container.containerID == sandboxImage.sandboxesId) {
+        if (container.redisPatch.cause == "SANDBOX_START_WORKSPACE" && container.containerID == sandboxImage.containerId) {
           return {
             ...container,
             status: "REMOVING"
@@ -106,9 +106,9 @@ export const SandboxWrapper = () => {
                 setUpdateTarget(sandboxImage);
               }
             }, {
-              text: sandboxImage.sandboxesId ? "Stop workspace" : "Start workspace",
+              text: sandboxImage.containerId ? "Stop workspace" : "Start workspace",
               onClick: async () => {
-                if (!sandboxImage.sandboxesId) {
+                if (!sandboxImage.containerId) {
                   //start 
                   if (containers.length == containerQuota) {
                     myToast.error({
@@ -146,7 +146,7 @@ export const SandboxWrapper = () => {
                   changeContainerToRemoving(sandboxImage)
                   const response = await removeSandbox(
                     {
-                      sandboxId: sandboxImage.sandboxesId,
+                      containerId: sandboxImage.containerId,
                       userId: userId
                     }
                   );
@@ -169,7 +169,7 @@ export const SandboxWrapper = () => {
             {
               text: "Delete",
               onClick: async () => {
-                if (sandboxImage.sandboxesId) {
+                if (sandboxImage.containerId) {
                   myToast.error({
                     title: "The workspace is still active. Fail to removed.",
                     description:
@@ -226,7 +226,7 @@ export const SandboxWrapper = () => {
                 myToast.dismiss(id)
                 await fetchContainers()
                 if (response.success) {
-                  const containerId = response.containerID
+                  const containerId = response.containerId
                   const id = myToast.custom(
                     <TempContainerToast
                       containerId={containerId}

@@ -43,11 +43,11 @@ const EmbeddedWorkspaceCard = ({
       title="Workspace is running..."
     >
       <span className="relative flex h-3 w-3">
-        {template.containerID && (
+        {template.containerId && (
           <span className="absolute animate-ping inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
         )}
         <span
-          className={`relative inline-flex rounded-full h-3 w-3 ${template.containerID ? "bg-green-400" : "bg-gray-400"
+          className={`relative inline-flex rounded-full h-3 w-3 ${template.containerId ? "bg-green-400" : "bg-gray-400"
             }`}
         ></span>
       </span>
@@ -134,7 +134,7 @@ function TemplateCard({
             <p className="template-card-des">{template.description}</p>
           </div>
           <div className="flex flex-col space-y-1">
-            {template.containerID && (
+            {template.containerId && (
               <EmbeddedWorkspaceCard
                 template={template}
                 onClick={() => {

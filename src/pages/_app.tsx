@@ -6,6 +6,8 @@ import Layout from '../components/Layout'
 import { CnailsProvider } from "../contexts/cnails";
 import { ThemeProvider } from "../contexts/theme"
 import { WarningProvider } from '../contexts/warning';
+import { ContainerProvider } from '../contexts/containers';
+import { MessagingProvider } from '../contexts/messaging';
 
 interface CnailsProps extends AppProps {
   sub: string
@@ -17,12 +19,17 @@ interface CnailsProps extends AppProps {
 
 function CnailsApp({ Component, pageProps }: CnailsProps) {
   return (
+    // all the context here are global contexts
     <CnailsProvider>
       <ThemeProvider>
         <WarningProvider>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
+          <ContainerProvider>
+            <MessagingProvider>
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            </MessagingProvider>
+          </ContainerProvider>
         </WarningProvider>
       </ThemeProvider>
     </CnailsProvider>

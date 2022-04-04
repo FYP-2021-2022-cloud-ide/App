@@ -3,7 +3,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { fetchAppSession } from "../../../lib/fetchAppSession";
 import {
-  SandboxAddResponse,
+  ContainerAddResponse,
   nodeError,
   SandboxAddRequest,
 } from "../../../lib/api/api";
@@ -17,7 +17,7 @@ import redisHelper from "../../../lib/redisHelper";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<SandboxAddResponse>
+  res: NextApiResponse<ContainerAddResponse>
 ) {
   const { memLimit, numCPU, sandboxImageId, title, sub } = JSON.parse(
     req.body

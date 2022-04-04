@@ -19,7 +19,7 @@ export const patchTemplates = (
         container.redisPatch.sourceId == template.id
       ) {
         // it is a template workspace
-        if (container.containerID == "")
+        if (container.containerId == "")
           return {
             ...template,
             status: "STARTING_WORKSPACE",
@@ -28,13 +28,13 @@ export const patchTemplates = (
           if (container.status == "REMOVING")
             return {
               ...template,
-              containerID: "", // clear the container id
+              containerId: "", // clear the container id
               status: "STOPPING_WORKSPACE",
             };
           else
             return {
               ...template,
-              containerID: container.containerID,
+              containerId: container.containerId,
               status: "DEFAULT",
             };
         }
@@ -42,7 +42,7 @@ export const patchTemplates = (
 
       if (container.redisPatch.sourceId == template.id) {
         // this is a temporary workspace
-        if (container.containerID == "")
+        if (container.containerId == "")
           return {
             ...template,
             status: "STARTING_WORKSPACE",
@@ -51,13 +51,13 @@ export const patchTemplates = (
           if (container.status == "REMOVING") {
             return {
               ...template,
-              containerID: "", // clear the container Id
+              containerId: "", // clear the container Id
               status: "STOPPING_WORKSPACE",
             };
           } else
             return {
               ...template,
-              containerID: container.containerID,
+              containerId: container.containerId,
               status: "UPDATING_INTERNAL",
             };
         }
@@ -67,7 +67,7 @@ export const patchTemplates = (
     // no template is related to this environment
     return {
       ...template,
-      containerID: "",
+      containerId: "",
       status: "DEFAULT",
     };
   });

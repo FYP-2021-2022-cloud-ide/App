@@ -79,7 +79,7 @@ export const expandGoogleFolder = async (
     };
     return findAndReplaceGoogleFolder(wholeTree, temp);
   } else {
-    console.error(response.error);
+    // console.error(response.error);
   }
 };
 

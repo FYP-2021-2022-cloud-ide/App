@@ -37,7 +37,7 @@ const NotificationBtn = ({ num }: { num: number }) => {
 };
 
 export default function NotiButton() {
-  const { userId, notifications } = useCnails();
+  const { userId, messages: notifications } = useCnails();
   let filterNotifications = notifications.filter(
     (notification) => !notification.read
   );

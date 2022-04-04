@@ -127,7 +127,7 @@ const patch = {
       (w) =>
         (w.containerId == "" &&
           getTimeDiff(w.requestAt).asSeconds() < creationTimeout) ||
-        containers.some((c) => c.containerID == w.containerId)
+        containers.some((c) => c.containerId == w.containerId)
     );
     if (workspaces.length == 0) {
       await redisClient.del(`ServerState:${sub}:workspaces`);
@@ -148,14 +148,14 @@ const patch = {
           title: workspace.title,
           subTitle: "",
           startAt: "",
-          containerID: "",
+          containerId: "",
           redisPatch: workspace,
         });
       } else {
         // the workspace has been created because there is container id
         //
         const index = patched.findIndex(
-          (c) => workspace.containerId == c.containerID
+          (c) => workspace.containerId == c.containerId
         );
         if (index == -1) {
           throw new Error("somehow container cannot found");

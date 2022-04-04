@@ -1,6 +1,7 @@
 import { data } from "cypress/types/jquery";
 import { useEffect } from "react";
 import { useCnails } from "../contexts/cnails";
+import { useContainers } from "../contexts/containers";
 import { containerAPI } from "../lib/api/containerAPI";
 import addTemplate from "../pages/api/template/addTemplate";
 import myToast from "./CustomToast";
@@ -15,7 +16,7 @@ type Props = {
      */
     containerId: string;
     /**
-     * when to do if user click OK
+     * when to do if user click OK.
      */
     onOK: () => void | Promise<void>;
     /**
@@ -30,15 +31,18 @@ type Props = {
 /**
  * The temp container toast to keep the consistency. When cancel button is clicked, the temp container will be removed. 
  * An `onOK` props need is needed to know that what to do if user click ok button. 
+ * 
+ * @remark you don't need to handle the `toast.dismiss` by yourself because the component helped you do that
  */
 const TempContainerToast = ({ containerId, getToastId, onOK, okBtnText, cancelBtnText, onCancel }: Props) => {
-    const { sub, fetchContainers, containers } = useCnails();
+    const { sub } = useCnails();
+    const { containers, fetchContainers } = useContainers();
     const { removeTempContainer } = containerAPI;
 
     useEffect(() => {
         // if the container is closed somewhere else
         const timeout = setTimeout(() => {
-            if (!containers.some(container => container.containerID == containerId)) {
+            if (!containers.some(container => container.containerId == containerId)) {
                 myToast.dismiss(getToastId());
             }
         }, 2000)

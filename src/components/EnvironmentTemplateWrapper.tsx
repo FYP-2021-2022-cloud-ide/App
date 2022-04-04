@@ -163,7 +163,7 @@ const EnvironmentTemplateWrapper = () => {
                                     // container is created 
                                     await fetchContainers()
                                     if (response.success) {
-                                        const containerId = response.containerID
+                                        const containerId = response.containerId
                                         const id = myToast.custom(
                                             <TempContainerToast
                                                 containerId={containerId}
@@ -246,11 +246,11 @@ const EnvironmentTemplateWrapper = () => {
                                 setTemplateUpdateOpen(true);
                             }
                         }, {
-                            text: (template) => template.containerID ? "Stop workspace" : "Start workspace",
+                            text: (template) => template.containerId ? "Stop workspace" : "Start workspace",
                             onClick: async (template) => {
-                                if (template.containerID) {
+                                if (template.containerId) {
                                     const response = await removeTemplateContainer({
-                                        containerId: template.containerID,
+                                        containerId: template.containerId,
                                         sub: sub
                                     });
                                     if (response.success) {
@@ -363,7 +363,7 @@ const EnvironmentTemplateWrapper = () => {
                                 myToast.dismiss(id)
                                 await fetchContainers()
                                 if (response.success) {
-                                    const containerId = response.containerID
+                                    const containerId = response.containerId
                                     const id = myToast.custom(
                                         <TempContainerToast
                                             containerId={containerId}
@@ -409,10 +409,10 @@ const EnvironmentTemplateWrapper = () => {
                         }
                     ]}
                     onWorkspaceCardClick={(template) => {
-                        if (template.containerID) {
+                        if (template.containerId) {
                             window.open(
                                 "https://codespace.ust.dev/user/container/" +
-                                template.containerID +
+                                template.containerId +
                                 "/"
                             );
                         }

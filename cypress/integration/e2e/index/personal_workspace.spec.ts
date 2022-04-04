@@ -1,5 +1,5 @@
 import {
-  SandboxAddResponse,
+  ContainerAddResponse,
   SandboxImageListResponse,
   SuccessStringResponse,
 } from "../../../../src/lib/api/api";
@@ -82,7 +82,7 @@ describe("personal workspace test", () => {
   //   cy.wait("@start", { responseTimeout: c.responseTimeout }).then(
   //     (interception) => {
   //       cy.get(".toaster-loading").should("not.exist");
-  //       const response = interception.response.body as SandboxAddResponse;
+  //       const response = interception.response.body as ContainerAddResponse;
   //       if (response.success) {
   //         cy.get(".toaster-success").should("exist");
   //         let card = cy

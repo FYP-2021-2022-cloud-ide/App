@@ -38,10 +38,10 @@ const SandboxImagesCard = ({
     >
       <div id={id} className="sandbox-card select-none" title="creating personal workspace..." onClick={
         () => {
-          if (sandboxImage.sandboxesId) {
+          if (sandboxImage.containerId) {
             window.open(
               "https://codespace.ust.dev/user/container/" +
-              sandboxImage.sandboxesId +
+              sandboxImage.containerId +
               "/"
             );
           }
@@ -107,13 +107,13 @@ const SandboxImagesCard = ({
     >
       <div
         id={id}
-        className={`sandbox-card select-none ${sandboxImage.sandboxesId ? "cursor-pointer" : ""
+        className={`sandbox-card select-none ${sandboxImage.containerId ? "cursor-pointer" : ""
           } `}
         onClick={() => {
-          if (sandboxImage.sandboxesId) {
+          if (sandboxImage.containerId) {
             window.open(
               "https://codespace.ust.dev/user/container/" +
-              sandboxImage.sandboxesId +
+              sandboxImage.containerId +
               "/"
             );
           }
@@ -126,12 +126,12 @@ const SandboxImagesCard = ({
               {/* the indicator */}
               <div className="mt-2">
                 <span className="relative flex h-3 w-3">
-                  {sandboxImage.sandboxesId && (
+                  {sandboxImage.containerId && (
                     <span className="absolute animate-ping inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                   )}
                   <span
                     id="indicator"
-                    className={`relative inline-flex rounded-full h-3 w-3 ${sandboxImage.sandboxesId ? "bg-green-400" : "bg-gray-400"
+                    className={`relative inline-flex rounded-full h-3 w-3 ${sandboxImage.containerId ? "bg-green-400" : "bg-gray-400"
                       }`}
                   ></span>
                 </span>
