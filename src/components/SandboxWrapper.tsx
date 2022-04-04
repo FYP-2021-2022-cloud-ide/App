@@ -14,9 +14,8 @@ import { useSandbox } from "../contexts/sandbox";
 import CreateSandboxForm from "./forms/CreateSandboxForm";
 import UpdateSandboxForm from "./forms/UpdateSandboxForm";
 import { containerAPI } from "../lib/api/containerAPI";
-import { SandboxAddRequest } from "../lib/api/api";
-import { Workspace as RedisPatch } from "../lib/redisHelper";
 import TempContainerToast from "./TempContainerToast";
+import { useWarning } from "../contexts/warning";
 
 
 
@@ -29,6 +28,7 @@ export const SandboxWrapper = () => {
   const [createOpen, setCreateOpen] = useState(false);
   const [updateOpen, setUpdateOpen] = useState(false);
   const [updateTarget, setUpdateTarget] = useState<SandboxImage>();
+  const { waitForConfirm } = useWarning()
   const {
     removeSandbox,
     removeSandboxImage,
@@ -101,13 +101,13 @@ export const SandboxWrapper = () => {
           const menuItems = [
             {
               text: "Update Info",
-              onClick: (sandbox) => {
+              onClick: () => {
                 setUpdateOpen(true);
-                setUpdateTarget(sandbox);
+                setUpdateTarget(sandboxImage);
               }
             }, {
-              text: (sandboxImage) => sandboxImage.sandboxesId ? "Stop workspace" : "Start workspace",
-              onClick: async (sandboxImage) => {
+              text: sandboxImage.sandboxesId ? "Stop workspace" : "Start workspace",
+              onClick: async () => {
                 if (!sandboxImage.sandboxesId) {
                   //start 
                   if (containers.length == containerQuota) {
@@ -168,7 +168,7 @@ export const SandboxWrapper = () => {
             },
             {
               text: "Delete",
-              onClick: async (sandboxImage) => {
+              onClick: async () => {
                 if (sandboxImage.sandboxesId) {
                   myToast.error({
                     title: "The workspace is still active. Fail to removed.",
@@ -178,6 +178,7 @@ export const SandboxWrapper = () => {
                   });
                   return;
                 }
+                if (await waitForConfirm("Are you sure that you want to delete this personal workspace? The action cannot be undo. ") == false) return
                 const id = myToast.loading(`Removing ${sandboxImage.title}...`);
                 changeSandboxToRemoving(sandboxImage)
                 const response = await removeSandboxImage({
@@ -202,7 +203,7 @@ export const SandboxWrapper = () => {
           if (sandboxImage.status != "UPDATING_INTERNAL")
             menuItems.push({
               text: "Update Internal",
-              onClick: async (sandboxImage) => {
+              onClick: async () => {
                 const id = myToast.loading("Creating a temporary workspace...")
                 addCreatingWorkspace(sandboxImage, "SANDBOX_UPDATE")
                 const response = await addTempContainer({
@@ -230,6 +231,9 @@ export const SandboxWrapper = () => {
                     <TempContainerToast
                       containerId={containerId}
                       getToastId={() => id}
+                      onCancel={async () => {
+                        return await waitForConfirm("Are you sure that you want to cancel the commit. All your changes in the workspace will not be saved and personal workspace will not be updated.")
+                      }}
                       onOK={async () => {
                         const response = await updateSandboxImage(
                           {

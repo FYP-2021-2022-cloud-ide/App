@@ -9,6 +9,11 @@ export type ModalProps = {
   clickOutsideToClose?: boolean;
   escToClose?: boolean;
   onOpen?: () => void;
+  /**
+   * This onClose doesn't intercept the `setOpen` function. 
+   * It will only trigger when it is closed on esc or clickoutside.
+   * If you have other close mechanism, you need to call that yourself.
+   */
   onClose?: () => void;
 };
 
@@ -54,7 +59,7 @@ function Modal({
           &#8203;
           <Dialog
             as="div"
-            className={`fixed inset-0 z-[10] overflow-y-auto `}
+            className={`fixed inset-0 z-[99999] overflow-y-auto `}
             open={Boolean(isOpen)}
             // this will disable the orginal useWindowEvent
             onClose={() => null}

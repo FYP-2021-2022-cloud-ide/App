@@ -18,6 +18,7 @@ import EnvironmentList from "./EnvironmentList";
 import TemplateList from "./TemplateList";
 import { useForceUpdate } from "./useForceUpdate";
 import TempContainerToast from "./TempContainerToast";
+import { useWarning } from "../contexts/warning";
 
 
 const EnvironmentTemplateWrapper = () => {
@@ -25,6 +26,7 @@ const EnvironmentTemplateWrapper = () => {
     const { sub, fetchContainers, setContainers } = useCnails();
     const { environments, templates, fetch, sectionUserInfo, setHighlightedEnv, fetchEnvironments, fetchTemplates } =
         useInstructor();
+    const { waitForConfirm } = useWarning();
     const { sectionUserId, sectionId } = sectionUserInfo;
     const [envCreateOpen, setEnvCreateOpen] = useState(false);
     const [envUpdateOpen, setEnvUpdateOpen] = useState(false);
@@ -104,6 +106,7 @@ const EnvironmentTemplateWrapper = () => {
                                             comment: CLICK_TO_DISMISS,
                                         });
                                     } else {
+                                        if (await waitForConfirm("Are you sure you want to remove this environment? This action cannot be undo.") == false) return;
                                         const response = await removeEnvironment({
                                             envId: env.id,
                                             section_user_id: sectionUserId,
@@ -165,6 +168,9 @@ const EnvironmentTemplateWrapper = () => {
                                             <TempContainerToast
                                                 containerId={containerId}
                                                 getToastId={() => id}
+                                                onCancel={async () => {
+                                                    return await waitForConfirm("Are you sure that you want to cancel the commit? All your changes in the workspace will not be saved and the environment will not be updated.")
+                                                }}
                                                 onOK={async () => {
                                                     const response = await updateEnvironment(
                                                         {
@@ -222,6 +228,7 @@ const EnvironmentTemplateWrapper = () => {
                         {
                             text: "Delete",
                             onClick: async (template) => {
+                                if (await waitForConfirm("Are you sure you want to delete this template? This action cannot be undo.") == false) return;
                                 const response = await removeTemplate({
                                     templateId: template.id,
                                     section_user_id: sectionUserId
@@ -361,6 +368,9 @@ const EnvironmentTemplateWrapper = () => {
                                         <TempContainerToast
                                             containerId={containerId}
                                             getToastId={() => id}
+                                            onCancel={async () => {
+                                                return await waitForConfirm("Are you sure you want to cancel the commit? All your changes in the workspace will not be saved and the template will not be updated.")
+                                            }}
                                             onOK={async () => {
                                                 const response = await updateTemplate({
                                                     templateId: template.id,

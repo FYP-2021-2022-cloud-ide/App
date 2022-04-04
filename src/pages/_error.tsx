@@ -1,5 +1,5 @@
 import { NextPageContext } from "next";
-import { useState } from "react";
+import { ChangeEventHandler, useCallback, useState } from "react";
 import CryingFace from "../components/CryingFace";
 import myToast from "../components/CustomToast";
 import sc from "../lib/statusCode.json";
@@ -15,6 +15,11 @@ const Error = ({
   status?: any;
 }) => {
   const [text, setText] = useState("");
+  const showToast = useCallback(() => {
+    // report the issue
+    myToast.success("You message has been sent.");
+  }, [])
+  const onInputChange: ChangeEventHandler<HTMLTextAreaElement> = useCallback((e) => setText(e.currentTarget.value), [])
   return (
     <div className="w-full h-full relative">
       <div className="flex flex-col items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 space-y-2 min-w-[1/2] w-1/2">
@@ -26,10 +31,7 @@ const Error = ({
         </p>
         <button
           className="btn btn-primary"
-          onClick={() => {
-            // report the issue
-            myToast.success("You message has been sent.");
-          }}
+          onClick={showToast}
           disabled={text == ""}
         >
           Report issue
@@ -43,7 +45,7 @@ const Error = ({
           <textarea
             className="error-page-textarea"
             placeholder="Description"
-            onChange={(e) => setText(e.currentTarget.value)}
+            onChange={onInputChange}
           ></textarea>
         </div>
       </div>

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "NODE_OPTIONS='--experimental-specifier-resolution=node' ts-node src/server/index.ts",
     "build": "next build && tsc ",
-    "start": "node out/server/index.js",
+    "start": "NODE_OPTIONS='--experimental-specifier-resolution=node' NODE_ENV=production node out/server/index.js",
     "lint": "next lint",
     "protoc": "grpc_tools_node_protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=. src/proto/dockerGet/dockerGet.proto --ts_proto_opt=outputServices=grpc-js,esModuleInterop=true "
   },
@@ -95,6 +95,7 @@
     "eslint": "7.31.0",
     "eslint-config-next": "11.0.1",
     "eslint-plugin-cypress": "^2.12.1",
+    "eslint-plugin-react-perf": "^3.3.1",
     "grpc-tools": "^1.11.2",
     "postcss": "^8.4.5",
     "tailwindcss": "^3.0.15",

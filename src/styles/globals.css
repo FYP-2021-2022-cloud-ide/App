@@ -128,7 +128,7 @@
 
 .course-dialog-modal,
 .modal-form {
-  @apply max-h-[70vh] inline-block z-10 max-w-[1000px] py-6 px-10 overflow-y-scroll overflow-x-visible text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-xl text-[#415A6E];
+  @apply max-h-[70vh] inline-block z-10 max-w-[1000px] py-6 px-10   text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-xl text-[#415A6E];
 }
 
 .course-dialog-content,

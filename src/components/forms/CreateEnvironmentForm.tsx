@@ -12,6 +12,7 @@ import { FormStructure } from "../ModalForm/types";
 import { env } from "process";
 import { EnvironmentBuildRequest } from "../../lib/api/api";
 import TempContainerToast from "../TempContainerToast";
+import { useWarning } from "../../contexts/warning";
 
 export type CreateEnvironmentFormData = {
     create_environment: {
@@ -30,6 +31,7 @@ export type Props = {
 const CreateEnvironmentForm = ({ isOpen, setOpen }: Props) => {
     const { sub, fetchContainers } = useCnails()
     const { environments, sectionUserInfo, fetch, fetchEnvironments } = useInstructor()
+    const { waitForConfirm } = useWarning()
     const { addTempContainer, removeTempContainer } = containerAPI
     const { addEnvironment, buildEnvironment } = envAPI
     const validName = getValidName(
@@ -146,6 +148,9 @@ const CreateEnvironmentForm = ({ isOpen, setOpen }: Props) => {
                             <TempContainerToast
                                 getToastId={() => customToastId}
                                 containerId={containerID}
+                                onCancel={async () => {
+                                    return await waitForConfirm("Are you sure you want to cancel the commit? All your changes in the workspace will not be saved and no environment will be built.")
+                                }}
                                 onOK={async () => {
                                     // build succeed
                                     myToast.dismiss(customToastId);

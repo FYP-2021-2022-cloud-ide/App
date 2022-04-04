@@ -230,7 +230,7 @@ function ModalForm<T>(props: Props<T>) {
       clickOutsideToClose={clickOutsideToClose}
       escToClose={escToClose}
     >
-      <div className={`modal-form ${sizeMap[size]} hide-scroll `}>
+      <div className={`modal-form ${sizeMap[size]} hide-scroll overflow-y-scroll overflow-x-visible `}>
         <Twemoji noWrapper options={{ className: "twemoji" }}>
           <div className="modal-form-content">
             <Dialog.Title as="h3" className="modal-form-title capitalize">

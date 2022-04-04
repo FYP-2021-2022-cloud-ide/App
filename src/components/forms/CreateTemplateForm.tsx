@@ -12,6 +12,7 @@ import { AddTemplateRequest, TemplateAddResponse } from "../../lib/api/api";
 import { Template } from "../../lib/cnails";
 import { errorToToastDescription } from "../../lib/errorHelper";
 import { CLICK_TO_REPORT } from "../../lib/constants";
+import { useWarning } from "../../contexts/warning";
 
 export type CreateTemplateFormData = {
     create_template: {
@@ -33,6 +34,7 @@ const CreateTemplateForm = ({ isOpen, setOpen }: Props) => {
 
     const { sub, fetchContainers, setContainers } = useCnails()
     const { environments, templates, sectionUserInfo, fetch, fetchTemplates } = useInstructor()
+    const { waitForConfirm } = useWarning();
     const { addTempContainer } = containerAPI;
     const { addTemplate } = templateAPI;
     const envOptions = getEnvOptions(environments)
@@ -171,6 +173,9 @@ const CreateTemplateForm = ({ isOpen, setOpen }: Props) => {
                     <TempContainerToast
                         getToastId={() => customToastId}
                         containerId={containerID}
+                        onCancel={async () => {
+                            return await waitForConfirm("Are you sure you want to cancel the commmit? All you changes in the workspace will not be saved and no template will be created.")
+                        }}
                         onOK={
                             async () => {
                                 const id = myToast.loading("Building your template...");

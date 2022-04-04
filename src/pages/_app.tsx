@@ -5,6 +5,7 @@ import '../styles/globals.css'
 import Layout from '../components/Layout'
 import { CnailsProvider } from "../contexts/cnails";
 import { ThemeProvider } from "../contexts/theme"
+import { WarningProvider } from '../contexts/warning';
 
 interface CnailsProps extends AppProps {
   sub: string
@@ -16,13 +17,15 @@ interface CnailsProps extends AppProps {
 
 function CnailsApp({ Component, pageProps }: CnailsProps) {
   return (
-      <CnailsProvider>
-        <ThemeProvider>
+    <CnailsProvider>
+      <ThemeProvider>
+        <WarningProvider>
           <Layout>
             <Component {...pageProps} />
           </Layout>
-        </ThemeProvider>
-      </CnailsProvider>
+        </WarningProvider>
+      </ThemeProvider>
+    </CnailsProvider>
 
   )
 }

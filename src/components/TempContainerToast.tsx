@@ -18,6 +18,10 @@ type Props = {
      * when to do if user click OK
      */
     onOK: () => void | Promise<void>;
+    /**
+     * return a boolean of whether this toast will be dismissed
+     */
+    onCancel?: () => boolean | Promise<boolean>;
     setUpWorkspaceText?: string;
     cancelBtnText?: string;
     okBtnText?: string;
@@ -27,7 +31,7 @@ type Props = {
  * The temp container toast to keep the consistency. When cancel button is clicked, the temp container will be removed. 
  * An `onOK` props need is needed to know that what to do if user click ok button. 
  */
-const TempContainerToast = ({ containerId, getToastId, onOK, okBtnText, cancelBtnText }: Props) => {
+const TempContainerToast = ({ containerId, getToastId, onOK, okBtnText, cancelBtnText, onCancel }: Props) => {
     const { sub, fetchContainers, containers } = useCnails();
     const { removeTempContainer } = containerAPI;
 
@@ -63,6 +67,7 @@ const TempContainerToast = ({ containerId, getToastId, onOK, okBtnText, cancelBt
             <button
                 className="btn btn-xs bg-gray-500 text-white hover:bg-gray-400 dark:bg-gray-400 dark:hover:bg-gray-500 border-none"
                 onClick={async () => {
+                    if (onCancel && await onCancel() == false) return
                     // cancel the build
                     myToast.dismiss(getToastId());
                     const response = await removeTempContainer({
