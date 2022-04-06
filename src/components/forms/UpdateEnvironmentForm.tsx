@@ -26,7 +26,7 @@ type Props = {
 }
 
 const UpdateEnvironmentForm = ({ isOpen, setOpen, target }: Props) => {
-    const { environments, updateEnvironment } = useInstructor();
+    const { environments, updateEnvironmentInfo: updateEnvironment } = useInstructor();
     const validName = getValidName(
         environments.map((env) => env.name),
         "Environment",

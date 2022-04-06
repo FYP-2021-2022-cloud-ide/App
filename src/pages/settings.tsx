@@ -1,12 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { useTheme } from '../contexts/theme';
-import { UserIcon } from '@heroicons/react/solid';
 import { useCnails } from '../contexts/cnails';
-import { generalAPI } from '../lib/api/generalAPI'
 export default function Setting() {
     const { sub, name, email } = useCnails();
-    const { updateUserData } = generalAPI;
-    const { isDark } = useTheme();
+
     // const[newBio,setNewBio]=useState(bio);
     return (
         <div className="flex flex-col space-y-3 items-center mt-10 ">

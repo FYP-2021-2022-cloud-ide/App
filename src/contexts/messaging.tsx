@@ -90,6 +90,7 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
                 });
                 setUnsubscribe(s);
             }
+            console.log("finished")
         } catch (error) {
             console.log(error);
         }
@@ -98,6 +99,7 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
     const fetchMessages = async () => {
         const response = await listNotifications(userId);
         if (response.success) {
+            console.log(response.notifications)
             setMessages(response.notifications);
             return response.notifications;
         } else console.error("[ ❌ ] : fail to fetch notifications ", response);
@@ -150,8 +152,9 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
     }
 
     const init = async () => {
-        if (await isSupported())
+        if (await isSupported()) {
             await initMessaging()
+        }
         await fetchMessages()
     }
 
@@ -167,8 +170,8 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
      * this hook fetch messages every one minutes
      */
     useInterval(fetchMessages, 60 * 1000)
+    if (!messages) return <></>;
 
-    if (!messages || !unsubscribe) return <></>;
     return <MessagingContext.Provider
         value={
             {

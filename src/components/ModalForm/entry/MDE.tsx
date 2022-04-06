@@ -10,40 +10,12 @@ import fm from "front-matter";
 import Custom from "./Custom";
 import FocusTrap from "focus-trap-react";
 import EasyMDE from "easymde";
-import Image from "next/image";
+
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
   ssr: false,
 });
 
-const validFrontmatter = ["course.code", "status", "course.section"];
 
-const FrontMatter = ({ attributes }: { attributes?: unknown }) => {
-  const flattened = flat.flatten(attributes);
-  return _.isEqual(attributes, {}) ? (
-    <></>
-  ) : (
-    <div className="flex flex-row space-x-2 mb-4">
-      {Object.keys(flattened)
-        .filter((a) => validFrontmatter.includes(a))
-        .map((a ,index) => {
-          return (
-            <div
-            key={index }
-              className={`flex rounded bg-blue-500 select-none overflow-hidden frontmatter-badge-${a.replace(
-                ".",
-                "-"
-              )}`}
-            >
-              <div className="px-1 text-2xs text-white font-bold">{a}</div>
-              <div className="px-1 text-2xs text-white bg-white/20">
-                {flattened[a]}
-              </div>
-            </div>
-          );
-        })}
-    </div>
-  );
-};
 
 const MDE = memo(
   ({
@@ -157,7 +129,6 @@ function Component<T>(props: EntryProps<T>) {
                 }}
               >
                 <div>
-                  <FrontMatter attributes={getBadge()}></FrontMatter>
                   <MDE
                     mdeRef={mdeRef}
                     text={data}

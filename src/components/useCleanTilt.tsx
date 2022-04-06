@@ -3,7 +3,7 @@ import Tilt from "react-parallax-tilt";
 
 /**
  * put the `ref` and `cleanStyle` to the `<Tilt>` component
- * @param preserve 
+ * @param preserve preserve a string after removing the styles
  * @returns 
  */
 const useCleanTilt = (preserve: string = "") => {

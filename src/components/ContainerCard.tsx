@@ -7,8 +7,6 @@ import { useCnails } from "../contexts/cnails";
 import myToast from "./CustomToast";
 import { errorToToastDescription } from "../lib/errorHelper";
 import { Container } from "../lib/cnails";
-
-import { Error } from "../lib/api/api";
 import { templateAPI } from "../lib/api/templateAPI";
 import { containerAPI } from "../lib/api/containerAPI";
 import { sandboxAPI } from "../lib/api/sandboxAPI";
@@ -40,7 +38,7 @@ function ContainerCard({
   title,
   subTitle,
   startAt,
-  containerId,
+  id: containerId,
   type,
   status,
   isTemporary,

@@ -7,7 +7,6 @@ import {
 } from "react";
 import { ReplyIcon } from "@heroicons/react/outline";
 import EmptyDiv from "../components/EmptyDiv";
-import { notificationAPI } from "../lib/api/notificationAPI";
 import { RefreshIcon, TrashIcon } from "@heroicons/react/solid";
 import DataTable, {
   TableColumn,
@@ -16,9 +15,6 @@ import DataTable, {
 import { Message } from "../lib/cnails";
 import moment from "moment";
 import Loader from "../components/Loader";
-import myToast from "../components/CustomToast";
-
-
 import React from "react";
 import { useRouter } from "next/router";
 import _ from "lodash";
@@ -33,11 +29,11 @@ type Course = {
   id: string;
 };
 
-const notificationToCourse = (notification: Message): Course => {
-  return notification.section_id
+const messageToCourse = (message: Message): Course => {
+  return message.section_id
     ? {
-      fullCode: `${notification.courseCode} (${notification.sectionCode})`,
-      id: notification.section_id,
+      fullCode: `${message.courseCode} (${message.sectionCode})`,
+      id: message.section_id,
     }
     : undefined;
 };
@@ -60,7 +56,7 @@ const MessageTable = () => {
   const target = router.query.id;
   const [selectedRows, setSelectedRows] = useState<Message[]>([]);
   const { messages, fetchMessages, changeMessagesRead, deleteMessages } = useMessaging();
-  const [pending, setPending] = useState(true);
+  // const [pending, setPending] = useState(true);
   const [replyFormOpen, setReplyFormOpen] = useState<boolean>(false);
   const [replyTarget, setReplyTarget] = useState<Message>();
   const [readDuringUnreadFiltering, setReadDuringUnreadFiltering] = useState<
@@ -68,7 +64,7 @@ const MessageTable = () => {
   >([]);
   const [onlyUnread, setOnlyUnread] = useState<boolean>(false);
   const [onlyCourses, setOnlyCourses] = useState<string[]>([]);
-  let filterNotifications = messages
+  let filterMessages = messages
     .filter((message) => {
       return (
         readDuringUnreadFiltering.some((j) => j.id == message.id) ||
@@ -76,29 +72,26 @@ const MessageTable = () => {
         (onlyUnread && !message.read)
       );
     })
-    .filter((notification) => {
+    .filter((message) => {
       return (
         onlyCourses.length == 0 ||
         onlyCourses
           .map((course) => JSON.parse(course) as Course)
-          .some((course) => course.id == notification.section_id)
+          .some((course) => course.id == message.section_id)
       );
     });
 
-  const { removeNotification, sendNotification } = notificationAPI;
-  // useEffect(() => {
-  //   async function temp() {
-  //     await fetchMessages();
-  //     setPending(false);
-  //   }
-  //   temp();
-  // }, []);
+  /**
+   * this hook change the column padding of the Read row in every render because the padding is wrong 
+   */
   useEffect(() => {
     const cell = document.querySelector(
       "div[data-column-id='Read']"
     ) as HTMLElement;
     if (cell) cell.style.padding = "0px";
   });
+
+
   const columns: TableColumn<Message>[] = [
     {
       id: "Read",
@@ -240,8 +233,8 @@ const MessageTable = () => {
 
   const getCourses = (): Course[] => {
     if (messages.length == 0) return [];
-    const courses = _.groupBy(messages, (notification) => {
-      return JSON.stringify(notificationToCourse(notification));
+    const courses = _.groupBy(messages, (message) => {
+      return JSON.stringify(messageToCourse(message));
     });
     return Object.keys(courses).map((course) => JSON.parse(course));
   };
@@ -250,7 +243,6 @@ const MessageTable = () => {
     expand,
     message
   ) => {
-    // read notification
     if (expand && onlyUnread)
       setReadDuringUnreadFiltering([
         ...readDuringUnreadFiltering,
@@ -270,19 +262,19 @@ const MessageTable = () => {
     "light"
   );
 
-  if (pending) {
-    return (
-      <div className="bg-gray-300 dark:bg-gray-700 rounded-lg w-full h-96 flex items-center justify-center overflow-hidden">
-        <Loader />
-      </div>
-    );
-  }
+  // if (pending) {
+  //   return (
+  //     <div className="bg-gray-300 dark:bg-gray-700 rounded-lg w-full h-96 flex items-center justify-center overflow-hidden">
+  //       <Loader />
+  //     </div>
+  //   );
+  // }
   return (
     <>
       {messages.length == 0 ? (
-        <EmptyDiv message="You have no notifications."></EmptyDiv>
+        <EmptyDiv message="You have no messages."></EmptyDiv>
       ) : (
-        // only if user have notifications
+        // only if user have messages
         <div className="flex flex-row space-x-2 text-gray-600 dark:text-gray-300">
           <div className="min-w-[12rem] h-min  flex flex-col space-y-2 p-3 border rounded-md text-xs bg-gray-100 dark:bg-black/50   border-[#D5D6D8] dark:border-[#2F3947] ">
             <p className="text-lg font-bold">Facet</p>
@@ -337,7 +329,7 @@ const MessageTable = () => {
           <div className="w-full ">
             <DataTable
               columns={columns}
-              data={filterNotifications}
+              data={filterMessages}
               selectableRows
               persistTableHead
               noDataComponent={<></>}
@@ -407,7 +399,7 @@ const MessageTable = () => {
               selectableRowSelected={(row) => selectedRows.map((n) => n.id).includes(row.id)}
               expandableRowsComponent={ExpandedComponent}
             />
-            {filterNotifications.length == 0 ? (
+            {filterMessages.length == 0 ? (
               <div className="flex flex-row bg-gray-100 dark:bg-black/50 rounded-b-md p-2 justify-center items-center rdt_pagination h-56 text-gray-400">
                 No messages after faceting
               </div>

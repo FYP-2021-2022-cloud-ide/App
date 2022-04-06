@@ -43,7 +43,7 @@ const TempContainerToast = ({ containerId, getToastId, onOK, okBtnText, cancelBt
     useEffect(() => {
         // if the container is closed somewhere else
         const timeout = setTimeout(() => {
-            if (!containers.some(container => container.containerId == containerId)) {
+            if (!containers.some(container => container.id == containerId)) {
                 myToast.dismiss(getToastId());
             }
         }, 2000)

@@ -1,23 +1,19 @@
 import ContainerCard from "./ContainerCard";
 import EmptyDiv from "./EmptyDiv";
 import { Container, ContainerInfo } from "../lib/cnails";
-import { useCnails } from "../contexts/cnails";
 import { useEffect } from "react";
+import { useContainers } from "../contexts/containers";
+import moment from "moment";
 
-type Props = {
-  containerInfo: ContainerInfo;
-  containers: Container[];
-};
 
 const ContainersList = () => {
   const {
     containers,
-    fetchContainers,
     containerQuota: quota,
-  } = useCnails();
-  useEffect(() => {
-    fetchContainers();
-  }, []);
+  } = useContainers();
+  // useEffect(() => {
+  //   fetchContainers();
+  // }, []);
 
   var numActiveContainers = containers ? containers.length : 0;
   var percentage = containers ? (containers.length / quota) * 100 : 0;
@@ -47,11 +43,14 @@ const ContainersList = () => {
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5"
             id="container-list-grid"
           >
-            {containers.sort().map((container, i) => {
-              const { containerID } = container;
+            {containers.sort((a, b) => {
+              if (moment(a.startAt) > moment(b.startAt)) return -1;
+              else if (moment(a.startAt) < moment(b.startAt)) return 1;
+              else return 0;
+            }).map((container, i) => {
               return (
                 <ContainerCard
-                  key={containerID}
+                  key={container.id}
                   {...container}
                   zIndex={containers.length - i}
                 ></ContainerCard>

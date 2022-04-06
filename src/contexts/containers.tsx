@@ -3,13 +3,13 @@ import React, { useContext, useEffect, useState } from "react";
 import myToast from "../components/CustomToast";
 import TempContainerToast from "../components/TempContainerToast";
 import useInterval from "../components/useInterval";
-import { SandboxAddRequest, ContainerAddRequest, AddTemplateContainerRequest, ContainerAddResponse } from "../lib/api/api";
+import { SandboxAddRequest, ContainerAddRequest, AddTemplateContainerRequest, ContainerAddResponse, ContainerRemoveRequest, SuccessStringResponse } from "../lib/api/api";
 import { containerAPI } from "../lib/api/containerAPI";
 import { generalAPI } from "../lib/api/generalAPI";
 import { sandboxAPI } from "../lib/api/sandboxAPI";
 import { templateAPI } from "../lib/api/templateAPI";
 import { Container } from "../lib/cnails";
-import { CLICK_TO_REPORT } from "../lib/constants";
+import { CLICK_TO_DISMISS, CLICK_TO_REPORT } from "../lib/constants";
 import { getType, isTemporary } from "../lib/containerHelper";
 import { errorToToastDescription } from "../lib/errorHelper";
 import { AddTempContainerReply } from "../proto/dockerGet/dockerGet";
@@ -26,6 +26,7 @@ interface ContainerProviderProps {
 
 type ContainerContextState = {
     containers: Container[];
+    getContainer: (id: string) => Container;
     setContainers: React.Dispatch<React.SetStateAction<Container[]>>;
     /**
      * a function to fetch the new container list.
@@ -36,7 +37,9 @@ type ContainerContextState = {
      */
     fetchContainers: () => Promise<Container[]>;
     containerQuota: number;
-    createContainer: (_req: ContainerAddRequest | SandboxAddRequest | AddTemplateContainerRequest, onOK: (containerId: string) => void) => Promise<void>
+
+    createContainer: (_req: ContainerAddRequest | SandboxAddRequest | AddTemplateContainerRequest, onOK?: (containerId: string) => void) => Promise<void>
+    removeContainer: (containerId: string) => Promise<void>
 }
 
 const ContainerContext = React.createContext({} as ContainerContextState);
@@ -57,6 +60,8 @@ export const ContainerProvider = ({ children }: ContainerProviderProps) => {
     const { addTemplateContainer, removeTemplateContainer } = templateAPI
     const { getEnv } = generalAPI;
 
+    const getContainer = (id: string) => containers.find(c => c.id == id)
+
     /**
      * internal fetchContainer 
      */
@@ -65,6 +70,7 @@ export const ContainerProvider = ({ children }: ContainerProviderProps) => {
         if (response.success) {
             const newContainers = response.containers.map(container => (container.redisPatch ? {
                 ...container,
+                id: container.containerId,
                 isTemporary: isTemporary(container.redisPatch.cause),
                 redisPatch: container.redisPatch,
                 type: getType(container.redisPatch.cause),
@@ -78,7 +84,10 @@ export const ContainerProvider = ({ children }: ContainerProviderProps) => {
             } as unknown as Container))
             if (!_.isEqual(containers, newContainers)) {
                 console.log("containers are different", newContainers)
+
                 setContainers(newContainers);
+
+
             }
 
             return newContainers
@@ -90,7 +99,15 @@ export const ContainerProvider = ({ children }: ContainerProviderProps) => {
         }
     };
 
-    async function createContainer(_req: ContainerAddRequest | SandboxAddRequest | AddTemplateContainerRequest, onOK: (containerId: string) => void) {
+    async function createContainer(_req: ContainerAddRequest | SandboxAddRequest | AddTemplateContainerRequest, onOK?: (containerId: string) => void) {
+        if (containers.length == containerQuota) {
+            myToast.error({
+                title: `You have met your simultaneous workspace quota. Fail to start workspace.`,
+                description: `You can have at most ${containerQuota}`,
+                comment: CLICK_TO_DISMISS,
+            });
+            return;
+        }
         let response: ContainerAddResponse
         let toastId: string
         if (_req.event == "SANDBOX_START_WORKSPACE") {
@@ -110,13 +127,44 @@ export const ContainerProvider = ({ children }: ContainerProviderProps) => {
         myToast.dismiss(toastId);
         await fetchContainers();
         if (response.success)
-            onOK(response.containerId)
+            if (onOK) {
+                onOK(response.containerId)
+            } else {
+                myToast.success("Workspace is successfully started.")
+            }
         else
             myToast.error({
                 title: "Fail to create temporary workspace",
                 description: errorToToastDescription(response.error),
                 comment: CLICK_TO_REPORT,
             })
+    }
+
+    async function removeContainer(containerId: string) {
+        const container = getContainer(containerId)
+        let response: SuccessStringResponse
+        let toastId = myToast.loading("Stopping the workspace...")
+        if (container.isTemporary) {
+
+        } if (container.redisPatch.cause == "SANDBOX_START_WORKSPACE") {
+            // it is a sandbox
+        } else {
+            // it is a template container 
+            response = await templateAPI.removeTemplateContainer({
+                containerId,
+                sub: sub
+            })
+        }
+        myToast.dismiss(toastId)
+        if (response.success)
+            myToast.success("Workspace is successfully removed.")
+        else
+            myToast.error({
+                title: `Fail to stop workspace`,
+                description: errorToToastDescription(response.error),
+                comment: CLICK_TO_REPORT,
+            });
+        await fetchContainers()
     }
 
     const getContainerQuotaFromEnv = async () => {
@@ -133,16 +181,20 @@ export const ContainerProvider = ({ children }: ContainerProviderProps) => {
 
     useEffect(() => {
         fetchContainers();
+
         getContainerQuotaFromEnv()
     }, [])
+
 
     if (!containers || !containerQuota) return <></>
     return <ContainerContext.Provider value={{
         containers,
+        getContainer,
         setContainers,
         fetchContainers,
         containerQuota,
-        createContainer
+        createContainer,
+        removeContainer
     }}>
         {children}
     </ContainerContext.Provider>

@@ -11,7 +11,7 @@ const firebaseCloudMessaging = {
   /**
    * this funtion initialized the firebase app and return the token for firebase messaging from local storage .
    */
-  init: async function () {
+  init: async function ():Promise<string> {
     const { getEnv } = generalAPI;
     var res = await getEnv();
     var {
@@ -20,35 +20,35 @@ const firebaseCloudMessaging = {
       FirebaseMessagingSenderId,
       FirebaseAppId,
     } = res;
-    if (isSupported()) {
+    if ((await isSupported()).valueOf()) {
       firebase.initializeApp({
         apiKey: FirebaseApiKey,
         projectId: FirebaseProjectId,
         messagingSenderId: FirebaseMessagingSenderId,
         appId: FirebaseAppId,
       });
-    } else {
-      console.log("not supported");
-    }
-
-    try {
-      if (await isSupported()) {
+      try {
         if ((await this.tokenInlocalforage()) !== null) {
-          return this.tokenInlocalforage();
+          return this.tokenInlocalforage()
         }
 
-        const messaging = getMessaging();
+        const messaging = getMessaging(); 
         const status = await Notification.requestPermission();
+
         if (status && status === "granted") {
           console.log("granted permission");
-          const token = await getToken(messaging);
-          localforage.setItem("fcm_token", token);
+          const token = getToken(messaging);
+
+          localforage.setItem("fcm_token", await token);
           console.log(token);
           return token;
         }
+      } catch (error) {
+        console.error(error);
       }
-    } catch (error) {
-      console.error(error);
+    } else {
+      console.log("not supported");
+      return "Not Supported"
     }
   },
 };

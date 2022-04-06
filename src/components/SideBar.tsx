@@ -1,17 +1,15 @@
-import Image from "next/image";
 import Link from "next/link";
 import {
   HomeIcon,
-  CubeTransparentIcon,
   AnnotationIcon,
   CloudIcon,
-  IdentificationIcon,
 } from "@heroicons/react/outline";
 import { useRouter } from "next/router";
-import { useCnails } from "../contexts/cnails";
 import Logo from "./Logo";
+import { useContainers } from "../contexts/containers";
+
 const SideBar = () => {
-  const { containerQuota, containers } = useCnails();
+  const { containerQuota, containers } = useContainers();
   const router = useRouter();
   var pages = [
     { name: "Dashboard", link: "/", icon: HomeIcon },
@@ -36,8 +34,8 @@ const SideBar = () => {
                 <a
                   id={page.name}
                   className={`sidebar-btn ${isActive
-                      ? "text-gray-900 dark:text-gray-200"
-                      : "text-gray-500 dark:text-gray-400"
+                    ? "text-gray-900 dark:text-gray-200"
+                    : "text-gray-500 dark:text-gray-400"
                     }`}
                 >
                   <page.icon className="w-6 h-6" />
@@ -67,8 +65,8 @@ const SideBar = () => {
                   width: `${(containers.length / containerQuota) * 100}%`,
                 }}
                 className={`current-run-bar-inner ${(containers.length / containerQuota) * 100 >= 100
-                    ? "bg-red-400"
-                    : "bg-green-300"
+                  ? "bg-red-400"
+                  : "bg-green-300"
                   }`}
               ></div>
             </div>

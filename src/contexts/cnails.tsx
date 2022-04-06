@@ -1,8 +1,6 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { FetchCookieResponse } from "../lib/api/api";
-import _ from "lodash";
-import CustomToaster from "../components/CustomToaster";
 
 interface CnailsProviderProps {
   children: JSX.Element;
@@ -71,7 +69,11 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
     }
   }
 
-  if (sub == "" || userId == "" || email == "" || semesterId == "" || name == "") return <></>;
+  useEffect(() => {
+    fetchCookies()
+  }, [])
+
+  if (sub == "" || userId == "" || name == "" || email == "" || semesterId == "") return <></>;
 
   return <CnailsContext.Provider
     value={{
@@ -84,7 +86,6 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
       // isAdmin,
     }}
   >
-    <CustomToaster />
     {children}
 
   </CnailsContext.Provider>

@@ -12,7 +12,7 @@ interface LayoutProps {
 const Layout = ({ children }: LayoutProps) => {
   const { isDark } = useTheme();
   const { sub, name, email } = useCnails();
-
+  console.log(children)
 
   return (
     <Twemoji noWrapper options={{ className: "twemoji" }}>

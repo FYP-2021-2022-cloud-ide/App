@@ -36,7 +36,7 @@ export default function handler(
               title: sandbox.title,
               description: sandbox.description,
               imageId: sandbox.imageId,
-              sandboxesId: sandbox.sandboxId[0],
+              containerId: sandbox.sandboxId[0],
             };
           }),
         });

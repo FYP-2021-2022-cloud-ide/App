@@ -19,12 +19,14 @@ import TemplateList from "./TemplateList";
 import { useForceUpdate } from "./useForceUpdate";
 import TempContainerToast from "./TempContainerToast";
 import { useWarning } from "../contexts/warning";
+import { useContainers } from "../contexts/containers";
 
 
 const EnvironmentTemplateWrapper = () => {
     const router = useRouter();
-    const { sub, fetchContainers, setContainers } = useCnails();
-    const { environments, templates, fetch, sectionUserInfo, setHighlightedEnv, fetchEnvironments, fetchTemplates } =
+    const { sub } = useCnails();
+    const { fetchContainers, setContainers, createContainer, removeContainer } = useContainers()
+    const { environments, templates, fetch, sectionUserInfo, setHighlightedEnv, fetchEnvironments, fetchTemplates, updateTemplateInternal, removeEnvironment, updateEnvironmentInternal, removeTemplate, publishTemplate, unpublishTemplate } =
         useInstructor();
     const { waitForConfirm } = useWarning();
     const { sectionUserId, sectionId } = sectionUserInfo;
@@ -37,19 +39,6 @@ const EnvironmentTemplateWrapper = () => {
         useState<Template>(null);
     const forceUpdate = useForceUpdate();
 
-    const {
-        removeTemplate,
-        activateTemplate,
-        deactivateTemplate,
-        addTemplateContainer,
-        removeTemplateContainer,
-        updateTemplate
-    } = templateAPI;
-    const {
-        removeEnvironment,
-        updateEnvironment
-    } = envAPI;
-    const { addTempContainer } = containerAPI
 
     const addCreatingWorkspace = (source: Environment | Template, event: "ENV_CREATE" | "ENV_UPDATE" | "TEMPLATE_CREATE" | "TEMPLATE_UPDATE" | "TEMPLATE_START_WORKSPACE") => {
         setContainers(containers => {
@@ -60,7 +49,7 @@ const EnvironmentTemplateWrapper = () => {
                     status: "CREATING",
                     subTitle: "",
                     startAt: "",
-                    containerID: "",
+                    id: "",
                     type: event == "ENV_CREATE" || event == "ENV_UPDATE" ? "ENV" : "TEMPLATE",
                     isTemporary: event != "TEMPLATE_START_WORKSPACE",
                     redisPatch: {
@@ -95,30 +84,7 @@ const EnvironmentTemplateWrapper = () => {
                             {
                                 text: "Delete",
                                 onClick: async (env) => {
-                                    const numTemplates = templates.filter(
-                                        (t) => t.environment_id === env.id
-                                    ).length;
-                                    if (numTemplates != 0) {
-                                        myToast.error({
-                                            title: "Fail to remove environment",
-                                            description: `${numTemplates} template${numTemplates > 1 ? "s are" : " is"
-                                                } still using ${env.name}.`,
-                                            comment: CLICK_TO_DISMISS,
-                                        });
-                                    } else {
-                                        if (await waitForConfirm("Are you sure you want to remove this environment? This action cannot be undo.") == false) return;
-                                        const response = await removeEnvironment({
-                                            envId: env.id,
-                                            section_user_id: sectionUserId,
-                                        });
-                                        if (response.success) {
-                                            myToast.success(
-                                                `environment ${env.id} is successfully removed`
-                                            );
-                                        }
-                                    }
-                                    // fetch();
-                                    await fetchEnvironments();
+                                    await removeEnvironment(env.id)
                                 }
                             },
                             {
@@ -138,32 +104,23 @@ const EnvironmentTemplateWrapper = () => {
                             }, {
                                 text: "Update Internal",
                                 onClick: async (env) => {
-                                    const id = myToast.loading("Creating a temporary workspace...")
-                                    addCreatingWorkspace(env, "ENV_UPDATE")
-                                    const response = await addTempContainer(
-                                        {
-                                            memLimit: memory,
-                                            numCPU: CPU,
-                                            imageId: env.imageId,
-                                            sub: sub,
-                                            accessRight: "root",
-                                            event: "ENV_UPDATE",
-                                            title: env.name,
-                                            sourceId: env.id,
-                                            formData: {
-                                                name: env.name,
-                                                description: env.description,
-                                                containerId: "",
-                                                section_user_id: sectionUserId,
-                                                envId: env.id,
-                                            }
+                                    createContainer({
+                                        memLimit: memory,
+                                        numCPU: CPU,
+                                        imageId: env.imageId,
+                                        sub: sub,
+                                        accessRight: "root",
+                                        event: "ENV_UPDATE",
+                                        title: env.name,
+                                        sourceId: env.id,
+                                        formData: {
+                                            name: env.name,
+                                            description: env.description,
+                                            containerId: "",
+                                            section_user_id: sectionUserId,
+                                            envId: env.id,
                                         }
-                                    );
-                                    myToast.dismiss(id)
-                                    // container is created 
-                                    await fetchContainers()
-                                    if (response.success) {
-                                        const containerId = response.containerId
+                                    }, (containerId) => {
                                         const id = myToast.custom(
                                             <TempContainerToast
                                                 containerId={containerId}
@@ -172,38 +129,13 @@ const EnvironmentTemplateWrapper = () => {
                                                     return await waitForConfirm("Are you sure that you want to cancel the commit? All your changes in the workspace will not be saved and the environment will not be updated.")
                                                 }}
                                                 onOK={async () => {
-                                                    const response = await updateEnvironment(
-                                                        {
-                                                            envId: env.id,
-                                                            name: env.name,
-                                                            description: env.description,
-                                                            section_user_id: sectionUserId,
-                                                            containerId: containerId
-                                                        }
-                                                    )
-                                                    if (response.success)
-                                                        myToast.success("Environment is successfully updated.");
-                                                    else
-                                                        myToast.error({
-                                                            title: "Fail to update environment",
-                                                            description: errorToToastDescription(response.error),
-                                                            comment: CLICK_TO_REPORT,
-                                                        });
-                                                    await fetchContainers()
-                                                    await fetchEnvironments()
-                                                    myToast.dismiss(id);
+                                                    await updateEnvironmentInternal(env.id, containerId)
                                                 }}
                                             ></TempContainerToast>,
                                             "toaster toaster-custom toaster-no-dismiss",
                                             "🗂"
                                         )
-                                    } else {
-                                        myToast.error({
-                                            title: "Fail to create temporary workspace",
-                                            description: errorToToastDescription(response.error),
-                                            comment: CLICK_TO_REPORT
-                                        })
-                                    }
+                                    })
                                 }
                             }
                         ]
@@ -228,15 +160,7 @@ const EnvironmentTemplateWrapper = () => {
                         {
                             text: "Delete",
                             onClick: async (template) => {
-                                if (await waitForConfirm("Are you sure you want to delete this template? This action cannot be undo.") == false) return;
-                                const response = await removeTemplate({
-                                    templateId: template.id,
-                                    section_user_id: sectionUserId
-                                });
-                                if (response.success) {
-                                    myToast.success("Template is successfully deleted.");
-                                }
-                                await fetch();
+                                await removeTemplate(template.id)
                             }
                         },
                         {
@@ -249,121 +173,54 @@ const EnvironmentTemplateWrapper = () => {
                             text: (template) => template.containerId ? "Stop workspace" : "Start workspace",
                             onClick: async (template) => {
                                 if (template.containerId) {
-                                    const response = await removeTemplateContainer({
-                                        containerId: template.containerId,
-                                        sub: sub
-                                    });
-                                    if (response.success) {
-                                        myToast.success("Template workspace is successfully stopped. ");
-                                    } else
-                                        myToast.error({
-                                            title: `Fail to stop template workspace`,
-                                            description: errorToToastDescription(response.error),
-                                            comment: CLICK_TO_REPORT,
-                                        });
+                                    await removeContainer(template.containerId)
                                 } else {
-                                    const id = myToast.loading("Starting workspace...");
-                                    const response = await addTemplateContainer(
-                                        {
-                                            imageName: template.imageId,
-                                            memLimit: memory,
-                                            numCPU: CPU,
-                                            section_user_id: sectionUserId,
-                                            template_id: template.id,
-                                            accessRight: "student",
-                                            useFresh: false,
-                                            title: template.name,
-                                            sub: sub,
-                                            event: "TEMPLATE_START_WORKSPACE"
-                                        }
-                                    );
-                                    myToast.dismiss(id);
-                                    if (response.success) {
-                                        myToast.success("Template workspace is successfully started.");
-                                    } else
-                                        myToast.error({
-                                            title: `Fail to start template workspace`,
-                                            description: errorToToastDescription(response.error),
-                                            comment: CLICK_TO_REPORT,
-                                        });
+                                    await createContainer({
+                                        imageName: template.imageId,
+                                        memLimit: memory,
+                                        numCPU: CPU,
+                                        section_user_id: sectionUserId,
+                                        template_id: template.id,
+                                        accessRight: "student",
+                                        useFresh: false,
+                                        title: template.name,
+                                        sub: sub,
+                                        event: "TEMPLATE_START_WORKSPACE"
+                                    })
                                 }
-                                await fetchContainers();
                             }
                         }, {
                             text: (template) => template.active ? "Unpublish" : "Publish",
                             onClick: async (template) => {
-                                if (!template.active) {
-                                    const id = myToast.loading(`Publishing the ${template.name}...`);
-                                    const response = await activateTemplate(
-                                        {
-                                            templateId: template.id,
-                                            section_user_id: sectionUserId
-                                        }
-                                    );
-                                    myToast.dismiss(id);
-                                    if (response.success) {
-                                        myToast.success(`${template.name} is published.`);
-                                    } else {
-                                        myToast.error({
-                                            title: `Fail to publish template`,
-                                            description: errorToToastDescription(response.error),
-                                            comment: CLICK_TO_REPORT,
-                                        });
-                                    }
-                                } else {
-                                    const id = myToast.loading(
-                                        `Unpublishing the ${template.name}...`
-                                    );
-                                    const response = await deactivateTemplate(
-                                        {
-                                            templateId: template.id,
-                                            section_user_id: sectionUserId
-                                        }
-                                    );
-                                    myToast.dismiss(id);
-                                    if (response.success) {
-                                        myToast.success(`${template.name} is unpublished.`);
-                                    } else
-                                        myToast.error({
-                                            title: `Fail to unpublish template`,
-                                            description: errorToToastDescription(response.error),
-                                            comment: CLICK_TO_REPORT,
-                                        });
-                                }
-                                fetch();
+                                if (!template.active)
+                                    await publishTemplate(template.id)
+                                else
+                                    await unpublishTemplate(template.id)
                             }
                         },
                         {
                             text: "Update Internal",
                             onClick: async (template) => {
-                                const id = myToast.loading("Creating a temporary workspace...")
-                                addCreatingWorkspace(template, "TEMPLATE_UPDATE")
-                                const response = await addTempContainer(
-                                    {
-                                        memLimit: memory,
-                                        numCPU: CPU,
-                                        imageId: template.imageId,
-                                        sub: sub,
-                                        accessRight: "root",
-                                        title: template.name,
-                                        sourceId: template.id,
-                                        event: "TEMPLATE_UPDATE",
-                                        formData: {
-                                            templateId: template.id,
-                                            templateName: template.name,
-                                            description: template.description,
-                                            section_user_id: sectionUserId,
-                                            containerId: "",
-                                            isExam: template.isExam,
-                                            timeLimit: template.timeLimit,
-                                            allow_notification: template.allow_notification
-                                        }
+                                await createContainer({
+                                    memLimit: memory,
+                                    numCPU: CPU,
+                                    imageId: template.imageId,
+                                    sub: sub,
+                                    accessRight: "root",
+                                    title: template.name,
+                                    sourceId: template.id,
+                                    event: "TEMPLATE_UPDATE",
+                                    formData: {
+                                        templateId: template.id,
+                                        templateName: template.name,
+                                        description: template.description,
+                                        section_user_id: sectionUserId,
+                                        containerId: "",
+                                        isExam: template.isExam,
+                                        timeLimit: template.timeLimit,
+                                        allow_notification: template.allow_notification
                                     }
-                                )
-                                myToast.dismiss(id)
-                                await fetchContainers()
-                                if (response.success) {
-                                    const containerId = response.containerId
+                                }, (containerId) => {
                                     const id = myToast.custom(
                                         <TempContainerToast
                                             containerId={containerId}
@@ -372,39 +229,13 @@ const EnvironmentTemplateWrapper = () => {
                                                 return await waitForConfirm("Are you sure you want to cancel the commit? All your changes in the workspace will not be saved and the template will not be updated.")
                                             }}
                                             onOK={async () => {
-                                                const response = await updateTemplate({
-                                                    templateId: template.id,
-                                                    templateName: template.name,
-                                                    description: template.description,
-                                                    section_user_id: sectionUserId,
-                                                    containerId: containerId,
-                                                    isExam: template.isExam,
-                                                    timeLimit: template.timeLimit,
-                                                    allow_notification: template.allow_notification
-                                                })
-                                                if (response.success)
-                                                    myToast.success("Template is successfully updated.");
-                                                else
-                                                    myToast.error({
-                                                        title: "Fail to update template",
-                                                        description: errorToToastDescription(response.error),
-                                                        comment: CLICK_TO_REPORT,
-                                                    });
-                                                await fetchContainers()
-                                                await fetchTemplates();
-                                                myToast.dismiss(id);
+                                                await updateTemplateInternal(template.id, containerId)
                                             }}
                                         ></TempContainerToast>,
                                         "toaster toaster-custom toaster-no-dismiss",
                                         "🗂"
                                     )
-                                } else {
-                                    myToast.error({
-                                        title: "Fail to create temporary workspace",
-                                        description: errorToToastDescription(response.error),
-                                        comment: CLICK_TO_REPORT
-                                    })
-                                }
+                                })
                             }
                         }
                     ]}

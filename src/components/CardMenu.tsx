@@ -1,5 +1,5 @@
 import { Menu, Transition } from "@headlessui/react";
-import { Fragment, MouseEventHandler, useEffect, useRef } from "react";
+import { Fragment, MouseEventHandler } from "react";
 import { MenuIcon } from "@heroicons/react/outline";
 
 export type MenuItem = {

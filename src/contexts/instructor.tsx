@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import myToast from "../components/CustomToast";
 import { Container, Environment, SectionUserInfo, Template } from "../lib/cnails";
-import { CLICK_TO_REPORT } from "../lib/constants";
+import { CLICK_TO_DISMISS, CLICK_TO_REPORT } from "../lib/constants";
 import { errorToToastDescription } from "../lib/errorHelper";
 import { useCnails } from "./cnails";
 import { envAPI } from "../lib/api/envAPI";
@@ -13,6 +13,7 @@ import { EnvironmentAddResponse, EnvironmentListResponse, TemplateListResponse }
 import { useContainers } from "./containers";
 import { useMessaging } from "./messaging";
 import courseAPI from "../lib/api/courses";
+import { useWarning } from "./warning";
 
 type InstructorContextState = {
     environments: Environment[];
@@ -64,9 +65,13 @@ type InstructorContextState = {
      */
     updateEnvironmentInfo: (envId: string, name: string, description: string) => Promise<void>;
     updateEnvironmentInternal: (envId: string, containerId: string) => Promise<void>;
+    removeEnvironment: (envId: string) => Promise<void>;
     createTemplate: (name: string, description: string, environmentId: string, containerId: string, active: boolean, isExam: boolean, timeLimit: number, allowNotification: boolean) => Promise<void>
     updateTemplateInfo: (templateId: string, name: string, description: string, isExam: boolean, timeLimit: number, allowNotification: boolean) => Promise<void>
     updateTemplateInternal: (templateId: string, containerId: string) => Promise<void>
+    removeTemplate: (templateId: string) => Promise<void>
+    publishTemplate: (templateId: string) => Promise<void>
+    unpublishTemplate: (templateId: string) => Promise<void>
 };
 
 
@@ -92,9 +97,14 @@ export const InstructorProvider = ({
     const [templates, setTemplates] = useState<Template[]>();
     const [highlightedEnv, setHighlightedEnv] = useState<Environment>();
     const { cancelablePromise } = useCancelablePromise();
+    const { waitForConfirm } = useWarning();
+
 
     const getEnvironment = (id: string) => environments.find(env => env.id == id)
+
+
     const getTemplate = (id: string) => templates.find(t => t.id == id);
+
     const fetchEnvironments = async (_containers: Container[] = containers) => {
         const afterResponse = (response: EnvironmentListResponse, mount: boolean = true) => {
             if (response.success) {
@@ -230,7 +240,62 @@ export const InstructorProvider = ({
     }
 
     const updateEnvironmentInternal = async (envId: string, containerId: string) => {
+        const env = getEnvironment(envId);
+        const id = myToast.loading("Updating the environment...")
+        const response = await envAPI.updateEnvironment(
+            {
+                envId: env.id,
+                name: env.name,
+                description: env.description,
+                section_user_id: sectionUserInfo.sectionUserId,
+                containerId: containerId
+            }
+        )
+        if (response.success)
+            myToast.success("Environment is successfully updated.");
+        else
+            myToast.error({
+                title: "Fail to update environment",
+                description: errorToToastDescription(response.error),
+                comment: CLICK_TO_REPORT,
+            });
+        myToast.dismiss(id)
+        await fetchContainers()
+        await fetchEnvironments()
+    }
 
+    const removeEnvironment = async (envId: string) => {
+        const numTemplates = templates.filter(
+            (t) => t.environment_id === envId
+        ).length;
+        if (numTemplates != 0) {
+            myToast.error({
+                title: "Fail to remove environment",
+                description: `${numTemplates} template${numTemplates > 1 ? "s are" : " is"
+                    } still using ${getEnvironment(envId).name}.`,
+                comment: CLICK_TO_DISMISS,
+            });
+        } else {
+            if (await waitForConfirm("Are you sure you want to remove this environment? This action cannot be undo.") == false) return;
+            const id = myToast.loading("Removing the environment...")
+            const response = await envAPI.removeEnvironment({
+                envId: envId,
+                section_user_id: sectionUserInfo.sectionUserId,
+            });
+            if (response.success) {
+                myToast.success(
+                    `The environment is successfully removed`
+                );
+            } else {
+                myToast.error({
+                    title: "Fail to remove environment",
+                    description: errorToToastDescription(response.error),
+                    comment: CLICK_TO_REPORT
+                })
+            }
+            myToast.dismiss(id)
+        }
+        await fetchEnvironments();
     }
 
     const createTemplate = async (name: string, description: string, environmentId: string, containerId: string, active: boolean, isExam: boolean, timeLimit: number, allowNotification: boolean) => {
@@ -290,6 +355,94 @@ export const InstructorProvider = ({
         await fetchTemplates()
     }
 
+    const removeTemplate = async (templateId: string) => {
+        if (await waitForConfirm("Are you sure you want to delete this template? This action cannot be undo.") == false) return;
+        const response = await templateAPI.removeTemplate({
+            templateId,
+            section_user_id: sectionUserInfo.sectionUserId
+        });
+        if (response.success) {
+            myToast.success("Template is successfully deleted.");
+        } else {
+            myToast.error({
+                title: "Fail to remove template",
+                description: errorToToastDescription(response.error),
+                comment: CLICK_TO_REPORT
+            })
+        }
+    }
+
+    const publishTemplate = async (templateId: string) => {
+        const template = getTemplate(templateId);
+        const id = myToast.loading(`Publishing the ${template.name}...`);
+        const response = await templateAPI.activateTemplate(
+            {
+                templateId: template.id,
+                section_user_id: sectionUserInfo.sectionUserId
+            }
+        );
+        myToast.dismiss(id);
+        if (response.success) {
+            myToast.success(`${template.name} is published.`);
+        } else {
+            myToast.error({
+                title: `Fail to publish template`,
+                description: errorToToastDescription(response.error),
+                comment: CLICK_TO_REPORT,
+            });
+        }
+        await fetchTemplates();
+    }
+
+    const unpublishTemplate = async (templateId: string) => {
+        const template = getTemplate(templateId);
+        const id = myToast.loading(
+            `Unpublishing the ${template.name}...`
+        );
+        const response = await templateAPI.deactivateTemplate(
+            {
+                templateId: template.id,
+                section_user_id: sectionUserInfo.sectionUserId
+            }
+        );
+        myToast.dismiss(id);
+        if (response.success) {
+            myToast.success(`${template.name} is unpublished.`);
+        } else
+            myToast.error({
+                title: `Fail to unpublish template`,
+                description: errorToToastDescription(response.error),
+                comment: CLICK_TO_REPORT,
+            });
+        await fetchTemplates()
+    }
+
+    const updateTemplateInternal = async (templateId: string, containerId: string) => {
+        const template = getTemplate(templateId)
+        const toastId = myToast.loading("Updating the templates...")
+        const response = await templateAPI.updateTemplate({
+            templateId: template.id,
+            templateName: template.name,
+            description: template.description,
+            section_user_id: sectionUserInfo.sectionUserId,
+            containerId: containerId,
+            isExam: template.isExam,
+            timeLimit: template.timeLimit,
+            allow_notification: template.allow_notification
+        })
+        if (response.success)
+            myToast.success("Template is successfully updated.");
+        else
+            myToast.error({
+                title: "Fail to update template",
+                description: errorToToastDescription(response.error),
+                comment: CLICK_TO_REPORT,
+            });
+        myToast.dismiss(toastId);
+        await fetchContainers()
+        await fetchTemplates();
+    }
+
     const fetch = async () => {
         await fetchEnvironments(containers);
         await fetchTemplates(containers)
@@ -332,8 +485,14 @@ export const InstructorProvider = ({
                 broadcastAnnouncement,
                 createEnvironment,
                 updateEnvironmentInfo,
+                removeEnvironment,
+                updateEnvironmentInternal,
                 createTemplate,
                 updateTemplateInfo,
+                removeTemplate,
+                publishTemplate,
+                unpublishTemplate,
+                updateTemplateInternal,
             }}
         >
             {children}

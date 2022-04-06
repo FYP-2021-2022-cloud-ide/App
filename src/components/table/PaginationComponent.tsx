@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { PaginationComponentProps } from "react-data-table-component";
-import { Notification } from "../../lib/cnails";
+import { Message } from "../../lib/cnails";
 
 const Right = (props: PaginationComponentProps & { options: number[] }) => {
   const {
@@ -81,7 +81,7 @@ const Right = (props: PaginationComponentProps & { options: number[] }) => {
 
 const PaginationComponent = (
   props: PaginationComponentProps & {
-    selectedRows: Notification[];
+    selectedRows: Message[];
     /**
      * number of rows per page
      */

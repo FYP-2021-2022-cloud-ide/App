@@ -290,17 +290,17 @@ app.prepare().then(() => {
   });
 
   // // authentication logout
-  // server.get("/logout", (req, res) => {
-  //   // @ts-ignore
-  //   req.appSession!.destroy((err) => {
-  //     if (err) {
-  //       console.error(err);
-  //     }
-  //     console.log(req.params);
-  //       res.oidc!.logout({ returnTo: process.env.POST_LOGOUT_REDIRECT_URI });
-  //   });
-  //   // res.oidc!.logout({ returnTo: process.env.POST_LOGOUT_REDIRECT_URI });
-  // });
+  server.get("/logout", (req, res) => {
+    // @ts-ignore
+    req.appSession!.destroy((err) => {
+      if (err) {
+        console.error(err);
+      }
+      console.log(req.params);
+        res.oidc!.logout({ returnTo: process.env.POST_LOGOUT_REDIRECT_URI });
+    });
+    // res.oidc!.logout({ returnTo: process.env.POST_LOGOUT_REDIRECT_URI });
+  });
 
   // grpc api route
   server.all(

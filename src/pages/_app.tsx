@@ -1,5 +1,4 @@
-import { GetServerSideProps } from 'next';
-import { parse } from "cookie";
+
 import type { AppProps } from 'next/app'
 import '../styles/globals.css'
 import Layout from '../components/Layout'
@@ -8,6 +7,7 @@ import { ThemeProvider } from "../contexts/theme"
 import { WarningProvider } from '../contexts/warning';
 import { ContainerProvider } from '../contexts/containers';
 import { MessagingProvider } from '../contexts/messaging';
+import CustomToaster from '../components/CustomToaster';
 
 interface CnailsProps extends AppProps {
   sub: string
@@ -27,6 +27,7 @@ function CnailsApp({ Component, pageProps }: CnailsProps) {
             <MessagingProvider>
               <Layout>
                 <Component {...pageProps} />
+                <CustomToaster />
               </Layout>
             </MessagingProvider>
           </ContainerProvider>

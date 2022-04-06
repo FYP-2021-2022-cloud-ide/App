@@ -1,7 +1,6 @@
 import { CubeTransparentIcon } from "@heroicons/react/outline";
-import { PlusCircleIcon } from "@heroicons/react/solid";
 import WorkspaceCard from "./WorkspaceCard";
-import { Template, Workspace } from "../lib/cnails";
+import { Workspace } from "../lib/cnails";
 import EmptyDiv from "./EmptyDiv";
 
 interface props {

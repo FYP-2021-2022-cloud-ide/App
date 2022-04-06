@@ -19,7 +19,6 @@ export default async function handler(
 ) {
   const { userId } = req.query;
   const { path } = JSON.parse(req.body);
-
   try {
     await fs.mkdir(path, { recursive: true });
     await fs.chmod(path, 0o777);

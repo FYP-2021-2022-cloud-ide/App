@@ -24,7 +24,7 @@ export const patchSandboxes = (
         container.redisPatch.sourceId == si.id
       ) {
         // it is a normal workspace
-        if (container.containerId == "")
+        if (container.id == "")
           return {
             ...si,
             status: "STARTING_WORKSPACE",
@@ -38,14 +38,14 @@ export const patchSandboxes = (
           else
             return {
               ...si,
-              containerId: container.containerId,
+              containerId: container.id,
               status: "DEFAULT",
             };
         }
       }
       if (container.redisPatch.sourceId == si.id) {
         // it is a temporary workspace
-        if (container.containerId == "")
+        if (container.id == "")
           return {
             ...si,
             status: "STARTING_WORKSPACE",
@@ -59,7 +59,7 @@ export const patchSandboxes = (
           } else
             return {
               ...si,
-              containerId: container.containerId,
+              containerId: container.id,
               status: "UPDATING_INTERNAL",
             };
         }

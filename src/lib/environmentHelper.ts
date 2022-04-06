@@ -22,7 +22,7 @@ export const patchEnvironments = (
         container.redisPatch.sourceId == env.id
       ) {
         // it is a temporary workspace to update this env
-        if (container.containerId == "")
+        if (container.id == "")
           return {
             ...env,
             status: "STARTING_UPDATE_WORKSPACE",
@@ -31,13 +31,13 @@ export const patchEnvironments = (
           if (container.status == "REMOVING") {
             return {
               ...env,
-              temporaryContainerId: container.containerId,
+              temporaryContainerId: container.id,
               status: "STOPPING_UPDATE_WORKSPACE",
             };
           } else
             return {
               ...env,
-              temporaryContainerId: container.containerId,
+              temporaryContainerId: container.id,
               status: "DEFAULT",
             };
         }

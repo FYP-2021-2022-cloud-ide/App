@@ -2,10 +2,11 @@ import { Popover, Transition } from "@headlessui/react";
 import { BellIcon, MailIcon } from "@heroicons/react/solid";
 import React, { useEffect, useState } from "react";
 import { Fragment } from "react";
-import { Notification } from "../lib/cnails";
+import { Message } from "../lib/cnails";
 import { useCnails } from "../contexts/cnails";
 import { useRouter } from "next/router";
 import moment from "moment";
+import { useMessaging } from "../contexts/messaging";
 
 export const maxShow = 5;
 
@@ -37,9 +38,10 @@ const NotificationBtn = ({ num }: { num: number }) => {
 };
 
 export default function NotiButton() {
-  const { userId, messages: notifications } = useCnails();
-  let filterNotifications = notifications.filter(
-    (notification) => !notification.read
+  const { userId } = useCnails();
+  const { messages } = useMessaging();
+  let filterNotifications = messages.filter(
+    (message) => !message.read
   );
   const router = useRouter();
   return (
@@ -75,7 +77,7 @@ export default function NotiButton() {
                         moment(a.sentAt) > moment(b.sentAt) ? -1 : 1
                       )
                       .slice(0, maxShow)
-                      .map((item: Notification) => (
+                      .map((item: Message) => (
                         <div
                           onClick={() => {
                             router.push(`/messages?id=${item.id}`);

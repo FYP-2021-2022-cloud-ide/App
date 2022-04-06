@@ -1,6 +1,4 @@
-import Image from "next/image";
 import {
-  BellIcon,
   QuestionMarkCircleIcon,
   MoonIcon,
   SearchIcon,
@@ -10,10 +8,8 @@ import {
 import UserMenu from "./UserMenu";
 import { useTheme } from "../contexts/theme";
 import NotiButton from "./NotiButton";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import useLocalStorage from "use-local-storage";
-import { useEffect } from "react";
 import { SystemMessageResponse } from "../lib/api/api";
 import useInterval from "./useInterval";
 

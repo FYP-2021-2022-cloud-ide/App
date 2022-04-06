@@ -140,7 +140,7 @@ type Container = {
   title: string;
   subTitle: string;
   startAt: string;
-  containerId: string;
+  id: string;
   type: "SANDBOX" | "TEMPLATE" | "ENV" | "STUDENT_WORKSPACE";
   /**
    *  if the container is `CREATING`, the request is being processed and the container is soon be created.

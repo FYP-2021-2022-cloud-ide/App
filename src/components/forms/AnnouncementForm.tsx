@@ -32,7 +32,7 @@ const AnnouncementForm = ({ isOpen, setOpen }: Props) => {
                         emptyValue: "",
                         label: "Title",
                     },
-                    announcement: {
+                    content: {
                         type: "markdown",
                         defaultValue: "",
                         label: "Content",
