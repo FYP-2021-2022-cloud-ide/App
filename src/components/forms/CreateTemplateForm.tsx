@@ -157,8 +157,8 @@ const CreateTemplateForm = ({ isOpen, setOpen }: Props) => {
                         timeLimit: Number(data.time_limit),
                         allow_notification: data.allow_notification,
                     }
-                }, containerId => {
-                    const toastId = myToast.custom(
+                }, (containerId, toastId) => {
+                    myToast.custom(
                         <TempContainerToast
                             getToastId={() => toastId}
                             containerId={containerId}
@@ -170,8 +170,11 @@ const CreateTemplateForm = ({ isOpen, setOpen }: Props) => {
                                     createTemplate(name, description, environment.id, containerId, false, is_exam, Number(time_limit), allow_notification)
                                 }
                             } />,
-                        "toaster toaster-custom toaster-no-dismiss",
-                        "🗂"
+                        {
+                            className: "toaster toaster-custom toaster-no-dismiss",
+                            icon: "🗂",
+                            id: toastId
+                        }
                     );
                 }
             );

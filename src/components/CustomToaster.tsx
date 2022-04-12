@@ -1,6 +1,5 @@
 import { Toaster, Toast, ToastBar } from "react-hot-toast";
 import Twemoji from "react-twemoji";
-import { useCnails } from "../contexts/cnails";
 import myToast, { loadingTime } from "./CustomToast";
 
 const CustomToaster = () => {
@@ -9,32 +8,28 @@ const CustomToaster = () => {
         position="bottom-right"
         toastOptions={{
             // this can the default duration of the toast
-            duration: 5000,
+            duration: 5000 * 60,
         }}
     >
         {(t: Toast) => {
-            const classList = t.className.split(" ");
-            if (classList.includes("toaster-loading")) t.duration = loadingTime;
-            if (classList.includes("toaster-custom")) t.duration = 60 * 60000;
             return (
                 <Twemoji noWrapper options={{ className: "twemoji" }}>
                     <div
                         onClick={() => {
-                            if (!classList.includes("toaster-no-dismiss"))
+                            if (t.type != "loading" && myToast.onClickDismiss[t.id])
                                 myToast.dismiss(t.id);
                             // dirty
                             if (myToast.onClickCallbacks[t.id]) {
                                 myToast.onClickCallbacks[t.id]();
-                                delete myToast.onClickCallbacks[t.id];
                             }
                         }}
                     >
                         <ToastBar toast={t}>
                             {({ icon, message }) => {
                                 return (
-                                    <div className="toaster-content">
+                                    <div className="flex flex-row items-start space-x-2">
                                         {icon}
-                                        <div className="toaster-text">
+                                        <div className="text-sm">
                                             {(message as JSX.Element).props.children}
                                         </div>
                                     </div>

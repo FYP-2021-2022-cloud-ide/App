@@ -285,20 +285,12 @@
   @apply cursor-pointer rounded text-gray-600 bg-gray-50 border border-gray-200 dark:bg-slate-900  dark:border-gray-900 dark:text-gray-300 min-w-[16rem]  !important;
 }
 
-.toaster-content {
-  @apply flex flex-row items-start space-x-2;
-}
-
-.toaster-text {
-  @apply text-sm;
-}
-
-.toaster-text #title {
+.toaster #title {
   @apply font-bold;
 }
 
-.toaster-text #comment {
-  @apply text-2xs text-gray-400;
+.toaster #comment {
+  @apply text-2xs text-gray-400 select-none;
 }
 
 .toaster-success {
@@ -308,7 +300,7 @@
 }
 
 .toaster-loading {
-  @apply cursor-default !important;
+  @apply cursor-default;
 }
 
 .toaster-warning {

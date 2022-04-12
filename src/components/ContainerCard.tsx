@@ -153,7 +153,6 @@ function ContainerCard({
                 myToast.error({
                   title: "Fail to remove workspace",
                   description: errorToToastDescription(response.error),
-                  comment: CLICK_TO_REPORT
                 });
             }}
           >

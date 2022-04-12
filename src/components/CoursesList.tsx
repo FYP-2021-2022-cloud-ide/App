@@ -39,7 +39,6 @@ const CoursesList = () => {
         {
           title: "Fail to fetch courses",
           description: errorToToastDescription(response.error),
-          comment: CLICK_TO_REPORT
         }
       )
     }

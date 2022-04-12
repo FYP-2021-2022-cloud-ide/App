@@ -54,7 +54,6 @@ const Home = () => {
       myToast.error({
         title: "Fail to get section information",
         description: errorToToastDescription(response.error),
-        comment: CLICK_TO_REPORT,
       });
       Router.push("/");
     }
@@ -82,7 +81,6 @@ const Home = () => {
         myToast.error({
           title: "Fail to fetch workspace.",
           description: errorToToastDescription(response.error),
-          comment: CLICK_TO_REPORT,
         });
       }
     }
@@ -148,7 +146,7 @@ const Home = () => {
                 text: workspace.containerId ? "Stop workspace" : "Start workspace",
                 onClick: async () => {
                   if (!workspace.containerId) {
-                    const id = myToast.loading("Starting workspace...");
+                    const toastId = myToast.loading("Starting workspace...");
                     const response = await addTemplateContainer(
                       {
                         imageName: workspace.imageId,
@@ -163,31 +161,35 @@ const Home = () => {
                         event: "WORKSPACE_START"
                       }
                     );
-                    myToast.dismiss(id);
                     if (response.success) {
-                      myToast.success("Workspace is successfully started.");
+                      myToast.success("Workspace is successfully started.", {
+                        id: toastId
+                      });
                     } else
                       myToast.error({
                         title: `Fail to start workspace`,
                         description: errorToToastDescription(response.error),
-                        comment: CLICK_TO_REPORT,
+                      }, {
+                        id: toastId
                       });
                   } else {
-                    const id = myToast.loading("Stopping workspace...")
+                    const toastId = myToast.loading("Stopping workspace...")
                     const response = await removeTemplateContainer(
                       {
                         containerId: workspace.containerId,
                         sub: sub
                       }
                     );
-                    myToast.dismiss(id)
                     if (response.success) {
-                      myToast.success("Workspace is successfully stopped.");
+                      myToast.success("Workspace is successfully stopped.", {
+                        id: toastId
+                      });
                     } else
                       myToast.error({
                         title: `Fail to stop workspace`,
                         description: errorToToastDescription(response.error),
-                        comment: CLICK_TO_REPORT,
+                      }, {
+                        id: toastId
                       });
 
                   }

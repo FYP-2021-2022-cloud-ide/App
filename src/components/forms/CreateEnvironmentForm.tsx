@@ -106,7 +106,7 @@ const CreateEnvironmentForm = ({ isOpen, setOpen }: Props) => {
                         section_user_id: sectionUserInfo.sectionUserId,
                         containerId: "",
                     }
-                }, (containerId) => {
+                }, (containerId, toastId) => {
                     const customToastId = myToast.custom(
                         <TempContainerToast
                             getToastId={() => customToastId}
@@ -118,8 +118,11 @@ const CreateEnvironmentForm = ({ isOpen, setOpen }: Props) => {
                                 await createEnvironment(name, description, containerId)
                             }}
                         ></TempContainerToast>,
-                        "toaster toaster-custom toaster-no-dismiss",
-                        "🗂"
+                        {
+                            className: "toaster toaster-custom toaster-no-dismiss",
+                            icon: "🗂",
+                            id: toastId
+                        }
                     );
                 })
             }

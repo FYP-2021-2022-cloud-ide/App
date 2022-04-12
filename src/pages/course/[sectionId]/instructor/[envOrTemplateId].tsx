@@ -36,7 +36,7 @@ const TemplateBoard = ({ template }: { template: Template }) => {
     // );
     const response = await getTemplateStudentWorkspace({
       templateId: template.id,
-      section_user_id:sectionUserInfo.sectionUserId
+      section_user_id: sectionUserInfo.sectionUserId
     });
     if (response.success) {
       setData(
@@ -298,7 +298,6 @@ const Home = () => {
       myToast.error({
         title: "Fail to get section information",
         description: errorToToastDescription(response.error),
-        comment: CLICK_TO_REPORT,
       });
       router.push("/");
     }

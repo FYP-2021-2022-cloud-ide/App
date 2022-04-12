@@ -38,7 +38,11 @@ type ContainerContextState = {
     fetchContainers: () => Promise<Container[]>;
     containerQuota: number;
 
-    createContainer: (_req: ContainerAddRequest | SandboxAddRequest | AddTemplateContainerRequest, onOK?: (containerId: string) => void) => Promise<void>
+    /**
+     * if `onOK` is provided, `onOK` will be called after container is created. 
+     * Else a default success toast will show up 
+     */
+    createContainer: (_req: ContainerAddRequest | SandboxAddRequest | AddTemplateContainerRequest, onOK?: (containerId: string, toastId: string) => void) => Promise<void>
     removeContainer: (containerId: string) => Promise<void>
 }
 
@@ -51,13 +55,10 @@ const ContainerContext = React.createContext({} as ContainerContextState);
 export const useContainers = () => useContext(ContainerContext)
 
 export const ContainerProvider = ({ children }: ContainerProviderProps) => {
-    const { sub } = useCnails()
+    const { sub, userId } = useCnails()
     const [containers, setContainers] = useState<Container[]>();
     const [containerQuota, setContainerQuota] = useState<number>(defaultQuota);
-    const { listContainers, addTempContainer, removeTempContainer } = containerAPI;
     const { waitForConfirm } = useWarning()
-    const { addSandbox, removeSandbox } = sandboxAPI
-    const { addTemplateContainer, removeTemplateContainer } = templateAPI
     const { getEnv } = generalAPI;
 
     const getContainer = (id: string) => containers.find(c => c.id == id)
@@ -66,7 +67,7 @@ export const ContainerProvider = ({ children }: ContainerProviderProps) => {
      * internal fetchContainer 
      */
     const fetchContainers = async () => {
-        const response = await listContainers(sub);
+        const response = await containerAPI.listContainers(sub);
         if (response.success) {
             const newContainers = response.containers.map(container => (container.redisPatch ? {
                 ...container,
@@ -84,10 +85,7 @@ export const ContainerProvider = ({ children }: ContainerProviderProps) => {
             } as unknown as Container))
             if (!_.isEqual(containers, newContainers)) {
                 console.log("containers are different", newContainers)
-
                 setContainers(newContainers);
-
-
             }
 
             return newContainers
@@ -99,12 +97,11 @@ export const ContainerProvider = ({ children }: ContainerProviderProps) => {
         }
     };
 
-    async function createContainer(_req: ContainerAddRequest | SandboxAddRequest | AddTemplateContainerRequest, onOK?: (containerId: string) => void) {
+    async function createContainer(_req: ContainerAddRequest | SandboxAddRequest | AddTemplateContainerRequest, onOK?: (containerId: string, loadingToastId: string) => void) {
         if (containers.length == containerQuota) {
             myToast.error({
                 title: `You have met your simultaneous workspace quota. Fail to start workspace.`,
                 description: `You can have at most ${containerQuota}`,
-                comment: CLICK_TO_DISMISS,
             });
             return;
         }
@@ -113,30 +110,31 @@ export const ContainerProvider = ({ children }: ContainerProviderProps) => {
         if (_req.event == "SANDBOX_START_WORKSPACE") {
             toastId = myToast.loading("Starting the personal workspace...")
             const req = _req as SandboxAddRequest
-            response = await addSandbox(req)
+            response = await sandboxAPI.addSandbox(req)
         } else if (_req.event == "TEMPLATE_START_WORKSPACE" || _req.event == "WORKSPACE_START") {
             toastId = myToast.loading("Starting the workspace for this template...")
             const req = _req as AddTemplateContainerRequest
-            response = await addTemplateContainer(req)
+            response = await templateAPI.addTemplateContainer(req)
         } else {
             toastId = myToast.loading("Starting a temporary workspace")
             const req = _req as ContainerAddRequest
-            response = await addTempContainer(req);
+            response = await containerAPI.addTempContainer(req);
         }
-        // the container is created 
-        myToast.dismiss(toastId);
         await fetchContainers();
         if (response.success)
             if (onOK) {
-                onOK(response.containerId)
+                onOK(response.containerId, toastId)
             } else {
-                myToast.success("Workspace is successfully started.")
+                myToast.success("Workspace is successfully started.", {
+                    id: toastId
+                })
             }
         else
             myToast.error({
                 title: "Fail to create temporary workspace",
                 description: errorToToastDescription(response.error),
-                comment: CLICK_TO_REPORT,
+            }, {
+                id: toastId
             })
     }
 
@@ -145,9 +143,16 @@ export const ContainerProvider = ({ children }: ContainerProviderProps) => {
         let response: SuccessStringResponse
         let toastId = myToast.loading("Stopping the workspace...")
         if (container.isTemporary) {
-
+            response = await containerAPI.removeTempContainer({
+                containerId,
+                sub
+            })
         } if (container.redisPatch.cause == "SANDBOX_START_WORKSPACE") {
             // it is a sandbox
+            response = await sandboxAPI.removeSandbox({
+                containerId,
+                userId
+            })
         } else {
             // it is a template container 
             response = await templateAPI.removeTemplateContainer({
@@ -155,14 +160,16 @@ export const ContainerProvider = ({ children }: ContainerProviderProps) => {
                 sub: sub
             })
         }
-        myToast.dismiss(toastId)
         if (response.success)
-            myToast.success("Workspace is successfully removed.")
+            myToast.success("Workspace is successfully removed.", {
+                id: toastId
+            })
         else
             myToast.error({
                 title: `Fail to stop workspace`,
                 description: errorToToastDescription(response.error),
-                comment: CLICK_TO_REPORT,
+            }, {
+                id: toastId
             });
         await fetchContainers()
     }

@@ -47,7 +47,6 @@ const Home = () => {
       myToast.error({
         title: "Fail to get section information",
         description: errorToToastDescription(response.error),
-        comment: CLICK_TO_REPORT,
       });
       router.push("/");
     }

@@ -92,7 +92,7 @@ export const SandboxWrapper = () => {
                     tempContainerId: "",
                     userId: userId
                   }
-                }, (containerId) => {
+                }, (containerId, toastId) => {
                   const id = myToast.custom(
                     <TempContainerToast
                       containerId={containerId}
@@ -104,8 +104,11 @@ export const SandboxWrapper = () => {
                         await updateSandboxImageInternal(sandboxImage.id, containerId)
                       }}
                     ></TempContainerToast>,
-                    "toaster toaster-custom toaster-no-dismiss",
-                    "🗂"
+                    {
+                      className: "toaster toaster-custom toaster-no-dismiss",
+                      icon: "🗂",
+                      id: toastId
+                    }
                   )
                 })
               }

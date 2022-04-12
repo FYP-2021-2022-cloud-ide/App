@@ -104,7 +104,7 @@ const EnvironmentTemplateWrapper = () => {
                             }, {
                                 text: "Update Internal",
                                 onClick: async (env) => {
-                                    createContainer({
+                                    await createContainer({
                                         memLimit: memory,
                                         numCPU: CPU,
                                         imageId: env.imageId,
@@ -120,7 +120,7 @@ const EnvironmentTemplateWrapper = () => {
                                             section_user_id: sectionUserId,
                                             envId: env.id,
                                         }
-                                    }, (containerId) => {
+                                    }, (containerId, toastId) => {
                                         const id = myToast.custom(
                                             <TempContainerToast
                                                 containerId={containerId}
@@ -132,8 +132,11 @@ const EnvironmentTemplateWrapper = () => {
                                                     await updateEnvironmentInternal(env.id, containerId)
                                                 }}
                                             ></TempContainerToast>,
-                                            "toaster toaster-custom toaster-no-dismiss",
-                                            "🗂"
+                                            {
+                                                id: toastId,
+                                                className: "toaster toaster-custom ",
+                                                icon: "🗂"
+                                            }
                                         )
                                     })
                                 }
@@ -220,7 +223,7 @@ const EnvironmentTemplateWrapper = () => {
                                         timeLimit: template.timeLimit,
                                         allow_notification: template.allow_notification
                                     }
-                                }, (containerId) => {
+                                }, (containerId, toastId) => {
                                     const id = myToast.custom(
                                         <TempContainerToast
                                             containerId={containerId}
@@ -232,8 +235,11 @@ const EnvironmentTemplateWrapper = () => {
                                                 await updateTemplateInternal(template.id, containerId)
                                             }}
                                         ></TempContainerToast>,
-                                        "toaster toaster-custom toaster-no-dismiss",
-                                        "🗂"
+                                        {
+                                            className: "toaster toaster-custom ",
+                                            icon: "🗂",
+                                            id: toastId
+                                        }
                                     )
                                 })
                             }

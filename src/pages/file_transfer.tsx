@@ -221,7 +221,6 @@ export default function Page() {
                 myToast.error({
                   title: "File operation failed",
                   description: errorToToastDescription(response.error),
-                  comment: CLICK_TO_REPORT,
                 });
               }
             }}
@@ -496,7 +495,6 @@ export default function Page() {
               title: "Fail operation failed",
               description:
                 "Fail to create folder because folder name is empty.",
-              comment: CLICK_TO_DISMISS,
             });
             return;
           }

@@ -22,16 +22,16 @@ function CnailsApp({ Component, pageProps }: CnailsProps) {
     // all the context here are global contexts
     <CnailsProvider>
       <ThemeProvider>
-        <WarningProvider>
-          <ContainerProvider>
-            <MessagingProvider>
+        <MessagingProvider>
+          <WarningProvider>
+            <ContainerProvider>
               <Layout>
                 <Component {...pageProps} />
                 <CustomToaster />
               </Layout>
-            </MessagingProvider>
-          </ContainerProvider>
-        </WarningProvider>
+            </ContainerProvider>
+          </WarningProvider>
+        </MessagingProvider>
       </ThemeProvider>
     </CnailsProvider>
 

@@ -14,6 +14,7 @@ import { useContainers } from "./containers";
 import { useMessaging } from "./messaging";
 import courseAPI from "../lib/api/courses";
 import { useWarning } from "./warning";
+import toast from "react-hot-toast";
 
 type InstructorContextState = {
     environments: Environment[];
@@ -115,7 +116,6 @@ export const InstructorProvider = ({
                 myToast.error({
                     title: "Fail to fetch environments.",
                     description: errorToToastDescription(response.error),
-                    comment: CLICK_TO_REPORT,
                 });
             }
         }
@@ -144,7 +144,6 @@ export const InstructorProvider = ({
                 myToast.error({
                     title: "Fail to fetch templates.",
                     description: errorToToastDescription(response.error),
-                    comment: CLICK_TO_REPORT,
                 });
             }
         }
@@ -170,13 +169,12 @@ export const InstructorProvider = ({
             myToast.error({
                 title: "Fail to send course announcement",
                 description: errorToToastDescription(response.error),
-                comment: CLICK_TO_REPORT,
             });
         await fetchMessages()
     }
 
     const createEnvironment = async (name: string, description: string, id: string | string[]) => {
-        const toastId = myToast.loading(typeof id == "string" ? "Building a custom environment..." : "Creating the environment...");
+        const toastId = myToast.loading(typeof id == "string" ? "Building a custom environment..." : "Creating the environment...")
         let response: EnvironmentAddResponse
         if (typeof id == "string") {
             // this is a custom environment 
@@ -197,14 +195,17 @@ export const InstructorProvider = ({
                 section_user_id: sectionUserInfo.sectionUserId,
             })
         }
-        myToast.dismiss(toastId);
+
         if (response.success) {
-            myToast.success("Environment is created successfully.")
+            myToast.success("Environment is created successfully.", {
+                id: toastId
+            })
         } else {
             myToast.error({
                 title: "Fail to create environment.",
                 description: errorToToastDescription(response.error),
-                comment: CLICK_TO_REPORT
+            }, {
+                id: toastId
             })
         }
         // we need the fetchContainers() because the build environment api 
@@ -216,7 +217,7 @@ export const InstructorProvider = ({
     }
 
     const updateEnvironmentInfo = async (envId: string, name: string, description: string) => {
-        const id = myToast.loading("Updating an environment...")
+        const toastId = myToast.loading("Updating an environment...")
         const response = await envAPI.updateEnvironment(
             {
                 envId,
@@ -226,14 +227,16 @@ export const InstructorProvider = ({
                 containerId: ""
             }
         );
-        myToast.dismiss(id);
         if (response.success) {
-            myToast.success("Environment is updated.");
+            myToast.success("Environment is updated.", {
+                id: toastId
+            });
         } else {
             myToast.error({
                 title: "Fail to update environment",
                 description: errorToToastDescription(response.error),
-                comment: CLICK_TO_REPORT,
+            }, {
+                id: toastId
             });
         }
         await fetchEnvironments()
@@ -241,7 +244,7 @@ export const InstructorProvider = ({
 
     const updateEnvironmentInternal = async (envId: string, containerId: string) => {
         const env = getEnvironment(envId);
-        const id = myToast.loading("Updating the environment...")
+        const toastId = myToast.loading("Updating the environment...")
         const response = await envAPI.updateEnvironment(
             {
                 envId: env.id,
@@ -252,14 +255,16 @@ export const InstructorProvider = ({
             }
         )
         if (response.success)
-            myToast.success("Environment is successfully updated.");
+            myToast.success("Environment is successfully updated.", {
+                id: toastId
+            });
         else
             myToast.error({
                 title: "Fail to update environment",
                 description: errorToToastDescription(response.error),
-                comment: CLICK_TO_REPORT,
+            }, {
+                id: toastId
             });
-        myToast.dismiss(id)
         await fetchContainers()
         await fetchEnvironments()
     }
@@ -273,33 +278,34 @@ export const InstructorProvider = ({
                 title: "Fail to remove environment",
                 description: `${numTemplates} template${numTemplates > 1 ? "s are" : " is"
                     } still using ${getEnvironment(envId).name}.`,
-                comment: CLICK_TO_DISMISS,
             });
         } else {
             if (await waitForConfirm("Are you sure you want to remove this environment? This action cannot be undo.") == false) return;
-            const id = myToast.loading("Removing the environment...")
+            const toastId = myToast.loading("Removing the environment...")
             const response = await envAPI.removeEnvironment({
                 envId: envId,
                 section_user_id: sectionUserInfo.sectionUserId,
             });
             if (response.success) {
                 myToast.success(
-                    `The environment is successfully removed`
+                    `The environment is successfully removed`, {
+                    id: toastId
+                }
                 );
             } else {
                 myToast.error({
                     title: "Fail to remove environment",
                     description: errorToToastDescription(response.error),
-                    comment: CLICK_TO_REPORT
+                }, {
+                    id: toastId
                 })
             }
-            myToast.dismiss(id)
         }
         await fetchEnvironments();
     }
 
     const createTemplate = async (name: string, description: string, environmentId: string, containerId: string, active: boolean, isExam: boolean, timeLimit: number, allowNotification: boolean) => {
-        const id = myToast.loading("Building your template...");
+        const toastId = myToast.loading("Building your template...");
         const response = await templateAPI.addTemplate(
             {
                 templateName: name,
@@ -314,14 +320,16 @@ export const InstructorProvider = ({
                 allow_notification: allowNotification,
             }
         );
-        myToast.dismiss(id);
         if (response.success) {
-            myToast.success("Template is created successfully");
+            myToast.success("Template is created successfully", {
+                id: toastId
+            });
         } else {
             myToast.error({
                 title: "Fail to create template",
                 description: errorToToastDescription(response.error),
-                comment: CLICK_TO_REPORT
+            }, {
+                id: toastId
             })
         }
         await fetchContainers();
@@ -342,14 +350,16 @@ export const InstructorProvider = ({
                 allow_notification: allowNotification
             }
         );
-        myToast.dismiss(toastId);
         if (response.success) {
-            myToast.success("Template is updated.");
+            myToast.success("Template is updated.", {
+                id: toastId
+            });
         } else {
             myToast.error({
                 title: "Fail to update template",
                 description: errorToToastDescription(response.error),
-                comment: CLICK_TO_REPORT,
+            }, {
+                id: toastId
             });
         }
         await fetchTemplates()
@@ -367,28 +377,29 @@ export const InstructorProvider = ({
             myToast.error({
                 title: "Fail to remove template",
                 description: errorToToastDescription(response.error),
-                comment: CLICK_TO_REPORT
             })
         }
     }
 
     const publishTemplate = async (templateId: string) => {
         const template = getTemplate(templateId);
-        const id = myToast.loading(`Publishing the ${template.name}...`);
+        const toastId = myToast.loading(`Publishing the ${template.name}...`);
         const response = await templateAPI.activateTemplate(
             {
                 templateId: template.id,
                 section_user_id: sectionUserInfo.sectionUserId
             }
         );
-        myToast.dismiss(id);
         if (response.success) {
-            myToast.success(`${template.name} is published.`);
+            myToast.success(`${template.name} is published.`, {
+                id: toastId
+            });
         } else {
             myToast.error({
                 title: `Fail to publish template`,
                 description: errorToToastDescription(response.error),
-                comment: CLICK_TO_REPORT,
+            }, {
+                id: toastId
             });
         }
         await fetchTemplates();
@@ -396,7 +407,7 @@ export const InstructorProvider = ({
 
     const unpublishTemplate = async (templateId: string) => {
         const template = getTemplate(templateId);
-        const id = myToast.loading(
+        const toastId = myToast.loading(
             `Unpublishing the ${template.name}...`
         );
         const response = await templateAPI.deactivateTemplate(
@@ -405,14 +416,16 @@ export const InstructorProvider = ({
                 section_user_id: sectionUserInfo.sectionUserId
             }
         );
-        myToast.dismiss(id);
         if (response.success) {
-            myToast.success(`${template.name} is unpublished.`);
+            myToast.success(`${template.name} is unpublished.`, {
+                id: toastId
+            });
         } else
             myToast.error({
                 title: `Fail to unpublish template`,
                 description: errorToToastDescription(response.error),
-                comment: CLICK_TO_REPORT,
+            }, {
+                id: toastId
             });
         await fetchTemplates()
     }
@@ -431,14 +444,16 @@ export const InstructorProvider = ({
             allow_notification: template.allow_notification
         })
         if (response.success)
-            myToast.success("Template is successfully updated.");
+            myToast.success("Template is successfully updated.", {
+                id: toastId
+            });
         else
             myToast.error({
                 title: "Fail to update template",
                 description: errorToToastDescription(response.error),
-                comment: CLICK_TO_REPORT,
+            }, {
+                id: toastId
             });
-        myToast.dismiss(toastId);
         await fetchContainers()
         await fetchTemplates();
     }

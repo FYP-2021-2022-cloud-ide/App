@@ -81,16 +81,18 @@ export const SandboxProvider = ({
             userId
         })
         if (response.success) {
-            myToast.success(`Personal workspace is successfully created.`)
+            myToast.success(`Personal workspace is successfully created.`, {
+                id: toastId
+            })
         } else {
             myToast.error({
                 title: "Fail to create personal workspace",
                 description: errorToToastDescription(response.error),
-                comment: CLICK_TO_REPORT,
+            }, {
+                id: toastId
             })
         }
         await fetchSandboxImages();
-        myToast.dismiss(toastId)
     }
 
     async function updateSandboxImageInfo(sandboxImageId: string, name: string, description: string) {
@@ -105,15 +107,17 @@ export const SandboxProvider = ({
             }
         )
         if (response.success)
-            myToast.success("Personal workspace is successfully updated.");
+            myToast.success("Personal workspace is successfully updated.", {
+                id: toastId
+            });
         else
             myToast.error({
                 title: "Fail to update personal workspace",
                 description: errorToToastDescription(response.error),
-                comment: CLICK_TO_REPORT,
+            }, {
+                id: toastId
             });
         await fetchSandboxImages()
-        myToast.dismiss(toastId);
     }
 
     async function updateSandboxImageInternal(sandboxImageId: string, containerId: string) {
@@ -129,16 +133,18 @@ export const SandboxProvider = ({
             }
         )
         if (response.success)
-            myToast.success("workspace is successfully updated.");
+            myToast.success("workspace is successfully updated.", {
+                id: toastId
+            });
         else
             myToast.error({
                 title: "Fail to update workspace",
                 description: errorToToastDescription(response.error),
-                comment: CLICK_TO_REPORT,
+            }, {
+                id: toastId
             });
         await fetchContainers()
         await fetchSandboxImages()
-        myToast.dismiss(toastId);
     }
 
     async function removeSandboxImage(sandboxImageId: string) {
@@ -148,26 +154,28 @@ export const SandboxProvider = ({
                 title: "The workspace is still active. Fail to removed.",
                 description:
                     "You can need to stop your workspace first before removing it.",
-                comment: CLICK_TO_DISMISS,
             });
             return;
         }
         if (await waitForConfirm("Are you sure that you want to delete this personal workspace? The action cannot be undo. ") == false) return
-        const id = myToast.loading(`Removing ${sandboxImage.title}...`);
+        const toastId = myToast.loading(`Removing ${sandboxImage.title}...`);
         const response = await sandboxAPI.removeSandboxImage({
             sandboxImageId: sandboxImage.id,
             userId: userId
         });
-        myToast.dismiss(id);
         if (response.success) {
             myToast.success(
-                `Workspace (${sandboxImage.title}) is successfully removed.`
+                `Workspace (${sandboxImage.title}) is successfully removed.`,
+                {
+                    id: toastId
+                }
             );
         } else {
             myToast.error({
                 title: `Fail to remove workspace (${sandboxImage.title})`,
                 description: errorToToastDescription(response.error),
-                comment: CLICK_TO_REPORT
+            }, {
+                id: toastId
             });
         }
         await fetchSandboxImages();

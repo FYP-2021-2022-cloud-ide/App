@@ -59,6 +59,7 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
         try {
             const token = await firebaseCloudMessaging.init();
             if (token) {
+                console.log("test")
                 const messaging = getMessaging();
                 // TODO: call API to fetch lastest notification
                 const notiRes = await fetch(`/api/notification/getNotificationToken`, {
@@ -80,10 +81,12 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
                         }),
                     });
                 }
+                console.log(messaging)
                 const s = onMessage(messaging, async (message) => {
+                    console.log("message in ")
                     setTimeout(async () => {
                         await fetchMessages();
-                        myToast.notification("You have a new notification", () => {
+                        myToast.notification("You have a new notification", {}, () => {
                             router.push("/messages");
                         });
                     }, 2000);
@@ -124,7 +127,6 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
             myToast.error({
                 title: "Fail to delete messages",
                 description: errorToToastDescription(response.error),
-                comment: CLICK_TO_REPORT
             })
         }
         await fetchMessages();
@@ -146,14 +148,16 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
             myToast.error({
                 title: "Fail to send message",
                 description: errorToToastDescription(response.error),
-                comment: CLICK_TO_DISMISS
             })
         await fetchMessages();
     }
 
     const init = async () => {
         if (await isSupported()) {
+            console.log("supported")
             await initMessaging()
+        } else {
+            console.log("not supported")
         }
         await fetchMessages()
     }
@@ -163,7 +167,7 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
      */
     useEffect(() => {
         init()
-        return () => { if (unsubscribe) unsubscribe() }
+        // return () => { if (unsubscribe) unsubscribe() }
     }, [])
 
     /**
