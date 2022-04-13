@@ -12,7 +12,6 @@ export interface CourseProps {
 }
 
 function CourseCard({ link, course, zIndex }: CourseProps) {
-  const badgeClass = course.sectionRole.toLocaleLowerCase() + "-badge";
   const { ref, cleanStyle } = useCleanTilt(
     zIndex ? `z-index : ${zIndex};` : ""
   );
@@ -29,15 +28,23 @@ function CourseCard({ link, course, zIndex }: CourseProps) {
           <div className="course-card ">
             <div className="flex flex-col w-full">
               <div className="flex flex-col items-start space-y-2 mb-3 ">
-                <b className="course-card-title">
-                  {`${course.courseCode} (${course.section})`}
-                </b>
-                <div className="course-card-name ">{course.name}</div>
-                <p className={badgeClass}>{course.sectionRole}</p>
+                <p id="course-code">{`${course.courseCode} (${course.section})`}</p>
+                <p id="course-name">{course.name}</p>
+                <p
+                  className={
+                    course.sectionRole.toLocaleLowerCase() == "instructor"
+                      ? "instructor-badge"
+                      : "student-badge"
+                  }
+                >
+                  {course.sectionRole}
+                </p>
               </div>
 
-              <p className="course-card-last-update">
-                {`Last update: ${moment(course.lastUpdateTime).format("YYYY-MM-DD")}`}
+              <p id="update-time">
+                {`Last update: ${moment(course.lastUpdateTime).format(
+                  "YYYY-MM-DD"
+                )}`}
               </p>
             </div>
           </div>

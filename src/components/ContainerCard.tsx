@@ -17,22 +17,22 @@ import { useContainers } from "../contexts/containers";
 type Props = Container & { zIndex: number };
 
 /**
- * 
+ *
  * @param isoTime a timestamp
  * @returns the time from the timestamp
  */
 const getTimeDiff = (isoTime: string) => {
-  return moment.duration(moment().diff(moment(isoTime)))
-}
+  return moment.duration(moment().diff(moment(isoTime)));
+};
 
 const formatDuration = (duration: moment.Duration): string => {
-  const second = duration.asSeconds()
+  const second = duration.asSeconds();
   if (second < 60) {
-    return `${Math.floor(second)}s`
+    return `${Math.floor(second)}s`;
   } else if (second < 3600) {
-    return `${Math.floor(duration.asMinutes())}m`
-  } else return `${Math.floor(duration.asHours())}h`
-}
+    return `${Math.floor(duration.asMinutes())}m`;
+  } else return `${Math.floor(duration.asHours())}h`;
+};
 
 function ContainerCard({
   title,
@@ -44,20 +44,19 @@ function ContainerCard({
   isTemporary,
   zIndex,
 }: Props) {
-
   const { removeTempContainer } = containerAPI;
   const { removeTemplateContainer } = templateAPI;
   const { removeSandbox } = sandboxAPI;
   const { userId, sub } = useCnails();
-  const { fetchContainers } = useContainers()
+  const { fetchContainers } = useContainers();
 
-  const [timeDiff, setTimeDiff] = useState(getTimeDiff(startAt))
+  const [timeDiff, setTimeDiff] = useState(getTimeDiff(startAt));
   const { ref, cleanStyle } = useCleanTilt(
     zIndex ? `z-index : ${zIndex};` : ""
   );
   useInterval(() => {
-    setTimeDiff(getTimeDiff(startAt))
-  }, 30 * 1000)
+    setTimeDiff(getTimeDiff(startAt));
+  }, 30 * 1000);
 
   if (status != "DEFAULT") {
     return (
@@ -68,10 +67,7 @@ function ContainerCard({
         tiltMaxAngleY={4}
         tiltReverse
       >
-        <div
-          className="flex flex-col h-full min-h-[8rem] justify-between
-        rounded-xl border-gray-200 dark:border-gray-700 border min-w-max transition-all ease-in-out duration-300 p-4 bg-gray-200 dark:bg-gray-900 select-none"
-        >
+        <div className="container-card">
           <div className="flex flex-row  space-x-4 items-start ">
             {/* the indicator */}
             <div className="mt-2">
@@ -89,14 +85,13 @@ function ContainerCard({
               </div>
             </div>
           </div>
-          <p className="text-gray-500 text-xs">{
-            status == "CREATING" && "being created..." ||
-            status == "REMOVING" && "being removed..."
-          }</p>
-
+          <p className="text-gray-500 text-xs">
+            {(status == "CREATING" && "being created...") ||
+              (status == "REMOVING" && "being removed...")}
+          </p>
         </div>
       </Tilt>
-    )
+    );
   }
 
   return (
@@ -137,14 +132,20 @@ function ContainerCard({
             onClick={async (e) => {
               e.stopPropagation();
 
-              const response = isTemporary ? await removeTempContainer({
-                containerId, sub: sub
-              }) : type == "SANDBOX" ? await removeSandbox({
-                containerId, userId: userId
-              }) : await removeTemplateContainer({
-                containerId,
-                sub: sub
-              })
+              const response = isTemporary
+                ? await removeTempContainer({
+                    containerId,
+                    sub: sub,
+                  })
+                : type == "SANDBOX"
+                ? await removeSandbox({
+                    containerId,
+                    userId: userId,
+                  })
+                : await removeTemplateContainer({
+                    containerId,
+                    sub: sub,
+                  });
 
               if (response.success) {
                 myToast.success("Workspace is removed.");
@@ -166,7 +167,7 @@ function ContainerCard({
           </div>
         </div>
       </div>
-    </Tilt >
+    </Tilt>
   );
 }
 

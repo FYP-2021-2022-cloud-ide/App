@@ -26,7 +26,7 @@ const MoreButton = ({ onClick }: { onClick: () => void }) => {
 
 const NotificationBtn = ({ num }: { num: number }) => {
   return (
-    <div className=" flex item-center" id="message_alarm_btn">
+    <div className=" flex item-center select-none" id="message_alarm_btn ">
       <Popover.Button title="Notification" className="indicator">
         {num == 0 || (
           <div className="indicator-item badge badge-info">{num}</div>
@@ -40,9 +40,7 @@ const NotificationBtn = ({ num }: { num: number }) => {
 export default function NotiButton() {
   const { userId } = useCnails();
   const { messages } = useMessaging();
-  let filterNotifications = messages.filter(
-    (message) => !message.read
-  );
+  let filterNotifications = messages.filter((message) => !message.read);
   const router = useRouter();
   return (
     <Popover className="relative z-[1] ">

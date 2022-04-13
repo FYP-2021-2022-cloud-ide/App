@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from "react";
  * @param initialIsVisible whether the component should be visible initially
  * @returns
  */
-export default function useComponentVisible(initialIsVisible: boolean) {
+export default function useComponentVisible(initialIsVisible: boolean = false) {
   const [isComponentVisible, setIsComponentVisible] =
     useState(initialIsVisible);
   const ref = useRef<HTMLDivElement>(null);

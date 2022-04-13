@@ -1,7 +1,5 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { NodeModel } from "@minoru/react-dnd-treeview";
 import React from "react";
-import { CustomData } from "./CustomNode";
 
 export type MenuItem = {
   text: string;

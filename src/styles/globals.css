@@ -7,6 +7,9 @@
 @tailwind components;
 @tailwind utilities;
 
+@import "course-card.css";
+@import "container-card.css";
+
 #topbar .twemoji {
   @apply w-4 h-4 inline-block;
 }
@@ -101,21 +104,6 @@
 
 .sidebar-btn-col {
   @apply flex flex-col w-full mt-3;
-}
-
-.course-card-title {
-  @apply font-semibold  text-gray-800 dark:text-gray-300 whitespace-nowrap;
-}
-.course-card-last-update {
-  @apply text-xs text-gray-400 mt-10;
-}
-
-.course-card-name {
-  @apply font-medium text-xs text-gray-600 dark:text-gray-400;
-}
-
-.course-card {
-  @apply border border-gray-200 shadow-sm transition rounded-lg bg-white p-4 dark:bg-gray-600 dark:border-gray-700;
 }
 
 .instructor-badge {

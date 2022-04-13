@@ -3,7 +3,7 @@ import CoursesList from "../components/CoursesList";
 import ContainersList from "../components/ContainersList";
 import { SandboxWrapper } from "../components/SandboxWrapper";
 import { Tab } from "@headlessui/react";
-import { SandboxProvider } from "../contexts/sandbox"
+import { SandboxProvider } from "../contexts/sandbox";
 
 export function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -15,7 +15,7 @@ export default function Home() {
     <div className="flex flex-col mx-6 space-y-4 mb-10">
       <ContainersList></ContainersList>
       <Tab.Group>
-        <Tab.List className="flex p-1 space-x-1 bg-blue-900/20 rounded-xl w-full max-w-[24rem]">
+        <Tab.List className="flex p-1 space-x-1 bg-blue-900/20 rounded-xl w-full max-w-[24rem] select-none">
           <Tab
             className={({ selected }) =>
               classNames(

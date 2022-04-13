@@ -5,10 +5,7 @@ import { SandboxImage } from "../lib/cnails";
 import myToast from "./CustomToast";
 import SandboxImageList from "./SandboxImageList";
 import { errorToToastDescription } from "../lib/errorHelper";
-import {
-  CPU,
-  memory
-} from "../lib/formHelper";
+import { CPU, memory } from "../lib/formHelper";
 import { CLICK_TO_DISMISS, CLICK_TO_REPORT } from "../lib/constants";
 import { useSandbox } from "../contexts/sandbox";
 import CreateSandboxForm from "./forms/CreateSandboxForm";
@@ -18,21 +15,16 @@ import TempContainerToast from "./TempContainerToast";
 import { useWarning } from "../contexts/warning";
 import { useContainers } from "../contexts/containers";
 
-
-
-
-
 export const SandboxWrapper = () => {
-  const { userId, sub } =
-    useCnails();
-  const { createContainer, removeContainer } = useContainers()
-  const { sandboxImages, updateSandboxImageInternal, removeSandboxImage } = useSandbox();
+  const { userId, sub } = useCnails();
+  const { createContainer, removeContainer } = useContainers();
+  const { sandboxImages, updateSandboxImageInternal, removeSandboxImage } =
+    useSandbox();
 
   const [createOpen, setCreateOpen] = useState(false);
   const [updateOpen, setUpdateOpen] = useState(false);
   const [updateTarget, setUpdateTarget] = useState<SandboxImage>();
-  const { waitForConfirm } = useWarning()
-
+  const { waitForConfirm } = useWarning();
 
   return (
     <>
@@ -48,9 +40,12 @@ export const SandboxWrapper = () => {
               onClick: () => {
                 setUpdateOpen(true);
                 setUpdateTarget(sandboxImage);
-              }
-            }, {
-              text: sandboxImage.containerId ? "Stop workspace" : "Start workspace",
+              },
+            },
+            {
+              text: sandboxImage.containerId
+                ? "Stop workspace"
+                : "Start workspace",
               onClick: async () => {
                 if (!sandboxImage.containerId)
                   await createContainer({
@@ -59,67 +54,77 @@ export const SandboxWrapper = () => {
                     numCPU: CPU,
                     sandboxImageId: sandboxImage.id,
                     title: sandboxImage.title,
-                    sub: sub
-                  })
-                else
-                  await removeContainer(sandboxImage.containerId)
-              }
+                    sub: sub,
+                  });
+                else await removeContainer(sandboxImage.containerId);
+              },
             },
             {
               text: "Delete",
               onClick: async () => {
-                await removeSandboxImage(sandboxImage.id)
-              }
+                await removeSandboxImage(sandboxImage.id);
+              },
             },
-          ]
+          ];
           if (sandboxImage.status != "UPDATING_INTERNAL")
             menuItems.push({
               text: "Update Internal",
               onClick: async () => {
-                await createContainer({
-                  memLimit: 0,
-                  numCPU: 0,
-                  imageId: sandboxImage.imageId,
-                  sub: sub,
-                  accessRight: "root",
-                  title: sandboxImage.title,
-                  event: "SANDBOX_UPDATE",
-                  sourceId: sandboxImage.id,
-                  formData: {
-                    sandboxImageId: sandboxImage.id,
+                await createContainer(
+                  {
+                    memLimit: 0,
+                    numCPU: 0,
+                    imageId: sandboxImage.imageId,
+                    sub: sub,
+                    accessRight: "root",
                     title: sandboxImage.title,
-                    description: sandboxImage.description,
-                    tempContainerId: "",
-                    userId: userId
+                    event: "SANDBOX_UPDATE",
+                    sourceId: sandboxImage.id,
+                    formData: {
+                      sandboxImageId: sandboxImage.id,
+                      title: sandboxImage.title,
+                      description: sandboxImage.description,
+                      tempContainerId: "",
+                      userId: userId,
+                    },
+                  },
+                  (containerId) => {
+                    const id = myToast.custom(
+                      <TempContainerToast
+                        containerId={containerId}
+                        getToastId={() => id}
+                        onCancel={async () => {
+                          return await waitForConfirm(
+                            "Are you sure that you want to cancel the commit. All your changes in the workspace will not be saved and personal workspace will not be updated."
+                          );
+                        }}
+                        onOK={async () => {
+                          await updateSandboxImageInternal(
+                            sandboxImage.id,
+                            containerId
+                          );
+                        }}
+                      ></TempContainerToast>,
+                      {
+                        className: "toaster toaster-custom toaster-no-dismiss",
+                        icon: "🗂",
+                      }
+                    );
                   }
-                }, (containerId, toastId) => {
-                  const id = myToast.custom(
-                    <TempContainerToast
-                      containerId={containerId}
-                      getToastId={() => id}
-                      onCancel={async () => {
-                        return await waitForConfirm("Are you sure that you want to cancel the commit. All your changes in the workspace will not be saved and personal workspace will not be updated.")
-                      }}
-                      onOK={async () => {
-                        await updateSandboxImageInternal(sandboxImage.id, containerId)
-                      }}
-                    ></TempContainerToast>,
-                    {
-                      className: "toaster toaster-custom toaster-no-dismiss",
-                      icon: "🗂",
-                      id: toastId
-                    }
-                  )
-                })
-              }
-            })
-          return menuItems
+                );
+              },
+            });
+          return menuItems;
         }}
       ></SandboxImageList>
       {/* create form */}
       <CreateSandboxForm isOpen={createOpen} setOpen={setCreateOpen} />
       {/* update form */}
-      <UpdateSandboxForm isOpen={updateOpen && sandboxImages.length != 0} setOpen={setUpdateOpen} target={updateTarget} />
+      <UpdateSandboxForm
+        isOpen={updateOpen && sandboxImages.length != 0}
+        setOpen={setUpdateOpen}
+        target={updateTarget}
+      />
     </>
   );
 };
