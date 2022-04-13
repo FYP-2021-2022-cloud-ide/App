@@ -16,7 +16,7 @@ import {
   TreeMethods,
 } from "@minoru/react-dnd-treeview";
 import CustomNode, { CustomData } from "./CustomNode";
-import useComponentVisible from "./useComponentVisible";
+import useComponentVisible from "../../hooks/useComponentVisible";
 import { CustomDragPreview } from "./CustomDragPreview";
 import { Placeholder } from "./placeholder";
 import { useState, useEffect, useRef, useCallback } from "react";

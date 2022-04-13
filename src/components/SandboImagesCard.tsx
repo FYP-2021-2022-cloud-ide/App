@@ -3,7 +3,7 @@ import CardMenu from "./CardMenu";
 import Tilt from "react-parallax-tilt";
 
 import { SandboxImage } from "../lib/cnails";
-import useCleanTilt from "./useCleanTilt";
+import useCleanTilt from "../hooks/useCleanTilt";
 
 
 type Props = {

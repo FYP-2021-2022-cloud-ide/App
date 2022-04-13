@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { ClockIcon, XIcon } from "@heroicons/react/outline";
 import Tilt from "react-parallax-tilt";
-import useCleanTilt from "./useCleanTilt";
+import useCleanTilt from "../hooks/useCleanTilt";
 
 import { useCnails } from "../contexts/cnails";
 import myToast from "./CustomToast";
@@ -11,7 +11,7 @@ import { templateAPI } from "../lib/api/templateAPI";
 import { containerAPI } from "../lib/api/containerAPI";
 import { sandboxAPI } from "../lib/api/sandboxAPI";
 import moment from "moment";
-import useInterval from "./useInterval";
+import useInterval from "../hooks/useInterval";
 import { CLICK_TO_REPORT } from "../lib/constants";
 import { useContainers } from "../contexts/containers";
 type Props = Container & { zIndex: number };

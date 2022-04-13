@@ -2,8 +2,8 @@ import { googleAPI } from "../lib/api/googleAPI";
 import React, { useEffect, useRef, useState } from "react";
 import { useCnails } from "../contexts/cnails";
 import { NodeModel } from "@minoru/react-dnd-treeview";
-import { CustomData } from "../components/FTree/CustomNode";
-import FTree, { MyTreeMethods } from "../components/FTree/FTree";
+import { CustomData } from "../components/CustomTree/CustomNode";
+import FTree, { MyTreeMethods } from "../components/CustomTree/CustomTree";
 import path, { dirname } from "path";
 import { localFileAPI } from "../lib/api/localFile";
 import { InformationCircleIcon } from "@heroicons/react/solid"
@@ -24,7 +24,7 @@ import { errorToToastDescription } from "../lib/errorHelper";
 import { CLICK_TO_DISMISS, CLICK_TO_REPORT } from "../lib/constants";
 import { usePopperTooltip } from "react-popper-tooltip";
 import ReactDOM from "react-dom";
-import useInterval from "../components/useInterval";
+import useInterval from "../hooks/useInterval";
 
 export default function Page() {
   const { userId, sub } = useCnails();

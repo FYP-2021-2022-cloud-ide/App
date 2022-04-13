@@ -16,7 +16,7 @@ import UpdateTemplateForm from "./forms/UpdateTemplateForm"
 import myToast from "./CustomToast";
 import EnvironmentList from "./EnvironmentList";
 import TemplateList from "./TemplateList";
-import { useForceUpdate } from "./useForceUpdate";
+import { useForceUpdate } from "../hooks/useForceUpdate";
 import TempContainerToast from "./TempContainerToast";
 import { useWarning } from "../contexts/warning";
 import { useContainers } from "../contexts/containers";

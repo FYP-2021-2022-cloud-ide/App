@@ -2,7 +2,7 @@ import _ from "lodash";
 import React, { useContext, useEffect, useState } from "react";
 import myToast from "../components/CustomToast";
 import TempContainerToast from "../components/TempContainerToast";
-import useInterval from "../components/useInterval";
+import useInterval from "../hooks/useInterval";
 import { SandboxAddRequest, ContainerAddRequest, AddTemplateContainerRequest, ContainerAddResponse, ContainerRemoveRequest, SuccessStringResponse } from "../lib/api/api";
 import { containerAPI } from "../lib/api/containerAPI";
 import { generalAPI } from "../lib/api/generalAPI";

@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef } from "react";
 import CardMenu from "./CardMenu";
 import Tilt from "react-parallax-tilt";
 import { Environment } from "../lib/cnails";
-import useCleanTilt from "./useCleanTilt";
+import useCleanTilt from "../hooks/useCleanTilt";
 
 type Props = {
   environment: Environment;

@@ -11,7 +11,7 @@ import myToast from "./CustomToast";
 import Tilt from "react-parallax-tilt";
 import { EyeIcon, EyeOffIcon, AcademicCapIcon } from "@heroicons/react/solid";
 import { useInstructor } from "../contexts/instructor";
-import useCleanTilt from "./useCleanTilt";
+import useCleanTilt from "../hooks/useCleanTilt";
 
 interface Props {
   template: Template;

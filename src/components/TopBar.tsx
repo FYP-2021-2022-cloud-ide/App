@@ -11,7 +11,7 @@ import NotiButton from "./NotiButton";
 import { useRouter } from "next/router";
 import useLocalStorage from "use-local-storage";
 import { SystemMessageResponse } from "../lib/api/api";
-import useInterval from "./useInterval";
+import useInterval from "../hooks/useInterval";
 
 
 interface props {

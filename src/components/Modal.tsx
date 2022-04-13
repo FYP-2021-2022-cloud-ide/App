@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { useWindowEvent } from "./useWindowEvent";
+import { useWindowEvent } from "../hooks/useWindowEvent";
 import { Fragment } from "react";
 
 export type ModalProps = {

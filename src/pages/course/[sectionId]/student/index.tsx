@@ -22,7 +22,7 @@ import {
 } from "../../../../lib/formHelper";
 import { apiTemplatesToUiTemplates, patchTemplates } from "../../../../lib/templateHelper";
 import { TemplateListResponse } from "../../../../lib/api/api";
-import { useCancelablePromise } from "../../../../components/useCancelablePromise";
+import { useCancelablePromise } from "../../../../hooks/useCancelablePromise";
 import { useContainers } from "../../../../contexts/containers";
 
 

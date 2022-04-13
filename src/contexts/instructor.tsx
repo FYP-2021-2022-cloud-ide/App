@@ -8,7 +8,7 @@ import { envAPI } from "../lib/api/envAPI";
 import { templateAPI } from "../lib/api/templateAPI";
 import { apiEnvironmentToUiEnvironment, patchEnvironments } from "../lib/environmentHelper";
 import { apiTemplatesToUiTemplates, patchTemplates } from "../lib/templateHelper"
-import { useCancelablePromise } from "../components/useCancelablePromise";
+import { useCancelablePromise } from "../hooks/useCancelablePromise";
 import { EnvironmentAddResponse, EnvironmentListResponse, TemplateListResponse } from "../lib/api/api";
 import { useContainers } from "./containers";
 import { useMessaging } from "./messaging";

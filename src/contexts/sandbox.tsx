@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import myToast from "../components/CustomToast";
-import { useCancelablePromise } from "../components/useCancelablePromise";
+import { useCancelablePromise } from "../hooks/useCancelablePromise";
 import { SandboxImageListResponse } from "../lib/api/api";
 import { sandboxAPI } from "../lib/api/sandboxAPI";
 import { SandboxImage } from "../lib/cnails";

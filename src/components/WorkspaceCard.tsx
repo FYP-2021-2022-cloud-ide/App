@@ -1,7 +1,7 @@
 import React from "react";
 import CardMenu, { MenuItem } from "./CardMenu";
 import { Workspace } from "../lib/cnails";
-import useCleanTilt from "./useCleanTilt";
+import useCleanTilt from "../hooks/useCleanTilt";
 import Tilt from "react-parallax-tilt";
 interface Props {
   workspace: Workspace;

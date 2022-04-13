@@ -2,7 +2,7 @@ import { getMessaging, isSupported, onMessage, Unsubscribe } from "firebase/mess
 import router from "next/router";
 import React, { useContext, useEffect, useState } from "react";
 import myToast from "../components/CustomToast";
-import useInterval from "../components/useInterval";
+import useInterval from "../hooks/useInterval";
 import { notificationAPI } from "../lib/api/notificationAPI";
 import { Message } from "../lib/cnails";
 import { CLICK_TO_DISMISS, CLICK_TO_REPORT } from "../lib/constants";

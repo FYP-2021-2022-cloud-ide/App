@@ -3,7 +3,7 @@ import Link from "next/link";
 import moment from "moment";
 import Tilt from "react-parallax-tilt";
 import { Course } from "../lib/cnails";
-import useCleanTilt from "./useCleanTilt";
+import useCleanTilt from "../hooks/useCleanTilt";
 
 export interface CourseProps {
   link: string;
