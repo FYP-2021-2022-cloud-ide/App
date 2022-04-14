@@ -1,19 +1,9 @@
 import { InformationCircleIcon } from "@heroicons/react/solid";
 import _ from "lodash";
 import { EntryProps } from "../types";
-import ReactDOM from "react-dom";
-import { usePopperTooltip } from "react-popper-tooltip";
-import styles from "./Tooltip.module.css";
-import classNames from "../../../lib/classnames";
+import { TooltipProvider } from "../../../contexts/Tooltip";
 
 function Label<T>({ entry }: EntryProps<T>) {
-  const {
-    getArrowProps,
-    getTooltipProps,
-    setTooltipRef,
-    setTriggerRef,
-    visible,
-  } = usePopperTooltip();
   return (
     <div className="flex flex-row space-x-2 items-center">
       {entry.label && (
@@ -23,38 +13,18 @@ function Label<T>({ entry }: EntryProps<T>) {
       )}
       {entry.tooltip && (
         <>
-          {/* <div
-            id="tooltip"
-            className="tooltip tooltip-bottom tooltip-info"
-            data-tip={entry.tooltip}
-          >
-            <InformationCircleIcon className="tooltip-icon" />
-          </div> */}
-          <div ref={setTriggerRef}>
-            <InformationCircleIcon className="tooltip-icon" />
-          </div>
-          {visible &&
-            ReactDOM.createPortal(
-              <div
-                ref={setTooltipRef}
-                {...getTooltipProps({
-                  className: classNames(styles, "tooltip-container"),
-                })}
-              >
-                {entry.tooltip}
-                <div
-                  {...getArrowProps({
-                    className: classNames(styles, "tooltip-arrow"),
-                  })}
-                />
-              </div>,
-              document.body
+          <TooltipProvider text={entry.tooltip}>
+            {(setTriggerRef) => (
+              <div ref={setTriggerRef}>
+                <InformationCircleIcon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+              </div>
             )}
+          </TooltipProvider>
         </>
       )}
     </div>
   );
-};
+}
 
 function Component<T>(props: EntryProps<T>) {
   const { zIndex, id, entry, sectionId, data, onChange } = props;
@@ -68,6 +38,6 @@ function Component<T>(props: EntryProps<T>) {
       {entry.node(onChange, data[sectionId][id], data)}
     </div>
   );
-};
+}
 
 export default Component;

@@ -1,14 +1,12 @@
 import _ from "lodash";
 import React, { useContext, useEffect, useState } from "react";
 import myToast from "../components/CustomToast";
-import TempContainerToast from "../components/TempContainerToast";
 import useInterval from "../hooks/useInterval";
 import {
   SandboxAddRequest,
   ContainerAddRequest,
   AddTemplateContainerRequest,
   ContainerAddResponse,
-  ContainerRemoveRequest,
   SuccessStringResponse,
 } from "../lib/api/api";
 import { containerAPI } from "../lib/api/containerAPI";
@@ -16,10 +14,8 @@ import { generalAPI } from "../lib/api/generalAPI";
 import { sandboxAPI } from "../lib/api/sandboxAPI";
 import { templateAPI } from "../lib/api/templateAPI";
 import { Container } from "../lib/cnails";
-import { CLICK_TO_DISMISS, CLICK_TO_REPORT } from "../lib/constants";
 import { getType, isTemporary } from "../lib/containerHelper";
 import { errorToToastDescription } from "../lib/errorHelper";
-import { AddTempContainerReply } from "../proto/dockerGet/dockerGet";
 import { useCnails } from "./cnails";
 import { useWarning } from "./warning";
 

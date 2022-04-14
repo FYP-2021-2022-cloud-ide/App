@@ -1,0 +1,19 @@
+.sidebar-icon {
+  @apply w-[80%] mx-auto mt-5  dark:invert-[1] dark:brightness-50 dark:contrast-200 dark:hue-rotate-60 dark:saturate-[3];
+}
+
+.sidebar-container {
+  @apply w-[200px] min-h-screen bg-gray-50 dark:bg-gray-700 dark:border-gray-800 flex flex-col border-r;
+}
+
+.sidebar-text {
+  @apply text-xs uppercase tracking-widest font-medium ml-2;
+}
+
+.sidebar-btn {
+  @apply p-3 flex flex-row items-center hover:text-gray-900 hover:bg-gray-200 dark:hover:bg-gray-600;
+}
+
+.sidebar-btn-col {
+  @apply flex flex-col w-full mt-3;
+}

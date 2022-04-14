@@ -1,4 +1,16 @@
 .container-card {
   @apply flex flex-col h-full min-h-[8rem] justify-between
-        rounded-xl border-gray-200 dark:border-gray-700 border min-w-max transition-all ease-in-out duration-300 p-4 bg-gray-200 dark:bg-gray-900 select-none;
+  rounded-xl border-gray-200 dark:border-gray-700 border min-w-max transition-all ease-in-out duration-300 p-4 bg-white dark:bg-gray-600 select-none;
+}
+
+.container-card #title {
+  @apply font-semibold text-sm text-gray-800 dark:text-gray-200;
+}
+
+.container-card #temporary {
+  @apply font-medium text-xs text-gray-600 dark:text-gray-300;
+}
+
+.container-card[data-ready] {
+  @apply cursor-pointer;
 }

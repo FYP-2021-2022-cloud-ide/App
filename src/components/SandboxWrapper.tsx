@@ -33,89 +33,91 @@ export const SandboxWrapper = () => {
         onCreateBtnClick={() => {
           setCreateOpen(true);
         }}
-        menuItems={(sandboxImage) => {
-          const menuItems = [
-            {
-              text: "Update Info",
-              onClick: () => {
-                setUpdateOpen(true);
-                setUpdateTarget(sandboxImage);
-              },
+        menuItems={(sandboxImage) => [
+          {
+            text: "Update Info",
+            onClick: () => {
+              setUpdateOpen(true);
+              setUpdateTarget(sandboxImage);
             },
-            {
-              text: sandboxImage.containerId
-                ? "Stop workspace"
-                : "Start workspace",
-              onClick: async () => {
-                if (!sandboxImage.containerId)
-                  await createContainer({
-                    event: "SANDBOX_START_WORKSPACE",
-                    memLimit: memory,
-                    numCPU: CPU,
+            show: !Boolean(sandboxImage.containerId),
+          },
+          {
+            text: sandboxImage.containerId
+              ? "Stop workspace"
+              : "Start workspace",
+            onClick: async () => {
+              if (!sandboxImage.containerId)
+                await createContainer({
+                  event: "SANDBOX_START_WORKSPACE",
+                  memLimit: memory,
+                  numCPU: CPU,
+                  sandboxImageId: sandboxImage.id,
+                  title: sandboxImage.title,
+                  sub: sub,
+                });
+              else await removeContainer(sandboxImage.containerId);
+            },
+          },
+          {
+            text: "Delete",
+            onClick: async () => {
+              await removeSandboxImage(sandboxImage.id);
+            },
+            show: !Boolean(sandboxImage.containerId),
+          },
+          {
+            text: "Update Internal",
+            show: !Boolean(sandboxImage.containerId),
+            onClick: async () => {
+              await createContainer(
+                {
+                  memLimit: 0,
+                  numCPU: 0,
+                  imageId: sandboxImage.imageId,
+                  sub: sub,
+                  accessRight: "root",
+                  title: sandboxImage.title,
+                  event: "SANDBOX_UPDATE",
+                  sourceId: sandboxImage.id,
+                  formData: {
                     sandboxImageId: sandboxImage.id,
                     title: sandboxImage.title,
-                    sub: sub,
-                  });
-                else await removeContainer(sandboxImage.containerId);
-              },
-            },
-            {
-              text: "Delete",
-              onClick: async () => {
-                await removeSandboxImage(sandboxImage.id);
-              },
-            },
-          ];
-          if (sandboxImage.status != "UPDATING_INTERNAL")
-            menuItems.push({
-              text: "Update Internal",
-              onClick: async () => {
-                await createContainer(
-                  {
-                    memLimit: 0,
-                    numCPU: 0,
-                    imageId: sandboxImage.imageId,
-                    sub: sub,
-                    accessRight: "root",
-                    title: sandboxImage.title,
-                    event: "SANDBOX_UPDATE",
-                    sourceId: sandboxImage.id,
-                    formData: {
-                      sandboxImageId: sandboxImage.id,
-                      title: sandboxImage.title,
-                      description: sandboxImage.description,
-                      tempContainerId: "",
-                      userId: userId,
-                    },
+                    description: sandboxImage.description,
+                    tempContainerId: "",
+                    userId: userId,
                   },
-                  (containerId) => {
-                    const id = myToast.custom(
-                      <TempContainerToast
-                        containerId={containerId}
-                        getToastId={() => id}
-                        onCancel={async () => {
-                          return await waitForConfirm(
-                            "Are you sure that you want to cancel the commit. All your changes in the workspace will not be saved and personal workspace will not be updated."
-                          );
-                        }}
-                        onOK={async () => {
-                          await updateSandboxImageInternal(
-                            sandboxImage.id,
-                            containerId
-                          );
-                        }}
-                      ></TempContainerToast>,
-                      {
-                        className: "toaster toaster-custom toaster-no-dismiss",
-                        icon: "🗂",
-                      }
-                    );
-                  }
-                );
-              },
-            });
-          return menuItems;
-        }}
+                },
+                (containerId) => {
+                  const id = myToast.custom(
+                    <TempContainerToast
+                      containerId={containerId}
+                      getToastId={() => id}
+                      onCancel={async () => {
+                        return await waitForConfirm(
+                          "Are you sure that you want to cancel the commit. All your changes in the workspace will not be saved and personal workspace will not be updated."
+                        );
+                      }}
+                      onOK={async () => {
+                        await updateSandboxImageInternal(
+                          sandboxImage.id,
+                          containerId
+                        );
+                      }}
+                    ></TempContainerToast>,
+                    {
+                      className: "toaster toaster-temp-container ",
+                      icon: "🗂",
+                      duration: 99999 * 86400,
+                    },
+                    undefined,
+                    false
+                  );
+                }
+              );
+            },
+          },
+        ]}
       ></SandboxImageList>
       {/* create form */}
       <CreateSandboxForm isOpen={createOpen} setOpen={setCreateOpen} />

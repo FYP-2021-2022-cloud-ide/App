@@ -6,7 +6,7 @@ export type MenuItem = {
   text: string;
   icon?: JSX.Element;
   onClick?: MouseEventHandler<HTMLButtonElement>;
-  conditional?: () => boolean;
+  show?: boolean;
 };
 
 export type Props = {
@@ -37,23 +37,18 @@ export default function CardMenu({ items }: Props) {
           <Menu.Items className="absolute right-0 origin-top-right bg-white dark:bg-gray-900 dark:text-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black dark:ring-gray-700 ring-opacity-5 focus:outline-none ">
             <div className="p-1">
               {items
-                .filter((item) => {
-                  if (!item.conditional) {
-                    return true;
-                  } else {
-                    return item.conditional();
-                  }
-                })
+                .filter((item) => item.show ?? true)
                 .sort((a, b) => {
-                  return a.text.localeCompare(b.text)
+                  return a.text.localeCompare(b.text);
                 })
                 .map((item) => {
                   return (
                     <Menu.Item key={item.text}>
                       {({ active }) => (
                         <button
-                          className={`${active ? "bg-gray-200 dark:bg-gray-800" : ""
-                            } text-left text-gray-900 dark:text-white group flex rounded-md items-center w-full px-2 py-2 text-sm capitalize select-none whitespace-nowrap`}
+                          className={`${
+                            active ? "bg-gray-200 dark:bg-gray-800" : ""
+                          } text-left text-gray-900 dark:text-white group flex rounded-md items-center w-full px-2 py-2 text-sm capitalize select-none whitespace-nowrap`}
                           onClick={(e) => {
                             e.stopPropagation();
                             if (item.onClick) {
@@ -62,9 +57,7 @@ export default function CardMenu({ items }: Props) {
                           }}
                         >
                           {item.icon ?? <></>}
-                          <span>
-                            {item.text}
-                          </span>
+                          <span>{item.text}</span>
                         </button>
                       )}
                     </Menu.Item>

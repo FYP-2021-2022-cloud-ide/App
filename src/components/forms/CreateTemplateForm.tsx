@@ -194,9 +194,12 @@ const CreateTemplateForm = ({ isOpen, setOpen }: Props) => {
                 }}
               />,
               {
-                className: "toaster toaster-custom toaster-no-dismiss",
+                className: "toaster toaster-temp-container ",
                 icon: "🗂",
-              }
+                duration: 99999 * 86400,
+              },
+              undefined,
+              false
             );
           }
         );

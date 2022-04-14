@@ -18,13 +18,16 @@ const Error = ({
   const showToast = useCallback(() => {
     // report the issue
     myToast.success("You message has been sent.");
-  }, [])
-  const onInputChange: ChangeEventHandler<HTMLTextAreaElement> = useCallback((e) => setText(e.currentTarget.value), [])
+  }, []);
+  const onInputChange: ChangeEventHandler<HTMLTextAreaElement> = useCallback(
+    (e) => setText(e.currentTarget.value),
+    []
+  );
   return (
     <div className="w-full h-full relative">
       <div className="flex flex-col items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 space-y-2 min-w-[1/2] w-1/2">
         <CryingFace className="h-[200px] w-[200px]"></CryingFace>
-        <p className="error-page-status-code">{statusCode}</p>
+        <p id="status-code">{statusCode}</p>
         <p className="error-page-text font-semibold">{sc[statusCode].text}</p>
         <p className="error-page-text ">
           {sc[statusCode].message ?? defaultText}

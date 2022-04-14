@@ -2,15 +2,16 @@ import { CubeTransparentIcon } from "@heroicons/react/outline";
 import { PlusCircleIcon, PlusIcon } from "@heroicons/react/solid";
 import { SandboxImage } from "../lib/cnails";
 import EmptyDiv from "./EmptyDiv";
-import SandboxImagesCard from "./SandboImagesCard";
+import SandboxImagesCard from "./SandboxImagesCard";
 
 export type Props = {
   sandboxImages: SandboxImage[];
   onCreateBtnClick: () => void;
   onSandboxClick?: (sandboxImage: SandboxImage) => void;
   menuItems: (sandboxImage: SandboxImage) => {
-    text: string | ((sandboxImage: SandboxImage) => string),
-    onClick: (sandboxImage: SandboxImage) => void;
+    text: string;
+    onClick: () => void;
+    disabled?: boolean;
   }[];
 };
 

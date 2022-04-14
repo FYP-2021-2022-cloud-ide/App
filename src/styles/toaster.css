@@ -1,0 +1,30 @@
+.toaster {
+  @apply rounded text-gray-600 bg-gray-50 border border-gray-200 dark:bg-slate-900  dark:border-gray-900 dark:text-gray-300 min-w-[16rem]  !important;
+}
+
+.toaster #title {
+  @apply font-bold;
+}
+
+.toaster #comment {
+  @apply text-2xs text-gray-400 select-none;
+}
+
+.toaster-success {
+}
+
+.toaster-error {
+}
+
+.toaster-loading {
+  @apply cursor-default;
+}
+
+.toaster-warning {
+}
+
+.toaster-temp-container {
+}
+div[data-click-action="true"] {
+  @apply cursor-pointer;
+}

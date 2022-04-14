@@ -82,6 +82,7 @@ const myToast = {
     const id = toast.loading(text, {
       className: "toaster toaster-loading",
       ...options,
+      duration: loadingTime,
     });
     myToast.onClickCallbacks[id] = onClick;
     /**

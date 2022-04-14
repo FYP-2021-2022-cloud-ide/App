@@ -15,9 +15,9 @@ export type Props = {
   onCreate?: () => void;
   onClick?: (template: Template) => void;
   menuItems: {
-    text: string | ((template: Template) => string),
+    text: string | ((template: Template) => string);
     onClick: (template: Template) => void;
-  }[]
+  }[];
 
   // onDelete?: (template: Template) => void;
   // onUpdate?: (template: Template) => void;
@@ -33,19 +33,21 @@ const TemplateList = ({
   onCreate,
 
   onWorkspaceCardClick,
-  menuItems
+  menuItems,
 }: Props) => {
   return (
-    <div className="flex flex-col w-full">
-      <div className="course-list-title">
-        <DocumentTextIcon className="course-list-title-icon"></DocumentTextIcon>
-        <div className="course-list-title-text">Templates</div>
+    <div className="template-list">
+      <div id="header">
+        <DocumentTextIcon id="icon"></DocumentTextIcon>
+        <div id="title">Templates</div>
         <button
           onClick={() => {
             if (onCreate) onCreate();
           }}
+          id="add"
+          title="create template"
         >
-          <PlusCircleIcon className="course-list-title-add"></PlusCircleIcon>
+          <PlusCircleIcon></PlusCircleIcon>
         </button>
       </div>
       {
@@ -59,7 +61,7 @@ const TemplateList = ({
               .map((template, index) => {
                 const highlighted = Boolean(
                   highlightedEnv &&
-                  template.environment_id === highlightedEnv.id
+                    template.environment_id === highlightedEnv.id
                 );
                 return (
                   <TemplateCard

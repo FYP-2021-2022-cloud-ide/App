@@ -1,0 +1,19 @@
+.rdt_TableRow {
+  @apply bg-gray-100 dark:bg-black/50 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-black/40 border-[#D5D6D8] dark:border-[#2F3947] !important;
+}
+
+.rdt_pagination {
+  @apply text-gray-700 dark:text-gray-300  border-t-[1px] border-[#D5D6D8] dark:border-[#2F3947] border-b border-l border-r;
+}
+
+.rdt_Table {
+  @apply shadow-lg  border-t border-l border-r  rounded-t-md  border-[#D5D6D8] dark:border-[#2F3947]  !important;
+}
+
+.rdt_TableHead {
+  @apply rounded-t-md overflow-hidden  border-b-0 dark:border-b border-[#D5D6D8] dark:border-[#2F3947] !important;
+}
+
+.rdt_TableHeadRow {
+  @apply bg-gray-100 dark:bg-black/50  text-gray-700 dark:text-gray-300 overflow-hidden !important;
+}

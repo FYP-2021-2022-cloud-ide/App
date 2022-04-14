@@ -1,19 +1,13 @@
-import React, { useLayoutEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { ClockIcon, XIcon } from "@heroicons/react/outline";
 import Tilt from "react-parallax-tilt";
 import useCleanTilt from "../hooks/useCleanTilt";
 
-import { useCnails } from "../contexts/cnails";
-import myToast from "./CustomToast";
-import { errorToToastDescription } from "../lib/errorHelper";
 import { Container } from "../lib/cnails";
-import { templateAPI } from "../lib/api/templateAPI";
-import { containerAPI } from "../lib/api/containerAPI";
-import { sandboxAPI } from "../lib/api/sandboxAPI";
 import moment from "moment";
 import useInterval from "../hooks/useInterval";
-import { CLICK_TO_REPORT } from "../lib/constants";
 import { useContainers } from "../contexts/containers";
+import WorkspaceIndicator from "./WorkspaceIndicator";
 type Props = Container & { zIndex: number };
 
 /**
@@ -34,64 +28,69 @@ const formatDuration = (duration: moment.Duration): string => {
   } else return `${Math.floor(duration.asHours())}h`;
 };
 
-function ContainerCard({
-  title,
-  subTitle,
-  startAt,
-  id: containerId,
-  type,
-  status,
-  isTemporary,
-  zIndex,
-}: Props) {
-  const { removeTempContainer } = containerAPI;
-  const { removeTemplateContainer } = templateAPI;
-  const { removeSandbox } = sandboxAPI;
-  const { userId, sub } = useCnails();
-  const { fetchContainers } = useContainers();
+const LoadingContainerCard = (props: Props) => {
+  const { status, isTemporary, zIndex, redisPatch } = props;
+  const { ref, cleanStyle } = useCleanTilt(
+    zIndex ? `z-index : ${zIndex};` : ""
+  );
+  return (
+    <Tilt
+      onLeave={cleanStyle}
+      ref={ref}
+      tiltMaxAngleX={4}
+      tiltMaxAngleY={4}
+      tiltReverse
+    >
+      <div className="container-card">
+        <div className="flex flex-row  space-x-4 items-start ">
+          {/* the indicator */}
+          <div className="mt-2">
+            <WorkspaceIndicator color="yellow"></WorkspaceIndicator>
+          </div>
+          <div className="w-full">
+            <div id="title">{redisPatch.title}</div>
+            {isTemporary && (
+              <>
+                <p id="temporary">Temporary Workspace</p>
+                <p id="temporary">({redisPatch.cause})</p>
+              </>
+            )}
+          </div>
+        </div>
+        <p className="text-gray-500 text-xs">
+          {(status == "CREATING" && "being created...") ||
+            (status == "REMOVING" && "being removed...")}
+        </p>
+      </div>
+    </Tilt>
+  );
+};
 
-  const [timeDiff, setTimeDiff] = useState(getTimeDiff(startAt));
+function ContainerCard(props: Props) {
+  const {
+    startAt,
+    id: containerId,
+    status,
+    isTemporary,
+    zIndex,
+    redisPatch,
+  } = props;
+  const { removeContainer } = useContainers();
+
+  // if the container temporary, API doesn't return the start time,
+  // so we use the request time, although it is technically wrong
+  const [timeDiff, setTimeDiff] = useState(
+    getTimeDiff(isTemporary ? redisPatch.requestAt : startAt)
+  );
   const { ref, cleanStyle } = useCleanTilt(
     zIndex ? `z-index : ${zIndex};` : ""
   );
   useInterval(() => {
-    setTimeDiff(getTimeDiff(startAt));
+    setTimeDiff(getTimeDiff(isTemporary ? redisPatch.requestAt : startAt));
   }, 30 * 1000);
 
   if (status != "DEFAULT") {
-    return (
-      <Tilt
-        onLeave={cleanStyle}
-        ref={ref}
-        tiltMaxAngleX={4}
-        tiltMaxAngleY={4}
-        tiltReverse
-      >
-        <div className="container-card">
-          <div className="flex flex-row  space-x-4 items-start ">
-            {/* the indicator */}
-            <div className="mt-2">
-              <span className="relative flex h-3 w-3">
-                <span className="absolute animate-ping inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-yellow-400"></span>
-              </span>
-            </div>
-            <div className="w-full">
-              <div className="font-semibold text-sm text-gray-800 dark:text-gray-200">
-                {subTitle}
-              </div>
-              <div className="font-medium text-xs text-gray-600 dark:text-gray-300">
-                {isTemporary ? "Tempory Container" : title}
-              </div>
-            </div>
-          </div>
-          <p className="text-gray-500 text-xs">
-            {(status == "CREATING" && "being created...") ||
-              (status == "REMOVING" && "being removed...")}
-          </p>
-        </div>
-      </Tilt>
-    );
+    return <LoadingContainerCard {...props}></LoadingContainerCard>;
   }
 
   return (
@@ -108,53 +107,29 @@ function ContainerCard({
             "https://codespace.ust.dev/user/container/" + containerId + "/"
           )
         }
-        className="flex flex-col h-full min-h-[8rem] justify-between
-        rounded-xl border-gray-200 dark:border-gray-700 border min-w-max transition-all ease-in-out duration-300 p-4 bg-white dark:bg-gray-600 select-none"
+        className="container-card"
+        data-ready
+        title={redisPatch.title}
       >
         <div className="flex flex-row  space-x-4 items-start ">
           {/* the indicator */}
           <div className="mt-2">
-            <span className="relative flex h-3 w-3">
-              <span className="absolute animate-ping inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-green-400"></span>
-            </span>
+            <WorkspaceIndicator color="green"></WorkspaceIndicator>
           </div>
           <div className="w-full">
-            <div className="font-semibold text-sm text-gray-800 dark:text-gray-200">
-              {title == "" ? "UNKNOWN" : title}
-            </div>
-            <div className="font-medium text-xs text-gray-600 dark:text-gray-300">
-              {isTemporary ? "Temporary Workspace" : subTitle}
-            </div>
+            <p id="title">{redisPatch.title}</p>
+            {isTemporary && (
+              <>
+                <p id="temporary">Temporary Workspace</p>
+                <p id="temporary">({redisPatch.cause})</p>
+              </>
+            )}
           </div>
           <button
             title="remove workspace"
             onClick={async (e) => {
               e.stopPropagation();
-
-              const response = isTemporary
-                ? await removeTempContainer({
-                    containerId,
-                    sub: sub,
-                  })
-                : type == "SANDBOX"
-                ? await removeSandbox({
-                    containerId,
-                    userId: userId,
-                  })
-                : await removeTemplateContainer({
-                    containerId,
-                    sub: sub,
-                  });
-
-              if (response.success) {
-                myToast.success("Workspace is removed.");
-                fetchContainers();
-              } else
-                myToast.error({
-                  title: "Fail to remove workspace",
-                  description: errorToToastDescription(response.error),
-                });
+              removeContainer(containerId);
             }}
           >
             <XIcon className="w-3 h-3 text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400" />

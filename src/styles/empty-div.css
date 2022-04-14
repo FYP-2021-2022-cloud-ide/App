@@ -1,0 +1,7 @@
+.empty-div {
+  @apply bg-gray-200 dark:bg-gray-700 rounded-md h-36 p-6 flex flex-grow max-h-[400px];
+}
+
+.empty-div-text {
+  @apply text-gray-400 dark:text-gray-300 font-bold m-auto object-center select-none;
+}

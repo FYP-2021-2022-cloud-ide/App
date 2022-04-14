@@ -1,6 +1,8 @@
 import React, { useContext, useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { FetchCookieResponse } from "../lib/api/api";
+import { FetchCookieResponse, SystemMessageResponse } from "../lib/api/api";
+import useLocalStorage from "use-local-storage";
+import useInterval from "../hooks/useInterval";
 
 interface CnailsProviderProps {
   children: JSX.Element;
@@ -14,15 +16,27 @@ type CnailsContextState = {
   semesterId: string;
   // bio: string;
   // isAdmin: boolean;
+  systemMessage: {
+    id: string;
+    text: string;
+    show: boolean;
+  };
+  setSystemMessage: React.Dispatch<
+    React.SetStateAction<{
+      id: string;
+      text: string;
+      show: boolean;
+    }>
+  >;
 };
 
 const CnailsContext = React.createContext({} as CnailsContextState);
 
 /**
- * It provides all users data, containers and notifications info to whole app. 
+ * It provides all users data, containers and notifications info to whole app.
  * It run an init function fetch all these data when it renders.
- * 
- * @remark Top level context. It can be accessed anywhere in the app. 
+ *
+ * @remark Top level context. It can be accessed anywhere in the app.
  */
 export const useCnails = () => useContext(CnailsContext);
 
@@ -34,9 +48,19 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
   const [semesterId, setSemesterId] = useState("");
   const [bio, setBio] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
+  /**
+   * the show status of system message is stored in localstorage.
+   * Each system message is recognized by id, if a new system message comes in,
+   * the system message status in local storage will automatically change to
+   * track the read status of the new message instead of old message.
+   */
+  const [systemMessage, setSystemMessage] = useLocalStorage("systemMessage", {
+    id: "",
+    text: "",
+    show: false,
+  });
   // simultaneous run quota
   const router = useRouter();
-
 
   async function fetchCookies() {
     const response = (await (
@@ -69,24 +93,60 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
     }
   }
 
+  const fetchSystemMessage = async () => {
+    const response = (await (
+      await fetch("/api/getSystemMessage")
+    ).json()) as SystemMessageResponse;
+    if (response.success == true) {
+      if (!systemMessage || response.systemMessage.id != systemMessage.id) {
+        // change the new message
+        setSystemMessage({
+          id: response.systemMessage.id,
+          text: response.systemMessage.text,
+          show: true,
+        });
+      }
+    } else {
+      console.error(response.error);
+    }
+  };
+
   useEffect(() => {
-    fetchCookies()
-  }, [])
+    fetchCookies();
+    fetchSystemMessage();
+  }, []);
 
-  if (sub == "" || userId == "" || name == "" || email == "" || semesterId == "") return <></>;
+  /**
+   * this hook fetch system message every one minute.
+   */
+  useInterval(() => {
+    fetchSystemMessage();
+  }, 1000 * 60);
 
-  return <CnailsContext.Provider
-    value={{
-      sub,
-      name,
-      email,
-      userId,
-      semesterId,
-      // bio,
-      // isAdmin,
-    }}
-  >
-    {children}
+  if (
+    sub == "" ||
+    userId == "" ||
+    name == "" ||
+    email == "" ||
+    semesterId == ""
+  )
+    return <></>;
 
-  </CnailsContext.Provider>
+  return (
+    <CnailsContext.Provider
+      value={{
+        sub,
+        name,
+        email,
+        userId,
+        semesterId,
+        // bio,
+        // isAdmin,
+        systemMessage,
+        setSystemMessage,
+      }}
+    >
+      {children}
+    </CnailsContext.Provider>
+  );
 };

@@ -41,7 +41,7 @@ function Entry<T>(props: EntryProps<T>) {
   } else if (entry.type == "datetime") {
     return <DatePicker {...props}></DatePicker>;
   } else throw new Error("not such entry type in <ModalForm>");
-};
+}
 
 function Section<T>({
   section,
@@ -81,18 +81,18 @@ function Section<T>({
                   {React.isValidElement(section.entries)
                     ? section.entries
                     : Object.keys(section.entries).map((id, index) => {
-                      return (
-                        <Entry
-                          zIndex={Object.keys(section.entries).length - index}
-                          key={id}
-                          entry={section.entries[id]}
-                          id={id}
-                          sectionId={sectionId}
-                          data={data}
-                          onChange={(data) => onChange(data, id)}
-                        ></Entry>
-                      );
-                    })}
+                        return (
+                          <Entry
+                            zIndex={Object.keys(section.entries).length - index}
+                            key={id}
+                            entry={section.entries[id]}
+                            id={id}
+                            sectionId={sectionId}
+                            data={data}
+                            onChange={(data) => onChange(data, id)}
+                          ></Entry>
+                        );
+                      })}
                 </div>
               </Disclosure.Panel>
             </Transition>
@@ -110,21 +110,21 @@ function Section<T>({
         {React.isValidElement(section.entries)
           ? section.entries
           : Object.keys(section.entries).map((id, index) => {
-            return (
-              <Entry
-                zIndex={Object.keys(section.entries).length - index}
-                key={id}
-                entry={section.entries[id]}
-                id={id}
-                sectionId={sectionId}
-                data={data}
-                onChange={(data) => onChange(data, id)}
-              ></Entry>
-            );
-          })}
+              return (
+                <Entry
+                  zIndex={Object.keys(section.entries).length - index}
+                  key={id}
+                  entry={section.entries[id]}
+                  id={id}
+                  sectionId={sectionId}
+                  data={data}
+                  onChange={(data) => onChange(data, id)}
+                ></Entry>
+              );
+            })}
       </div>
     );
-};
+}
 
 /**
  * this function will convert the form structure to the initial data of the form.
@@ -152,19 +152,19 @@ function fromStructureToData<T>(sections: FormStructure<T>): T {
     });
   });
   return flat.unflatten(data);
-};
+}
 
 /**
  * A component to show a form in modal. Use this component to keep consistency in the app.
  * To use this, put the `<ModalForm>` in a component and supply a form structure.
- * 
- * a good practice that you define a type of the formData as well. As `ModalForm` is generic, 
- * by providing a type of form data to form structure, you can typing for `data` return as parameter when 
+ *
+ * a good practice that you define a type of the formData as well. As `ModalForm` is generic,
+ * by providing a type of form data to form structure, you can typing for `data` return as parameter when
  * props like `onChange` and `onEnter`.
- * 
- * @remark `ModalForm` is a over-complex higher order component. It could be simplified by using context. 
- * Although this component is perfectly workable, it is foreseed that this component will soon be deprecated. 
- * @remark this component suppose to be use to aid the creation of a form. Although it is possible to create 
+ *
+ * @remark `ModalForm` is a over-complex higher order component. It could be simplified by using context.
+ * Although this component is perfectly workable, it is foreseed that this component will soon be deprecated.
+ * @remark this component suppose to be use to aid the creation of a form. Although it is possible to create
  * your custom entry, it is suggested not to do so unless really necessary because it defeats the purpose of
  * the modal form. The entry type are supported because they are used frequently and common in many general forms.
  */
@@ -230,12 +230,12 @@ function ModalForm<T>(props: Props<T>) {
       clickOutsideToClose={clickOutsideToClose}
       escToClose={escToClose}
     >
-      <div className={`modal-form ${sizeMap[size]} hide-scroll overflow-y-scroll overflow-x-visible `}>
+      <div
+        className={`modal-form ${sizeMap[size]} hide-scroll overflow-y-scroll overflow-x-visible `}
+      >
         <Twemoji noWrapper options={{ className: "twemoji" }}>
-          <div className="modal-form-content">
-            <Dialog.Title as="h3" className="modal-form-title capitalize">
-              {title}
-            </Dialog.Title>
+          <div id="content">
+            <Dialog.Title as="h3">{title}</Dialog.Title>
             {Object.keys(formStructure).map((sectionId) => {
               const section = formStructure[sectionId];
               return (
@@ -256,9 +256,9 @@ function ModalForm<T>(props: Props<T>) {
                 ></Section>
               );
             })}
-            <div className="modal-form-btn-row pt-4">
+            <div id="btn-group">
               <button
-                className="modal-form-btn-cancel "
+                id="btn-cancel"
                 onClick={() => {
                   setOpen(false);
                   patchedOnClose();
@@ -267,6 +267,7 @@ function ModalForm<T>(props: Props<T>) {
                 {cancelBtnText ?? "Cancel"}
               </button>
               <button
+                id="btn-ok"
                 className={
                   canProceed() ? "modal-form-btn-ok" : "modal-form-btn-cancel"
                 }
@@ -287,6 +288,6 @@ function ModalForm<T>(props: Props<T>) {
       </div>
     </Modal>
   );
-};
+}
 
 export default ModalForm;

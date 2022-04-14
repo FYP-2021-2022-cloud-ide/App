@@ -68,23 +68,28 @@ app.prepare().then(() => {
   httpServer.on(
     "upgrade",
     function (req: Request, socket: Socket, head: Header) {
-      if (req.url.search("/_next/webpack-hmr") == -1) {
-        var baseURL = "/user/container/";
-        var userPosition = req.url.search(baseURL);
-        var id = req.url.slice(
-          userPosition + baseURL.length,
-          userPosition + baseURL.length + ID_LENGTH
-        );
-        console.log(id);
+      try {
+        if (req.url.search("/_next/webpack-hmr") == -1) {
+          var baseURL = "/user/container/";
+          var userPosition = req.url.search(baseURL);
+          var id = req.url.slice(
+            userPosition + baseURL.length,
+            userPosition + baseURL.length + ID_LENGTH
+          );
+          console.log(id);
 
-        req.headers.host = id;
-        req.url = req.url.slice(userPosition + baseURL.length + ID_LENGTH);
+          req.headers.host = id;
+          req.url = req.url.slice(userPosition + baseURL.length + ID_LENGTH);
 
-        proxy.ws(req, socket, head, {
-          target: "http://traefik.codespace.ust.dev",
-        });
-      } else {
-        proxy.ws(req, socket, head, { target: req.url });
+          proxy.ws(req, socket, head, {
+            target: "http://traefik.codespace.ust.dev",
+          });
+        } else {
+          proxy.ws(req, socket, head, { target: req.url });
+        }
+      } catch (error) {
+        console.error(error.stack);
+        throw error;
       }
     }
   );
@@ -159,7 +164,7 @@ app.prepare().then(() => {
           // // // @ts-ignore
           // console.log("session: ", session)
           const additionalUserClaims = await axios(
-            "https://cas.ust.hk/cas/oidc" + "/profile",
+            "https://cas.ust.hk/cas/oidc/profile",
             {
               headers: {
                 Authorization: "Bearer " + session.access_token,
@@ -264,6 +269,7 @@ app.prepare().then(() => {
             domain: `${process.env.HOSTNAME}`,
           });
         } catch (error) {
+          console.error(error.stack);
           throw error;
         }
         return {
@@ -297,7 +303,7 @@ app.prepare().then(() => {
         console.error(err);
       }
       console.log(req.params);
-        res.oidc!.logout({ returnTo: process.env.POST_LOGOUT_REDIRECT_URI });
+      res.oidc!.logout({ returnTo: process.env.POST_LOGOUT_REDIRECT_URI });
     });
     // res.oidc!.logout({ returnTo: process.env.POST_LOGOUT_REDIRECT_URI });
   });
@@ -331,7 +337,7 @@ app.prepare().then(() => {
           }
         );
       } catch (error) {
-        console.log(error);
+        console.error(error.stack);
         res.redirect("/");
       }
     }
@@ -366,7 +372,7 @@ app.prepare().then(() => {
               req.headers.host = req.params.id;
               // req.header("Host") = req.params.id
               req.url = req.url.replace(
-                "/user/container/" + req.params.id + "/",
+                `/user/container/${req.params.id}/`,
                 ""
               );
               // req.url = req.params.id
@@ -380,7 +386,7 @@ app.prepare().then(() => {
           }
         );
       } catch (error) {
-        console.log(error);
+        console.error(error.stack);
         res.redirect("/");
       }
     }

@@ -1,0 +1,19 @@
+#topbar .twemoji {
+  @apply w-4 h-4 inline-block;
+}
+
+#topbar #system-message {
+  @apply bg-yellow-200 border-2 border-yellow-400 px-2 rounded-md text-yellow-600 text-sm flex flex-row items-center;
+}
+
+#topbar #close {
+  @apply ml-2;
+}
+
+#topbar svg {
+  @apply w-6 h-6 hover:scale-110 transition-all ease-in-out duration-300 cursor-pointer text-gray-500 dark:text-gray-300;
+}
+
+#topbar svg[data-icon-sun] {
+  @apply text-yellow-400;
+}

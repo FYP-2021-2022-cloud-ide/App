@@ -1,0 +1,44 @@
+/* modal and modal form */
+
+.modal-form {
+  @apply max-h-[70vh] inline-block z-10 max-w-[1000px] py-6 px-10   text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-xl  text-gray-700 dark:text-gray-300;
+}
+
+.modal-form #content {
+  @apply h-full text-gray-700 dark:text-gray-300;
+}
+
+.modal-form [id^="headlessui-dialog-title"] {
+  @apply text-xl font-medium leading-6 dark:text-gray-300 mb-2;
+}
+
+/* entry, className is modal-form-{entryType }*/
+.modal-form-datetime {
+  @apply dark:text-gray-300 border dark:border-0 focus:outline-none dark:bg-gray-700 p-1 px-3 w-full flex-row space-x-2  text-left rounded-md shadow-md;
+}
+
+.modal-form-toggle {
+  @apply flex flex-row items-center space-x-2;
+}
+
+.modal-form .listbox-options {
+  @apply mb-10  absolute overflow-visible w-full py-1 mt-1  text-base bg-white dark:bg-gray-700 dark:text-gray-400 rounded-md shadow-lg shadow-black/30 max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm;
+}
+
+/* button group  */
+
+.modal-form #btn-group {
+  @apply flex flex-row justify-end space-x-2;
+}
+
+.modal-form #btn-group #btn-ok {
+  @apply w-fit rounded-md px-4 py-2 bg-green-500 hover:bg-green-600 text-base leading-6 font-medium text-white shadow-sm  focus:border-blue-300  transition ease-in-out duration-150 sm:text-sm sm:leading-5;
+}
+
+.modal-form #btn-group #btn-cancel {
+  @apply w-fit rounded-md px-4 py-2 bg-gray-400 hover:bg-gray-500 text-base leading-6 font-medium text-white shadow-sm  focus:border-blue-300 transition ease-in-out duration-150 sm:text-sm sm:leading-5;
+}
+
+.modal-form .validate-fail {
+  @apply border-red-400 border-2 bg-red-100 dark:bg-red-100  dark:border-red-400 dark:focus:outline-none text-gray-500 dark:text-gray-500 ring-2 ring-red-400 !important;
+}

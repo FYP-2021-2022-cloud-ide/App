@@ -6,7 +6,7 @@ import { CustomData } from "../components/CustomTree/CustomNode";
 import FTree, { MyTreeMethods } from "../components/CustomTree/CustomTree";
 import path, { dirname } from "path";
 import { localFileAPI } from "../lib/api/localFile";
-import { InformationCircleIcon } from "@heroicons/react/solid"
+import { InformationCircleIcon } from "@heroicons/react/solid";
 import {
   isBlacklisted,
   status,
@@ -21,10 +21,8 @@ import directoryTree from "directory-tree";
 import classNames from "../lib/classnames";
 import styles from "../styles/file_tree.module.css";
 import { errorToToastDescription } from "../lib/errorHelper";
-import { CLICK_TO_DISMISS, CLICK_TO_REPORT } from "../lib/constants";
-import { usePopperTooltip } from "react-popper-tooltip";
-import ReactDOM from "react-dom";
 import useInterval from "../hooks/useInterval";
+import { TooltipProvider } from "../contexts/Tooltip";
 
 export default function Page() {
   const { userId, sub } = useCnails();
@@ -51,13 +49,6 @@ export default function Page() {
    */
   const targetNodeRef = useRef<NodeModel<CustomData>>();
   const uploadInputRef = useRef<HTMLInputElement>();
-  const {
-    getArrowProps,
-    getTooltipProps,
-    setTooltipRef,
-    setTriggerRef,
-    visible,
-  } = usePopperTooltip();
 
   // for modal form
   const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] =
@@ -85,8 +76,7 @@ export default function Page() {
 
   useInterval(() => {
     fetchRoot(sub);
-  }, 10000)
-
+  }, 10000);
 
   const rerenderPersonalVolume = async (data: directoryTree.DirectoryTree) => {
     await ref1.current.getFilesAndRerender(convertDirectoryTree(data));
@@ -105,26 +95,13 @@ export default function Page() {
             <p className="text-gray-600 font-bold text-xl dark:text-gray-300 h-fit">
               Personal Volume
             </p>
-            <div ref={setTriggerRef}>
-              <InformationCircleIcon className="tooltip-icon" />
-            </div>
-            {visible &&
-              ReactDOM.createPortal(
-                <div
-                  ref={setTooltipRef}
-                  {...getTooltipProps({
-                    className: "tooltip-container",
-                  })}
-                >
-                  You can drag and drop files and folders to the personal volume. You can also drag and drop files between the personal volume and the cloud volume.
-                  <div
-                    {...getArrowProps({
-                      className: "tooltip-arrow",
-                    })}
-                  />
-                </div>,
-                document.body
+            <TooltipProvider text="You can drag and drop files and folders to the personal volume. You can also drag and drop files between the personal volume and the cloud volume.">
+              {(setTriggerRef) => (
+                <div ref={setTriggerRef}>
+                  <InformationCircleIcon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                </div>
               )}
+            </TooltipProvider>
           </div>
           <FTree
             ref={ref1}
@@ -331,10 +308,9 @@ export default function Page() {
                 {
                   text: "Upload files",
                   onClick: () => {
-                    if (uploadInputRef.current)
-                      uploadInputRef.current.click()
-                  }
-                }
+                    if (uploadInputRef.current) uploadInputRef.current.click();
+                  },
+                },
               ];
             }}
             rootActions={[
@@ -345,15 +321,21 @@ export default function Page() {
                 },
               },
             ]}
-            onContextMenuClose={() => { }}
+            onContextMenuClose={() => {}}
           ></FTree>
-          <input ref={uploadInputRef} type="file" multiple className="hidden" onChange={(e) => {
-            console.log(targetNodeRef.current)
-            e.stopPropagation();
-            e.preventDefault();
-            console.log(e.target.files)
-            targetNodeRef.current = null
-          }}></input>
+          <input
+            ref={uploadInputRef}
+            type="file"
+            multiple
+            className="hidden"
+            onChange={(e) => {
+              console.log(targetNodeRef.current);
+              e.stopPropagation();
+              e.preventDefault();
+              console.log(e.target.files);
+              targetNodeRef.current = null;
+            }}
+          ></input>
         </div>
         {/* cloud  */}
         <div className="flex flex-col">
@@ -460,7 +442,7 @@ export default function Page() {
                 if (dragSource == undefined) return true;
                 else return false;
               }}
-              onContextMenuClose={() => { }}
+              onContextMenuClose={() => {}}
             ></FTree>
           )}
         </div>
@@ -483,10 +465,12 @@ export default function Page() {
             },
           },
         }}
-        onEnter={async ({ create_folder: data }: {
+        onEnter={async ({
+          create_folder: data,
+        }: {
           create_folder: {
-            name: string,
-          }
+            name: string;
+          };
         }) => {
           const node = targetNodeRef.current;
           const folderName = data.name;
@@ -510,7 +494,7 @@ export default function Page() {
             folderPath = `${path.dirname(node.data.filePath)}/${folderName}`;
           }
           progressRef1.current = status.loading;
-          console.log(folderPath, node)
+          console.log(folderPath, node);
           const response = await makeFolder(userId, folderPath);
           progressRef1.current = "";
           targetNodeRef.current = null;
@@ -519,45 +503,45 @@ export default function Page() {
         }}
       ></ModalForm>
 
-      {
-        targetNodeRef.current && (
-          <ModalForm
-            isOpen={isEditNameModalOpen}
-            setOpen={setIsEditNameModalOpen}
-            clickOutsideToClose
-            escToClose
-            title="Edit Name"
-            formStructure={{
-              edit_name: {
-                entries: {
-                  name: {
-                    type: "input",
-                    defaultValue: targetNodeRef.current.text,
-                  },
+      {targetNodeRef.current && (
+        <ModalForm
+          isOpen={isEditNameModalOpen}
+          setOpen={setIsEditNameModalOpen}
+          clickOutsideToClose
+          escToClose
+          title="Edit Name"
+          formStructure={{
+            edit_name: {
+              entries: {
+                name: {
+                  type: "input",
+                  defaultValue: targetNodeRef.current.text,
                 },
               },
-            }}
-            onEnter={async ({ edit_name: data }: {
-              edit_name: {
-                name: string
-              }
-            }) => {
-              const node = targetNodeRef.current;
-              const newName = data.name;
-              progressRef1.current = status.loading;
-              const response = await moveFile(
-                userId,
-                node.data.filePath,
-                `${path.dirname(node.data.filePath)}/${newName}`
-              );
-              progressRef1.current = "";
-              targetNodeRef.current = null
-              if (response.success) await rerenderPersonalVolume(response.tree);
-              else alert(response.error.status);
-            }}
-          ></ModalForm>
-        )
-      }
+            },
+          }}
+          onEnter={async ({
+            edit_name: data,
+          }: {
+            edit_name: {
+              name: string;
+            };
+          }) => {
+            const node = targetNodeRef.current;
+            const newName = data.name;
+            progressRef1.current = status.loading;
+            const response = await moveFile(
+              userId,
+              node.data.filePath,
+              `${path.dirname(node.data.filePath)}/${newName}`
+            );
+            progressRef1.current = "";
+            targetNodeRef.current = null;
+            if (response.success) await rerenderPersonalVolume(response.tree);
+            else alert(response.error.status);
+          }}
+        ></ModalForm>
+      )}
     </>
   );
 }

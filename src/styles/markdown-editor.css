@@ -1,0 +1,61 @@
+.CodeMirror {
+  @apply bg-transparent;
+}
+
+.editor-toolbar {
+  @apply border-gray-300 dark:border-gray-500 !important;
+}
+.editor-toolbar i.separator {
+  @apply dark:border-gray-500 !important;
+}
+
+.editor-toolbar .easymde-dropdown,
+.editor-toolbar button {
+  @apply dark:text-white;
+}
+
+.editor-toolbar .easymde-dropdown,
+.editor-toolbar button.active,
+.editor-toolbar button:hover {
+  @apply text-slate-500;
+}
+
+.EasyMDEContainer .CodeMirror {
+  @apply border-gray-300 dark:border-gray-500 text-gray-600 dark:text-gray-300 bg-transparent shadow-md !important;
+}
+
+.CodeMirror-cursor {
+  @apply dark:border-gray-500 border-black/50 !important;
+}
+
+span.CodeMirror-selectedtext {
+  @apply text-gray-700 !important;
+}
+
+.simplemde-editor-5-wrapper {
+  @apply max-h-96;
+}
+
+.editor-preview {
+  @apply bg-white dark:bg-gray-800 !important;
+}
+
+.markdown-support {
+  @apply flex flex-row items-center rounded flex-nowrap grow-0 w-min p-1 fill-blue-200 space-x-2 cursor-pointer;
+}
+
+.markdown-support svg {
+  @apply w-5 h-5 fill-gray-600 dark:fill-gray-400;
+}
+
+.markdown-support:hover svg {
+  @apply fill-blue-500 dark:fill-blue-400;
+}
+
+.markdown-support p {
+  @apply text-2xs text-gray-600 dark:text-gray-400 whitespace-nowrap grow-0;
+}
+
+.markdown-support:hover p {
+  @apply text-blue-500 dark:text-blue-400;
+}

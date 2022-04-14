@@ -56,6 +56,48 @@ export const StudentProvider = ({ children }: { children: JSX.Element }) => {
           _containers
         );
         if (mount) setWorkspaces(workspaces);
+        // setWorkspaces([
+        //   {
+        //     id: "sdkfosdfods1",
+        //     name: "oskfosdkfodks",
+        //     description: "skdofksdfoosdofdksds",
+        //     imageId: "sodkfosdfkodksfodsf",
+        //     assignment_config_id: "sdoaksosakodkasd",
+        //     storage: "sodkfosdkodfks",
+        //     environment_id: "sodfkosdkfodskfo",
+        //     active: true,
+        //     isExam: false,
+        //     timeLimit: 123,
+        //     allow_notification: false,
+        //   },
+        //   {
+        //     id: "sdkfosdfods2",
+        //     name: "oskfosdkfodks",
+        //     description: "skdofksdfoosdofdksds",
+        //     imageId: "sodkfosdfkodksfodsf",
+        //     assignment_config_id: "sdoaksosakodkasd",
+        //     storage: "sodkfosdkodfks",
+        //     environment_id: "sodfkosdkfodskfo",
+        //     active: true,
+        //     isExam: false,
+        //     timeLimit: 123,
+        //     allow_notification: false,
+        //   },
+        //   {
+        //     id: "sdkfosdfods3",
+        //     name: "oskfosdkfodks",
+        //     description: "skdofksdfoosdofdksds",
+        //     imageId: "sodkfosdfkodksfodsf",
+        //     assignment_config_id: "sdoaksosakodkasd",
+        //     storage: "sodkfosdkodfks",
+        //     containerId: "skdfoksdf",
+        //     environment_id: "sodfkosdkfodskfo",
+        //     active: true,
+        //     isExam: true,
+        //     timeLimit: 123,
+        //     allow_notification: false,
+        //   },
+        // ]);
         return workspaces;
       } else {
         myToast.error({

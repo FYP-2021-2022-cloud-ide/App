@@ -8,7 +8,7 @@ type Props = {
   environment: Environment;
   onClick?: (environment: Environment) => void;
   menuItems: {
-    text: string | ((environment: Environment) => string)
+    text: string | ((environment: Environment) => string);
     onClick: (environment: Environment) => void;
   }[];
   zIndex?: number;
@@ -37,21 +37,24 @@ function EnvironmentCard({
       tiltReverse
     >
       <div
+        title={environment.name}
         className="env-card"
         onClick={() => {
           if (onClick) onClick(environment);
         }}
       >
-        <div className="env-card-content">
-          <div className="env-card-name">{environment.name}</div>
-          <div className="env-card-lib">{environment.libraries}</div>
-          {/* <div className="env-card-ref">{environment.imageId}</div> */}
-          <p className="env-card-des">{environment.description}</p>
+        <div id="content">
+          <p id="name">{environment.name}</p>
+          <p id="lib">{environment.libraries}</p>
+          <p id="description">{environment.description}</p>
         </div>
-        <CardMenu items={menuItems.map(item => ({
-          text: typeof item.text == "string" ? item.text : item.text(environment),
-          onClick: () => item.onClick(environment)
-        }))}></CardMenu>
+        <CardMenu
+          items={menuItems.map((item) => ({
+            text:
+              typeof item.text == "string" ? item.text : item.text(environment),
+            onClick: () => item.onClick(environment),
+          }))}
+        ></CardMenu>
       </div>
     </Tilt>
   );

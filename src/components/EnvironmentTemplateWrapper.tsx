@@ -160,7 +160,10 @@ const EnvironmentTemplateWrapper = () => {
                       {
                         className: "toaster toaster-custom ",
                         icon: "🗂",
-                      }
+                        duration: 99999 * 86400,
+                      },
+                      undefined,
+                      false
                     );
                   }
                 );
@@ -268,9 +271,12 @@ const EnvironmentTemplateWrapper = () => {
                         }}
                       ></TempContainerToast>,
                       {
-                        className: "toaster toaster-custom ",
+                        className: "toaster toaster-temp-container ",
                         icon: "🗂",
-                      }
+                        duration: 99999 * 86400,
+                      },
+                      undefined,
+                      false
                     );
                   }
                 );

@@ -1,0 +1,75 @@
+/* this files store the styling of env-card, template-card and sandbox-card */
+
+.env-card,
+.template-card,
+.sandbox-card,
+.workspace-card {
+  @apply border  select-none border-gray-200 dark:border-gray-700 shadow-sm rounded-lg  min-h-[9rem]  p-3 flex flex-row items-start justify-between;
+}
+
+.env-card {
+  @apply h-56 bg-white dark:bg-gray-600 shadow-sm;
+}
+
+.template-card {
+  @apply cursor-pointer h-56 transition-all duration-300 ease-in;
+}
+
+.template-card[data-active="false"] {
+  @apply bg-gray-200 dark:bg-gray-900 shadow-sm;
+}
+
+.template-card[data-active="true"] {
+  @apply bg-white dark:bg-gray-600 shadow-sm;
+}
+
+.template-card[data-active="highlighted"] {
+  @apply bg-yellow-300 shadow-yellow-300 shadow-xl;
+}
+
+.workspace-card {
+  @apply h-56 bg-white dark:bg-gray-600 shadow-sm;
+}
+
+.sandbox-card {
+  @apply h-32 bg-white dark:bg-gray-600;
+}
+
+.sandbox-card[data-active="true"] {
+  @apply cursor-pointer;
+}
+
+/* the content */
+.env-card #content,
+.template-card #content,
+.sandbox-card #content,
+.workspace-card #content {
+  @apply flex flex-col h-full w-full min-w-0;
+}
+
+.template-card #content,
+.workspace-card #content {
+  @apply justify-between;
+}
+
+.env-card #name,
+.template-card #name,
+.sandbox-card #name,
+.workspace-card #name {
+  @apply font-semibold max-w-full text-sm text-gray-600 dark:text-gray-300 text-left line-clamp-1;
+}
+
+.template-card #env {
+  @apply text-2xs text-gray-600 dark:text-gray-300 line-clamp-1;
+}
+
+.env-card #lib {
+  @apply font-medium max-w-full text-xs text-gray-600 dark:text-gray-300 text-left line-clamp-1;
+}
+
+.env-card #description,
+.sandbox-card #description,
+.template-card #description,
+.workspace-card #description {
+  @apply font-medium max-w-full text-xs text-gray-400 line-clamp-4 whitespace-pre-line;
+}

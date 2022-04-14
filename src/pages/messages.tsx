@@ -1,10 +1,4 @@
-import {
-  useState,
-  useEffect,
-  useCallback,
-  memo,
-  Fragment,
-} from "react";
+import { useState, useEffect, useCallback, memo, Fragment } from "react";
 import { ReplyIcon } from "@heroicons/react/outline";
 import EmptyDiv from "../components/EmptyDiv";
 import { RefreshIcon, TrashIcon } from "@heroicons/react/solid";
@@ -32,9 +26,9 @@ type Course = {
 const messageToCourse = (message: Message): Course => {
   return message.section_id
     ? {
-      fullCode: `${message.courseCode} (${message.sectionCode})`,
-      id: message.section_id,
-    }
+        fullCode: `${message.courseCode} (${message.sectionCode})`,
+        id: message.section_id,
+      }
     : undefined;
 };
 
@@ -53,9 +47,10 @@ const ExpandedComponent = memo(
 
 const MessageTable = () => {
   const router = useRouter();
-  const target = router.query.id;
+  const queryTarget = router.query.id;
   const [selectedRows, setSelectedRows] = useState<Message[]>([]);
-  const { messages, fetchMessages, changeMessagesRead, deleteMessages } = useMessaging();
+  const { messages, fetchMessages, changeMessagesRead, deleteMessages } =
+    useMessaging();
   // const [pending, setPending] = useState(true);
   const [replyFormOpen, setReplyFormOpen] = useState<boolean>(false);
   const [replyTarget, setReplyTarget] = useState<Message>();
@@ -82,7 +77,7 @@ const MessageTable = () => {
     });
 
   /**
-   * this hook change the column padding of the Read row in every render because the padding is wrong 
+   * this hook change the column padding of the Read row in every render because the padding is wrong
    */
   useEffect(() => {
     const cell = document.querySelector(
@@ -90,7 +85,6 @@ const MessageTable = () => {
     ) as HTMLElement;
     if (cell) cell.style.padding = "0px";
   });
-
 
   const columns: TableColumn<Message>[] = [
     {
@@ -160,39 +154,39 @@ const MessageTable = () => {
           onClick: () => void;
           shown?: boolean; // default is shown
         }[] = [
-            {
-              text: row.read ? "Mark as unread" : "Mark as read",
-              icon: (
-                <div className="w-5 h-5 flex items-center justify-center">
-                  {row.read ? (
-                    <div className="rounded-full w-3 h-3 border-2 bg-white  border-white "></div>
-                  ) : (
-                    <div className="rounded-full w-3 h-3 border-2  border-white "></div>
-                  )}
-                </div>
-              ),
-              onClick: async () => {
-                await changeMessagesRead([row.id], !row.read)
-              },
+          {
+            text: row.read ? "Mark as unread" : "Mark as read",
+            icon: (
+              <div className="w-5 h-5 flex items-center justify-center">
+                {row.read ? (
+                  <div className="rounded-full w-3 h-3 border-2 bg-white  border-white "></div>
+                ) : (
+                  <div className="rounded-full w-3 h-3 border-2  border-white "></div>
+                )}
+              </div>
+            ),
+            onClick: async () => {
+              await changeMessagesRead([row.id], !row.read);
             },
-            {
-              text: "Reply",
-              icon: <ReplyIcon className="w-5 h-5 text-white" />,
-              onClick: () => {
-                setReplyFormOpen(true);
-                setReplyTarget(row)
-              },
-              shown: !row.allow_reply, //bug:this does not show when allow reply is true
+          },
+          {
+            text: "Reply",
+            icon: <ReplyIcon className="w-5 h-5 text-white" />,
+            onClick: () => {
+              setReplyFormOpen(true);
+              setReplyTarget(row);
             },
-            {
-              text: "Delete message",
-              icon: <TrashIcon className="w-5 h-5 text-white"></TrashIcon>,
-              onClick: async () => {
-                setSelectedRows(selectedRows.filter((r) => r.id != row.id));
-                await deleteMessages([row.id])
-              },
+            shown: !row.allow_reply, //bug:this does not show when allow reply is true
+          },
+          {
+            text: "Delete message",
+            icon: <TrashIcon className="w-5 h-5 text-white"></TrashIcon>,
+            onClick: async () => {
+              setSelectedRows(selectedRows.filter((r) => r.id != row.id));
+              await deleteMessages([row.id]);
             },
-          ];
+          },
+        ];
         return (
           <div className="flex flex-row space-x-2">
             {actions.map((action, index) => {
@@ -244,12 +238,8 @@ const MessageTable = () => {
     message
   ) => {
     if (expand && onlyUnread)
-      setReadDuringUnreadFiltering([
-        ...readDuringUnreadFiltering,
-        message,
-      ]);
-    if (expand && !message.read)
-      await changeMessagesRead([message.id], false)
+      setReadDuringUnreadFiltering([...readDuringUnreadFiltering, message]);
+    if (expand && !message.read) await changeMessagesRead([message.id], true);
   };
 
   createTheme(
@@ -338,8 +328,11 @@ const MessageTable = () => {
               defaultSortFieldId={"Time"}
               expandableRows
               pagination
-              // To pre-select rows based on your data
-              expandableRowExpanded={(row) => target != null && row.id == target}
+              // To pre-expand rows based on your data
+              // this will not trigger the on expand function
+              expandableRowExpanded={(row) =>
+                queryTarget != null && row.id == queryTarget
+              }
               paginationComponent={(props) => (
                 <PaginationComponent
                   options={[15, 20, 30, 50]}
@@ -359,7 +352,7 @@ const MessageTable = () => {
                         <TrashIcon className="w-5 h-5 text-white"></TrashIcon>
                       ),
                       onClick: async () => {
-                        await deleteMessages(selectedRows.map((r) => r.id))
+                        await deleteMessages(selectedRows.map((r) => r.id));
                       },
                       shown: selectedRows.length != 0,
                     },
@@ -371,7 +364,10 @@ const MessageTable = () => {
                         </div>
                       ),
                       onClick: async () => {
-                        await changeMessagesRead(selectedRows.map((r) => r.id), true)
+                        await changeMessagesRead(
+                          selectedRows.map((r) => r.id),
+                          true
+                        );
                       },
                       shown: selectedRows.length != 0,
                     },
@@ -383,7 +379,10 @@ const MessageTable = () => {
                         </div>
                       ),
                       onClick: async () => {
-                        await changeMessagesRead(selectedRows.map((r) => r.id), false)
+                        await changeMessagesRead(
+                          selectedRows.map((r) => r.id),
+                          false
+                        );
                       },
                       shown: selectedRows.length != 0,
                     },
@@ -396,7 +395,9 @@ const MessageTable = () => {
               expandableRowsHideExpander
               onRowExpandToggled={onRowExpandToggled}
               theme="cnails-dark"
-              selectableRowSelected={(row) => selectedRows.map((n) => n.id).includes(row.id)}
+              selectableRowSelected={(row) =>
+                selectedRows.map((n) => n.id).includes(row.id)
+              }
               expandableRowsComponent={ExpandedComponent}
             />
             {filterMessages.length == 0 ? (
@@ -407,7 +408,11 @@ const MessageTable = () => {
               <></>
             )}
           </div>
-          <MessageReplyForm isOpen={replyFormOpen} setOpen={setReplyFormOpen} target={replyTarget} />
+          <MessageReplyForm
+            isOpen={replyFormOpen}
+            setOpen={setReplyFormOpen}
+            target={replyTarget}
+          />
         </div>
       )}
       {/* <button

@@ -3,13 +3,12 @@ import CardMenu, { MenuItem } from "./CardMenu";
 import { Workspace } from "../lib/cnails";
 import useCleanTilt from "../hooks/useCleanTilt";
 import Tilt from "react-parallax-tilt";
+import WorkspaceIndicator from "./WorkspaceIndicator";
+import { AcademicCapIcon } from "@heroicons/react/solid";
 interface Props {
   workspace: Workspace;
   onClick?: () => void;
-  menuItems: (workspace: Workspace) => {
-    text: string | ((workspace: Workspace) => string),
-    onClick: (workspace: Workspace) => void,
-  }[];
+  menuItems: (workspace: Workspace) => MenuItem[];
   // onToggleStart?: () => void;
   zIndex?: number;
 }
@@ -31,36 +30,34 @@ function WorkspaceCard({ workspace, onClick, menuItems, zIndex }: Props) {
         onClick={async (e) => {
           if (onClick) onClick();
         }}
-        className="env-card select-none"
+        data-active={Boolean(workspace.containerId)}
+        title={workspace.name}
+        className="workspace-card"
       >
-        <div className="flex flex-row min-w-0 space-x-2">
-          <span className="relative flex h-3 w-3 mt-3">
-            {workspace.containerId && (
-              <span className="absolute animate-ping inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-            )}
-            <span
-              className={`relative inline-flex rounded-full h-3 w-3 ${workspace.containerId ? "bg-green-400" : "bg-gray-400"
-                }`}
-            ></span>
-          </span>
-          <div className="env-card-content justify-between w-full">
-            <div>
-              <div className="env-card-name mt-2">{workspace.name}</div>
-              <div className=" text-xs text-gray-600 dark:text-gray-300 line-clamp-3">
-                {workspace.description}
-              </div>
+        <div id="content">
+          <div className="flex flex-row min-w-0 space-x-2 items-start ">
+            <div className="mt-2">
+              <WorkspaceIndicator
+                color={workspace.containerId ? "green" : "gray"}
+              ></WorkspaceIndicator>
             </div>
             <div>
-              {
-                // show a badge if student haven't started this workspace before.
-              }
+              <p id="name">{workspace.name}</p>
+              <p id="description">{workspace.description}</p>
             </div>
           </div>
+          <div className="flex flex-row space-x-2">
+            {workspace.isExam ? (
+              <div className="flex flex-row items-center">
+                <AcademicCapIcon className="w-3 h-3 text-gray-400" />
+                <span className="text-2xs text-gray-400">Exam</span>
+              </div>
+            ) : (
+              <></>
+            )}
+          </div>
         </div>
-        <CardMenu items={menuItems(workspace).map(item => ({
-          text: typeof item.text == "string" ? item.text : item.text(workspace),
-          onClick: () => item.onClick(workspace)
-        }))}></CardMenu>
+        <CardMenu items={menuItems(workspace)}></CardMenu>
       </div>
     </Tilt>
   );

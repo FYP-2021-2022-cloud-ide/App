@@ -3,8 +3,6 @@ import { CubeIcon } from "@heroicons/react/outline";
 import { PlusCircleIcon } from "@heroicons/react/solid";
 import React from "react";
 import EmptyDiv from "./EmptyDiv";
-import { useCnails } from "../contexts/cnails";
-import { useRouter } from "next/router";
 import { Environment } from "../lib/cnails";
 import _ from "lodash";
 
@@ -13,7 +11,7 @@ export interface Props {
   onEnvCreateBtnClick: () => void;
   onEnvClick?: (environment: Environment) => void;
   menuItems: {
-    text: string | ((environment: Environment) => string)
+    text: string | ((environment: Environment) => string);
     onClick: (environment: Environment) => void;
   }[];
 }
@@ -22,19 +20,21 @@ const EnvironmentList = ({
   environments,
   onEnvCreateBtnClick,
   onEnvClick,
-  menuItems
+  menuItems,
 }: Props) => {
   return (
-    <div className="env-list-container">
-      <div className="env-list-header">
-        <CubeIcon className="course-list-title-icon"></CubeIcon>
-        <div className="env-grid-title">Environments</div>
+    <div className="env-list">
+      <div id="header">
+        <CubeIcon id="icon"></CubeIcon>
+        <div id="title">Environments</div>
         <button
           onClick={() => {
             if (onEnvCreateBtnClick) onEnvCreateBtnClick();
           }}
+          id="add"
+          title="create environment"
         >
-          <PlusCircleIcon className="course-list-title-add"></PlusCircleIcon>
+          <PlusCircleIcon></PlusCircleIcon>
         </button>
       </div>
       {

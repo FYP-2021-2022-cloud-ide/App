@@ -1,0 +1,11 @@
+.error-page #status-code {
+  @apply text-5xl text-gray-800 font-extrabold dark:text-white;
+}
+
+.error-page textarea {
+  @apply textarea w-full min-h-[6rem] h-24 max-h-[12rem] textarea-bordered textarea-primary bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300;
+}
+
+.error-page {
+  @apply text-gray-600 dark:text-gray-300;
+}
