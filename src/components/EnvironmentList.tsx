@@ -5,15 +5,13 @@ import React from "react";
 import EmptyDiv from "./EmptyDiv";
 import { Environment } from "../lib/cnails";
 import _ from "lodash";
+import { MenuItem } from "./CardMenu";
 
 export interface Props {
   environments: Environment[];
   onEnvCreateBtnClick: () => void;
   onEnvClick?: (environment: Environment) => void;
-  menuItems: {
-    text: string | ((environment: Environment) => string);
-    onClick: (environment: Environment) => void;
-  }[];
+  menuItems: (environment: Environment) => MenuItem[];
 }
 
 const EnvironmentList = ({

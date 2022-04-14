@@ -99,23 +99,23 @@ const EnvironmentTemplateWrapper = () => {
             // router.push(`${router.asPath}/${env.id}`);
             // console.log(router.asPath);
           }}
-          menuItems={[
+          menuItems={(env) => [
             {
               text: "Delete",
-              onClick: async (env) => {
+              onClick: async () => {
                 await removeEnvironment(env.id);
               },
             },
             {
               text: "Update Info",
-              onClick: (env) => {
+              onClick: () => {
                 setEnvUpdateOpen(true);
                 setEnvUpdateTarget(env);
               },
             },
             {
               text: "Highlight Templates",
-              onClick: (env) => {
+              onClick: () => {
                 if (templates.some((t) => t.environment_id === env.id)) {
                   setHighlightedEnv(env);
                   forceUpdate();
@@ -124,7 +124,7 @@ const EnvironmentTemplateWrapper = () => {
             },
             {
               text: "Update Internal",
-              onClick: async (env) => {
+              onClick: async () => {
                 await createContainer(
                   {
                     memLimit: memory,
@@ -186,24 +186,23 @@ const EnvironmentTemplateWrapper = () => {
               setTemplateCreateOpen(true);
             }
           }}
-          menuItems={[
+          menuItems={(template) => [
             {
               text: "Delete",
-              onClick: async (template) => {
+              onClick: async () => {
                 await removeTemplate(template.id);
               },
             },
             {
               text: "Update info",
-              onClick: (template) => {
+              onClick: () => {
                 setTemplateUpdateTarget(template);
                 setTemplateUpdateOpen(true);
               },
             },
             {
-              text: (template) =>
-                template.containerId ? "Stop workspace" : "Start workspace",
-              onClick: async (template) => {
+              text: template.containerId ? "Stop workspace" : "Start workspace",
+              onClick: async () => {
                 if (template.containerId) {
                   await removeContainer(template.containerId);
                 } else {
@@ -223,15 +222,25 @@ const EnvironmentTemplateWrapper = () => {
               },
             },
             {
-              text: (template) => (template.active ? "Unpublish" : "Publish"),
-              onClick: async (template) => {
+              text: template.active ? "Unpublish" : "Publish",
+              onClick: async () => {
                 if (!template.active) await publishTemplate(template.id);
                 else await unpublishTemplate(template.id);
               },
             },
             {
+              text: "Share link",
+              onClick: () => {
+                myToast.success("link to copied to clipboard.");
+                navigator.clipboard.writeText(
+                  "https://codespace.ust.dev/quickAssignmentInit/" + template.id
+                );
+              },
+              show: Boolean(template.active),
+            },
+            {
               text: "Update Internal",
-              onClick: async (template) => {
+              onClick: async () => {
                 await createContainer(
                   {
                     memLimit: memory,

@@ -5,6 +5,7 @@ import { PlusCircleIcon } from "@heroicons/react/solid";
 import EmptyDiv from "./EmptyDiv";
 import { Environment, Template } from "../lib/cnails";
 import TemplateCard from "./TemplateCard";
+import { MenuItem } from "./CardMenu";
 
 export type Props = {
   templates: Template[];
@@ -14,16 +15,7 @@ export type Props = {
   onWorkspaceCardClick?: (template: Template) => void;
   onCreate?: () => void;
   onClick?: (template: Template) => void;
-  menuItems: {
-    text: string | ((template: Template) => string);
-    onClick: (template: Template) => void;
-  }[];
-
-  // onDelete?: (template: Template) => void;
-  // onUpdate?: (template: Template) => void;
-  // onToggle?: (template: Template, open: boolean) => void;
-  // onInspect?: (template: Template) => void;
-  // onToggleActivation?: (template: Template, active: boolean) => void;
+  menuItems: (template: Template) => MenuItem[];
 };
 
 const TemplateList = ({

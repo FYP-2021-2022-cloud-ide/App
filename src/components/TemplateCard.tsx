@@ -18,11 +18,7 @@ interface Props {
   highlighted?: Boolean;
   onClick?: (template: Template) => void;
   onWorkspaceCardClick?: (template: Template) => void;
-  menuItems: {
-    text: string | ((template: Template) => string);
-    onClick: (template: Template) => void;
-  }[];
-
+  menuItems: (template: Template) => MenuItem[];
   zIndex?: number;
 }
 
@@ -75,16 +71,6 @@ function TemplateCard({
     zIndex ? `z-index : ${zIndex};` : ""
   );
   const env = getEnvironment(template.environment_id);
-  if (template.active)
-    menuItems.push({
-      text: "Share link",
-      onClick: (template) => {
-        myToast.success("link to copied to clipboard.");
-        navigator.clipboard.writeText(
-          "https://codespace.ust.dev/quickAssignmentInit/" + template.id
-        );
-      },
-    });
 
   useEffect(() => {
     if (highlightedEnv && highlightedEnv.id === template.environment_id) {
@@ -166,13 +152,7 @@ function TemplateCard({
         </div>
 
         {/* <div className="flex flex-col justify-between h-full items-center"> */}
-        <Menu
-          items={menuItems.map((item) => ({
-            text:
-              typeof item.text == "string" ? item.text : item.text(template),
-            onClick: () => item.onClick(template),
-          }))}
-        ></Menu>
+        <Menu items={menuItems(template)}></Menu>
       </div>
       {/* </div> */}
     </Tilt>

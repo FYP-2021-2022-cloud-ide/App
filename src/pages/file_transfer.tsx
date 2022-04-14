@@ -55,7 +55,6 @@ export default function Page() {
     useState<boolean>(false);
   const [isEditNameModalOpen, setIsEditNameModalOpen] =
     useState<boolean>(false);
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState<boolean>(false);
 
   const fetchRoot = async (sub: string) => {
     googleFilesRef.current = await expandGoogleFolder(

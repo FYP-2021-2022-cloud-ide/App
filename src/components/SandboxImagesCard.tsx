@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import CardMenu from "./CardMenu";
+import CardMenu, { MenuItem } from "./CardMenu";
 import Tilt from "react-parallax-tilt";
 
 import { SandboxImage } from "../lib/cnails";
@@ -9,11 +9,7 @@ import WorkspaceIndicator from "./WorkspaceIndicator";
 type Props = {
   sandboxImage: SandboxImage;
   onClick?: (sandboxImage: SandboxImage) => void;
-  menuItems: (sandboxImage: SandboxImage) => {
-    text: string;
-    onClick: () => void;
-    disabled?: boolean;
-  }[];
+  menuItems: (sandboxImage: SandboxImage) => MenuItem[];
   zIndex?: number;
   id: string;
 };

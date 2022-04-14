@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef } from "react";
-import CardMenu from "./CardMenu";
+import CardMenu, { MenuItem } from "./CardMenu";
 import Tilt from "react-parallax-tilt";
 import { Environment } from "../lib/cnails";
 import useCleanTilt from "../hooks/useCleanTilt";
@@ -7,23 +7,13 @@ import useCleanTilt from "../hooks/useCleanTilt";
 type Props = {
   environment: Environment;
   onClick?: (environment: Environment) => void;
-  menuItems: {
-    text: string | ((environment: Environment) => string);
-    onClick: (environment: Environment) => void;
-  }[];
+  menuItems: (environment: Environment) => MenuItem[];
   zIndex?: number;
 };
 
-function EnvironmentCard({
-  environment,
-  onClick,
-  // onDelete,
-  // onUpdate,
-  // onHighlight,
-  // onUpdateInternal,
-  menuItems,
-  zIndex,
-}: Props) {
+const LoadingEnvCard = (props: Props) => {};
+
+function EnvironmentCard({ environment, onClick, menuItems, zIndex }: Props) {
   const { ref, cleanStyle } = useCleanTilt(
     zIndex ? `z-index : ${zIndex};` : ""
   );
@@ -48,13 +38,7 @@ function EnvironmentCard({
           <p id="lib">{environment.libraries}</p>
           <p id="description">{environment.description}</p>
         </div>
-        <CardMenu
-          items={menuItems.map((item) => ({
-            text:
-              typeof item.text == "string" ? item.text : item.text(environment),
-            onClick: () => item.onClick(environment),
-          }))}
-        ></CardMenu>
+        <CardMenu items={menuItems(environment)}></CardMenu>
       </div>
     </Tilt>
   );
