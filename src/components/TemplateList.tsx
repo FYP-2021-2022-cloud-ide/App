@@ -12,7 +12,6 @@ export type Props = {
   environments: Environment[];
   sectionUserID: string;
   highlightedEnv?: Environment;
-  onWorkspaceCardClick?: (template: Template) => void;
   onCreate?: () => void;
   onClick?: (template: Template) => void;
   menuItems: (template: Template) => MenuItem[];
@@ -23,8 +22,6 @@ const TemplateList = ({
   highlightedEnv,
   onClick,
   onCreate,
-
-  onWorkspaceCardClick,
   menuItems,
 }: Props) => {
   return (
@@ -62,9 +59,6 @@ const TemplateList = ({
                     template={template}
                     onClick={() => {
                       if (onClick) onClick(template);
-                    }}
-                    onWorkspaceCardClick={(template) => {
-                      if (onWorkspaceCardClick) onWorkspaceCardClick(template);
                     }}
                     zIndex={templates.length - index}
                     menuItems={menuItems}

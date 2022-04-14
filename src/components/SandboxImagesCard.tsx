@@ -24,10 +24,12 @@ const LoadingSandboxImageCard = (props: Props) => {
     (sandboxImage.status == "CREATING" && "being created...") ||
     (sandboxImage.status == "UPDATING" && "being updated...") ||
     (sandboxImage.status == "REMOVING" && "being removed...") ||
-    (sandboxImage.status == "STARTING_WORKSPACE" &&
-      "workspace is starting...") ||
-    (sandboxImage.status == "STOPPING_WORKSPACE" &&
-      "workspace is stopping...") ||
+    (sandboxImage.status == "STARTING_UPDATE_WORKSPACE" &&
+      "starting temporary workspace...") ||
+    (sandboxImage.status == "STARTING_WORKSPACE" && "starting workspace...") ||
+    (sandboxImage.status == "STOPPING_UPDATE_WORKSPACE" &&
+      "stopping temporary workspace...") ||
+    (sandboxImage.status == "STOPPING_WORKSPACE" && "stopping workspace...") ||
     (sandboxImage.status == "UPDATING_INTERNAL" && "internal being upated...");
   return (
     <Tilt
@@ -64,7 +66,7 @@ const LoadingSandboxImageCard = (props: Props) => {
             }
           ></WorkspaceIndicator>
         </div>
-        <div className="w-full flex flex-col justify-between h-full">
+        <div id="content">
           <div>
             <p id="name">{sandboxImage.title}</p>
             {/* the pulsing animation */}

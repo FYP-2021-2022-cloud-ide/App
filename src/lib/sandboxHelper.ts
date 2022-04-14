@@ -48,13 +48,13 @@ export const patchSandboxes = (
         if (container.id == "")
           return {
             ...si,
-            status: "STARTING_WORKSPACE",
+            status: "STARTING_UPDATE_WORKSPACE",
           };
         else {
           if (container.status == "REMOVING") {
             return {
               ...si,
-              status: "STOPPING_WORKSPACE",
+              status: "STOPPING_UPDATE_WORKSPACE",
             };
           } else
             return {

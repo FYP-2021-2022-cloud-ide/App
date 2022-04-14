@@ -19,7 +19,7 @@
   @apply bg-gray-200 dark:bg-gray-900 shadow-sm;
 }
 
-.template-card[data-active="true"] {
+.template-card {
   @apply bg-white dark:bg-gray-600 shadow-sm;
 }
 
@@ -44,12 +44,7 @@
 .template-card #content,
 .sandbox-card #content,
 .workspace-card #content {
-  @apply flex flex-col h-full w-full min-w-0;
-}
-
-.template-card #content,
-.workspace-card #content {
-  @apply justify-between;
+  @apply flex flex-col h-full w-full min-w-0 justify-between;
 }
 
 .env-card #name,

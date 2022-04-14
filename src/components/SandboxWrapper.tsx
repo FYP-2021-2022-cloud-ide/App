@@ -88,32 +88,34 @@ export const SandboxWrapper = () => {
                     userId: userId,
                   },
                 },
-                (containerId) => {
-                  const id = myToast.custom(
-                    <TempContainerToast
-                      containerId={containerId}
-                      getToastId={() => id}
-                      onCancel={async () => {
-                        return await waitForConfirm(
-                          "Are you sure that you want to cancel the commit. All your changes in the workspace will not be saved and personal workspace will not be updated."
-                        );
-                      }}
-                      onOK={async () => {
-                        await updateSandboxImageInternal(
-                          sandboxImage.id,
-                          containerId
-                        );
-                      }}
-                    ></TempContainerToast>,
-                    {
-                      className: "toaster toaster-temp-container ",
-                      icon: "🗂",
-                      duration: 99999 * 86400,
-                    },
-                    undefined,
-                    false
-                  );
-                }
+                "nothing"
+                // (containerId) => {
+                //   const id = myToast.custom(
+                //     <TempContainerToast
+                //       containerId={containerId}
+                //       getToastId={() => id}
+                //       onCancel={async () => {
+                //         return await waitForConfirm(
+                //           "Are you sure that you want to cancel the commit. All your changes in the workspace will not be saved and personal workspace will not be updated."
+                //         );
+                //       }}
+                //       onOK={async () => {
+                //         await updateSandboxImageInternal(
+                //           sandboxImage.id,
+                //           containerId
+                //         );
+                //       }}
+                //     ></TempContainerToast>,
+                //     {
+                //       className: "toaster toaster-temp-container ",
+                //       icon: "🗂",
+                //       id: containerId,
+                //       duration: 99999 * 86400,
+                //     },
+                //     undefined,
+                //     false
+                //   );
+                // }
               );
             },
           },

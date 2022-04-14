@@ -117,29 +117,31 @@ const CreateEnvironmentForm = ({ isOpen, setOpen }: Props) => {
                 containerId: "",
               },
             },
-            (containerId) => {
-              const customToastId = myToast.custom(
-                <TempContainerToast
-                  getToastId={() => customToastId}
-                  containerId={containerId}
-                  onCancel={async () => {
-                    return await waitForConfirm(
-                      "Are you sure you want to cancel the commit? All your changes in the workspace will not be saved and no environment will be built."
-                    );
-                  }}
-                  onOK={async () => {
-                    await createEnvironment(name, description, containerId);
-                  }}
-                ></TempContainerToast>,
-                {
-                  className: "toaster toaster-temp-container",
-                  icon: "🗂",
-                  duration: 99999 * 86400,
-                },
-                undefined,
-                false
-              );
-            }
+            "nothing"
+            // (containerId) => {
+            //   const toastId = myToast.custom(
+            //     <TempContainerToast
+            //       getToastId={() => toastId}
+            //       containerId={containerId}
+            //       onCancel={async () => {
+            //         return await waitForConfirm(
+            //           "Are you sure you want to cancel the commit? All your changes in the workspace will not be saved and no environment will be built."
+            //         );
+            //       }}
+            //       onOK={async () => {
+            //         await createEnvironment(name, description, containerId);
+            //       }}
+            //     ></TempContainerToast>,
+            //     {
+            //       className: "toaster toaster-temp-container",
+            //       icon: "🗂",
+            //       id: containerId,
+            //       duration: 99999 * 86400,
+            //     },
+            //     undefined,
+            //     false
+            //   );
+            // }
           );
         }
       }}

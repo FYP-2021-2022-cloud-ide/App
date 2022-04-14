@@ -2,13 +2,8 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { useCnails } from "../contexts/cnails";
 import { useInstructor } from "../contexts/instructor";
-import { containerAPI } from "../lib/api/containerAPI";
-import { envAPI } from "../lib/api/envAPI";
-import { templateAPI } from "../lib/api/templateAPI";
 import { Environment, Template } from "../lib/cnails";
-import { CLICK_TO_DISMISS, CLICK_TO_REPORT } from "../lib/constants";
-import { errorToToastDescription } from "../lib/errorHelper";
-import { memory, CPU, rootImage } from "../lib/formHelper";
+import { memory, CPU } from "../lib/formHelper";
 import CreateEnvironmentForm from "./forms/CreateEnvironmentForm";
 import UpdateEnvironmentForm from "./forms/UpdateEnvironmentForm";
 import CreateTemplateForm from "./forms/CreateTemplateForm";
@@ -102,12 +97,14 @@ const EnvironmentTemplateWrapper = () => {
           menuItems={(env) => [
             {
               text: "Delete",
+              show: !Boolean(env.temporaryContainerId),
               onClick: async () => {
                 await removeEnvironment(env.id);
               },
             },
             {
               text: "Update Info",
+              show: !Boolean(env.temporaryContainerId),
               onClick: () => {
                 setEnvUpdateOpen(true);
                 setEnvUpdateTarget(env);
@@ -124,7 +121,16 @@ const EnvironmentTemplateWrapper = () => {
             },
             {
               text: "Update Internal",
+              show: !Boolean(env.temporaryContainerId),
               onClick: async () => {
+                if (templates.some((t) => t.environment_id === env.id)) {
+                  myToast.error({
+                    title: "Invalid Operation",
+                    description:
+                      "Some template is still using this environment.",
+                  });
+                  return;
+                }
                 await createContainer(
                   {
                     memLimit: memory,
@@ -143,29 +149,31 @@ const EnvironmentTemplateWrapper = () => {
                       envId: env.id,
                     },
                   },
-                  (containerId) => {
-                    const id = myToast.custom(
-                      <TempContainerToast
-                        containerId={containerId}
-                        getToastId={() => id}
-                        onCancel={async () => {
-                          return await waitForConfirm(
-                            "Are you sure that you want to cancel the commit? All your changes in the workspace will not be saved and the environment will not be updated."
-                          );
-                        }}
-                        onOK={async () => {
-                          await updateEnvironmentInternal(env.id, containerId);
-                        }}
-                      ></TempContainerToast>,
-                      {
-                        className: "toaster toaster-custom ",
-                        icon: "🗂",
-                        duration: 99999 * 86400,
-                      },
-                      undefined,
-                      false
-                    );
-                  }
+                  "nothing"
+                  // (containerId) => {
+                  //   const id = myToast.custom(
+                  //     <TempContainerToast
+                  //       containerId={containerId}
+                  //       getToastId={() => id}
+                  //       onCancel={async () => {
+                  //         return await waitForConfirm(
+                  //           "Are you sure that you want to cancel the commit? All your changes in the workspace will not be saved and the environment will not be updated."
+                  //         );
+                  //       }}
+                  //       onOK={async () => {
+                  //         await updateEnvironmentInternal(env.id, containerId);
+                  //       }}
+                  //     ></TempContainerToast>,
+                  //     {
+                  //       className: "toaster toaster-custom ",
+                  //       icon: "🗂",
+                  //       id: containerId,
+                  //       duration: 99999 * 86400,
+                  //     },
+                  //     undefined,
+                  //     false
+                  //   );
+                  // }
                 );
               },
             },
@@ -192,6 +200,7 @@ const EnvironmentTemplateWrapper = () => {
               onClick: async () => {
                 await removeTemplate(template.id);
               },
+              show: !Boolean(template.containerId),
             },
             {
               text: "Update info",
@@ -199,9 +208,11 @@ const EnvironmentTemplateWrapper = () => {
                 setTemplateUpdateTarget(template);
                 setTemplateUpdateOpen(true);
               },
+              show: !Boolean(template.containerId),
             },
             {
               text: template.containerId ? "Stop workspace" : "Start workspace",
+              show: template.status != "UPDATING_INTERNAL",
               onClick: async () => {
                 if (template.containerId) {
                   await removeContainer(template.containerId);
@@ -240,7 +251,16 @@ const EnvironmentTemplateWrapper = () => {
             },
             {
               text: "Update Internal",
+              show: !Boolean(template.containerId),
               onClick: async () => {
+                if (template.active) {
+                  myToast.error({
+                    title: "Operation invalid",
+                    description:
+                      "The template is published and it is suggested to unpublish it before update it.",
+                  });
+                  return;
+                }
                 await createContainer(
                   {
                     memLimit: memory,
@@ -262,45 +282,38 @@ const EnvironmentTemplateWrapper = () => {
                       allow_notification: template.allow_notification,
                     },
                   },
-                  (containerId) => {
-                    const id = myToast.custom(
-                      <TempContainerToast
-                        containerId={containerId}
-                        getToastId={() => id}
-                        onCancel={async () => {
-                          return await waitForConfirm(
-                            "Are you sure you want to cancel the commit? All your changes in the workspace will not be saved and the template will not be updated."
-                          );
-                        }}
-                        onOK={async () => {
-                          await updateTemplateInternal(
-                            template.id,
-                            containerId
-                          );
-                        }}
-                      ></TempContainerToast>,
-                      {
-                        className: "toaster toaster-temp-container ",
-                        icon: "🗂",
-                        duration: 99999 * 86400,
-                      },
-                      undefined,
-                      false
-                    );
-                  }
+                  "nothing"
+                  // (containerId) => {
+                  //   const id = myToast.custom(
+                  //     <TempContainerToast
+                  //       containerId={containerId}
+                  //       getToastId={() => id}
+                  //       onCancel={async () => {
+                  //         return await waitForConfirm(
+                  //           "Are you sure you want to cancel the commit? All your changes in the workspace will not be saved and the template will not be updated."
+                  //         );
+                  //       }}
+                  //       onOK={async () => {
+                  //         await updateTemplateInternal(
+                  //           template.id,
+                  //           containerId
+                  //         );
+                  //       }}
+                  //     ></TempContainerToast>,
+                  //     {
+                  //       className: "toaster toaster-temp-container ",
+                  //       icon: "🗂",
+                  //       id: containerId,
+                  //       duration: 99999 * 86400,
+                  //     },
+                  //     undefined,
+                  //     false
+                  //   );
+                  // }
                 );
               },
             },
           ]}
-          onWorkspaceCardClick={(template) => {
-            if (template.containerId) {
-              window.open(
-                "https://codespace.ust.dev/user/container/" +
-                  template.containerId +
-                  "/"
-              );
-            }
-          }}
           environments={environments}
           sectionUserID={sectionUserInfo.sectionUserId}
         ></TemplateList>

@@ -99,6 +99,10 @@ const onReturn = {
             return {
               ...w,
               containerId: containerId,
+              data: {
+                ...w.data,
+                containerId: containerId,
+              },
             } as Workspace;
           else return w;
         })

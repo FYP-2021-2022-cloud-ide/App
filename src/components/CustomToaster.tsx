@@ -31,11 +31,10 @@ const CustomToaster = () => {
               <ToastBar toast={t}>
                 {({ icon, message }) => {
                   return (
-                    <div className="flex flex-row items-start space-x-2">
+                    <div className="flex flex-row items-start space-x-2 text-sm max-w-[100%]">
                       {icon}
-                      <div className="text-sm">
-                        {(message as JSX.Element).props.children}
-                      </div>
+
+                      <div>{(message as JSX.Element).props.children}</div>
                     </div>
                   );
                 }}

@@ -15,7 +15,7 @@ export const patchTemplates = (
   return templates.map<Template>((template) => {
     for (let container of containers) {
       if (
-        !container.redisPatch.data &&
+        !container.isTemporary &&
         container.redisPatch.sourceId == template.id
       ) {
         // it is a template workspace
@@ -45,14 +45,14 @@ export const patchTemplates = (
         if (container.id == "")
           return {
             ...template,
-            status: "STARTING_WORKSPACE",
+            status: "STARTING_UPDATE_WORKSPACE",
           };
         else {
           if (container.status == "REMOVING") {
             return {
               ...template,
               containerId: "", // clear the container Id
-              status: "STOPPING_WORKSPACE",
+              status: "STOPPING_UPDATE_WORKSPACE",
             };
           } else
             return {

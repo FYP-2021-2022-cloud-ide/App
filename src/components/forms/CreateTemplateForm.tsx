@@ -139,14 +139,6 @@ const CreateTemplateForm = ({ isOpen, setOpen }: Props) => {
       }
       title="Create Template"
       onEnter={async ({ create_template: data }) => {
-        const {
-          name,
-          description,
-          environment,
-          allow_notification,
-          is_exam,
-          time_limit,
-        } = data;
         await createContainer(
           {
             memLimit: memory,
@@ -170,38 +162,40 @@ const CreateTemplateForm = ({ isOpen, setOpen }: Props) => {
               allow_notification: data.allow_notification,
             },
           },
-          (containerId) => {
-            const id = myToast.custom(
-              <TempContainerToast
-                getToastId={() => id}
-                containerId={containerId}
-                onCancel={async () => {
-                  return await waitForConfirm(
-                    "Are you sure you want to cancel the commmit? All you changes in the workspace will not be saved and no template will be created."
-                  );
-                }}
-                onOK={async () => {
-                  createTemplate(
-                    name,
-                    description,
-                    environment.id,
-                    containerId,
-                    false,
-                    is_exam,
-                    Number(time_limit),
-                    allow_notification
-                  );
-                }}
-              />,
-              {
-                className: "toaster toaster-temp-container ",
-                icon: "🗂",
-                duration: 99999 * 86400,
-              },
-              undefined,
-              false
-            );
-          }
+          // (containerId) => {
+          //   const id = myToast.custom(
+          //     <TempContainerToast
+          //       getToastId={() => id}
+          //       containerId={containerId}
+          //       onCancel={async () => {
+          //         return await waitForConfirm(
+          //           "Are you sure you want to cancel the commmit? All you changes in the workspace will not be saved and no template will be created."
+          //         );
+          //       }}
+          //       onOK={async () => {
+          //         await createTemplate(
+          //           name,
+          //           description,
+          //           environment.id,
+          //           containerId,
+          //           false,
+          //           is_exam,
+          //           Number(time_limit),
+          //           allow_notification
+          //         );
+          //       }}
+          //     />,
+          //     {
+          //       className: "toaster toaster-temp-container ",
+          //       icon: "🗂",
+          //       id: containerId,
+          //       duration: 99999 * 86400,
+          //     },
+          //     undefined,
+          //     false
+          //   );
+          // }
+          "nothing"
         );
       }}
     ></ModalForm>

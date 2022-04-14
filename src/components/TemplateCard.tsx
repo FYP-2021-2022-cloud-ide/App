@@ -1,70 +1,95 @@
-import React, {
-  Fragment,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect } from "react";
 import Menu, { MenuItem } from "./CardMenu";
 import { Template } from "../lib/cnails";
-import myToast from "./CustomToast";
 import Tilt from "react-parallax-tilt";
 import { EyeIcon, EyeOffIcon, AcademicCapIcon } from "@heroicons/react/solid";
 import { useInstructor } from "../contexts/instructor";
 import useCleanTilt from "../hooks/useCleanTilt";
+import EmbeddedWorkspaceCard from "./EmbeddingWorkspaceCard";
+import EmbeddingWorkspaceCard from "./EmbeddingWorkspaceCard";
 
 interface Props {
   template: Template;
   highlighted?: Boolean;
   onClick?: (template: Template) => void;
-  onWorkspaceCardClick?: (template: Template) => void;
+  // onWorkspaceCardClick?: (template: Template) => void;
   menuItems: (template: Template) => MenuItem[];
   zIndex?: number;
 }
 
-const EmbeddedWorkspaceCard = ({
-  template,
-  onClick,
-}: {
-  template: Template;
-  onClick: () => void;
-}) => {
+const LoadingTemplateCard = (props: Props) => {
+  const {
+    template,
+    highlighted: _highlighted = false,
+    onClick,
+    menuItems,
+    zIndex,
+  } = props;
+  const { ref, cleanStyle } = useCleanTilt(
+    zIndex ? `z-index : ${zIndex};` : ""
+  );
+  const comment =
+    (template.status == "STARTING_WORKSPACE" && "starting workspace...") ||
+    (template.status == "STOPPING_WORKSPACE" && "stopping workspace...") ||
+    (template.status == "STARTING_UPDATE_WORKSPACE" &&
+      "starting temporary workspace...") ||
+    (template.status == "STOPPING_UPDATE_WORKSPACE" &&
+      "stopping temporary workspace...") ||
+    (template.status == "UPDATING_INTERNAL" && "updating internal...");
   return (
-    <div
-      className="rounded  border bg-white hover:bg-gray-100 dark:bg-black dark:hover:bg-gray-900 p-2 flex flex-row space-x-2 border-gray-300 dark:border-gray-800"
-      onClick={(e) => {
-        e.stopPropagation();
-        if (onClick) onClick();
-      }}
-      title="Workspace is running..."
+    <Tilt
+      onLeave={cleanStyle}
+      ref={ref}
+      tiltMaxAngleX={4}
+      tiltMaxAngleY={4}
+      tiltReverse
     >
-      <span className="relative flex h-3 w-3">
-        {template.containerId && (
-          <span className="absolute animate-ping inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-        )}
-        <span
-          className={`relative inline-flex rounded-full h-3 w-3 ${
-            template.containerId ? "bg-green-400" : "bg-gray-400"
-          }`}
-        ></span>
-      </span>
-      <div className="env-card-content min-h-[32px]">
-        <p className="text-xs font-bold text-gray-700 dark:text-gray-300">
-          Workspace
-        </p>
+      <div className="template-card">
+        <div id="content">
+          <div>
+            <p id="name">{template.name}</p>
+            <div className="animate-pulse flex space-x-4 mt-3">
+              <div className="flex-1 space-y-6 py-1">
+                <div className="space-y-3">
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="h-2 bg-slate-400 dark:bg-slate-800 rounded col-span-2"></div>
+                    <div className="h-2 bg-slate-400 dark:bg-slate-800 rounded col-span-1"></div>
+                  </div>
+                  <div className="h-2 bg-slate-400 dark:bg-slate-800 rounded"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <EmbeddingWorkspaceCard
+              name={
+                template.status == "STARTING_WORKSPACE" ||
+                template.status == "STOPPING_WORKSPACE"
+                  ? template.name
+                  : "Temporary Workspace"
+              }
+              tooltip={comment}
+              color={
+                template.status == "UPDATING_INTERNAL" ? "green" : "yellow"
+              }
+              containerId={template.containerId}
+            ></EmbeddingWorkspaceCard>
+            <p className="text-xs  text-gray-400">{comment}</p>
+          </div>
+        </div>
       </div>
-    </div>
+    </Tilt>
   );
 };
 
-function TemplateCard({
-  template,
-  highlighted: _highlighted = false,
-  onClick,
-  onWorkspaceCardClick,
-  menuItems,
-  zIndex,
-}: Props) {
+function TemplateCard(props: Props) {
+  const {
+    template,
+    highlighted: _highlighted = false,
+    onClick,
+    menuItems,
+    zIndex,
+  } = props;
   const { environments, highlightedEnv, setHighlightedEnv, getEnvironment } =
     useInstructor();
   const { ref, cleanStyle } = useCleanTilt(
@@ -83,6 +108,9 @@ function TemplateCard({
       };
     }
   });
+
+  if (template.status != "DEFAULT")
+    return <LoadingTemplateCard {...props}></LoadingTemplateCard>;
 
   return (
     <Tilt
@@ -119,12 +147,10 @@ function TemplateCard({
           <div className="flex flex-col space-y-1">
             {template.containerId && (
               <EmbeddedWorkspaceCard
-                template={template}
-                onClick={() => {
-                  if (onWorkspaceCardClick) {
-                    onWorkspaceCardClick(template);
-                  }
-                }}
+                name={template.name}
+                tooltip={"workspace is running..."}
+                color="green"
+                containerId={template.containerId}
               />
             )}
             <div className="flex flex-row space-x-2">

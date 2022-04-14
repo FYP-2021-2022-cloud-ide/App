@@ -57,7 +57,7 @@ const LoadingContainerCard = (props: Props) => {
             )}
           </div>
         </div>
-        <p className="text-gray-500 text-xs">
+        <p className="text-gray-500 dark:text-gray-400 text-xs">
           {(status == "CREATING" && "being created...") ||
             (status == "REMOVING" && "being removed...")}
         </p>

@@ -31,14 +31,14 @@ export const patchEnvironments = (
           if (container.status == "REMOVING") {
             return {
               ...env,
-              temporaryContainerId: container.id,
+              temporaryContainerId: "", // removing the container id
               status: "STOPPING_UPDATE_WORKSPACE",
             };
           } else
             return {
               ...env,
               temporaryContainerId: container.id,
-              status: "DEFAULT",
+              status: "UPDATING_INTERNAL",
             };
         }
       }
