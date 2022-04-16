@@ -1,19 +1,49 @@
-.sidebar-icon {
-  @apply w-[80%] mx-auto mt-5  dark:invert-[1] dark:brightness-50 dark:contrast-200 dark:hue-rotate-60 dark:saturate-[3];
+.sidebar {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  @apply w-full items-center flex flex-row bg-gray-50 dark:bg-gray-700 dark:border-gray-800 z-[100];
+  @apply sm:static justify-between sm:w-[200px] sm:min-h-screen  sm:flex-col border shadow-md;
 }
 
-.sidebar-container {
-  @apply w-[200px] min-h-screen bg-gray-50 dark:bg-gray-700 dark:border-gray-800 flex flex-col border-r;
+.sidebar .menu {
+  @apply block m-3 z-[10] sm:hidden;
 }
 
-.sidebar-text {
-  @apply text-xs uppercase tracking-widest font-medium ml-2;
+.sidebar .menu #prefix {
+  @apply p-2;
 }
 
-.sidebar-btn {
+.sidebar .menu #prefix #name {
+  @apply text-sm text-gray-800 dark:text-white font-bold whitespace-nowrap;
+}
+
+.sidebar .menu #prefix #email {
+  @apply text-xs text-gray-600 dark:text-gray-300 whitespace-nowrap;
+}
+
+.sidebar #logo {
+  @apply w-24;
+  @apply sm:w-auto  sm:mx-5 sm:mt-5  dark:invert-[1] dark:brightness-50 dark:contrast-200 dark:hue-rotate-60 dark:saturate-[3];
+}
+
+.sidebar #navigation {
+  @apply hidden;
+  @apply flex-col w-full mt-3  sm:flex;
+}
+
+.sidebar #navigation a {
   @apply p-3 flex flex-row items-center hover:text-gray-900 hover:bg-gray-200 dark:hover:bg-gray-600;
 }
 
-.sidebar-btn-col {
-  @apply flex flex-col w-full mt-3;
+.sidebar #navigation a[data-active="true"] {
+  @apply text-gray-900 dark:text-gray-200;
+}
+
+.sidebar #navigation a[data-active="false"] {
+  @apply text-gray-500 dark:text-gray-400;
+}
+
+.sidebar #navigation a p {
+  @apply text-xs uppercase tracking-widest font-medium ml-2;
 }

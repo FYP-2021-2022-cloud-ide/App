@@ -19,10 +19,7 @@ export const patchSandboxes = (
 ) => {
   return sandboxImages.map<SandboxImage>((si) => {
     for (let container of containers) {
-      if (
-        !container.redisPatch.data &&
-        container.redisPatch.sourceId == si.id
-      ) {
+      if (!container.isTemporary && container.redisPatch.sourceId == si.id) {
         // it is a normal workspace
         if (container.id == "")
           return {

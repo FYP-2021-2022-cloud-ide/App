@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useCnails } from "../contexts/cnails";
 import { NodeModel } from "@minoru/react-dnd-treeview";
 import { CustomData } from "../components/CustomTree/CustomNode";
-import FTree, { MyTreeMethods } from "../components/CustomTree/CustomTree";
+import CustomTree, { MyTreeMethods } from "../components/CustomTree/CustomTree";
 import path, { dirname } from "path";
 import { localFileAPI } from "../lib/api/localFile";
 import { InformationCircleIcon } from "@heroicons/react/solid";
@@ -87,14 +87,14 @@ export default function Page() {
 
   return (
     <>
-      <div className="grid grid-cols-2 text-black max-h-screen h-full min-h-fit gap-6 px-10 mb-10 bottom-0 w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 text-black max-h-screen h-full min-h-fit gap-6 px-10 mb-10 bottom-0 w-full mt-5">
         {/* local  */}
         <div className=" flex flex-col ">
           <div className="flex flex-row space-x-2 items-center">
-            <p className="text-gray-600 font-bold text-xl dark:text-gray-300 h-fit">
+            <p className="text-gray-600 font-bold text-base sm:text-xl dark:text-gray-300 h-fit whitespace-nowrap">
               Personal Volume
             </p>
-            <TooltipProvider text="You can drag and drop files and folders to the personal volume. You can also drag and drop files between the personal volume and the cloud volume.">
+            <TooltipProvider text="You can drag and drop files and folders to the personal volume. You can also drag and drop files between the personal volume and the cloud volume. On mobile devices, you can double click to show the context menu.">
               {(setTriggerRef) => (
                 <div ref={setTriggerRef}>
                   <InformationCircleIcon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
@@ -102,7 +102,7 @@ export default function Page() {
               )}
             </TooltipProvider>
           </div>
-          <FTree
+          <CustomTree
             ref={ref1}
             rootId={`/volumes/${userId}/persist`}
             handleDropzone={async (
@@ -321,7 +321,7 @@ export default function Page() {
               },
             ]}
             onContextMenuClose={() => {}}
-          ></FTree>
+          ></CustomTree>
           <input
             ref={uploadInputRef}
             type="file"
@@ -358,7 +358,7 @@ export default function Page() {
               </div>
             </div>
           ) : (
-            <FTree
+            <CustomTree
               ref={ref2}
               rootId={"root"}
               handleMoveFromAnotherTree={async (treeData, dropTarget) => {
@@ -442,7 +442,7 @@ export default function Page() {
                 else return false;
               }}
               onContextMenuClose={() => {}}
-            ></FTree>
+            ></CustomTree>
           )}
         </div>
       </div>

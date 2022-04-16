@@ -4,13 +4,7 @@ import myToast, { loadingTime } from "./CustomToast";
 
 const CustomToaster = () => {
   return (
-    <Toaster
-      position="bottom-right"
-      toastOptions={{
-        // this can the default duration of the toast
-        duration: 5000,
-      }}
-    >
+    <Toaster position="bottom-right">
       {(t: Toast) => {
         return (
           <Twemoji noWrapper options={{ className: "twemoji" }}>

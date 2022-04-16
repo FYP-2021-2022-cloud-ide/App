@@ -42,7 +42,7 @@ export default function NotiButton() {
   let filterNotifications = messages.filter((message) => !message.read);
   const router = useRouter();
   return (
-    <Popover className="relative z-[1] ">
+    <Popover className="sm:relative z-[1] ">
       {({ open, close }) => (
         <>
           <NotificationBtn num={filterNotifications?.length} />
@@ -55,10 +55,10 @@ export default function NotiButton() {
             leaveFrom="opacity-100 translate-y-0"
             leaveTo="opacity-0 translate-y-1"
           >
-            <Popover.Panel className="absolute z-1 min-w-fit px-4 mt-3 transform -translate-x-[80%] left-1/2 sm:px-0">
-              <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 bg-white dark:bg-gray-700 p-2">
+            <Popover.Panel className="notification-popover absolute z-1 min-w-fit  mt-3 right-10 sm:right-0 sm:px-0">
+              <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 bg-white dark:bg-gray-700 p-2 w-64 sm:w-96">
                 {filterNotifications && filterNotifications?.length == 0 ? (
-                  <div className="text-gray-400 bg-white dark:text-gray-300 dark:bg-gray-700 w-96 flex flex-col items-center p-5 select-none">
+                  <div className="text-gray-400 bg-white dark:text-gray-300 dark:bg-gray-700  flex flex-col items-center p-5 select-none">
                     You have no unread notifications
                   </div>
                 ) : (
@@ -81,34 +81,35 @@ export default function NotiButton() {
                               router.push(`/messages?id=${item.id}`);
                               close();
                             }}
-                            className="cursor-pointer flex items-center p-2 transition duration-150 ease-in-out rounded-lg hover:bg-gray-200 dark:hover:bg-gray-500 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
+                            className="w-full cursor-pointer flex flex-col  items-start p-2 transition duration-150 ease-in-out rounded-lg hover:bg-gray-200 dark:hover:bg-gray-500 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
                           >
-                            <div>
-                              <p
-                                id="title"
-                                className="w-96 whitespace-nowrap truncate text-sm font-medium text-gray-900 dark:text-gray-200 "
-                              >
-                                {item.title}
-                              </p>
-                              <p
-                                id="body"
-                                className="w-96 text-sm text-gray-500 dark:text-gray-300 text-ellipsis overflow-hidden line-clamp-4"
-                              >
-                                {item.body}
-                              </p>
-                              <p
-                                id="sender-sub"
-                                className="text-emerald-600 dark:text-emerald-300 text-2xs"
-                              >
-                                @{item.sender.sub}
-                              </p>
-                              <p
-                                id="time"
-                                className="text-2xs text-gray-400 dark:text-gray-400"
-                              >
-                                {moment(item.sentAt).format("YYYY-MM-DD HH:mm")}
-                              </p>
-                            </div>
+                            {/* <div className="flex flex-row space-x-2"> */}
+                            <p
+                              id="title"
+                              className=" whitespace-nowrap line-clamp-1 text-sm font-medium text-gray-900 dark:text-gray-200 "
+                            >
+                              {item.title}
+                            </p>
+                            {/* </div> */}
+                            <p
+                              id="body"
+                              className="max-w-full text-xs text-gray-500 dark:text-gray-300  line-clamp-4"
+                            >
+                              {item.body}
+                            </p>
+                            <p
+                              id="sender-sub"
+                              className="text-emerald-600 dark:text-emerald-300 text-2xs"
+                            >
+                              {item.courseCode} ({item.sectionCode}) @
+                              {item.sender.sub}
+                            </p>
+                            <p
+                              id="time"
+                              className="text-2xs text-gray-400 dark:text-gray-400"
+                            >
+                              {moment(item.sentAt).format("YYYY-MM-DD HH:mm")}
+                            </p>
                           </div>
                           <div className="h-0.5 rounded-full w-full bg-gray-100 dark:bg-gray-500"></div>
                         </Fragment>

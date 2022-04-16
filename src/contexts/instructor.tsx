@@ -463,6 +463,7 @@ export const InstructorProvider = ({ children }: { children: JSX.Element }) => {
         description: errorToToastDescription(response.error),
       });
     }
+    await fetchTemplates();
   };
 
   const publishTemplate = async (templateId: string) => {

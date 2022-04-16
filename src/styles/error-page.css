@@ -7,5 +7,5 @@
 }
 
 .error-page {
-  @apply text-gray-600 dark:text-gray-300;
+  @apply text-gray-600 dark:text-gray-300 w-full h-full flex items-center justify-center;
 }

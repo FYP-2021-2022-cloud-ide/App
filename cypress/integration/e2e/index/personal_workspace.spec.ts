@@ -1,10 +1,3 @@
-import {
-  ContainerAddResponse,
-  SandboxImageListResponse,
-  SuccessStringResponse,
-} from "../../../../src/lib/api/api";
-import { c } from "../../../fixtures/constant";
-import { recurse } from "cypress-recurse";
 import { hostname } from "../../../support/commands";
 
 describe("personal workspace test", () => {
@@ -148,6 +141,6 @@ describe("personal workspace test", () => {
   //   });
   // });
 
-  it("remove all personal workspaces", () => {});
+  // it("remove all personal workspaces", () => {});
 });
 export {};

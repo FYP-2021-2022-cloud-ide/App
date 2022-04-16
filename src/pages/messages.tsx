@@ -1,7 +1,12 @@
 import { useState, useEffect, useCallback, memo, Fragment } from "react";
 import { ReplyIcon } from "@heroicons/react/outline";
 import EmptyDiv from "../components/EmptyDiv";
-import { RefreshIcon, TrashIcon } from "@heroicons/react/solid";
+import {
+  RefreshIcon,
+  TrashIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+} from "@heroicons/react/solid";
 import DataTable, {
   TableColumn,
   createTheme,
@@ -86,6 +91,10 @@ const MessageTable = () => {
     if (cell) cell.style.padding = "0px";
   });
 
+  useEffect(() => {
+    if (queryTarget != null) changeMessagesRead([queryTarget as string], true);
+  }, []);
+
   const columns: TableColumn<Message>[] = [
     {
       id: "Read",
@@ -111,6 +120,7 @@ const MessageTable = () => {
       id: "Title",
       name: "Title",
       selector: (row) => row.title,
+      minWidth: "300px",
     },
     {
       id: "Course",
@@ -118,6 +128,7 @@ const MessageTable = () => {
       selector: (row) =>
         row.section_id ? `${row.courseCode} (${row.sectionCode})` : "N/A",
       maxWidth: "200px",
+      minWidth: "150px",
     },
     {
       id: "People",
@@ -130,6 +141,7 @@ const MessageTable = () => {
           </p>
         </div>
       ),
+      minWidth: "200px",
     },
     {
       id: "Time",
@@ -142,6 +154,7 @@ const MessageTable = () => {
         else return 0;
       },
       maxWidth: "150px",
+      minWidth: "150px",
     },
     {
       id: "Actions",
@@ -252,71 +265,94 @@ const MessageTable = () => {
     "light"
   );
 
-  // if (pending) {
-  //   return (
-  //     <div className="bg-gray-300 dark:bg-gray-700 rounded-lg w-full h-96 flex items-center justify-center overflow-hidden">
-  //       <Loader />
-  //     </div>
-  //   );
-  // }
+  const Facet = ({ expand: _expand }: { expand: boolean }) => {
+    const [expand, setExpand] = useState<boolean>(_expand);
+
+    const Arrow = () => {
+      const Icon = expand ? ChevronUpIcon : ChevronDownIcon;
+      return (
+        <button
+          onClick={() => {
+            setExpand(!expand);
+          }}
+          title={expand ? "collapse" : "expand"}
+        >
+          <Icon className="absolute left-1/2 bottom-0 -translate-x-1/2 translate-y-1/2  bg-gray-100 hover:bg-gray-200 dark:bg-gray-900 dark:hover:bg-gray-800 border border-[#D5D6D8] dark:border-[#2F3947]   rounded-full w-5 h-5 cursor-pointer"></Icon>
+        </button>
+      );
+    };
+    return (
+      <div className="relative min-w-[12rem] h-min  flex flex-col space-y-2 p-3 border rounded-md text-xs bg-gray-100 dark:bg-black/50   border-[#D5D6D8] dark:border-[#2F3947] ">
+        <p className="text-lg font-bold">Facet</p>
+        {expand && (
+          <label htmlFor="only not read" className="whitespace-nowrap">
+            <span>
+              <input
+                type="checkbox"
+                onChange={(e) => {
+                  setOnlyUnread(e.target.checked);
+                  setReadDuringUnreadFiltering([]);
+                }}
+                checked={onlyUnread}
+              />
+            </span>
+            <span className="whitespace-nowrap ml-2">Unread</span>
+          </label>
+        )}
+        {expand && (
+          <div className="flex flex-col w-max">
+            <p className="text-base font-semibold">Filter Course</p>
+            {getCourses().map((course) => {
+              return (
+                <label
+                  htmlFor="only not read"
+                  className="whitespace-nowrap"
+                  key={course.id}
+                >
+                  <span>
+                    <input
+                      type="checkbox"
+                      checked={onlyCourses.some(
+                        (c) => JSON.parse(c).id == course.id
+                      )}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setOnlyCourses([
+                            ...onlyCourses,
+                            JSON.stringify(course),
+                          ]);
+                        } else {
+                          setOnlyCourses([
+                            ...onlyCourses.filter(
+                              (c) => JSON.parse(c).id != course.id
+                            ),
+                          ]);
+                        }
+                      }}
+                    />
+                  </span>
+                  <span className="whitespace-nowrap ml-2">
+                    {course.fullCode}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        )}
+        <Arrow></Arrow>
+      </div>
+    );
+  };
+
   return (
     <>
       {messages.length == 0 ? (
         <EmptyDiv message="You have no messages."></EmptyDiv>
       ) : (
         // only if user have messages
-        <div className="flex flex-row space-x-2 text-gray-600 dark:text-gray-300">
-          <div className="min-w-[12rem] h-min  flex flex-col space-y-2 p-3 border rounded-md text-xs bg-gray-100 dark:bg-black/50   border-[#D5D6D8] dark:border-[#2F3947] ">
-            <p className="text-lg font-bold">Facet</p>
-            <label htmlFor="only not read" className="whitespace-nowrap">
-              <span>
-                <input
-                  type="checkbox"
-                  onChange={(e) => {
-                    setOnlyUnread(e.target.checked);
-                    setReadDuringUnreadFiltering([]);
-                  }}
-                />
-              </span>
-              <span className="whitespace-nowrap ml-2">Unread</span>
-            </label>
-            <div className="flex flex-col w-max">
-              <p className="text-base font-semibold">Filter Course</p>
-              {getCourses().map((course) => {
-                return (
-                  <label
-                    htmlFor="only not read"
-                    className="whitespace-nowrap"
-                    key={course.id}
-                  >
-                    <span>
-                      <input
-                        type="checkbox"
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setOnlyCourses([
-                              ...onlyCourses,
-                              JSON.stringify(course),
-                            ]);
-                          } else {
-                            setOnlyCourses([
-                              ...onlyCourses.filter(
-                                (c) => JSON.parse(c).id != course.id
-                              ),
-                            ]);
-                          }
-                        }}
-                      />
-                    </span>
-                    <span className="whitespace-nowrap ml-2">
-                      {course.fullCode}
-                    </span>
-                  </label>
-                );
-              })}
-            </div>
-          </div>
-          <div className="w-full ">
+        <div className="flex flex-col space-y-4 space-x-0 sm:flex-row sm:space-x-2 sm:space-y-0  text-gray-600 dark:text-gray-300">
+          <Facet expand={true}></Facet>
+          <div className="w-full">
             <DataTable
               columns={columns}
               data={filterMessages}
@@ -447,7 +483,7 @@ const MessageTable = () => {
 
 export default function Home() {
   return (
-    <div className="px-10 mb-10">
+    <div className="px-10 mb-10 mt-5">
       <p className="text-3xl  font-bold mb-2 text-gray-600 dark:text-gray-300">
         {" 📬 "} Messages
       </p>

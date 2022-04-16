@@ -1,44 +1,46 @@
-
-import type { AppProps } from 'next/app'
-import '../styles/globals.css'
-import Layout from '../components/Layout'
+import type { AppProps } from "next/app";
+import "../styles/globals.css";
+import Layout from "../components/Layout";
 import { CnailsProvider } from "../contexts/cnails";
-import { ThemeProvider } from "../contexts/theme"
-import { WarningProvider } from '../contexts/warning';
-import { ContainerProvider } from '../contexts/containers';
-import { MessagingProvider } from '../contexts/messaging';
-import CustomToaster from '../components/CustomToaster';
+import { ThemeProvider } from "../contexts/theme";
+import { WarningProvider } from "../contexts/warning";
+import { ContainerProvider } from "../contexts/containers";
+import { MessagingProvider } from "../contexts/messaging";
+import CustomToaster from "../components/CustomToaster";
+import Head from "next/head";
 
 interface CnailsProps extends AppProps {
-  sub: string
-  name: string
-  email: string
-  userId: string
-  semesterId: string
+  sub: string;
+  name: string;
+  email: string;
+  userId: string;
+  semesterId: string;
 }
 
 function CnailsApp({ Component, pageProps }: CnailsProps) {
   return (
     // all the context here are global contexts
-    <CnailsProvider>
-      <ThemeProvider>
-        <MessagingProvider>
-          <WarningProvider>
-            <ContainerProvider>
-              <Layout>
-                <Component {...pageProps} />
-                <CustomToaster />
-              </Layout>
-            </ContainerProvider>
-          </WarningProvider>
-        </MessagingProvider>
-      </ThemeProvider>
-    </CnailsProvider>
-
-  )
+    <>
+      <Head>
+        <title>Cnails</title>
+      </Head>
+      <CnailsProvider>
+        <ThemeProvider>
+          <MessagingProvider>
+            <WarningProvider>
+              <ContainerProvider>
+                <Layout>
+                  <Component {...pageProps} />
+                  <CustomToaster />
+                </Layout>
+              </ContainerProvider>
+            </WarningProvider>
+          </MessagingProvider>
+        </ThemeProvider>
+      </CnailsProvider>
+    </>
+  );
 }
-
-
 
 // CnailsApp.getInitialProps = async ({ctx}: any) => {
 //   // console.log(ctx)
@@ -56,4 +58,4 @@ function CnailsApp({ Component, pageProps }: CnailsProps) {
 // export function reportWebVitals(metric) {
 //     console.log(metric) // The metric object ({ id, name, startTime, value, label }) is logged to the console
 // }
-export default CnailsApp
+export default CnailsApp;

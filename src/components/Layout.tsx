@@ -15,26 +15,21 @@ const Layout = ({ children }: LayoutProps) => {
 
   return (
     <Twemoji noWrapper options={{ className: "twemoji" }}>
-      <div
-        className={`flex flex-row w-full justify-start h-fit min-h-[600px] ${
-          isDark && "dark"
-        }`}
-        id="layout"
-      >
-        <Head>
-          <title>Cnails</title>
-          <link rel="icon" href="/favicon.ico" />
-          <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"
-          ></link>
-        </Head>
-        <SideBar></SideBar>
-        <div className="flex flex-col bg-white dark:bg-gray-800 w-full  z-10 ">
-          <TopBar sub={sub} name={name} email={email}></TopBar>
+      <div className="flex flex-row min-h-screen">
+        <div className=""></div>
+        <div
+          className={`flex flex-col sm:flex-row w-full justify-start ${
+            isDark ? "dark" : ""
+          }`}
+          id="layout"
+        >
+          <SideBar></SideBar>
+          <div className="flex flex-col bg-white dark:bg-gray-800 w-full h-full z-10">
+            <TopBar></TopBar>
 
-          <div className=" w-full grow" id="page-content">
-            {children}
+            <div className=" w-full  grow" id="page-content">
+              {children}
+            </div>
           </div>
         </div>
       </div>

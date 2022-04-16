@@ -25,7 +25,7 @@
 .react-markdown h1,
 .react-markdown h2,
 .react-markdown h3 {
-  @apply mt-10 mb-2;
+  @apply mb-2;
 }
 
 .react-markdown blockquote {

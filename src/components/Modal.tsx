@@ -10,7 +10,7 @@ export type ModalProps = {
   escToClose?: boolean;
   onOpen?: () => void;
   /**
-   * This onClose doesn't intercept the `setOpen` function. 
+   * This onClose doesn't intercept the `setOpen` function.
    * It will only trigger when it is closed on esc or clickoutside.
    * If you have other close mechanism, you need to call that yourself.
    */
@@ -28,7 +28,7 @@ function Modal({
 }: ModalProps & { children: React.ReactNode }) {
   useWindowEvent("keydown", (event) => {
     if (event.key !== "Escape") return;
-    if (escToClose) {
+    if (escToClose && isOpen) {
       if (onClose) onClose();
       setOpen(false);
     }

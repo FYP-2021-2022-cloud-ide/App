@@ -18,6 +18,7 @@ import {
   Props,
   Section,
   SectionProps,
+  ValidationOutput,
 } from "./types";
 import { ChevronRightIcon } from "@heroicons/react/solid";
 
@@ -268,9 +269,6 @@ function ModalForm<T>(props: Props<T>) {
               </button>
               <button
                 id="btn-ok"
-                className={
-                  canProceed() ? "modal-form-btn-ok" : "modal-form-btn-cancel"
-                }
                 disabled={!canProceed()}
                 onClick={() => {
                   if (onEnter) {

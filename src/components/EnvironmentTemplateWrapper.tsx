@@ -84,7 +84,7 @@ const EnvironmentTemplateWrapper = () => {
 
   return (
     <>
-      <div className="flex flex-row space-x-10 w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 w-full">
         <EnvironmentList
           environments={environments}
           onEnvCreateBtnClick={() => {

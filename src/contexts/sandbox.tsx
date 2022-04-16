@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import myToast from "../components/CustomToast";
 import { useCancelablePromise } from "../hooks/useCancelablePromise";
+import useInterval from "../hooks/useInterval";
 import { SandboxImageListResponse } from "../lib/api/api";
 import { sandboxAPI } from "../lib/api/sandboxAPI";
 import { SandboxImage } from "../lib/cnails";
@@ -67,6 +68,7 @@ export const SandboxProvider = ({ children }: { children: JSX.Element }) => {
           apiSandboxesToUiSandboxes(response.sandboxImages),
           containers
         );
+        console.log(sandboxImages);
         if (mount) setSandboxImages(sandboxImages);
         return sandboxImages;
       } else {
@@ -210,6 +212,10 @@ export const SandboxProvider = ({ children }: { children: JSX.Element }) => {
       );
     }
   }, [containers]);
+
+  useInterval(async () => {
+    await fetchSandboxImages();
+  }, 10000);
 
   /**
    * this hook will fetch the sandboxes on render

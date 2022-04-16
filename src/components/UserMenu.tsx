@@ -1,26 +1,22 @@
 import { Menu, Transition } from "@headlessui/react";
-import { Fragment, useEffect, useRef, useState } from "react";
-import { ChevronDownIcon } from "@heroicons/react/solid";
-import Link from "next/link";
-import { useTheme } from "../contexts/theme";
+import { Fragment } from "react";
+import { useCnails } from "../contexts/cnails";
 
 interface UserMenuProps {
-  sub: string;
-  name: string;
-  email: string;
   items: {
     text: string;
     onClick?: () => void;
   }[];
 }
 
-export default function UserMenu({ sub, name, email, items }: UserMenuProps) {
+export default function UserMenu({ items }: UserMenuProps) {
+  const { sub, name, email } = useCnails();
   return (
     <div className={`w-fit  text-right top-16 `}>
-      <Menu as="div" className="relative text-left">
+      <Menu as="div" className="sm:relative text-left">
         <Menu.Button
           title="User menu"
-          className="justify-center text-sm font-medium rounded-md hover:scale-105 transition ease-in-out duration-200 dark:text-gray-300"
+          className="usermenu justify-center text-sm font-medium rounded-md hover:scale-105 transition ease-in-out duration-200 dark:text-gray-300"
         >
           {sub}
         </Menu.Button>
@@ -33,7 +29,7 @@ export default function UserMenu({ sub, name, email, items }: UserMenuProps) {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <Menu.Items className="absolute right-0 w-72 mt-2 origin-top-right bg-white dark:bg-gray-600 divide-y divide-gray-100 dark:divide-gray-500 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+          <Menu.Items className="absolute right-10 sm:right-0 w-72 mt-2 origin-top-right bg-white dark:bg-gray-600 divide-y divide-gray-100 dark:divide-gray-500 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
             <div className="p-4">
               <div
                 id="username"

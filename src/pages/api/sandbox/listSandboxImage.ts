@@ -31,6 +31,7 @@ export default function handler(
             error: GoLangResponse.error?.error,
           },
           sandboxImages: GoLangResponse.sandboxImages.map((sandbox) => {
+            console.log(sandbox);
             return {
               id: sandbox.id,
               title: sandbox.title,

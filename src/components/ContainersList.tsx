@@ -11,9 +11,9 @@ const ContainersList = () => {
   var percentage = containers ? (containers.length / quota) * 100 : 0;
 
   return (
-    <div className=" w-full ">
+    <div className="mt-5">
       <div id="current-run" className="flex flex-row space-x-3 mb-2">
-        <div className="text-xl text-gray-600 dark:text-gray-300 font-bold whitespace-nowrap">
+        <div className="text-base sm:text-xl text-gray-600 dark:text-gray-300 font-bold whitespace-nowrap">
           Current Running Workspaces
         </div>
         <div className="flex flex-col justify-between w-32">
@@ -36,7 +36,7 @@ const ContainersList = () => {
           <EmptyDiv message="You have no active workspace."></EmptyDiv>
         ) : (
           <div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5"
+            className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-3 xl:grid-cols-4 gap-5"
             id="container-list-grid"
           >
             {containers

@@ -18,8 +18,8 @@ const Wrapper = () => {
   const [announceFormOpen, setAnnounceFormOpen] = useState<boolean>(false);
 
   return (
-    <div className="w-full">
-      <div className="flex flex-col  px-8 w-full space-y-4">
+    <>
+      <div className="flex flex-col  px-8 w-full space-y-4 mb-10 mt-5">
         <Breadcrumbs
           elements={[
             {
@@ -56,7 +56,7 @@ const Wrapper = () => {
         isOpen={announceFormOpen}
         setOpen={setAnnounceFormOpen}
       />
-    </div>
+    </>
   );
 };
 

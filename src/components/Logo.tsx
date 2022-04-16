@@ -1,8 +1,6 @@
-const Logo = ({ className, fill }: { className: string; fill?: string }) => (
+const Logo = ({ fill }: { fill?: string }) => (
   <svg
-    className={className}
-    width="237"
-    height="94"
+    id="logo"
     viewBox="0 0 237 94"
     fill={fill ?? "none"}
     xmlns="http://www.w3.org/2000/svg"

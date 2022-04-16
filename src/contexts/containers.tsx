@@ -116,10 +116,7 @@ export const ContainerProvider = ({ children }: ContainerProviderProps) => {
             // if containers are undefined, they reenter the page
             if (!containers)
               myToast.warning(
-                "You have uncommited temporary workspaces. They will hold your workspace quota. If you don't plan to persist the changes in the programming environment, remember to stop the them.",
-                {
-                  duration: 60 * 1000,
-                }
+                "You have uncommited temporary workspaces. They will hold your workspace quota. If you don't plan to persist the changes in the programming environment, remember to stop the them."
               );
             const c = newContainers.find((c) => c.id == container.id);
             const id = myToast.custom(

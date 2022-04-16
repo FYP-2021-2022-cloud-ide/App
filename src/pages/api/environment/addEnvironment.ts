@@ -22,7 +22,7 @@ export default async function handler(
   const { libraries, name, section_user_id, description } = JSON.parse(
     req.body
   ) as EnvironmentAddRequest;
-  const userId = getCookie(req.headers.cookie, "userId");
+
   var docReq = AddEnvironmentRequest.fromPartial({
     sessionKey: fetchAppSession(req),
     libraries: libraries,

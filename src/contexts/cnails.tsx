@@ -123,14 +123,7 @@ export const CnailsProvider = ({ children }: CnailsProviderProps) => {
     fetchSystemMessage();
   }, 1000 * 60);
 
-  if (
-    sub == "" ||
-    userId == "" ||
-    name == "" ||
-    email == "" ||
-    semesterId == ""
-  )
-    return <></>;
+  if (!sub || !userId || !name || !email || !semesterId) return <></>;
 
   return (
     <CnailsContext.Provider

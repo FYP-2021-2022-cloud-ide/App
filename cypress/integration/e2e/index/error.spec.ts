@@ -1,14 +1,5 @@
+import { hostname } from "../../../support/commands";
 describe("Error test", () => {
-  const cookies = Cypress.env("cookies");
-  const hostname = Cypress.env("hostname");
-  //@ts-ignore
-  Cypress.Commands.add("login", (cookies: Cypress.Cookie[]) => {
-    for (let cookie of cookies) {
-      cookie.sameSite = "lax";
-      cy.setCookie(cookie.name, cookie.value, cookie);
-    }
-  });
-
   before(() => {
     cy.login();
     cy.visit(hostname);

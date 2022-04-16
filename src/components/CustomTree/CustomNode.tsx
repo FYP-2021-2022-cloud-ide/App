@@ -3,7 +3,7 @@ import { NodeModel } from "@minoru/react-dnd-treeview";
 import FolderArrow from "./FolderArrow";
 import { TypeIcon } from "./TypeIcon";
 import { DropEvent, FileRejection, useDropzone } from "react-dropzone";
-import path from "path";
+import { isMobile } from "react-device-detect";
 
 export type CustomData = {
   /**
@@ -139,9 +139,18 @@ const CustomNode: React.FC<Props> = ({
         }`}
         // draggable={false}
         onContextMenu={(e: React.MouseEvent) => {
-          e.preventDefault();
-          e.stopPropagation();
-          onContextMenu(e);
+          if (!isMobile) {
+            e.preventDefault();
+            e.stopPropagation();
+            onContextMenu(e);
+          }
+        }}
+        onDoubleClick={(e) => {
+          if (isMobile) {
+            e.preventDefault();
+            e.stopPropagation();
+            onContextMenu(e);
+          }
         }}
         draggable
       >

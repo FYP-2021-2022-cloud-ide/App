@@ -221,7 +221,7 @@ const Wrapper = () => {
   const index2 = templates.findIndex((t) => t.id == envOrTemplateId);
 
   return (
-    <div className="w-full">
+    <div className="w-full mt-5">
       <div className="flex flex-col px-10 w-full text-gray-600 space-y-4 mb-10">
         <Breadcrumbs
           elements={[

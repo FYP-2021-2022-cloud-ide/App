@@ -18,12 +18,13 @@ import {
 import CustomNode, { CustomData } from "./CustomNode";
 import useComponentVisible from "../../hooks/useComponentVisible";
 import { CustomDragPreview } from "./CustomDragPreview";
-import { Placeholder } from "./placeholder";
+import { Placeholder } from "./Placeholder";
 import { useState, useEffect, useRef, useCallback } from "react";
 import React from "react";
 import styles from "../../styles/file_tree.module.css";
 import classNames from "../../lib/classnames";
 import ContextMenu, { MenuItem } from "./ContextMenu";
+import { isMobile } from "react-device-detect";
 import _ from "lodash";
 
 export type Props = {
@@ -223,7 +224,7 @@ const ButtonGroups = ({
  * @remarks
  * The tree will not rerender on a custom action even when it could possibly change the tree. The rerender will to be triggered manually by calling `ref.current.getFilesAndRerender` .
  */
-const FTree = React.forwardRef(
+const CustomTree = React.forwardRef(
   (
     {
       rootId,
@@ -327,12 +328,25 @@ const FTree = React.forwardRef(
           {...getRootProps()}
           className="h-full  min-h-[300px] max-h-[80vh] relative"
           onContextMenu={(event: React.MouseEvent) => {
-            event.preventDefault();
-            event.stopPropagation();
-            if (rootActions) {
-              setIsMenuVisible(true);
-              setMenuLocation([event.clientX, event.clientY]);
-              setMenuItems(rootActions);
+            if (!isMobile) {
+              event.preventDefault();
+              event.stopPropagation();
+              if (rootActions) {
+                setIsMenuVisible(true);
+                setMenuLocation([event.clientX, event.clientY]);
+                setMenuItems(rootActions);
+              }
+            }
+          }}
+          onDoubleClick={(event: React.MouseEvent) => {
+            if (isMobile) {
+              event.preventDefault();
+              event.stopPropagation();
+              if (rootActions) {
+                setIsMenuVisible(true);
+                setMenuLocation([event.clientX, event.clientY]);
+                setMenuItems(rootActions);
+              }
             }
           }}
         >
@@ -395,14 +409,14 @@ const FTree = React.forwardRef(
                   handleDrop={
                     handleDropzone
                       ? async (acceptedFiles, fileRejections, event) => {
-                        const data = await handleDropzone(
-                          acceptedFiles,
-                          fileRejections,
-                          event,
-                          node
-                        );
-                        await getFilesAndRerender(data);
-                      }
+                          const data = await handleDropzone(
+                            acceptedFiles,
+                            fileRejections,
+                            event,
+                            node
+                          );
+                          await getFilesAndRerender(data);
+                        }
                       : undefined
                   }
                   onToggle={async () => {
@@ -467,16 +481,16 @@ const FTree = React.forwardRef(
             </p>
           )}
         </div>
-        {menuItems && menuItems.length != 0 && (
-          <ContextMenu
-            ref={menuRef}
-            isMenuVisible={isMenuVisible}
-            setIsMenuVisible={setIsMenuVisible}
-            menuItems={menuItems}
-            menuLocation={menuLocation}
-            onClose={onContextMenuClose}
-          />
-        )}
+        {/* {menuItems && menuItems.length != 0 && ( */}
+        <ContextMenu
+          ref={menuRef}
+          isMenuVisible={isMenuVisible}
+          setIsMenuVisible={setIsMenuVisible}
+          menuItems={menuItems}
+          menuLocation={menuLocation}
+          onClose={onContextMenuClose}
+        />
+        {/* )} */}
       </div>
     );
   }
@@ -490,4 +504,4 @@ declare module "react" {
   }
 }
 
-export default FTree;
+export default CustomTree;

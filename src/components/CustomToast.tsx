@@ -48,6 +48,7 @@ const myToast = {
       {
         className: "toaster toaster-error",
         ...options,
+        duration: 5000,
       }
     );
     myToast.onClickCallbacks[id] = onClick;
@@ -68,6 +69,7 @@ const myToast = {
       {
         className: "toaster toaster-success",
         ...options,
+        duration: 5000,
       }
     );
     myToast.onClickCallbacks[id] = onClick;
@@ -120,6 +122,7 @@ const myToast = {
         className: "toaster toaster-warning",
         icon: "⚠️",
         ...options,
+        duration: 60 * 1000,
       },
       onClick,
       clickToDismiss
@@ -140,6 +143,7 @@ const myToast = {
         className: "toaster toaster_notification",
         icon: "📥",
         ...options,
+        duration: 5000,
       },
       onClick,
       clickToDismiss

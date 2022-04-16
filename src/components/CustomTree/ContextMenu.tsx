@@ -60,7 +60,11 @@ const ContextMenu = React.forwardRef(
             if (onClose) onClose();
           }}
           style={{
-            left: menuLocation[0] + "px",
+            left:
+              Math.min(
+                menuLocation[0],
+                window.screen.width - ref.current?.offsetWidth
+              ) + "px",
             top: menuLocation[1] + "px",
           }}
           className="z-10 shadow-lg rounded-md left-[100%] absolute bg-white p-1 dark:bg-gray-700 text-gray-600 dark:text-gray-200 w-fit"

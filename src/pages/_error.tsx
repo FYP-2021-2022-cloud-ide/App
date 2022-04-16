@@ -15,17 +15,13 @@ const Error = ({
   status?: any;
 }) => {
   const [text, setText] = useState("");
-  const showToast = useCallback(() => {
-    // report the issue
-    myToast.success("You message has been sent.");
-  }, []);
-  const onInputChange: ChangeEventHandler<HTMLTextAreaElement> = useCallback(
-    (e) => setText(e.currentTarget.value),
-    []
-  );
+  // const onInputChange: ChangeEventHandler<HTMLTextAreaElement> = useCallback(
+  //   (e) => setText(e.currentTarget.value),
+  //   []
+  // );
   return (
-    <div className="w-full h-full relative">
-      <div className="flex flex-col items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 space-y-2 min-w-[1/2] w-1/2">
+    <div className="error-page">
+      <div className="flex flex-col items-center space-y-2 min-w-[1/2] w-1/2">
         <CryingFace className="h-[200px] w-[200px]"></CryingFace>
         <p id="status-code">{statusCode}</p>
         <p className="error-page-text font-semibold">{sc[statusCode].text}</p>
@@ -34,12 +30,15 @@ const Error = ({
         </p>
         <button
           className="btn btn-primary"
-          onClick={showToast}
-          disabled={text == ""}
+          onClick={() => {
+            window.open(
+              "https://github.com/FYP-2021-2022-cloud-ide/Public-Issues/issues"
+            );
+          }}
         >
           Report issue
         </button>
-        <div className="form-control w-full">
+        {/* <div className="form-control w-full">
           <label className="label">
             <span className="label-text text-gray-600 text-sm dark:text-gray-200 ">
               Issue
@@ -50,7 +49,7 @@ const Error = ({
             placeholder="Description"
             onChange={onInputChange}
           ></textarea>
-        </div>
+        </div> */}
       </div>
     </div>
   );

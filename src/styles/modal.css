@@ -35,6 +35,10 @@
   @apply w-fit rounded-md px-4 py-2 bg-green-500 hover:bg-green-600 text-base leading-6 font-medium text-white shadow-sm  focus:border-blue-300  transition ease-in-out duration-150 sm:text-sm sm:leading-5;
 }
 
+.modal-form #btn-group #btn-ok[disabled] {
+  @apply bg-gray-400 hover:bg-gray-500;
+}
+
 .modal-form #btn-group #btn-cancel {
   @apply w-fit rounded-md px-4 py-2 bg-gray-400 hover:bg-gray-500 text-base leading-6 font-medium text-white shadow-sm  focus:border-blue-300 transition ease-in-out duration-150 sm:text-sm sm:leading-5;
 }
