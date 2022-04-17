@@ -56,7 +56,8 @@ export type Props = {
   ) => Promise<NodeModel<CustomData>[]>;
   /**
    * by default each tree does not know the existence of another tree, so we need to handle the logic outside the tree.
-   * Return the new tree data suhch that the tree will rerender base on this data.
+   * In this case, the tree data is not updated and there new tree data is just the same as old tree data
+   * Return the new tree data such that the tree will rerender base on this data.
    *
    * @param treeData
    * @param dropTarget target is `undefined` if moving to root. Else target is the id of the target node. Therefore in your dnd, you need to handle 3 cases:
@@ -64,6 +65,7 @@ export type Props = {
    * 1. `dropTarget` is `undefined`
    * 2. `dropTarget` is the a directory
    * 3. `dropTarget` is a file
+   *
    * @returns the new tree
    */
   handleMoveFromAnotherTree?: (
@@ -122,10 +124,7 @@ export type Props = {
    * a list of actions shown on context menu when right click on root
    */
   rootActions?: MenuItem[];
-  /**
-   * this will be called when the context menu is closed
-   */
-  onContextMenuClose?: () => void;
+
   /**
    * buttons like `open all` and `close all` are shown above the tree view.
    * By default, this is `true`. Hide the buttons by setting `false`.
@@ -241,7 +240,6 @@ const CustomTree = React.forwardRef(
       nothingText = "Click or drop files to upload",
       getNodeActions,
       rootActions,
-      onContextMenuClose,
       showGlobalActionButtons = true,
     }: Props,
     ref: React.MutableRefObject<MyTreeMethods>
@@ -249,7 +247,7 @@ const CustomTree = React.forwardRef(
     const [treeData, setTreeData] = useState<NodeModel<CustomData>[]>(
       [] as NodeModel<CustomData>[]
     );
-    const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
+    const { acceptedFiles, getRootProps, getInputProps, open } = useDropzone({
       noClick: treeData.length != 0,
       onDrop: async (acceptedFiles, fileRejections, event) => {
         if (handleDropzone) {
@@ -273,6 +271,7 @@ const CustomTree = React.forwardRef(
     } = useComponentVisible(false);
     const [menuLocation, setMenuLocation] = useState([0, 0]);
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+    const inputRef = useRef<HTMLInputElement>();
 
     async function getFilesAndRerender(data?: NodeModel<CustomData>[]) {
       if (!data) {
@@ -328,17 +327,16 @@ const CustomTree = React.forwardRef(
           {...getRootProps()}
           className="h-full  min-h-[300px] max-h-[80vh] relative"
           onContextMenu={(event: React.MouseEvent) => {
-            if (!isMobile) {
-              event.preventDefault();
-              event.stopPropagation();
-              if (rootActions) {
-                setIsMenuVisible(true);
-                setMenuLocation([event.clientX, event.clientY]);
-                setMenuItems(rootActions);
-              }
+            event.preventDefault();
+            event.stopPropagation();
+            if (rootActions) {
+              setIsMenuVisible(true);
+              setMenuLocation([event.clientX, event.clientY]);
+              setMenuItems(rootActions);
             }
           }}
           onDoubleClick={(event: React.MouseEvent) => {
+            open();
             if (isMobile) {
               event.preventDefault();
               event.stopPropagation();
@@ -354,6 +352,7 @@ const CustomTree = React.forwardRef(
             <input
               type="file"
               multiple
+              ref={inputRef}
               // directory=""
               // webkitdirectory=""
               {...getInputProps()}
@@ -488,20 +487,10 @@ const CustomTree = React.forwardRef(
           setIsMenuVisible={setIsMenuVisible}
           menuItems={menuItems}
           menuLocation={menuLocation}
-          onClose={onContextMenuClose}
         />
-        {/* )} */}
       </div>
     );
   }
 );
-
-declare module "react" {
-  interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
-    // extends React's HTMLAttributes
-    directory?: string; // remember to make these attributes optional....
-    webkitdirectory?: string;
-  }
-}
 
 export default CustomTree;

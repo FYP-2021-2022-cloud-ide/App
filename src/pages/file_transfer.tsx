@@ -142,11 +142,11 @@ export default function Page() {
                   : dirname(node.data.filePath)
                 : `/volumes/${userId}/persist`;
               formData.append("filePath", target);
-              let data = await uploadFiles(userId, formData);
+              let response = await uploadFiles(userId, formData);
               progressRef1.current = "";
-              if (data.success) return undefined;
+              if (response.success) return undefined;
               else {
-                alert(data.error.status);
+                alert(response.error.status);
                 return undefined;
               }
             }}
@@ -320,7 +320,6 @@ export default function Page() {
                 },
               },
             ]}
-            onContextMenuClose={() => {}}
           ></CustomTree>
           <input
             ref={uploadInputRef}
@@ -347,9 +346,7 @@ export default function Page() {
               <div className="h-full min-h-[300px] max-h-[80vh] relative">
                 <button
                   className={classNames(styles, "root", "root-nothing")}
-                  onClick={async () => {
-                    await googleAPI.auth();
-                  }}
+                  onClick={googleAPI.auth}
                 >
                   <p className={classNames(styles, "root-nothing-text")}>
                     Click here to log in Google Drive
@@ -441,7 +438,6 @@ export default function Page() {
                 if (dragSource == undefined) return true;
                 else return false;
               }}
-              onContextMenuClose={() => {}}
             ></CustomTree>
           )}
         </div>
