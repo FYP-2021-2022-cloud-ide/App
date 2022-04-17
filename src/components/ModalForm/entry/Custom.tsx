@@ -2,21 +2,23 @@ import { InformationCircleIcon } from "@heroicons/react/solid";
 import _ from "lodash";
 import { EntryProps } from "../types";
 import { TooltipProvider } from "../../../contexts/Tooltip";
+import { useModalForm } from "../modalFormContext";
 
-function Label<T>({ entry }: EntryProps<T>) {
+function Label({ tooltip, text }: { tooltip?: string; text: string }) {
   return (
-    <div className="flex flex-row space-x-2 items-center">
-      {entry.label && (
-        <p className="modal-form-text-base capitalize" id="label">
-          {entry.label}
-        </p>
-      )}
-      {entry.tooltip && (
+    <div className="flex flex-row space-x-2 w-fit items-center">
+      <p className="capitalize" id="name">
+        {text}
+      </p>
+      {tooltip && (
         <>
-          <TooltipProvider text={entry.tooltip}>
+          <TooltipProvider text={tooltip}>
             {(setTriggerRef) => (
               <div ref={setTriggerRef}>
-                <InformationCircleIcon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                <InformationCircleIcon
+                  id="tooltip-icon"
+                  className="w-5 h-5 text-gray-700 dark:text-gray-300"
+                />
               </div>
             )}
           </TooltipProvider>
@@ -26,16 +28,20 @@ function Label<T>({ entry }: EntryProps<T>) {
   );
 }
 
-function Component<T>(props: EntryProps<T>) {
-  const { zIndex, id, entry, sectionId, data, onChange } = props;
+function Component({
+  children,
+  zIndex,
+  id,
+  sectionId,
+}: { children: JSX.Element } & EntryProps) {
+  const { formStructure } = useModalForm<any>();
+  const entry = formStructure[sectionId].entries[id];
   return (
-    <div
-      style={{ zIndex: zIndex }}
-      id={id}
-      className={`modal-form-${entry.type}`}
-    >
-      <Label {...props}></Label>
-      {entry.node(onChange, data[sectionId][id], data)}
+    <div style={{ zIndex: zIndex }} id={id} data-entry-type={entry.type}>
+      {entry.label && (
+        <Label tooltip={entry.tooltip} text={entry.label}></Label>
+      )}
+      {children}
     </div>
   );
 }

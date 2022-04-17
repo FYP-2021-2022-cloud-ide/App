@@ -14,7 +14,7 @@ const Right = (props: PaginationComponentProps & { options: number[] }) => {
   const top = rowsPerPage * (currentPage - 1) + 1;
   const bottom = Math.min(rowsPerPage + top - 1, rowCount);
   return (
-    <div className="flex flex-col space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0 mt-2 sm:mt-0">
+    <div className="flex flex-col space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0 mt-2 sm:mt-0 text-sm">
       <div className="flex flex-row items-center space-x-2 ">
         <p className="whitespace-nowrap">Rows per page : </p>
         <select

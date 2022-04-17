@@ -1,25 +1,24 @@
 import { EntryProps, ToggleEntry } from "../types";
 import Toggle from "../../Toggle";
 import Custom from "./Custom";
+import { useModalForm } from "../modalFormContext";
 
-function Component<T>(props: EntryProps<T>) {
-  const entry = props.entry as ToggleEntry<T>;
+function Component(props: EntryProps) {
+  const { formStructure, data, changeData } = useModalForm<any>();
+  const { sectionId, id } = props;
+  const entry = formStructure[sectionId].entries[id] as ToggleEntry<any>;
   if (entry.type != "toggle") return <></>;
   return (
-    <Custom
-      {...props}
-      entry={{
-        ...entry,
-        node: (onChange, currentValue) => (
-          <Toggle
-            text={entry.label}
-            onChange={onChange}
-            enabled={currentValue}
-          ></Toggle>
-        ),
-      }}
-    ></Custom>
+    <Custom {...props}>
+      <Toggle
+        text={entry.label}
+        onChange={(newValue) => {
+          changeData(newValue, sectionId, id);
+        }}
+        enabled={data[sectionId][id]}
+      ></Toggle>
+    </Custom>
   );
-};
+}
 
 export default Component;

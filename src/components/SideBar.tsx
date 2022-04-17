@@ -25,12 +25,20 @@ const SideBar = () => {
   const { containerQuota, containers } = useContainers();
   const router = useRouter();
   var pages = [
-    { name: "Dashboard", link: "/", icon: HomeIcon },
-    { name: "Messages", link: "/messages", icon: AnnotationIcon },
+    {
+      name: "Dashboard",
+      link: "/",
+      icon: <HomeIcon className="w-5 h-5 mr-2"></HomeIcon>,
+    },
+    {
+      name: "Messages",
+      link: "/messages",
+      icon: <AnnotationIcon className="w-5 h-5 mr-2"></AnnotationIcon>,
+    },
     {
       name: "File Transfer",
       link: "/file_transfer",
-      icon: CloudIcon,
+      icon: <CloudIcon className="w-5 h-5 mr-2"></CloudIcon>,
     },
     // { name: "Admin", link: "/admin", icon: IdentificationIcon },
   ];
@@ -52,7 +60,7 @@ const SideBar = () => {
           .map((page) => {
             return {
               text: page.name,
-              icon: page.icon({ className: "w-5 h-5 mr-2" }),
+              icon: page.icon,
               onClick: () => {
                 router.push(page.link);
               },
@@ -61,7 +69,9 @@ const SideBar = () => {
           .concat([
             {
               text: "Report Issue",
-              icon: ExclamationCircleIcon({ className: "w-5 h-5 mr-2" }),
+              icon: (
+                <ExclamationCircleIcon className="w-5 h-5 mr-2"></ExclamationCircleIcon>
+              ),
               onClick: () => {
                 window.open(
                   "https://github.com/FYP-2021-2022-cloud-ide/Public-Issues/issues"
@@ -71,23 +81,27 @@ const SideBar = () => {
 
             {
               text: "Help and docs",
-              icon: QuestionMarkCircleIcon({ className: "w-5 h-5 mr-2" }),
+              icon: (
+                <QuestionMarkCircleIcon className="w-5 h-5 mr-2"></QuestionMarkCircleIcon>
+              ),
               onClick: () => {
                 window.open("https://brenkysbwim.gitbook.io/cnails/");
               },
             },
             {
               text: "Change Theme",
-              icon: isDark
-                ? SunIcon({ className: "w-5 h-5 mr-2" })
-                : MoonIcon({ className: "w-5 h-5 mr-2" }),
+              icon: isDark ? (
+                <SunIcon className="w-5 h-5 mr-2"></SunIcon>
+              ) : (
+                <MoonIcon className="w-5 h-5 mr-2"></MoonIcon>
+              ),
               onClick: () => {
                 setDark(!isDark);
               },
             },
             {
               text: "Logout",
-              icon: LogoutIcon({ className: "w-5 h-5 mr-2" }),
+              icon: <LogoutIcon className="w-5 h-5 mr-2"></LogoutIcon>,
               onClick: () => {
                 router.push("/logout");
               },
@@ -107,10 +121,11 @@ const SideBar = () => {
         <div id="navigation">
           {pages.map((page, index) => {
             const isActive = router.pathname === page.link;
+
             return (
               <Link key={page.link} href={page.link}>
                 <a id={page.name} data-active={isActive}>
-                  <page.icon className="w-6 h-6" />
+                  {page.icon}
                   <p>{page.name}</p>
                 </a>
               </Link>

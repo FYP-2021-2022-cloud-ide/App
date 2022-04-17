@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { useWindowEvent } from "../hooks/useWindowEvent";
 import { Fragment } from "react";
+import useUpdateEffect from "../hooks/useUpdateEffect";
 
 export type ModalProps = {
   isOpen: Boolean;
@@ -29,13 +30,14 @@ function Modal({
   useWindowEvent("keydown", (event) => {
     if (event.key !== "Escape") return;
     if (escToClose && isOpen) {
-      if (onClose) onClose();
       setOpen(false);
     }
   });
-  useEffect(() => {
+  useUpdateEffect(() => {
     if (isOpen) {
       if (onOpen) onOpen();
+    } else {
+      if (onClose) onClose();
     }
   }, [isOpen]);
   return (
@@ -80,7 +82,6 @@ function Modal({
                   id="modal-overlay"
                   onClick={() => {
                     if (clickOutsideToClose) {
-                      if (onClose) onClose();
                       setOpen(false);
                     }
                   }}

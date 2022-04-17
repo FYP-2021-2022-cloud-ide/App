@@ -1,3 +1,4 @@
+import _ from "lodash";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import myToast from "../components/CustomToast";
 import { useCancelablePromise } from "../hooks/useCancelablePromise";
@@ -64,13 +65,13 @@ export const SandboxProvider = ({ children }: { children: JSX.Element }) => {
       mount: boolean = true
     ) => {
       if (response.success) {
-        const sandboxImages = patchSandboxes(
+        const newSandboxImages = patchSandboxes(
           apiSandboxesToUiSandboxes(response.sandboxImages),
           containers
         );
-        console.log(sandboxImages);
-        if (mount) setSandboxImages(sandboxImages);
-        return sandboxImages;
+        if (mount && !_.isEqual(newSandboxImages, sandboxImages))
+          setSandboxImages(newSandboxImages);
+        return newSandboxImages;
       } else {
         myToast.error({
           title: "Personal workspaces cannot be fetched",
@@ -94,6 +95,12 @@ export const SandboxProvider = ({ children }: { children: JSX.Element }) => {
     description: string,
     imageId: string
   ) {
+    console.log({
+      title: name,
+      description,
+      imageId,
+      userId,
+    });
     const response = await myToast.promise(
       "Creating a personal workspace...",
       sandboxAPI.addSandboxImage({

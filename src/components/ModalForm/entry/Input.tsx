@@ -1,5 +1,6 @@
 import _ from "lodash";
 import { memo, useRef } from "react";
+import { useModalForm } from "../modalFormContext";
 import { EntryProps, InputEntry, ValidationOutput } from "../types";
 import Custom from "./Custom";
 
@@ -51,47 +52,49 @@ const Input = memo(
       </>
     );
   },
-  () => true
+  (prevProps, nextProps) => {
+    return prevProps.onChange == nextProps.onChange;
+  }
 );
 
-function Component<T>(props: EntryProps<T>) {
+function Component(props: EntryProps) {
   const { sectionId, id } = props;
-  const entry = props.entry as InputEntry<T>;
+  const { formStructure, data, changeData } = useModalForm<any>();
+  const entry = formStructure[sectionId].entries[id] as InputEntry<any>;
   if (entry.type != "input") return <></>;
   return (
     <Custom
       {...props}
-      entry={{
-        ...entry,
-        // when you are creating a custom component,
-        // you can either use the `onChange` from props or the parameter of callback because they are the same.
-        // For consistency, we use the value from parameter
-        node: (onChange, currentValue, data) => (
-          <Input
-            text={currentValue}
-            placeholder={entry.placeholder}
-            disabled={entry.disabled}
-            onChange={(text) => {
-              if (text == "" && entry.emptyValue) {
-                text = entry.emptyValue;
-              }
-              onChange(text);
-            }}
-            // need to patch the validate function because this is a memorized component
-            validate={(targetValue) => {
-              if (entry.validate)
-                return entry.validate(
-                  _.cloneDeepWith(data, (data) => {
-                    data[sectionId][id] = targetValue;
-                    return data;
-                  })
-                );
-              else return { ok: true, message: "" };
-            }}
-          ></Input>
-        ),
-      }}
-    />
+      // entry={{
+      //   ...entry,
+      //   // when you are creating a custom component,
+      //   // you can either use the `onChange` from props or the parameter of callback because they are the same.
+      //   // For consistency, we use the value from parameter
+      //   node: (onChange, currentValue, data) => (
+
+      //   ),
+      // }}
+    >
+      <Input
+        text={data[sectionId][id]}
+        placeholder={entry.placeholder}
+        disabled={entry.disabled}
+        onChange={(text) => {
+          changeData(text, sectionId, id);
+        }}
+        // need to patch the validate function because this is a memorized component
+        validate={(targetValue) => {
+          if (entry.validate)
+            return entry.validate(
+              _.cloneDeepWith(data, (data) => {
+                data[sectionId][id] = targetValue;
+                return data;
+              })
+            );
+          else return { ok: true, message: "" };
+        }}
+      ></Input>
+    </Custom>
   );
 }
 

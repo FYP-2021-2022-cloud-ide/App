@@ -32,4 +32,4 @@ Although unit testing's scope is bounded to the frontend, the end to end test ha
 
 ## npm script to run test
 
-1. `npm run e2e`: a report will be generated under `cypress/reports`
+1. `npm run e2e --env username=<username>,password=<password>; npm run e2e:after`: a report will be generated under `cypress/reports`. Please use a test account.

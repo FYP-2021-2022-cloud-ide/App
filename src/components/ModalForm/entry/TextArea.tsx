@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { useModalForm } from "../modalFormContext";
 import { EntryProps, TextAreaEntry } from "../types";
 import Custom from "./Custom";
 
@@ -28,32 +29,31 @@ const TextArea = memo(
       ></textarea>
     );
   },
-  () => true
+  (prevProps, nextProps) => {
+    return prevProps.onChange == nextProps.onChange;
+  }
 );
 
-function Component<T>(props: EntryProps<T>) {
-  const entry = props.entry as TextAreaEntry<T>;
+function Component(props: EntryProps) {
+  const { formStructure, data, changeData } = useModalForm<any>();
+  const { sectionId, id } = props;
+  const entry = formStructure[sectionId].entries[id] as TextAreaEntry<any>;
   if (entry.type != "textarea") return <></>;
   return (
-    <Custom
-      {...props}
-      entry={{
-        ...entry,
-        node: (onChange, data) => (
-          <TextArea
-            text={data}
-            placeholder={entry.placeholder}
-            disabled={entry.disabled}
-            onChange={(text) => {
-              if (text == "" && entry.emptyValue) {
-                text = entry.emptyValue;
-              }
-              onChange(text);
-            }}
-          ></TextArea>
-        ),
-      }}
-    ></Custom>
+    <Custom {...props}>
+      <TextArea
+        text={data[sectionId][id]}
+        placeholder={entry.placeholder}
+        disabled={entry.disabled}
+        onChange={(text) => {
+          // if (text == "" && entry.emptyValue) {
+          //   text = entry.emptyValue;
+          // }
+          // onChange(text);
+          changeData(text, sectionId, id);
+        }}
+      ></TextArea>
+    </Custom>
   );
-};
+}
 export default Component;

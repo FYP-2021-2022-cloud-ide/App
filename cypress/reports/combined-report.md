@@ -1,7 +1,7 @@
 # Test report
-> Run start date: 16/4/2022, 10:58:30 am 
+> Run start date: 16/4/2022, 11:37:29 am 
 
-> Duration: 0s 
+> Duration: 5s 
 
 ## Tests run stats
   - 📚 total tests: 7

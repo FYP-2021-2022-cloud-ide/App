@@ -13,11 +13,11 @@
 }
 
 /* entry, className is modal-form-{entryType }*/
-.modal-form-datetime {
+.modal-form [data-entry-type="datetime"] {
   @apply dark:text-gray-300 border dark:border-0 focus:outline-none dark:bg-gray-700 p-1 px-3 w-full flex-row space-x-2  text-left rounded-md shadow-md;
 }
 
-.modal-form-toggle {
+.modal-form [data-entry-type="toggle"] {
   @apply flex flex-row items-center space-x-2;
 }
 

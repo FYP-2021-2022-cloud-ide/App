@@ -3,7 +3,7 @@ import { hostname } from "../../../support/commands";
 describe("dashboard test", () => {
   before(() => {
     cy.login();
-    cy.visit(hostname);
+    cy.wait(4000);
   });
 
   beforeEach(() => {
@@ -18,7 +18,7 @@ describe("dashboard test", () => {
       "semesterId",
       "name"
     );
-    cy.visit(hostname);
+    cy.visit("/");
   });
 
   after(() => {});

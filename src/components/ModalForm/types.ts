@@ -44,11 +44,11 @@ export interface BaseEntry<T> {
    * @param data the currentValue of this entry. Basically `data[sectionId][id]`.
    * @param formData all the data of the modal form.
    */
-  node?: (
-    onChange: (newValue: any) => void,
-    data: any,
-    formData: T
-  ) => JSX.Element;
+  // node?: (
+  //   onChange: (newValue: any) => void,
+  //   data: any,
+  //   formData: T
+  // ) => JSX.Element;
 }
 
 export interface InputEntry<T> extends BaseEntry<T> {
@@ -122,6 +122,10 @@ export type Section<T> = {
  * a form is composed of many sections
  */
 export type FormStructure<T> = { [id: string]: Section<T> };
+/**
+ * another name of `FormStructure<T>`
+ */
+export type Sections<T> = FormStructure<T>;
 
 export type Props<T> = {
   /**
@@ -151,11 +155,11 @@ export type Props<T> = {
   onOpen?: () => void;
   /**
    * callback when the modal is close. If the modal close because user submit the form,
-   * both onEnter and onClose is called, so you need to handle it by yourself.
+   * both `onEnter` and `onClose` is called, so you need to handle it by yourself. `onClose` cannot distinguish
+   * whether the form is closed because of enter.
    * @param data the data in the form when the modal is closed
-   * @param isEnter whether this form close because of enter
    */
-  onClose?: (data: T, isEnter: boolean) => void;
+  onClose?: (data: T) => void;
   /**
    * the title of this form
    */
@@ -186,7 +190,7 @@ export type Props<T> = {
 /**
  * T is EntryType
  */
-export type EntryProps<T> = {
+export type EntryProps = {
   /**
    * the z index to be used for styling. The upper entry usually has a higher z index than a lower entry
    */
@@ -194,7 +198,7 @@ export type EntryProps<T> = {
   /**
    * an `Entry` object from the `FromStructure`
    */
-  entry: Entry<T>;
+  // entry: Entry<T>;
   /**
    * the section of this entry
    */
@@ -203,21 +207,21 @@ export type EntryProps<T> = {
    * id of this entry in the format
    */
   id: string;
-  /**
-   * the current data
-   */
-  data: T;
-  /**
-   * @param data new value of this entry
-   */
-  onChange: (data: any) => void;
+  // /**
+  //  * the current data
+  //  */
+  // data: T;
+  // /**
+  //  * @param data new value of this entry
+  //  */
+  // onChange: (data: any) => void;
 };
 
-export type SectionProps<T> = {
+export type SectionProps = {
   /**
    * the `Section` object from `FromStructure`
    */
-  section: Section<T>;
+  // section: Section<T>;
   /**
    * id of this section
    */
@@ -225,13 +229,13 @@ export type SectionProps<T> = {
   /**
    * the current form data
    */
-  data: T;
-  useDisclosure: boolean;
-  /**
-   * onChange callback
-   *
-   * @param data the new value of an entry
-   * @param id the entry id
-   */
-  onChange: (data: any, id: string) => void;
+  // data: T;
+  // useDisclosure: boolean;
+  // /**
+  //  * onChange callback
+  //  *
+  //  * @param data the new value of an entry
+  //  * @param id the entry id
+  //  */
+  // onChange: (data: any, id: string) => void;
 };
