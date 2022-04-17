@@ -18,7 +18,7 @@ interface ModalFormContextState<T> extends Props<T> {
 
 const ModalFormContext = createContext({} as ModalFormContextState<any>);
 
-export function useModalForm<T>(): ModalFormContextState<T> {
+export function useModalForm<T = any>(): ModalFormContextState<T> {
   return useContext(ModalFormContext);
 }
 

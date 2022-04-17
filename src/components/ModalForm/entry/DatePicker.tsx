@@ -4,25 +4,11 @@ import Custom from "./Custom";
 
 function Component(props: EntryProps) {
   const { sectionId, id } = props;
-  const { formStructure, changeData } = useModalForm<any>();
-  const entry = formStructure[sectionId].entries[id] as DateTimeEntry<any>;
+  const { formStructure, changeData } = useModalForm();
+  const entry = formStructure[sectionId].entries[id] as DateTimeEntry;
   if (entry.type != "datetime") return <></>;
   return (
-    <Custom
-      {...props}
-      // entry={{
-      //   ...entry,
-      //   node: (onChange, data, formData) => {
-      //     return (
-      //       <input
-      //         type="datetime-local"
-      //         defaultValue={data}
-      //         onChange={(e) => onChange(e.target.value)}
-      //       />
-      //     );
-      //   },
-      // }}
-    >
+    <Custom {...props}>
       <input
         type="datetime-local"
         defaultValue={entry.defaultValue}

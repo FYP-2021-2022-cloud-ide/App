@@ -3,10 +3,10 @@ import { useModalForm } from "../modalFormContext";
 import { EntryProps, ListBoxEntry } from "../types";
 import Custom from "./Custom";
 
-function Component<T>(props: EntryProps) {
-  const { data, formStructure, changeData } = useModalForm<T>();
+function Component(props: EntryProps) {
+  const { data, formStructure, changeData } = useModalForm();
   const { sectionId, id } = props;
-  const entry = formStructure[sectionId].entries[id] as ListBoxEntry<T>;
+  const entry = formStructure[sectionId].entries[id] as ListBoxEntry;
   if (entry.type != "listbox") return <></>;
   return (
     <Custom {...props}>

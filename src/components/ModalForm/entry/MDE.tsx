@@ -98,9 +98,9 @@ const MDE = memo(
 function Component(props: EntryProps) {
   const [focusTrapActive, setFocusTrapActive] = useState(false);
   const mdeRef = useRef<EasyMDE>();
-  const { data, formStructure, changeData } = useModalForm<any>();
+  const { data, formStructure, changeData } = useModalForm();
   const { sectionId, id } = props;
-  const entry = formStructure[sectionId].entries[id] as MarkdownEntry<any>;
+  const entry = formStructure[sectionId].entries[id] as MarkdownEntry;
   useEffect(() => {
     if (focusTrapActive) {
       const handleTab = (event: KeyboardEvent) => {

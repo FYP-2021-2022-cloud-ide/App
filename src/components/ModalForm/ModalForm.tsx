@@ -38,13 +38,7 @@ function Entry<T>(props: EntryProps) {
   } else throw new Error("not such entry type in <ModalForm>");
 }
 
-function Section<T>({
-  // section,
-  id: sectionId,
-}: // data,
-// onChange,
-// useDisclosure,
-SectionProps) {
+function Section<T>({ id: sectionId }: SectionProps) {
   const { data, useDisclosure, formStructure } = useModalForm<T>();
   const section = formStructure[sectionId];
 
@@ -77,15 +71,7 @@ SectionProps) {
                   ? section.entries
                   : Object.keys(section.entries).map((id, index) => {
                       return (
-                        <Entry
-                          zIndex={Object.keys(section.entries).length - index}
-                          key={id}
-                          // entry={section.entries[id]}
-                          id={id}
-                          sectionId={sectionId}
-                          // data={data}
-                          // onChange={(data) => onChange(data, id)}
-                        ></Entry>
+                        <Entry key={id} id={id} sectionId={sectionId}></Entry>
                       );
                     })}
               </div>
@@ -105,17 +91,7 @@ SectionProps) {
       {React.isValidElement(section.entries)
         ? section.entries
         : Object.keys(section.entries).map((id, index) => {
-            return (
-              <Entry
-                zIndex={Object.keys(section.entries).length - index}
-                key={id}
-                // entry={section.entries[id]}
-                id={id}
-                sectionId={sectionId}
-                // data={data}
-                // onChange={(data) => onChange(data, id)}
-              ></Entry>
-            );
+            return <Entry key={id} id={id} sectionId={sectionId}></Entry>;
           })}
     </div>
   );
@@ -140,7 +116,6 @@ function Wrapped<T>() {
     onOpen,
     clickOutsideToClose,
     escToClose,
-    onEnter,
     okBtnText,
     cancelBtnText,
     size = "sm",

@@ -22,7 +22,6 @@ const TextArea = memo(
         // this component will never be rerender so the input props is the default value
         defaultValue={text}
         onChange={(e) => {
-          // setText(e.target.value);
           onChange(e.target.value);
         }}
         disabled={disabled}
@@ -35,9 +34,9 @@ const TextArea = memo(
 );
 
 function Component(props: EntryProps) {
-  const { formStructure, data, changeData } = useModalForm<any>();
+  const { formStructure, data, changeData } = useModalForm();
   const { sectionId, id } = props;
-  const entry = formStructure[sectionId].entries[id] as TextAreaEntry<any>;
+  const entry = formStructure[sectionId].entries[id] as TextAreaEntry;
   if (entry.type != "textarea") return <></>;
   return (
     <Custom {...props}>
@@ -46,10 +45,6 @@ function Component(props: EntryProps) {
         placeholder={entry.placeholder}
         disabled={entry.disabled}
         onChange={(text) => {
-          // if (text == "" && entry.emptyValue) {
-          //   text = entry.emptyValue;
-          // }
-          // onChange(text);
           changeData(text, sectionId, id);
         }}
       ></TextArea>

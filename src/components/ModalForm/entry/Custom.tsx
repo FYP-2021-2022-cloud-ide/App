@@ -30,14 +30,13 @@ function Label({ tooltip, text }: { tooltip?: string; text: string }) {
 
 function Component({
   children,
-  zIndex,
   id,
   sectionId,
 }: { children: JSX.Element } & EntryProps) {
-  const { formStructure } = useModalForm<any>();
+  const { formStructure } = useModalForm();
   const entry = formStructure[sectionId].entries[id];
   return (
-    <div style={{ zIndex: zIndex }} id={id} data-entry-type={entry.type}>
+    <div id={id} data-entry-type={entry.type}>
       {entry.label && (
         <Label tooltip={entry.tooltip} text={entry.label}></Label>
       )}

@@ -2,7 +2,7 @@ import { Option } from "../ListBox";
 
 export type ValidationOutput = { ok: false; message: string } | { ok: true };
 
-export interface BaseEntry<T> {
+export interface BaseEntry<T = any> {
   /**
    * type of this entry.
    */
@@ -34,24 +34,9 @@ export interface BaseEntry<T> {
    * @param data the new data
    */
   validate?: (data: T) => ValidationOutput;
-  /**
-   * This function provides the `onChange` callback, `currentValue` and `data` for you.
-   * Based on these two props, you need to determine how to render your element.
-   * For performance purpose, you may also want to use a memorized element.
-   *
-   * @param onChange a function you need to call to change the data of the form.
-   * This `onChange` function is exactly the function pass to the Custom Component.
-   * @param data the currentValue of this entry. Basically `data[sectionId][id]`.
-   * @param formData all the data of the modal form.
-   */
-  // node?: (
-  //   onChange: (newValue: any) => void,
-  //   data: any,
-  //   formData: T
-  // ) => JSX.Element;
 }
 
-export interface InputEntry<T> extends BaseEntry<T> {
+export interface InputEntry<T = any> extends BaseEntry<T> {
   type: "input";
   defaultValue: string;
   placeholder?: string;
@@ -59,7 +44,7 @@ export interface InputEntry<T> extends BaseEntry<T> {
   disabled?: boolean;
 }
 
-export interface TextAreaEntry<T> extends BaseEntry<T> {
+export interface TextAreaEntry<T = any> extends BaseEntry<T> {
   type: "textarea";
   defaultValue: string;
   placeholder?: string;
@@ -67,23 +52,23 @@ export interface TextAreaEntry<T> extends BaseEntry<T> {
   disabled?: boolean;
 }
 
-export interface ListBoxEntry<T> extends BaseEntry<T> {
+export interface ListBoxEntry<T = any> extends BaseEntry<T> {
   type: "listbox";
   defaultValue: Option;
   options: Option[];
 }
 
-export interface ToggleEntry<T> extends BaseEntry<T> {
+export interface ToggleEntry<T = any> extends BaseEntry<T> {
   type: "toggle";
   defaultValue: boolean;
 }
 
-export interface MarkdownEntry<T> extends BaseEntry<T> {
+export interface MarkdownEntry<T = any> extends BaseEntry<T> {
   type: "markdown";
   defaultValue: string;
 }
 
-export interface DateTimeEntry<T> extends BaseEntry<T> {
+export interface DateTimeEntry<T = any> extends BaseEntry<T> {
   type: "datetime";
   /**
    * the `moment` string
@@ -91,7 +76,7 @@ export interface DateTimeEntry<T> extends BaseEntry<T> {
   defaultValue: string;
 }
 
-export type Entry<T> =
+export type Entry<T = any> =
   | BaseEntry<T>
   | InputEntry<T>
   | TextAreaEntry<T>
@@ -103,7 +88,7 @@ export type Entry<T> =
 /**
  * a form structure is compose of many sections
  */
-export type Section<T> = {
+export type Section<T = any> = {
   /**
    * the title of this section
    */
@@ -121,13 +106,13 @@ export type Section<T> = {
 /**
  * a form is composed of many sections
  */
-export type FormStructure<T> = { [id: string]: Section<T> };
+export type FormStructure<T = any> = { [id: string]: Section<T> };
 /**
  * another name of `FormStructure<T>`
  */
-export type Sections<T> = FormStructure<T>;
+export type Sections<T = any> = FormStructure<T>;
 
-export type Props<T> = {
+export type Props<T = any> = {
   /**
    * whether this section should be in a disclosure.
    * If it is not in a disclosure, its content will spread out.
@@ -192,14 +177,6 @@ export type Props<T> = {
  */
 export type EntryProps = {
   /**
-   * the z index to be used for styling. The upper entry usually has a higher z index than a lower entry
-   */
-  zIndex: number;
-  /**
-   * an `Entry` object from the `FromStructure`
-   */
-  // entry: Entry<T>;
-  /**
    * the section of this entry
    */
   sectionId: string;
@@ -207,35 +184,8 @@ export type EntryProps = {
    * id of this entry in the format
    */
   id: string;
-  // /**
-  //  * the current data
-  //  */
-  // data: T;
-  // /**
-  //  * @param data new value of this entry
-  //  */
-  // onChange: (data: any) => void;
 };
 
 export type SectionProps = {
-  /**
-   * the `Section` object from `FromStructure`
-   */
-  // section: Section<T>;
-  /**
-   * id of this section
-   */
   id: string;
-  /**
-   * the current form data
-   */
-  // data: T;
-  // useDisclosure: boolean;
-  // /**
-  //  * onChange callback
-  //  *
-  //  * @param data the new value of an entry
-  //  * @param id the entry id
-  //  */
-  // onChange: (data: any, id: string) => void;
 };
