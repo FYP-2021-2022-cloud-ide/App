@@ -271,7 +271,6 @@ const CustomTree = React.forwardRef(
     } = useComponentVisible(false);
     const [menuLocation, setMenuLocation] = useState([0, 0]);
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-    const inputRef = useRef<HTMLInputElement>();
 
     async function getFilesAndRerender(data?: NodeModel<CustomData>[]) {
       if (!data) {
@@ -336,7 +335,6 @@ const CustomTree = React.forwardRef(
             }
           }}
           onDoubleClick={(event: React.MouseEvent) => {
-            open();
             if (isMobile) {
               event.preventDefault();
               event.stopPropagation();
@@ -352,7 +350,6 @@ const CustomTree = React.forwardRef(
             <input
               type="file"
               multiple
-              ref={inputRef}
               // directory=""
               // webkitdirectory=""
               {...getInputProps()}
@@ -405,7 +402,7 @@ const CustomTree = React.forwardRef(
                   depth={depth}
                   // ui isopen
                   isOpen={isOpen}
-                  handleDrop={
+                  handleUpload={
                     handleDropzone
                       ? async (acceptedFiles, fileRejections, event) => {
                           const data = await handleDropzone(

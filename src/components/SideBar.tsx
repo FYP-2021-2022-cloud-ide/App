@@ -20,7 +20,7 @@ import { useCnails } from "../contexts/cnails";
 import { useTheme } from "../contexts/theme";
 
 const SideBar = () => {
-  const { sub, name, email } = useCnails();
+  const { name, email } = useCnails();
   const { isDark, setDark } = useTheme();
   const { containerQuota, containers } = useContainers();
   const router = useRouter();
@@ -37,7 +37,12 @@ const SideBar = () => {
     },
     {
       name: "File Transfer",
-      link: "/file_transfer",
+      link: "/fileTransfer",
+      icon: <CloudIcon className="w-5 h-5 mr-2"></CloudIcon>,
+    },
+    {
+      name: "File Transfer 2 ",
+      link: "/fileTransfer2",
       icon: <CloudIcon className="w-5 h-5 mr-2"></CloudIcon>,
     },
     // { name: "Admin", link: "/admin", icon: IdentificationIcon },

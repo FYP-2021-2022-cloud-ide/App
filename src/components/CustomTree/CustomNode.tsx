@@ -34,10 +34,11 @@ type Props = {
    * handle dropping of files into this node
    * @param
    */
-  handleDrop?: <T extends File>(
+  handleUpload?: <T extends File>(
     acceptedFiles: T[],
     fileRejections: FileRejection[],
-    event: DropEvent
+    event: DropEvent,
+    node?: NodeModel<CustomData>
   ) => void;
   /**
    * This is called when the folder arrow is clicked (when a folder is expanded or collapsed)
@@ -64,7 +65,7 @@ type Props = {
 const CustomNode: React.FC<Props> = ({
   isOpen,
   depth,
-  handleDrop,
+  handleUpload,
   onClick,
   onDragStart,
   onDragEnd,
@@ -85,13 +86,13 @@ const CustomNode: React.FC<Props> = ({
     },
     onDrop: async (acceptedFiles, fileRejections, event) => {
       setDragOver(false);
-      if (handleDrop) {
-        handleDrop(acceptedFiles, fileRejections, event);
+      if (handleUpload) {
+        handleUpload(acceptedFiles, fileRejections, event);
       }
     },
   });
   const patchGetRootProps = () => {
-    return handleDrop ? getRootProps() : {};
+    return handleUpload ? getRootProps() : {};
   };
 
   const handleToggle = async (event: React.MouseEvent) => {
@@ -154,7 +155,7 @@ const CustomNode: React.FC<Props> = ({
         }}
         draggable
       >
-        {handleDrop ? <input {...getInputProps()} /> : <></>}
+        {handleUpload ? <input {...getInputProps()} /> : <></>}
         <Leading depth={depth} droppable={node.droppable}></Leading>
         <FolderArrow
           open={isOpen}

@@ -50,7 +50,7 @@ export default function Page() {
   const targetNodeRef = useRef<NodeModel<CustomData>>();
   const uploadInputRef = useRef<HTMLInputElement>();
 
-  // for modal form
+  //  modal form
   const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] =
     useState<boolean>(false);
   const [isEditNameModalOpen, setIsEditNameModalOpen] =
@@ -109,7 +109,7 @@ export default function Page() {
               acceptedFiles,
               _fileRejections,
               _event,
-              node: NodeModel<CustomData>
+              node
             ) => {
               progressRef1.current = status.uploading;
               const formData = new FormData();

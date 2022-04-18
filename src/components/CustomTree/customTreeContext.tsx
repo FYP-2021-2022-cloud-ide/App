@@ -4,13 +4,20 @@ import {
   TreeMethods,
 } from "@minoru/react-dnd-treeview";
 import _ from "lodash";
-import React, { createContext, useContext, useRef, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { DropEvent, FileRejection } from "react-dropzone";
 import useComponentVisible from "../../hooks/useComponentVisible";
 import ContextMenu, { MenuItem } from "./ContextMenu";
 import { CustomData } from "./CustomNode";
 
-type HandleMoveArgs =
+export type HandleMoveArgs =
   | {
       sameTree: true;
       /**
@@ -49,7 +56,7 @@ type GetRootActionsArgs = {
   open: () => void;
 };
 
-type Props = {
+export type Props = {
   /**
    * the id of the tree
    */
@@ -57,6 +64,8 @@ type Props = {
   /**
    * the root id of the tree, by default is 0.
    * The root id is the parent of files in the first layer. Therefore, it make sense to set this as the root directory path.
+   *
+   * @remark you root id need to match the first nth directory path of your nodes. Otherwise the tree will not display the node.
    */
   rootId?: string | number;
   /**
@@ -64,9 +73,10 @@ type Props = {
    */
   data: NodeModel<CustomData>[];
   /**
-   * this will be changed when the last active node of this tree changes
+   * this will be changed when the last active node of this tree changes.
+   * This function is useful if you need to implement cross tree dnd.
    *
-   * @param node the new last active node
+   * @param node the new last active node in this tree
    * @param treeId  the id of the tree
    */
   onLastActiveNodeChange: (
@@ -89,7 +99,10 @@ type Props = {
   /**
    * this is called when the directory is toggled
    */
-  onToggle?: (node: NodeModel<CustomData>) => void | Promise<void>;
+  onToggle?: (
+    node: NodeModel<CustomData>,
+    open: boolean
+  ) => void | Promise<void>;
   /**
    * this is called when a node is click
    */
@@ -106,7 +119,7 @@ type Props = {
    * This is just a forward props of the original Tree component.
    * This callback is used to check whether the a node can drag and drop within tree or cross-tree.
    */
-  canDrop?: (
+  canDrop: (
     tree: NodeModel<CustomData>[],
     options: DropOptions<CustomData>
   ) => boolean | void;
@@ -138,21 +151,26 @@ type Props = {
 
 type CustomTreeContextState = {
   ref: React.MutableRefObject<TreeMethods>;
-  openIds: React.MutableRefObject<string[]>;
+  openIdsRef: React.MutableRefObject<string[]>;
   getNode: (id: string) => NodeModel<CustomData>;
   isMenuVisible: boolean;
   menuLocation: number[];
   setMenuLocation: React.Dispatch<React.SetStateAction<number[]>>;
   menuItems: MenuItem[];
   setMenuItems: React.Dispatch<React.SetStateAction<MenuItem[]>>;
-  lastActiveNodeRef: React.MutableRefObject<string>;
   changeLastActiveNode: (id: string) => void;
   openContextMenu: (location: number[], menuItems: MenuItem[]) => void;
-} & Props;
+  openAll: () => void;
+  closeAll: () => void;
+  onDrop: (
+    tree: NodeModel<CustomData>[],
+    options: DropOptions<CustomData>
+  ) => void;
+} & Omit<Props, "onLastActiveNodeChange">;
 
 const CustomTreeContext = createContext({} as CustomTreeContextState);
 
-export const useFileTransfer = () => useContext(CustomTreeContext);
+export const useCustomTree = () => useContext(CustomTreeContext);
 
 export const CustomTreeProvider = ({
   children,
@@ -172,9 +190,10 @@ export const CustomTreeProvider = ({
     showGlobalActionButtons = true,
     getNodeActions,
     getRootActions,
+    canDrop,
   } = props;
   const ref = useRef<TreeMethods>();
-  const openIds = useRef<string[]>([]);
+  const openIdsRef = useRef<string[]>([]);
   const {
     ref: menuRef,
     isComponentVisible: isMenuVisible,
@@ -184,12 +203,18 @@ export const CustomTreeProvider = ({
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const lastActiveNodeRef = useRef<string>();
 
-  const getNode = (id: string) => data.find((node) => node.id == id);
+  const getNode = useCallback(
+    (id: string) => data.find((node) => node.id == id),
+    [data]
+  );
 
-  const changeLastActiveNode = (id: string) => {
-    lastActiveNodeRef.current = id;
-    if (onLastActiveNodeChange) onLastActiveNodeChange(getNode(id), treeId);
-  };
+  const changeLastActiveNode = useCallback(
+    (id: string) => {
+      lastActiveNodeRef.current = id;
+      if (onLastActiveNodeChange) onLastActiveNodeChange(getNode(id), treeId);
+    },
+    [lastActiveNodeRef, treeId, onLastActiveNodeChange, getNode]
+  );
 
   const openContextMenu = (location: number[], menuItems: MenuItem[]) => {
     if (menuItems.length > 0) {
@@ -197,6 +222,52 @@ export const CustomTreeProvider = ({
       setMenuItems(menuItems);
     }
   };
+
+  const closeAll = useCallback(() => {
+    openIdsRef.current = [];
+    ref.current.closeAll();
+  }, [openIdsRef, ref]);
+
+  const openAll = useCallback(() => {
+    openIdsRef.current = data
+      .filter((node) => node.droppable)
+      .map((node) => String(node.id));
+    ref.current.openAll();
+  }, [openIdsRef, data, ref]);
+
+  const onDrop = useCallback(
+    async (
+      newTreeData: NodeModel<CustomData>[],
+      dropOptions: DropOptions<CustomData>
+    ) => {
+      const { dragSourceId, dropTargetId, dragSource, dropTarget } =
+        dropOptions;
+      if (dragSource == undefined) {
+        // from another tree
+        await handleMove({
+          sameTree: false,
+          dropTarget: dropTarget,
+        });
+        return;
+      }
+      if (dragSource.id == dropTarget?.id) {
+        // if the target parent is the same as old parent , there is no moving of files, so just refresh the UI
+        return;
+      }
+      await handleMove({
+        sameTree: true,
+        options: dropOptions,
+        treeData: newTreeData,
+      });
+    },
+    [handleMove]
+  );
+
+  useEffect(() => {
+    console.log(openIdsRef.current);
+  }, []);
+
+  if (!data) return <></>;
 
   return (
     <CustomTreeContext.Provider
@@ -207,7 +278,6 @@ export const CustomTreeProvider = ({
         data,
         handleMove,
         handleUpload,
-        onLastActiveNodeChange,
         getNodeActions,
         getRootActions,
         showGlobalActionButtons,
@@ -215,16 +285,19 @@ export const CustomTreeProvider = ({
         onDragEnd,
         onDragStart,
         onToggle,
-        openIds,
+        openIdsRef,
         getNode,
         isMenuVisible,
         menuLocation,
         setMenuLocation,
         menuItems,
         setMenuItems,
-        lastActiveNodeRef,
         changeLastActiveNode,
         openContextMenu,
+        openAll,
+        closeAll,
+        onDrop,
+        canDrop,
       }}
     >
       {children}

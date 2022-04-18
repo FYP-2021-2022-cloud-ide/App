@@ -9,7 +9,7 @@ const FolderArrow = React.memo(
   }: {
     open: boolean;
     droppable: boolean;
-    handleToggle: (event: React.MouseEvent) => Promise<void>;
+    handleToggle: (event: React.MouseEvent) => void | Promise<void>;
   }) => {
     const Arrow = open ? ChevronDownIcon : ChevronRightIcon;
     if (!droppable) return <></>;
