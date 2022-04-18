@@ -350,7 +350,7 @@ const MessageTable = () => {
         <EmptyDiv message="You have no messages."></EmptyDiv>
       ) : (
         // only if user have messages
-        <div className="flex flex-col space-y-4 space-x-0 sm:flex-row sm:space-x-2 sm:space-y-0  text-gray-600 dark:text-gray-300">
+        <div className="flex flex-col space-y-4 space-x-0 md:flex-row md:space-x-2 md:space-y-0  text-gray-600 dark:text-gray-300">
           <Facet expand={true}></Facet>
           <div className="w-full">
             <DataTable
@@ -451,39 +451,13 @@ const MessageTable = () => {
           />
         </div>
       )}
-      {/* <button
-        className="bg-green-500 text-white px-2 rounded h-min"
-        onClick={async () => {
-          const response = await sendNotification(
-            "test",
-            "this is a test message. This button should be hidden. ".repeat(
-              Math.ceil(Math.random() * 10)
-            ),
-            userId,
-            userId,
-            Math.random() > 0.5,
-            "e2de12fe-ba9c-4ded-8496-8428446b96d4"
-          );
-          if (response.success) {
-            fetchNotifications();
-          } else {
-            myToast.error({
-              title: "Fail to send message",
-              description: errorToToastDescription(response.error),
-              comment: CLICK_TO_REPORT,
-            });
-          }
-        }}
-      >
-        Send test message
-      </button> */}
     </>
   );
 };
 
 export default function Home() {
   return (
-    <div className="px-5 sm:px-10 mb-10 mt-5">
+    <div className="px-5 sm:px-10 mb-10 mt-5 ">
       <p className="text-3xl  font-bold mb-2 text-gray-600 dark:text-gray-300">
         {" 📬 "} Messages
       </p>

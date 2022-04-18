@@ -1,9 +1,10 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useCallback } from "react";
 import { NodeModel } from "@minoru/react-dnd-treeview";
 import FolderArrow from "./FolderArrow";
 import { TypeIcon } from "./TypeIcon";
-import { DropEvent, FileRejection, useDropzone } from "react-dropzone";
+import { useDropzone } from "react-dropzone";
 import { isMobile } from "react-device-detect";
+import { useCustomTree } from "./customTreeContext";
 
 export type CustomData = {
   /**
@@ -30,54 +31,32 @@ type Props = {
    * whether this node is open
    */
   isOpen: boolean;
-  /**
-   * handle dropping of files into this node
-   * @param
-   */
-  handleUpload?: <T extends File>(
-    acceptedFiles: T[],
-    fileRejections: FileRejection[],
-    event: DropEvent,
-    node?: NodeModel<CustomData>
-  ) => void;
-  /**
-   * This is called when the folder arrow is clicked (when a folder is expanded or collapsed)
-   */
-  onToggle: () => void;
-  /**
-   * This is called when file button is clicked.
-   */
-  onClick?: (event: React.MouseEvent) => void;
-  /**
-   * this will be called when a node dragging start
-   */
-  onDragStart?: () => void;
-  /**
-   * this will be called when the node dragging is end
-   */
-  onDragEnd?: () => void;
-  /**
-   * this will be called when right click on node
-   */
-  onContextMenu?: (event: React.MouseEvent) => void;
 };
 
-const CustomNode: React.FC<Props> = ({
-  isOpen,
-  depth,
-  handleUpload,
-  onClick,
-  onDragStart,
-  onDragEnd,
-  onContextMenu,
-  onToggle,
-  node,
-}: Props) => {
-  const { droppable, data } = node;
+const CustomNode = (props: Props) => {
+  const { node, depth, isOpen } = props;
+  const { droppable } = node;
+  const {
+    ref: treeRef,
+    onDragEnd,
+    onDragStart,
+    handleUpload,
+    onClick,
+    openContextMenu,
+    getNodeActions,
+    onToggle,
+    changeLastActiveNode,
+    openIdsRef,
+  } = useCustomTree();
+  /**
+   * keep track on whether a file is dragged on top of this node
+   * such that UI can highlight this node
+   */
   const [dragOver, setDragOver] = useState(false);
-
-  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
+  const { getRootProps, getInputProps, open } = useDropzone({
     noClick: true,
+    multiple: true,
+    maxSize: 1048576 * 30, // 30 MB
     onDragEnter: () => {
       setDragOver(true);
     },
@@ -86,28 +65,12 @@ const CustomNode: React.FC<Props> = ({
     },
     onDrop: async (acceptedFiles, fileRejections, event) => {
       setDragOver(false);
-      if (handleUpload) {
-        handleUpload(acceptedFiles, fileRejections, event);
-      }
+      if (handleUpload)
+        handleUpload(acceptedFiles, fileRejections, event, node);
     },
   });
-  const patchGetRootProps = () => {
-    return handleUpload ? getRootProps() : {};
-  };
 
-  const handleToggle = async (event: React.MouseEvent) => {
-    event.stopPropagation();
-    onToggle();
-    onClick(event);
-  };
-
-  const Leading = ({
-    depth,
-    droppable,
-  }: {
-    depth: number;
-    droppable: boolean;
-  }) => {
+  const Leading = useCallback(() => {
     if (depth == 0 && !droppable)
       return <div className="w-[24px] h-[24px] min-w-[24px]"></div>;
     return (
@@ -126,52 +89,87 @@ const CustomNode: React.FC<Props> = ({
           })}
       </>
     );
-  };
+  }, [depth, droppable]);
+
+  const _onClick = useCallback(async () => {
+    changeLastActiveNode(node.id as string);
+    if (onClick) await onClick(node);
+  }, [onClick, node, changeLastActiveNode]);
+
+  const onContextMenu = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      changeLastActiveNode(node.id as string);
+      if (getNodeActions)
+        openContextMenu([e.clientX, e.clientY], getNodeActions(node, { open }));
+    },
+    [getNodeActions, openContextMenu, open, node]
+  );
+
+  const onDoubleClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      changeLastActiveNode(node.id as string);
+      if (isMobile && getNodeActions)
+        openContextMenu([e.clientX, e.clientY], getNodeActions(node, { open }));
+    },
+    [openContextMenu, getNodeActions, node, open]
+  );
+
+  const _onDragStart = useCallback(() => {
+    changeLastActiveNode(node.id as string);
+    if (onDragStart) onDragStart(node);
+  }, [onDragStart, node]);
+
+  const _onDragEnd = useCallback(() => {
+    if (onDragEnd) onDragEnd(node);
+  }, [onDragEnd, node]);
+
+  const handleToggle = useCallback(async () => {
+    await _onClick();
+    const contain = openIdsRef.current.includes(node.id as string);
+    if (contain) {
+      openIdsRef.current = openIdsRef.current.filter((i) => i != node.id);
+      treeRef.current.close([node.id]);
+    } else {
+      openIdsRef.current.push(node.id as string);
+      treeRef.current.open(openIdsRef.current);
+    }
+    if (onToggle) await onToggle(node, !isOpen);
+  }, [_onClick, onToggle, node, treeRef, openIdsRef]);
+
+  const dropzoneRootProps = handleUpload ? getRootProps : {};
 
   return (
-    <>
-      <button
-        {...patchGetRootProps()}
-        onClick={onClick}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-        className={` flex flex-row items-center px-2 hover:bg-blue-200 dark:hover:bg-white/10 w-full ${
-          dragOver && "bg-blue-200 dark:bg-gray-500"
-        }`}
-        // draggable={false}
-        onContextMenu={(e: React.MouseEvent) => {
-          if (!isMobile) {
-            e.preventDefault();
-            e.stopPropagation();
-            onContextMenu(e);
-          }
-        }}
-        onDoubleClick={(e) => {
-          if (isMobile) {
-            e.preventDefault();
-            e.stopPropagation();
-            onContextMenu(e);
-          }
-        }}
-        draggable
-      >
-        {handleUpload ? <input {...getInputProps()} /> : <></>}
-        <Leading depth={depth} droppable={node.droppable}></Leading>
-        <FolderArrow
-          open={isOpen}
-          droppable={node.droppable}
-          handleToggle={handleToggle}
-        ></FolderArrow>
-        <TypeIcon
-          className={`w-6 h-6 text-gray-600 `}
-          droppable={droppable}
-          fileName={node.text}
-          isOpen={isOpen}
-        />
-
-        <p className="truncate w-full text-left">{node.text}</p>
-      </button>
-    </>
+    <button
+      {...dropzoneRootProps}
+      onClick={_onClick}
+      onContextMenu={onContextMenu}
+      onDoubleClick={onDoubleClick}
+      onDragStart={_onDragStart}
+      onDragEnd={_onDragEnd}
+      draggable
+      className={` flex flex-row items-center px-2 hover:bg-blue-200 dark:hover:bg-white/10 w-full ${
+        dragOver && "bg-blue-200 dark:bg-gray-500"
+      }`}
+    >
+      {handleUpload && <input {...getInputProps()} />}
+      <Leading></Leading>
+      <FolderArrow
+        open={isOpen}
+        droppable={node.droppable}
+        handleToggle={handleToggle}
+      ></FolderArrow>
+      <TypeIcon
+        className={`w-6 h-6 text-gray-600 `}
+        droppable={droppable}
+        fileName={node.text}
+        isOpen={isOpen}
+      />
+      <p className="truncate w-full text-left">{node.text}</p>
+    </button>
   );
 };
 

@@ -2,8 +2,8 @@ import { hostname } from "../../../support/commands";
 
 describe("dashboard test", () => {
   before(() => {
-    cy.login();
-    cy.wait(4000);
+    // cy.login();
+    // cy.wait(4000);
   });
 
   beforeEach(() => {
@@ -18,7 +18,6 @@ describe("dashboard test", () => {
       "semesterId",
       "name"
     );
-    cy.visit("/");
   });
 
   after(() => {});
@@ -26,6 +25,16 @@ describe("dashboard test", () => {
   afterEach(() => {
     cy.wait(1000);
   });
+
+  it("login", () => {
+    cy.visit("/", { timeout: 1000 * 30 });
+    cy.wait(1000);
+    // cy.clearCookies();
+    // cy.visit("/");
+  });
+
+  // it("sso sign in", () => {});
+
   it("list cookies", () => {
     const shouldHave = ["appSession", "sub", "email"];
     cy.getCookies().then((cookies) => {
@@ -34,32 +43,32 @@ describe("dashboard test", () => {
     });
   });
 
-  it("check topbar", () => {
-    // user menu button
-    cy.get("#topbar #action-bar .usermenu", { timeout: 10000 }).click();
-    cy.get('a[href*="/logout"]');
+  // it("check topbar", () => {
+  //   // user menu button
+  //   cy.get("#topbar #action-bar .usermenu", { timeout: 10000 }).click();
+  //   cy.get('a[href*="/logout"]');
 
-    // message alarm button
-    cy.get("#topbar #action-bar [title='Notification']").click();
-    cy.get(".notification-popover");
+  //   // message alarm button
+  //   cy.get("#topbar #action-bar [title='Notification']").click();
+  //   cy.get(".notification-popover");
 
-    // help doc btn
-    cy.get("#help_doc_btn");
+  //   // help doc btn
+  //   cy.get("#help_doc_btn");
 
-    // change theme btn
-    let darkTheme;
-    cy.get("body").then((el) => {
-      darkTheme = el[0].classList.contains("dark");
-    });
-    let themeBtn = cy.get("#change_theme_btn");
-    themeBtn.click();
-    cy.get("body").should((el) => {
-      let darkTheme2 = el[0].classList.contains("dark");
-      expect(darkTheme2).to.not.equal(darkTheme);
-    });
-    // change back the theme
-    themeBtn.click();
-  });
+  //   // change theme btn
+  //   let darkTheme;
+  //   cy.get("body").then((el) => {
+  //     darkTheme = el[0].classList.contains("dark");
+  //   });
+  //   let themeBtn = cy.get("#change_theme_btn");
+  //   themeBtn.click();
+  //   cy.get("body").should((el) => {
+  //     let darkTheme2 = el[0].classList.contains("dark");
+  //     expect(darkTheme2).to.not.equal(darkTheme);
+  //   });
+  //   // change back the theme
+  //   themeBtn.click();
+  // });
 
   // it("check current run container match number", () => {
   //   let current: number;

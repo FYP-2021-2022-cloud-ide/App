@@ -40,38 +40,39 @@ export const username = Cypress.env("username");
 export const password = Cypress.env("password");
 
 Cypress.Commands.add("login", (overrides = {}) => {
-  // for (let cookie of cookies) {
-  //   cookie.sameSite = "lax";
-  //   cy.setCookie(cookie.name, cookie.value, cookie);
-  // }
-  Cypress.log({
-    name: "login ITSC",
-  });
+  for (let cookie of cookies) {
+    cookie.sameSite = "lax";
+    cy.setCookie(cookie.name, cookie.value, cookie);
+  }
+  // Cypress.log({
+  //   name: "login ITSC",
+  // });
 
-  const options = {
-    method: "post",
-    url: "https://cas.ust.hk/cas/login",
-    form: true,
-    body: {
-      username: username,
-      password: password,
-    },
-  };
+  // const options = {
+  //   method: "post",
+  //   url: "https://cas.ust.hk/cas/login",
+  //   form: true,
+  //   body: {
+  //     username: username,
+  //     password: password,
+  //   },
+  // };
 
   // allow us to override defaults with passed in overrides
-  _.extend(options, overrides);
+  // _.extend(options, overrides);
 
-  cy.request(options).then((resp) => {
-    expect(resp.status).eq(200);
-    // cy.getCookie("TGC").should("exist");
-  });
+  // cy.request(options).then((resp) => {
+  //   expect(resp.status).eq(200);
+  //   // cy.getCookie("TGC").should("exist");
+  //   cy.visit("/");
+  // });
 
-  cy.request({
-    method: "post",
-    url: "https://codespace.ust.dev",
-  }).then((resp) => {
-    expect(resp.status).eq(200);
-  });
+  // cy.request({
+  //   method: "post",
+  //   url: "https://codespace.ust.dev",
+  // }).then((resp) => {
+  //   expect(resp.status).eq(200);
+  // });
 });
 
 // this needs to be called on BeforeEach

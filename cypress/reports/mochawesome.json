@@ -2,23 +2,23 @@
   "stats": {
     "suites": 1,
     "tests": 2,
-    "passes": 0,
+    "passes": 1,
     "pending": 0,
-    "failures": 2,
-    "start": "2022-04-16T03:42:33.880Z",
-    "end": "2022-04-16T03:42:36.519Z",
-    "duration": 2639,
+    "failures": 1,
+    "start": "2022-04-18T16:16:46.312Z",
+    "end": "2022-04-18T16:16:52.292Z",
+    "duration": 5980,
     "testsRegistered": 2,
-    "passPercent": 0,
+    "passPercent": 50,
     "pendingPercent": 0,
-    "other": -1,
+    "other": 0,
     "hasOther": false,
-    "skipped": 1,
-    "hasSkipped": true
+    "skipped": 0,
+    "hasSkipped": false
   },
   "results": [
     {
-      "uuid": "c624ddd4-19ad-4815-9bff-8201f0a21076",
+      "uuid": "4d4d196e-d313-437c-94da-07b4f35e2c48",
       "title": "",
       "fullFile": "cypress/integration/e2e/index/dashboard.spec.ts",
       "file": "cypress/integration/e2e/index/dashboard.spec.ts",
@@ -27,7 +27,7 @@
       "tests": [],
       "suites": [
         {
-          "uuid": "2a4a0683-3cb0-4ddd-b7af-cfd16117c0b5",
+          "uuid": "bb472f1d-7f33-4b9f-af6c-5baa41b2d605",
           "title": "dashboard test",
           "fullFile": "",
           "file": "",
@@ -35,10 +35,28 @@
           "afterHooks": [],
           "tests": [
             {
+              "title": "login",
+              "fullTitle": "dashboard test login",
+              "timedOut": null,
+              "duration": 2478,
+              "state": "passed",
+              "speed": "fast",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.visit(\"/\", { timeout: 1000 * 30 });\ncy.wait(1000);\ncy.get(\"#userNameInput\").type(\"mlkyeung\");\ncy.get(\"#passwordInput\").type(\"Ken80248\");\ncy.get(\"#submitButton\").click();\ncy.get(\"a#allow\").click();\ncy.login();\ncy.getCookies().then((cookies) => {\n    cookies.forEach((cookie) => cy.log(cookie.name));\n});\n// cy.clearCookies();\n// cy.visit(\"/\");",
+              "err": {},
+              "uuid": "e0debfa8-2e4a-4196-b194-62071fa371d6",
+              "parentUUID": "bb472f1d-7f33-4b9f-af6c-5baa41b2d605",
+              "isHook": false,
+              "skipped": false
+            },
+            {
               "title": "list cookies",
               "fullTitle": "dashboard test list cookies",
               "timedOut": null,
-              "duration": 184,
+              "duration": 302,
               "state": "failed",
               "speed": null,
               "pass": false,
@@ -47,44 +65,26 @@
               "context": null,
               "code": "const shouldHave = [\"appSession\", \"sub\", \"email\"];\ncy.getCookies().then((cookies) => {\n    // ensure that the cookies contains all should have\n    expect(cookies.map((c) => c.name)).to.include.members(shouldHave);\n});",
               "err": {
-                "message": "CypressError: `cy.visit()` failed because you are attempting to visit a URL that is of a different origin.\n\nThe new URL is considered a different origin because the following parts of the URL are different:\n\n  > superdomain\n\nYou may only `cy.visit()` same-origin URLs within a single test.\n\nThe previous URL you visited was:\n\n  > 'https://cas.ust.hk'\n\nYou're attempting to visit this URL:\n\n  > 'https://codespace.ust.dev'\n\nYou may need to restructure some of your test code to avoid this problem.\n\nhttps://on.cypress.io/cannot-visit-different-origin-domain\n\nBecause this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `dashboard test`",
-                "estack": "CypressError: `cy.visit()` failed because you are attempting to visit a URL that is of a different origin.\n\nThe new URL is considered a different origin because the following parts of the URL are different:\n\n  > superdomain\n\nYou may only `cy.visit()` same-origin URLs within a single test.\n\nThe previous URL you visited was:\n\n  > 'https://cas.ust.hk'\n\nYou're attempting to visit this URL:\n\n  > 'https://codespace.ust.dev'\n\nYou may need to restructure some of your test code to avoid this problem.\n\nhttps://on.cypress.io/cannot-visit-different-origin-domain\n\nBecause this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `dashboard test`\n    at cannotVisitDifferentOrigin (https://cas.ust.hk/__cypress/runner/cypress_runner.js:158308:72)\n    at go (https://cas.ust.hk/__cypress/runner/cypress_runner.js:159135:18)\n    at visit (https://cas.ust.hk/__cypress/runner/cypress_runner.js:159325:16)\n    at Context.visit (https://cas.ust.hk/__cypress/runner/cypress_runner.js:159328:14)\nFrom Your Spec Code:\n    at Context.eval (https://cas.ust.hk/__cypress/tests?p=cypress/integration/e2e/index/dashboard.spec.ts:120:13)",
-                "diff": null
+                "message": "AssertionError: expected [] to be a superset of [ 'appSession', 'sub', 'email' ]",
+                "estack": "AssertionError: expected [] to be a superset of [ 'appSession', 'sub', 'email' ]\n    at Context.eval (https://cas.ust.hk/__cypress/tests?p=cypress/integration/e2e/index/dashboard.spec.ts:129:59)",
+                "diff": "- []\n+ [ 'appSession', 'sub', 'email' ]\n"
               },
-              "uuid": "1951baa9-4a71-4afe-9549-1c2bd5433b58",
-              "parentUUID": "2a4a0683-3cb0-4ddd-b7af-cfd16117c0b5",
+              "uuid": "f0d1e87d-6f0c-42f9-9fb1-5a9125a44786",
+              "parentUUID": "bb472f1d-7f33-4b9f-af6c-5baa41b2d605",
               "isHook": false,
               "skipped": false
-            },
-            {
-              "title": "check topbar",
-              "fullTitle": "dashboard test check topbar",
-              "timedOut": null,
-              "duration": 0,
-              "state": "skipped",
-              "speed": null,
-              "pass": false,
-              "fail": false,
-              "pending": false,
-              "context": null,
-              "code": "// user menu button\ncy.get(\"#topbar #action-bar .usermenu\", { timeout: 10000 }).click();\ncy.get('a[href*=\"/logout\"]');\n// message alarm button\ncy.get(\"#topbar #action-bar [title='Notification']\").click();\ncy.get(\".notification-popover\");\n// help doc btn\ncy.get(\"#help_doc_btn\");\n// change theme btn\nlet darkTheme;\ncy.get(\"body\").then((el) => {\n    darkTheme = el[0].classList.contains(\"dark\");\n});\nlet themeBtn = cy.get(\"#change_theme_btn\");\nthemeBtn.click();\ncy.get(\"body\").should((el) => {\n    let darkTheme2 = el[0].classList.contains(\"dark\");\n    expect(darkTheme2).to.not.equal(darkTheme);\n});\n// change back the theme\nthemeBtn.click();",
-              "err": {},
-              "uuid": "1cc825bd-e9af-4be2-8faa-0b984ab16129",
-              "parentUUID": "2a4a0683-3cb0-4ddd-b7af-cfd16117c0b5",
-              "isHook": false,
-              "skipped": true
             }
           ],
           "suites": [],
-          "passes": [],
+          "passes": [
+            "e0debfa8-2e4a-4196-b194-62071fa371d6"
+          ],
           "failures": [
-            "1951baa9-4a71-4afe-9549-1c2bd5433b58"
+            "f0d1e87d-6f0c-42f9-9fb1-5a9125a44786"
           ],
           "pending": [],
-          "skipped": [
-            "1cc825bd-e9af-4be2-8faa-0b984ab16129"
-          ],
-          "duration": 184,
+          "skipped": [],
+          "duration": 2780,
           "root": false,
           "rootEmpty": false,
           "_timeout": 2000

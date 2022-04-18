@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import Twemoji from "react-twemoji";
 import Modal from "../components/Modal";
 
@@ -37,14 +43,27 @@ type Props = {
 };
 
 const WarningModal = ({ warning, setOpen, isOpen, setWarning }: Props) => {
+  const onCancel = useCallback(() => {
+    warning.onCancel();
+  }, [warning, setWarning, setOpen]);
+
+  const onOK = useCallback(() => {
+    warning.onOK();
+  }, [warning, setOpen, setWarning]);
+
+  const onClose = useCallback(() => {
+    warning.onCancel();
+  }, [warning, setWarning]);
+
+  useEffect(() => {
+    warning;
+  });
+
   return (
     <Modal
       isOpen={isOpen}
       setOpen={setOpen}
-      onClose={() => {
-        warning.onCancel();
-        setWarning(undefined);
-      }}
+      onClose={onClose}
       escToClose
       clickOutsideToClose
     >
@@ -57,24 +76,10 @@ const WarningModal = ({ warning, setOpen, isOpen, setWarning }: Props) => {
                 <span className="text-sm">{warning.message}</span>
               </div>
               <div id="btn-group">
-                <button
-                  onClick={() => {
-                    warning.onCancel();
-                    setWarning(undefined);
-                    setOpen(false);
-                  }}
-                  id="btn-cancel"
-                >
+                <button onClick={onCancel} id="btn-cancel">
                   {warning.cancelBtnText ?? "Cancel"}
                 </button>
-                <button
-                  onClick={() => {
-                    warning.onOK();
-                    setOpen(false);
-                    setWarning(undefined);
-                  }}
-                  id="btn-ok"
-                >
+                <button onClick={onOK} id="btn-ok">
                   {warning.okbtnText ?? "OK"}
                 </button>
               </div>
@@ -93,7 +98,6 @@ export const WarningProvider = ({ children }: WarningProviderProps) => {
   const [open, setOpen] = useState<boolean>(false);
 
   const showWarning = (warning: Warning) => {
-    if (open) setOpen(false);
     setOpen(true);
     setWarning(warning);
   };
@@ -104,11 +108,19 @@ export const WarningProvider = ({ children }: WarningProviderProps) => {
         message: message,
         onCancel: () => {
           resolve(false);
+          setOpen(false);
         },
-        onOK: () => resolve(true),
+        onOK: () => {
+          resolve(true);
+          setOpen(false);
+        },
         okbtnText: "Confirm",
       });
     });
+
+  useEffect(() => {
+    if (!open) setWarning(undefined);
+  }, [open]);
 
   return (
     <WarningContext.Provider

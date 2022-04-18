@@ -1,10 +1,10 @@
 import { InformationCircleIcon } from "@heroicons/react/solid";
 import { DropOptions, NodeModel } from "@minoru/react-dnd-treeview";
 import path from "path";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import myToast from "../components/CustomToast";
-import { CustomData } from "../components/CustomTree/CustomNode2";
-import CustomTree from "../components/CustomTree/CustomTree2";
+import { CustomData } from "../components/CustomTree/CustomNode";
+import CustomTree from "../components/CustomTree/CustomTree";
 import {
   GetNodeActionsArgs,
   GetRootActionsArgs,
@@ -19,10 +19,8 @@ import {
 import { TooltipProvider } from "../contexts/Tooltip";
 import { googleAPI } from "../lib/api/googleAPI";
 import { localFileAPI } from "../lib/api/localFile";
-import classNames from "../lib/classnames";
 import { errorToToastDescription } from "../lib/errorHelper";
 import { convertDirectoryTree } from "../lib/fileTransferHelper";
-import styles from "../styles/file_tree.module.css";
 
 const Wrapped = () => {
   const { userId } = useCnails();
@@ -302,10 +300,10 @@ const Wrapped = () => {
   );
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 text-black max-h-screen h-full min-h-fit gap-6 px-10 mb-10 bottom-0 w-full mt-5">
+    <div className="grid grid-cols-1 lg:grid-cols-2 text-black gap-6 px-10 mb-10 bottom-0 w-full mt-5">
       {/* local */}
-      <div className=" flex flex-col space-y-2">
-        <div className="flex flex-row space-x-2 items-center">
+      <div>
+        <div className="flex flex-row space-x-2 items-center mb-2">
           <p className="text-gray-600 font-bold text-base sm:text-xl dark:text-gray-300 h-fit whitespace-nowrap">
             Personal Volume
           </p>
@@ -338,9 +336,9 @@ const Wrapped = () => {
         />
       </div>
       {/* cloud  */}
-      <div className="flex flex-col space-y-2">
-        <div className="flex flex-row space-x-2 items-center">
-          <p className="text-gray-600 font-bold text-xl dark:text-gray-300 h-fit">
+      <div>
+        <div className="flex flex-row space-x-2 items-center mb-2">
+          <p className="text-gray-600 font-bold text-base sm:text-xl dark:text-gray-300 h-fit">
             Cloud Volume (Google Drive)
           </p>
           {progress2 && (
@@ -353,16 +351,11 @@ const Wrapped = () => {
           )}
         </div>
         {!googleFilesRef.current ? (
-          <div className={classNames(styles, "wrapper")}>
-            <div className="h-5 w-0"></div>
-            <div className="h-full min-h-[300px] max-h-[80vh] relative">
-              <button
-                className={classNames(styles, "root", "root-nothing")}
-                onClick={googleAPI.auth}
-              >
-                <p className={classNames(styles, "root-nothing-text")}>
-                  Click here to log in Google Drive
-                </p>
+          <div id={tree2Id}>
+            <div id="tree" data-no-file={true}>
+              <div id="dummy" className="h-5 w-0"></div>
+              <button id="google-login" onClick={googleAPI.auth}>
+                <p id="nothing-text">Click here to log in Google Drive</p>
               </button>
             </div>
           </div>
@@ -376,6 +369,7 @@ const Wrapped = () => {
             showGlobalActionButtons={false}
             onToggle={tree2onToggle}
             canDrop={tree2canDrop}
+            nothingText="Drag files from personal volume"
           />
         )}
       </div>

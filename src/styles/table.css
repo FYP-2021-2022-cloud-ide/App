@@ -17,3 +17,10 @@
 .rdt_TableHeadRow {
   @apply bg-gray-100 dark:bg-black/50  text-gray-700 dark:text-gray-300 overflow-hidden !important;
 }
+
+/* this will affect the daisy ui button */
+.rdt_pagination .btn-disabled,
+.rdt_pagination .btn[disabled] {
+  --tw-bg-opacity: 0.3;
+  --tw-text-opacity: 0.4;
+}

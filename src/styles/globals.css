@@ -25,10 +25,4 @@
 @import "twemoji.css";
 @import "error-page.css";
 @import "shiver.css";
-
-/* this will affect the daisy ui button */
-.btn-disabled,
-.btn[disabled] {
-  --tw-bg-opacity: 0.3;
-  --tw-text-opacity: 0.4;
-}
+@import "custom-tree.css";

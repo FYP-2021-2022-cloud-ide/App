@@ -1,0 +1,60 @@
+/* .wrapper {
+  @apply w-full h-full rounded max-h-full flex flex-col space-y-5;
+} */
+
+/* .tree {
+  -ms-overflow-style: none;
+  scrollbar-width: 20px;
+  @apply relative p-3 w-full bg-gray-200 overflow-scroll rounded  text-gray-700 h-full;
+}
+
+:global(.dark) .root {
+  @apply bg-gray-900 text-gray-200;
+}
+
+.root::-webkit-scrollbar {
+  display: none;
+}
+
+.root-nothing {
+  @apply border-8 border-dashed border-gray-400 hover:bg-gray-200;
+}
+
+:global(.dark) .root-nothing {
+  @apply border-black hover:bg-white/5;
+}
+
+.root-nothing-text {
+  @apply absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-lg sm:text-3xl text-gray-400  font-bold select-none text-center;
+}
+
+:global(.dark) .root-nothing-text {
+  @apply text-gray-600;
+} */
+
+div#tree {
+  @apply relative cursor-default;
+}
+
+div#tree[data-no-file="true"] {
+  @apply cursor-pointer;
+}
+
+div#tree > ul,
+div#tree[data-no-file="true"] > button#google-login {
+  @apply mt-5 p-3 w-full bg-gray-200 overflow-scroll rounded-md  text-gray-700 h-[40vh] lg:h-[80vh] min-h-[300px]   max-h-[80vh] dark:text-gray-200 dark:bg-gray-900;
+}
+
+div#tree > ul::-webkit-scrollbar,
+div#tree[data-no-file="true"] > button#google-login::-webkit-scrollbar {
+  display: none;
+}
+
+div#tree[data-no-file="true"] > ul,
+div#tree[data-no-file="true"] > button#google-login {
+  @apply border-8 border-dashed border-gray-400 hover:bg-gray-300 dark:border-black dark:hover:border-gray-900 dark:hover:bg-gray-700;
+}
+
+div#tree[data-no-file="true"] #nothing-text {
+  @apply absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-lg sm:text-3xl text-gray-400  font-bold select-none text-center;
+}

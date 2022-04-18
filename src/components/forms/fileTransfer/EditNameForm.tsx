@@ -3,7 +3,7 @@ import _ from "lodash";
 import React from "react";
 import { useCallback, useMemo } from "react";
 import { useFileTransfer } from "../../../contexts/fileTransfer";
-import { CustomData } from "../../CustomTree/CustomNode2";
+import { CustomData } from "../../CustomTree/CustomNode";
 import ModalForm from "../../ModalForm/ModalForm";
 import { FormStructure } from "../../ModalForm/types";
 

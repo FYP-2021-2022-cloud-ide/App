@@ -93,14 +93,7 @@ export const FileTransferProvider = ({
 }: {
   children: JSX.Element;
 }) => {
-  const {
-    listFolders,
-    uploadFiles,
-    moveFile,
-    makeFolder,
-    removeFile,
-    downloadFileToUser,
-  } = localFileAPI;
+  const { listFolders, uploadFiles, moveFile, makeFolder } = localFileAPI;
   const { userId, sub } = useCnails();
   const [treeData1, setTreeData1] = useState<NodeModel<CustomData>[]>([]);
   const [treeData2, setTreeData2] = useState<NodeModel<CustomData>[]>([]);
@@ -131,12 +124,12 @@ export const FileTransferProvider = ({
         closed: false,
       }
     ) => {
-      googleFilesRef.current = await FileTransferHelper.expandGoogleFolder(
-        googleFilesRef.current,
-        targetFolder,
-        sub
-      );
-      setTreeData2(convertGoogleTree(googleFilesRef.current));
+      // googleFilesRef.current = await FileTransferHelper.expandGoogleFolder(
+      //   googleFilesRef.current,
+      //   targetFolder,
+      //   sub
+      // );
+      // setTreeData2(convertGoogleTree(googleFilesRef.current));
     },
     [googleFilesRef, sub, setTreeData2]
   );

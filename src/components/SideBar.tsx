@@ -18,11 +18,14 @@ import { TooltipProvider } from "../contexts/Tooltip";
 import CardMenu from "./CardMenu";
 import { useCnails } from "../contexts/cnails";
 import { useTheme } from "../contexts/theme";
+import { useWarning } from "../contexts/warning";
+import { isMobile } from "react-device-detect";
 
 const SideBar = () => {
   const { name, email } = useCnails();
   const { isDark, setDark } = useTheme();
   const { containerQuota, containers } = useContainers();
+  const { waitForConfirm } = useWarning();
   const router = useRouter();
   var pages = [
     {
@@ -102,8 +105,13 @@ const SideBar = () => {
             {
               text: "Logout",
               icon: <LogoutIcon className="w-5 h-5 mr-2"></LogoutIcon>,
-              onClick: () => {
-                router.push("/logout");
+              onClick: async () => {
+                if (isMobile) {
+                  const confirm = await waitForConfirm(
+                    "Are you sure that you want to logout?"
+                  );
+                  if (confirm) router.push("/logout");
+                } else router.push("/logout");
               },
             },
           ])}
