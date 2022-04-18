@@ -1,5 +1,5 @@
 import { Dialog, Transition } from "@headlessui/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 export type MenuItem = {
   text: string;
@@ -43,6 +43,18 @@ const ContextMenu = React.forwardRef(
     }: Props,
     ref: React.MutableRefObject<HTMLDivElement>
   ) => {
+    const [dimensions, setDimensions] = useState<{
+      width: number;
+      height: number;
+    }>();
+    useEffect(() => {
+      if (ref.current && !dimensions) {
+        setDimensions({
+          width: ref.current.offsetWidth,
+          height: ref.current.offsetHeight,
+        });
+      }
+    });
     return (
       <Transition
         show={isMenuVisible}
@@ -60,11 +72,12 @@ const ContextMenu = React.forwardRef(
             if (onClose) onClose();
           }}
           style={{
-            left:
-              Math.min(
-                menuLocation[0],
-                window.screen.width - ref.current?.offsetWidth
-              ) + "px",
+            left: dimensions
+              ? Math.min(
+                  menuLocation[0],
+                  window.screen.width - dimensions.width
+                )
+              : menuLocation[0] + "px",
             top: menuLocation[1] + "px",
           }}
           className="z-10 shadow-lg rounded-md left-[100%] absolute bg-white p-1 dark:bg-gray-700 text-gray-600 dark:text-gray-200 w-fit"

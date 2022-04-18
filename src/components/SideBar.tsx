@@ -37,12 +37,7 @@ const SideBar = () => {
     },
     {
       name: "File Transfer",
-      link: "/fileTransfer",
-      icon: <CloudIcon className="w-5 h-5 mr-2"></CloudIcon>,
-    },
-    {
-      name: "File Transfer 2 ",
-      link: "/fileTransfer2",
+      link: "/file_transfer",
       icon: <CloudIcon className="w-5 h-5 mr-2"></CloudIcon>,
     },
     // { name: "Admin", link: "/admin", icon: IdentificationIcon },

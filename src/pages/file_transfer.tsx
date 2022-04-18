@@ -278,7 +278,7 @@ const Wrapped = () => {
   const tree2onToggle = useCallback(
     async (node: NodeModel<CustomData>) => {
       setProgress2(status.loading);
-      expandGoogleFolder({
+      await expandGoogleFolder({
         id: String(node.id),
         name: node.text,
         path: node.data.filePath,
