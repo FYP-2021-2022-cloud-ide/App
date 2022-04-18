@@ -42,14 +42,14 @@ export type HandleMoveArgs =
       dropTarget: NodeModel<CustomData>;
     };
 
-type GetNodeActionsArgs = {
+export type GetNodeActionsArgs = {
   /**
    * open the file upload input
    */
   open: () => void;
 };
 
-type GetRootActionsArgs = {
+export type GetRootActionsArgs = {
   /**
    * open the file upload input
    */
@@ -73,7 +73,8 @@ export type Props = {
    */
   data: NodeModel<CustomData>[];
   /**
-   * this will be changed when the last active node of this tree changes.
+   * this will be changed when the last active node of this tree changes
+   * (click, toggle, context menu, drag start, double click (mobile)).
    * This function is useful if you need to implement cross tree dnd.
    *
    * @param node the new last active node in this tree
@@ -217,6 +218,7 @@ export const CustomTreeProvider = ({
   );
 
   const openContextMenu = (location: number[], menuItems: MenuItem[]) => {
+    setIsMenuVisible(true);
     if (menuItems.length > 0) {
       setMenuLocation(location);
       setMenuItems(menuItems);
@@ -262,10 +264,6 @@ export const CustomTreeProvider = ({
     },
     [handleMove]
   );
-
-  useEffect(() => {
-    console.log(openIdsRef.current);
-  }, []);
 
   if (!data) return <></>;
 

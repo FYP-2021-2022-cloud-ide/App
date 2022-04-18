@@ -7,10 +7,9 @@ import { CustomData } from "../components/CustomTree/CustomNode";
 import ModalForm from "../components/ModalForm/ModalForm";
 import { localFileAPI } from "../lib/api/localFile";
 import { errorToToastDescription } from "../lib/errorHelper";
-import {
+import FileTransferHelper, {
   convertDirectoryTree,
   convertGoogleTree,
-  expandGoogleFolder,
   GoogleFolder,
   isBlacklisted,
 } from "../lib/fileTransferHelper";
@@ -22,7 +21,6 @@ import {
   HandleMoveArgs,
   Props,
 } from "../components/CustomTree/customTreeContext";
-import { googleAPI } from "../lib/api/googleAPI";
 
 /**
  * store all the status text
@@ -47,6 +45,10 @@ type FileTransferContextState = {
   setProgress1: React.Dispatch<React.SetStateAction<string>>;
   progress2: string;
   setProgress2: React.Dispatch<React.SetStateAction<string>>;
+  isCreateFolderModalOpen: boolean;
+  setIsCreateFolderModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  isEditNameModalOpen: boolean;
+  setIsEditNameModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   lastActiveNodeRef: React.MutableRefObject<{
     treeId: string;
     node: NodeModel<CustomData>;
@@ -63,13 +65,23 @@ type FileTransferContextState = {
    * edit a file name in personal volume
    */
   editName: (node: NodeModel<CustomData>, name: string) => void | Promise<void>;
+  /**
+   * this ref keep track on the Google Folder data such that we can use the helper function
+   * if this is `undefined`, user has not login
+   */
+  googleFilesRef: React.MutableRefObject<GoogleFolder>;
+  /**
+   * this function fetch the data and set the tree data state
+   */
+  fetchPersonalVolumeRoot: () => Promise<void>;
+  /**
+   * if `targetFolder` is provided, the target folder will be expanded.
+   * Otherwise, it will expand from root. This function also set the tree data state.
+   */
+  expandGoogleFolder: (targetFolder?: GoogleFolder) => Promise<void>;
 } & Pick<
   Props,
-  | "handleUpload"
-  | "handleMove"
-  | "onLastActiveNodeChange"
-  | "onDragStart"
-  | "onDragEnd"
+  "handleUpload" | "onLastActiveNodeChange" | "onDragStart" | "onDragEnd"
 >;
 
 const FileTransferContext = createContext({} as FileTransferContextState);
@@ -103,29 +115,31 @@ export const FileTransferProvider = ({
     treeId: string;
     node: NodeModel<CustomData>;
   }>();
+  const googleFilesRef = useRef<GoogleFolder>();
 
   const tree1Id = "personal-volume";
   const tree1RootId = `/volumes/${userId}/persist`;
   const tree2Id = "google-drive";
   const tree2RootId = "root";
-  /**
-   * this ref keep track on the Google Folder data such that we can use the helper function
-   */
-  const googleFilesRef = useRef<GoogleFolder>();
 
-  const fetchGoogleRoot = useCallback(async () => {
-    googleFilesRef.current = await expandGoogleFolder(
-      googleFilesRef.current,
-      {
+  const expandGoogleFolder = useCallback(
+    async (
+      targetFolder: GoogleFolder = {
         id: "root",
         name: "root",
         path: "/root",
         closed: false,
-      },
-      sub
-    );
-    setTreeData2(convertGoogleTree(googleFilesRef.current));
-  }, [googleFilesRef, sub, setTreeData2]);
+      }
+    ) => {
+      googleFilesRef.current = await FileTransferHelper.expandGoogleFolder(
+        googleFilesRef.current,
+        targetFolder,
+        sub
+      );
+      setTreeData2(convertGoogleTree(googleFilesRef.current));
+    },
+    [googleFilesRef, sub, setTreeData2]
+  );
 
   const fetchPersonalVolumeRoot = useCallback(async () => {
     const response = await listFolders(userId);
@@ -250,68 +264,12 @@ export const FileTransferProvider = ({
     [lastActiveNodeRef]
   );
 
-  const handleMove = useCallback(
-    async (args: HandleMoveArgs) => {
-      if (args.sameTree == true) {
-        const { treeData, options } = args;
-        const { dragSource, dropTarget } = options;
-        setProgress1(status.transfering);
-        setTreeData1(treeData);
-        const target =
-          (dropTarget ? dropTarget.data.filePath : tree1RootId) +
-          "/" +
-          path.basename(dragSource.data.filePath);
-        const response = await moveFile(
-          userId,
-          dragSource.data.filePath,
-          target
-        );
-        setProgress1("");
-        if (response.success) setTreeData1(convertDirectoryTree(response.tree));
-        else alert(response.error.status);
-      } else {
-        const { dropTarget } = args;
-        setProgress1(status.transfering);
-        // from another tree
-        const getTarget = () => {
-          if (!dropTarget) return tree1RootId;
-          if (dropTarget && dropTarget.droppable)
-            return dropTarget.data.filePath;
-          if (dropTarget && !dropTarget.droppable)
-            return path.dirname(dropTarget.data.filePath);
-        };
-        const response = await googleAPI.downloadFiles(
-          sub,
-          lastActiveNodeRef.current.node.id as string,
-          lastActiveNodeRef.current.node.text,
-          getTarget() as string,
-          lastActiveNodeRef.current.node.data.fileType
-        );
-        setProgress1("");
-        if (response.success) {
-          const response = await listFolders(userId);
-          if (response.success)
-            setTreeData1(convertDirectoryTree(response.tree));
-          else alert(response.error.status);
-        } else {
-          myToast.error({
-            title: "File operation failed",
-            description: errorToToastDescription(response.error),
-          });
-        }
-      }
-    },
-    [setProgress1, userId, tree1RootId, setTreeData1]
-  );
-
-  const onDragStartTree1 = useCallback(async (node) => {}, []);
-
   useEffect(() => {
     fetchPersonalVolumeRoot();
-    fetchGoogleRoot();
-  }, [fetchGoogleRoot]);
+    expandGoogleFolder();
+  }, [expandGoogleFolder]);
 
-  useInterval(fetchGoogleRoot, 1000 * 30);
+  useInterval(expandGoogleFolder, 1000 * 30);
   useInterval(fetchPersonalVolumeRoot, 1000 * 30);
 
   return (
@@ -335,7 +293,13 @@ export const FileTransferProvider = ({
         editName,
         handleUpload,
         onLastActiveNodeChange,
-        handleMove,
+        isCreateFolderModalOpen,
+        isEditNameModalOpen,
+        setIsCreateFolderModalOpen,
+        setIsEditNameModalOpen,
+        googleFilesRef,
+        fetchPersonalVolumeRoot,
+        expandGoogleFolder,
       }}
     >
       {children}

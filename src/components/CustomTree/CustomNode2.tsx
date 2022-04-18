@@ -53,7 +53,7 @@ const CustomNode = (props: Props) => {
    * such that UI can highlight this node
    */
   const [dragOver, setDragOver] = useState(false);
-  const { getRootProps, getInputProps } = useDropzone({
+  const { getRootProps, getInputProps, open } = useDropzone({
     noClick: true,
     multiple: true,
     maxSize: 1048576 * 30, // 30 MB
@@ -100,7 +100,9 @@ const CustomNode = (props: Props) => {
     (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      openContextMenu([e.clientX, e.clientY], getNodeActions(node, { open }));
+      changeLastActiveNode(node.id as string);
+      if (getNodeActions)
+        openContextMenu([e.clientX, e.clientY], getNodeActions(node, { open }));
     },
     [getNodeActions, openContextMenu, open, node]
   );
@@ -109,18 +111,21 @@ const CustomNode = (props: Props) => {
     (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      if (isMobile)
+      changeLastActiveNode(node.id as string);
+      if (isMobile && getNodeActions)
         openContextMenu([e.clientX, e.clientY], getNodeActions(node, { open }));
     },
     [openContextMenu, getNodeActions, node, open]
   );
 
-  const _onDragStart = useCallback(
-    () => onDragStart(node),
-    [onDragStart, node]
-  );
+  const _onDragStart = useCallback(() => {
+    changeLastActiveNode(node.id as string);
+    if (onDragStart) onDragStart(node);
+  }, [onDragStart, node]);
 
-  const _onDragEnd = useCallback(() => onDragEnd(node), [onDragEnd, node]);
+  const _onDragEnd = useCallback(() => {
+    if (onDragEnd) onDragEnd(node);
+  }, [onDragEnd, node]);
 
   const handleToggle = useCallback(async () => {
     await _onClick();

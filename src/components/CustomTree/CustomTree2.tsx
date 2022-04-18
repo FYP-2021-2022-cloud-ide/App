@@ -26,7 +26,6 @@ const Wrapped = () => {
     openContextMenu,
     getRootActions,
     onDrop,
-    openIdsRef,
     nothingText,
     canDrop,
   } = useCustomTree();
@@ -44,12 +43,13 @@ const Wrapped = () => {
     (event: React.MouseEvent) => {
       event.preventDefault();
       event.stopPropagation();
-      openContextMenu(
-        [event.clientX, event.clientY],
-        getRootActions({
-          open,
-        })
-      );
+      if (getRootActions)
+        openContextMenu(
+          [event.clientX, event.clientY],
+          getRootActions({
+            open,
+          })
+        );
     },
     [openContextMenu, getRootActions, open]
   );
@@ -57,7 +57,7 @@ const Wrapped = () => {
     (event: React.MouseEvent) => {
       event.preventDefault();
       event.stopPropagation();
-      if (isMobile)
+      if (isMobile && getRootActions)
         openContextMenu(
           [event.clientX, event.clientY],
           getRootActions({ open })
@@ -81,13 +81,6 @@ const Wrapped = () => {
       listItem: "",
     };
   }, [data]);
-
-  const onChangeOpen = useCallback(
-    (newOpenIds: string[]) => {
-      openIdsRef.current = newOpenIds;
-    },
-    [openIdsRef]
-  );
 
   const dragPreviewRender = useCallback(
     (monitorProps: DragLayerMonitorProps<CustomData>) => (
