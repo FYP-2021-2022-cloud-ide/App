@@ -57,7 +57,7 @@ const SideBar = () => {
     );
   }, [name, email]);
   return (
-    <div className="sidebar">
+    <div id="sidebar" className="sidebar">
       <CardMenu
         items={pages
           .map((page) => {

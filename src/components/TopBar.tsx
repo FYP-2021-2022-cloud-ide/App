@@ -34,7 +34,7 @@ const TopBar = () => {
       data-has-message={systemMessage && systemMessage.id && systemMessage.show}
       id="topbar"
     >
-      {systemMessage.id && systemMessage.show && (
+      {systemMessage && systemMessage.id && systemMessage.show && (
         <div id="system-message">
           <p>
             ⚠️{" "}

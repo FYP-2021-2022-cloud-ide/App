@@ -1,13 +1,13 @@
 #topbar {
-  @apply flex flex-row  items-center z-[10] mx-5 mt-5;
+  @apply z-[10] mx-5 mt-5;
 }
 
 #topbar[data-has-message="true"] {
-  @apply justify-between;
+  @apply flex flex-row items-center justify-between;
 }
 
 #topbar[data-has-message="false"] {
-  @apply hidden sm:block;
+  @apply hidden sm:flex sm:flex-row sm:items-center justify-end;
 }
 
 #topbar .twemoji {
@@ -27,7 +27,7 @@
 }
 
 #topbar #action-bar {
-  @apply hidden sm:flex flex-row items-center text-gray-500 justify-end gap-x-4 ml-4;
+  @apply hidden sm:flex flex-row items-center text-gray-500 justify-end gap-x-4 ml-4 w-fit;
 }
 
 #topbar #action-bar svg {

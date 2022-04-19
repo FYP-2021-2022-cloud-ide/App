@@ -95,12 +95,6 @@ export const SandboxProvider = ({ children }: { children: JSX.Element }) => {
     description: string,
     imageId: string
   ) {
-    console.log({
-      title: name,
-      description,
-      imageId,
-      userId,
-    });
     const response = await myToast.promise(
       "Creating a personal workspace...",
       sandboxAPI.addSandboxImage({

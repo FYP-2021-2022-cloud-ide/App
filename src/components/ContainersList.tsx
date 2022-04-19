@@ -11,7 +11,12 @@ const ContainersList = () => {
 
   return (
     <div className="mt-5">
-      <div id="current-run" className="flex flex-row space-x-3 mb-2">
+      <div
+        id="current-run"
+        data-containers={containers.length}
+        data-quota={quota}
+        className="flex flex-row space-x-3 mb-2"
+      >
         <div className="text-base sm:text-xl text-gray-600 dark:text-gray-300 font-bold whitespace-nowrap">
           Current Running Workspaces
         </div>
