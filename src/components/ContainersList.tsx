@@ -7,8 +7,7 @@ import moment from "moment";
 const ContainersList = () => {
   const { containers, containerQuota: quota } = useContainers();
 
-  var numActiveContainers = containers ? containers.length : 0;
-  var percentage = containers ? (containers.length / quota) * 100 : 0;
+  var percentage = (containers.length / quota) * 100;
 
   return (
     <div className="mt-5">
@@ -18,7 +17,7 @@ const ContainersList = () => {
         </div>
         <div className="flex flex-col justify-between w-32">
           <div className="h-1 text-xs  text-gray-400 text-right">
-            <span id="active-num">{numActiveContainers}</span>/
+            <span id="active-num">{containers.length}</span>/
             <span id="quota">{quota}</span>
           </div>
           <div className=" h-2 rounded-full w-full bg-gray-300 overflow-hidden">

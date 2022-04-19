@@ -4,7 +4,6 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createContext, useContext } from "react";
 import myToast from "../components/CustomToast";
 import { CustomData } from "../components/CustomTree/CustomNode";
-import ModalForm from "../components/ModalForm/ModalForm";
 import { localFileAPI } from "../lib/api/localFile";
 import { errorToToastDescription } from "../lib/errorHelper";
 import FileTransferHelper, {
@@ -17,10 +16,7 @@ import { useCnails } from "./cnails";
 import CreateFolderForm from "../components/forms/fileTransfer/CreateFolderForm";
 import EditNameForm from "../components/forms/fileTransfer/EditNameForm";
 import useInterval from "../hooks/useInterval";
-import {
-  HandleMoveArgs,
-  Props,
-} from "../components/CustomTree/customTreeContext";
+import { Props } from "../components/CustomTree/customTreeContext";
 
 /**
  * store all the status text
@@ -124,12 +120,12 @@ export const FileTransferProvider = ({
         closed: false,
       }
     ) => {
-      // googleFilesRef.current = await FileTransferHelper.expandGoogleFolder(
-      //   googleFilesRef.current,
-      //   targetFolder,
-      //   sub
-      // );
-      // setTreeData2(convertGoogleTree(googleFilesRef.current));
+      googleFilesRef.current = await FileTransferHelper.expandGoogleFolder(
+        googleFilesRef.current,
+        targetFolder,
+        sub
+      );
+      setTreeData2(convertGoogleTree(googleFilesRef.current));
     },
     [googleFilesRef, sub, setTreeData2]
   );

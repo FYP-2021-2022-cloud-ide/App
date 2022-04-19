@@ -19,17 +19,3 @@
 ```
 npm run protoc
 ```
-
-# Cypress
-
-https://user-images.githubusercontent.com/43137033/156647940-25911b41-f8fa-41db-831a-c9c2b31b245c.mp4
-
-Cypress is responsible for the unit testing, integration testing and end-to-end testing. The source code of test is kept under the `cypress` folder with `cypress.json` as the configuration file in the project root.
-
-Runnning all the test at once is time-consuming, most of the time tests are only ran when needed. Using this command `npx cypress run --spec <filepath> --env ...`.
-
-Although unit testing's scope is bounded to the frontend, the end to end test has a much larger scope. Any problem that happens in the end to end could be caused by any part of the system (could be frontend or backend or something else). End to end test is most likely to be affected by many side effects, to avoid side effects, you might to "fake" certain components in the system. But I don't have time to do it, so the test progress is prioritized to "frontend-first". Side effects outside the frontend is ignored as much as possible.
-
-## npm script to run test
-
-1. `npm run e2e --env username=<username>,password=<password>; npm run e2e:after`: a report will be generated under `cypress/reports`. Please use a test account.

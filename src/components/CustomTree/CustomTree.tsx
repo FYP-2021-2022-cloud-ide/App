@@ -29,7 +29,7 @@ const Wrapped = () => {
     changeLastActiveNode,
   } = useCustomTree();
   const { getRootProps, getInputProps, open } = useDropzone({
-    noClick: data.length != 0,
+    noClick: true,
     multiple: true,
     maxSize: 1048576 * 30, // 30MB
     onDrop: async (acceptedFiles, fileRejections, event) => {
@@ -67,11 +67,15 @@ const Wrapped = () => {
     [openContextMenu, getRootActions, open]
   );
 
-  const onClick = useCallback((event: React.MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-    changeLastActiveNode(rootId as string);
-  }, []);
+  const onClick = useCallback(
+    (event: React.MouseEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+      changeLastActiveNode(rootId as string);
+      open();
+    },
+    [changeLastActiveNode]
+  );
 
   const dropzoneRootProps = handleUpload ? getRootProps() : {};
 

@@ -1,7 +1,6 @@
 import React, { createContext, SetStateAction } from "react";
 import { usePopperTooltip } from "react-popper-tooltip";
 import ReactDOM from "react-dom";
-import classNames from "../lib/classnames";
 
 type TooltipContextState = {};
 
@@ -14,7 +13,7 @@ export const TooltipProvider = ({
   children: (
     setTriggerRef: React.Dispatch<SetStateAction<HTMLDivElement>>
   ) => JSX.Element;
-  text: string;
+  text: string | JSX.Element;
 }) => {
   const {
     getArrowProps,

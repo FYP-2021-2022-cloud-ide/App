@@ -20,6 +20,7 @@ import { useCnails } from "../contexts/cnails";
 import { useTheme } from "../contexts/theme";
 import { useWarning } from "../contexts/warning";
 import { isMobile } from "react-device-detect";
+import { useCallback, useMemo } from "react";
 
 const SideBar = () => {
   const { name, email } = useCnails();
@@ -46,7 +47,7 @@ const SideBar = () => {
     // { name: "Admin", link: "/admin", icon: IdentificationIcon },
   ];
 
-  const PrefixElement = () => {
+  const PrefixElement = useCallback(() => {
     return (
       <div id="prefix">
         <p id="name">{name}</p>
@@ -54,8 +55,7 @@ const SideBar = () => {
         <div className="h-[1px] bg-gray-300 dark:bg-gray-600 mt-3"></div>
       </div>
     );
-  };
-
+  }, [name, email]);
   return (
     <div className="sidebar">
       <CardMenu
@@ -149,6 +149,9 @@ const SideBar = () => {
           {(setTriggerRef) => (
             <div
               ref={setTriggerRef}
+              id="current-run"
+              data-containers={containers.length}
+              data-quota={containerQuota}
               className="w-full flex flex-col space-y-2 text-xs text-gray-500 dark:text-gray-400 select-none sm:mb-5 px-4"
             >
               <p className="capitalize whitespace-nowrap">
