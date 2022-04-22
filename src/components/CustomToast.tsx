@@ -173,6 +173,12 @@ const myToast = {
     toast.dismiss(id);
     clear(id);
   },
+  /**
+   * wrap the promise with loading toast
+   * @param content
+   * @param promise
+   * @returns
+   */
   promise: async function <T>(
     content: string | JSX.Element,
     promise: Promise<T>

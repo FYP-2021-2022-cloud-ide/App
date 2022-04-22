@@ -5,7 +5,7 @@ import {
   Unsubscribe,
 } from "firebase/messaging";
 import router from "next/router";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import myToast from "../components/CustomToast";
 import useInterval from "../hooks/useInterval";
 import { notificationAPI } from "../lib/api/notificationAPI";
@@ -58,7 +58,7 @@ export const useMessaging = () => useContext(MessagingContext);
 export const MessagingProvider = ({ children }: MessagingProviderProps) => {
   const { userId, sub, semesterId } = useCnails();
   const [messages, setMessages] = useState<Message[]>();
-  const [unsubscribe, setUnsubscribe] = useState<Unsubscribe>();
+  const unsubscribeRef = useRef<Unsubscribe>();
   const {
     listNotifications,
     changeNotificationRead,
@@ -96,7 +96,7 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
             }),
           });
         }
-        const s = onMessage(messaging, async (message) => {
+        unsubscribeRef.current = onMessage(messaging, async (message) => {
           setTimeout(async () => {
             await fetchMessages();
             myToast.notification("You have a new notification", {}, () => {
@@ -104,7 +104,6 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
             });
           }, 2000);
         });
-        setUnsubscribe(s);
       }
     } catch (error) {
       console.log(error);
@@ -173,10 +172,9 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
 
   const init = async () => {
     if (await isSupported()) {
-      console.log("supported");
       await initMessaging();
     } else {
-      console.log("not supported");
+      console.log("messaging is not supported");
     }
     await fetchMessages();
   };
@@ -186,13 +184,16 @@ export const MessagingProvider = ({ children }: MessagingProviderProps) => {
    */
   useEffect(() => {
     init();
-    // return () => { if (unsubscribe) unsubscribe() }
+    return () => {
+      if (unsubscribeRef.current) unsubscribeRef.current();
+    };
   }, []);
 
   /**
    * this hook fetch messages every one minutes
    */
   useInterval(fetchMessages, 60 * 1000);
+
   if (!messages) return <></>;
 
   return (

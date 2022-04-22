@@ -1,3 +1,4 @@
+import { SectionUserInfo } from "../cnails";
 import type { Workspace as RedisWorkspace } from "../redisHelper";
 
 /**
@@ -457,6 +458,7 @@ type ContainerAddRequest = {
    * the id of the env, template or workspace
    */
   sourceId: string;
+  sectionUserInfo?: SectionUserInfo;
 } & EventFormDataPair;
 
 export type ContainerRemoveRequest = {
@@ -587,6 +589,7 @@ export type AddTemplateContainerRequest = {
   useFresh: boolean;
   title: string;
   sub: string;
+  sectionUserInfo: SectionUserInfo;
   event: "WORKSPACE_START" | "TEMPLATE_START_WORKSPACE";
 };
 

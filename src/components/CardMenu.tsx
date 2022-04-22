@@ -7,6 +7,7 @@ export type MenuItem = {
   icon?: JSX.Element;
   onClick?: MouseEventHandler<HTMLButtonElement>;
   show?: boolean;
+  disabled?: boolean;
 };
 
 export type Props = {
@@ -46,9 +47,8 @@ export default function CardMenu({
           leaveTo="transform opacity-0 scale-95"
         >
           <Menu.Items
-            className={`absolute ${
-              direction == "left" ? "right-0" : "left-0"
-            } origin-top-right bg-white dark:bg-gray-900 dark:text-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black dark:ring-gray-700 ring-opacity-5 focus:outline-none`}
+            className={`absolute ${direction == "left" ? "right-0" : "left-0"} 
+              bg-white dark:bg-gray-900 dark:text-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black dark:ring-gray-700 ring-opacity-5 focus:outline-none`}
           >
             <div className="p-1">
               {prefixElement}
@@ -66,6 +66,7 @@ export default function CardMenu({
                           className={`${
                             active ? "bg-gray-200 dark:bg-gray-800" : ""
                           } text-left text-gray-900 dark:text-white group flex rounded-md items-center w-full px-2 py-2 text-sm capitalize select-none whitespace-nowrap`}
+                          disabled={item.disabled ?? false}
                           onClick={(e) => {
                             e.stopPropagation();
                             if (item.onClick) {

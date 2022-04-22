@@ -100,31 +100,28 @@ const CreateTemplateForm = ({ isOpen, setOpen }: Props) => {
 
   const onEnter = useCallback(
     async ({ create_template: data }) => {
-      await createContainer(
-        {
-          memLimit: memory,
-          numCPU: CPU,
-          imageId: data.environment.imageId,
-          sub: sub,
-          accessRight: "root",
-          event: "TEMPLATE_CREATE",
-          title: data.name,
-          sourceId: "",
-          formData: {
-            templateName: data.name,
-            description: data.description,
-            section_user_id: sectionUserInfo.sectionUserId,
-            environment_id: data.environment.id,
-            assignment_config_id: "",
-            containerId: "",
-            active: false,
-            isExam: data.is_exam,
-            timeLimit: Number(data.time_limit),
-            allow_notification: data.allow_notification,
-          },
+      await createContainer({
+        memLimit: memory,
+        numCPU: CPU,
+        imageId: data.environment.imageId,
+        sub: sub,
+        accessRight: "root",
+        event: "TEMPLATE_CREATE",
+        title: data.name,
+        sourceId: "",
+        formData: {
+          templateName: data.name,
+          description: data.description,
+          section_user_id: sectionUserInfo.sectionUserId,
+          environment_id: data.environment.id,
+          assignment_config_id: "",
+          containerId: "",
+          active: false,
+          isExam: data.is_exam,
+          timeLimit: Number(data.time_limit),
+          allow_notification: data.allow_notification,
         },
-        "nothing"
-      );
+      });
     },
     [createContainer, sub, sectionUserInfo]
   );

@@ -1,9 +1,9 @@
 import React from "react";
 import CoursesList from "../components/CoursesList";
 import ContainersList from "../components/ContainersList";
-import { SandboxWrapper } from "../components/SandboxWrapper";
 import { Tab } from "@headlessui/react";
 import { SandboxProvider } from "../contexts/sandbox";
+import SandboxImageList from "../components/SandboxImageList";
 
 export function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -49,7 +49,7 @@ export default function Home() {
           </Tab.Panel>
           <Tab.Panel>
             <SandboxProvider>
-              <SandboxWrapper />
+              <SandboxImageList />
             </SandboxProvider>
           </Tab.Panel>
         </Tab.Panels>

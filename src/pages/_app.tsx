@@ -8,6 +8,7 @@ import { ContainerProvider } from "../contexts/containers";
 import { MessagingProvider } from "../contexts/messaging";
 import CustomToaster from "../components/CustomToaster";
 import Head from "next/head";
+import { CourseProvider } from "../contexts/courses";
 
 interface CnailsProps extends AppProps {
   sub: string;
@@ -25,37 +26,23 @@ function CnailsApp({ Component, pageProps }: CnailsProps) {
         <title>Cnails</title>
       </Head>
       <CnailsProvider>
-        <ThemeProvider>
-          <MessagingProvider>
-            <WarningProvider>
-              <ContainerProvider>
-                <Layout>
-                  <Component {...pageProps} />
-                  <CustomToaster />
-                </Layout>
-              </ContainerProvider>
-            </WarningProvider>
-          </MessagingProvider>
-        </ThemeProvider>
+        <CourseProvider>
+          <ThemeProvider>
+            <MessagingProvider>
+              <WarningProvider>
+                <ContainerProvider>
+                  <Layout>
+                    <Component {...pageProps} />
+                    <CustomToaster />
+                  </Layout>
+                </ContainerProvider>
+              </WarningProvider>
+            </MessagingProvider>
+          </ThemeProvider>
+        </CourseProvider>
       </CnailsProvider>
     </>
   );
 }
 
-// CnailsApp.getInitialProps = async ({ctx}: any) => {
-//   // console.log(ctx)
-//   const{sub, name, email, userId, semesterId} = parse(ctx.req.headers.cookie)
-//   return {
-//     sub,
-//     name,
-//     email,
-//     userId,
-//     semesterId
-//   }
-// }
-
-// for client-side performance test
-// export function reportWebVitals(metric) {
-//     console.log(metric) // The metric object ({ id, name, startTime, value, label }) is logged to the console
-// }
 export default CnailsApp;

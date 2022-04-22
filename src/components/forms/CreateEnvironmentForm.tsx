@@ -96,25 +96,22 @@ const CreateEnvironmentForm = ({ isOpen, setOpen }: Props) => {
           `${environment.value}:${environment.imageId}`,
         ]);
       if (!data.is_predefined) {
-        await createContainer(
-          {
-            memLimit: memory,
-            numCPU: CPU,
-            imageId: rootImage,
-            sub: sub,
-            accessRight: "root",
-            event: "ENV_CREATE",
-            sourceId: "",
-            title: name,
-            formData: {
-              name: name,
-              description: description,
-              section_user_id: sectionUserInfo.sectionUserId,
-              containerId: "",
-            },
+        await createContainer({
+          memLimit: memory,
+          numCPU: CPU,
+          imageId: rootImage,
+          sub: sub,
+          accessRight: "root",
+          event: "ENV_CREATE",
+          sourceId: "",
+          title: name,
+          formData: {
+            name: name,
+            description: description,
+            section_user_id: sectionUserInfo.sectionUserId,
+            containerId: "",
           },
-          "nothing"
-        );
+        });
       }
     },
     [createContainer, sub, sectionUserInfo]

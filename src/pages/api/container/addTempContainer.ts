@@ -32,6 +32,7 @@ export default async function handler(
     title,
     sourceId,
     sub,
+    sectionUserInfo,
   } = JSON.parse(req.body) as ContainerAddRequest;
   var docReq: AddTempContainerRequest = AddTempContainerRequest.fromPartial({
     sessionKey: fetchAppSession(req),
@@ -51,6 +52,7 @@ export default async function handler(
       title: title,
       data: formData,
       sourceId: sourceId,
+      sectionUserInfo: sectionUserInfo,
     });
     grpcClient.addTempContainer(
       docReq,

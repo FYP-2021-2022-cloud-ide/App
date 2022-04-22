@@ -46,7 +46,13 @@ const TemplateList = ({
         ) : (
           <div className="template-grid">
             {templates
-              .sort((a, b) => a.name.localeCompare(b.name))
+              .sort((a, b) => {
+                if (a.active != b.active) {
+                  return Number(b.active) - Number(a.active);
+                } else {
+                  return a.name.localeCompare(b.name);
+                }
+              })
               .map((template, index) => {
                 const highlighted = Boolean(
                   highlightedEnv &&

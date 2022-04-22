@@ -2,7 +2,6 @@ import TopBar from "./TopBar";
 import SideBar from "./SideBar";
 import Head from "next/head";
 import { useTheme } from "../contexts/theme";
-import { useCnails } from "../contexts/cnails";
 import Twemoji from "react-twemoji";
 
 interface LayoutProps {
@@ -11,7 +10,6 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   const { isDark } = useTheme();
-  const { sub, name, email } = useCnails();
 
   return (
     <Twemoji noWrapper options={{ className: "twemoji" }}>

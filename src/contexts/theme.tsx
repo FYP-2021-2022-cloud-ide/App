@@ -1,12 +1,12 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useCnails } from "./cnails";
 import { generalAPI } from "../lib/api/generalAPI";
-import useLocalStorage from "use-local-storage"
-type ThemeState = {
+import useLocalStorage from "use-local-storage";
+type ThemeContextState = {
   isDark: boolean;
   setDark: (d: boolean) => Promise<void>;
 };
-const themeContext = createContext({} as ThemeState);
+const themeContext = createContext({} as ThemeContextState);
 
 /**
  * @remark A top level context. This context can be access anywhere in the app.
@@ -19,7 +19,7 @@ type Props = {
 
 export const ThemeProvider = ({ children }: Props) => {
   const { sub } = useCnails();
-  const [dark, setDark] = useLocalStorage("darkMode", false)
+  const [dark, setDark] = useLocalStorage("darkMode", false);
 
   useEffect(() => {
     if (dark) {

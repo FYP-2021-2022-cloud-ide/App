@@ -1,6 +1,14 @@
 import _ from "lodash";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import myToast from "../components/CustomToast";
+import CreateSandboxForm from "../components/forms/CreateSandboxForm";
+import UpdateSandboxForm from "../components/forms/UpdateSandboxForm";
 import { useCancelablePromise } from "../hooks/useCancelablePromise";
 import useInterval from "../hooks/useInterval";
 import { SandboxImageListResponse } from "../lib/api/api";
@@ -44,6 +52,12 @@ type SandboxContextState = {
     containerId: string
   ) => Promise<void>;
   removeSandboxImage: (sandboxImageId: string) => Promise<void>;
+  createOpen: boolean;
+  setCreateOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  updateOpen: boolean;
+  setUpdateOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  updateTarget: SandboxImage;
+  setUpdateTarget: React.Dispatch<React.SetStateAction<SandboxImage>>;
 };
 
 const SandboxContext = createContext({} as SandboxContextState);
@@ -51,10 +65,13 @@ export const useSandbox = () => useContext(SandboxContext);
 
 export const SandboxProvider = ({ children }: { children: JSX.Element }) => {
   const { userId } = useCnails();
-  const { containers, fetchContainers } = useContainers();
+  const { containers, fetchContainers, onCommitRef } = useContainers();
   const { waitForConfirm } = useWarning();
   const [sandboxImages, setSandboxImages] = useState<SandboxImage[]>();
   const { cancelablePromise } = useCancelablePromise();
+  const [createOpen, setCreateOpen] = useState(false);
+  const [updateOpen, setUpdateOpen] = useState(false);
+  const [updateTarget, setUpdateTarget] = useState<SandboxImage>();
 
   const getSandboxImage = (id: string) =>
     sandboxImages.find((si) => si.id == id);
@@ -222,7 +239,13 @@ export const SandboxProvider = ({ children }: { children: JSX.Element }) => {
    * this hook will fetch the sandboxes on render
    */
   useEffect(() => {
+    onCommitRef.current.push(fetchSandboxImages);
     fetchSandboxImages();
+    return () => {
+      onCommitRef.current = onCommitRef.current.filter(
+        (callback) => callback != fetchSandboxImages
+      );
+    };
   }, []);
 
   if (!sandboxImages) return <></>;
@@ -237,9 +260,23 @@ export const SandboxProvider = ({ children }: { children: JSX.Element }) => {
         updateSandboxImageInfo,
         removeSandboxImage,
         updateSandboxImageInternal,
+        createOpen,
+        setCreateOpen,
+        updateOpen,
+        setUpdateOpen,
+        updateTarget,
+        setUpdateTarget,
       }}
     >
       {children}
+      {/* create form */}
+      <CreateSandboxForm isOpen={createOpen} setOpen={setCreateOpen} />
+      {/* update form */}
+      <UpdateSandboxForm
+        isOpen={updateOpen && sandboxImages.length != 0}
+        setOpen={setUpdateOpen}
+        target={updateTarget}
+      />
     </SandboxContext.Provider>
   );
 };

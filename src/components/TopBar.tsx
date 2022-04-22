@@ -13,9 +13,8 @@ import { useCnails } from "../contexts/cnails";
 
 const TopBar = () => {
   const { isDark, setDark } = useTheme();
-  const { systemMessage, setSystemMessage, sub, name, email } = useCnails();
+  const { systemMessage, setSystemMessage } = useCnails();
 
-  const router = useRouter();
   const SearchBar = () => {
     return (
       <div className="border flex flex-row space-x-2 items-center focus:border-black-600 text-left rounded dark:border-gray-700 dark:bg-gray-700 hover:border-gray-300 w-36 md:w-96 px-2 shadow mr-6">
@@ -58,24 +57,7 @@ const TopBar = () => {
         </div>
       )}
       <div id="action-bar">
-        <UserMenu
-          items={[
-            {
-              text: "Report Issue",
-              onClick: () => {
-                window.open(
-                  "https://github.com/FYP-2021-2022-cloud-ide/Public-Issues/issues"
-                );
-              },
-            },
-            {
-              text: "Sign Out",
-              onClick: () => {
-                router.push("/logout");
-              },
-            },
-          ]}
-        ></UserMenu>
+        <UserMenu></UserMenu>
         <NotiButton />
         <button id="help_doc_btn" title="Help and docs">
           <QuestionMarkCircleIcon

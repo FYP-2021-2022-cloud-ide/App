@@ -1,17 +1,10 @@
 import { CubeTransparentIcon } from "@heroicons/react/outline";
 import WorkspaceCard from "./WorkspaceCard";
-import { Workspace } from "../lib/cnails";
 import EmptyDiv from "./EmptyDiv";
-import { MenuItem } from "./CardMenu";
+import { useStudent } from "../contexts/student";
 
-interface props {
-  workspaces: Workspace[];
-  onClick?: (workspace: Workspace) => void;
-  // onToggleStart?: (workspace: Workspace, start: boolean) => void;
-  menuItems: (workspace: Workspace) => MenuItem[];
-}
-
-const WorkspacesList = ({ workspaces, onClick, menuItems }: props) => {
+const WorkspacesList = () => {
+  const { workspaces } = useStudent();
   return (
     <div className="workspace-list">
       <div id="header">
@@ -29,10 +22,6 @@ const WorkspacesList = ({ workspaces, onClick, menuItems }: props) => {
                 <WorkspaceCard
                   key={workspace.id}
                   workspace={workspace}
-                  onClick={() => {
-                    if (onClick) onClick(workspace);
-                  }}
-                  menuItems={menuItems}
                   zIndex={workspaces.length - index}
                 ></WorkspaceCard>
               );

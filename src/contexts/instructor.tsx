@@ -139,7 +139,7 @@ export const useInstructor = () => useContext(InstructorContext);
 export const InstructorProvider = ({ children }: { children: JSX.Element }) => {
   const { sectionUserInfo } = useSection();
   const { sub, userId } = useCnails();
-  const { containers, fetchContainers } = useContainers();
+  const { containers, fetchContainers, onCommitRef } = useContainers();
   const { sendNotificationAnnouncement } = courseAPI;
   const { fetchMessages } = useMessaging();
   const [environments, setEnvironments] = useState<Environment[]>();
@@ -578,7 +578,13 @@ export const InstructorProvider = ({ children }: { children: JSX.Element }) => {
    * this hook do the initial fetching
    */
   useEffect(() => {
+    onCommitRef.current.push(fetch);
     fetch();
+    return () => {
+      onCommitRef.current = onCommitRef.current.filter(
+        (callback) => callback != fetch
+      );
+    };
   }, []);
 
   if (!environments || !templates || !sectionUserInfo) return <Loader />;

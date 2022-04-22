@@ -1,0 +1,17 @@
+.embedding-workspace {
+  @apply select-none rounded  border bg-white hover:bg-gray-100 dark:bg-black dark:hover:bg-gray-900 p-2 flex flex-col items-start justify-between border-gray-300 dark:border-gray-800 transition-all duration-300 ease-in;
+}
+
+.embedding-workspace[data-status="DEFAULT"] {
+  @apply cursor-pointer;
+}
+
+.embedding-workspace [data-status="DEFAULT"] #status {
+  @apply hidden;
+}
+
+.embedding-workspace[data-status="DEFAULT"] #status,
+.embedding-workspace:not([data-status="DEFAULT"]) #duration,
+.embedding-workspace:not([data-status="DEFAULT"]) #remove-btn {
+  @apply hidden;
+}

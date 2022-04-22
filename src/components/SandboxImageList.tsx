@@ -1,8 +1,8 @@
-import { CubeTransparentIcon } from "@heroicons/react/outline";
-import { PlusCircleIcon, PlusIcon } from "@heroicons/react/solid";
+import { PlusIcon } from "@heroicons/react/solid";
+import { useCallback } from "react";
+import { useSandbox } from "../contexts/sandbox";
 import { SandboxImage } from "../lib/cnails";
-import EmptyDiv from "./EmptyDiv";
-import SandboxImagesCard from "./SandboxImagesCard";
+import SandboxImagesCard from "./SandboxImageCard";
 
 export type Props = {
   sandboxImages: SandboxImage[];
@@ -15,12 +15,13 @@ export type Props = {
   }[];
 };
 
-const SandboxImageList = ({
-  sandboxImages,
-  onCreateBtnClick,
-  onSandboxClick,
-  menuItems,
-}: Props) => {
+const SandboxImageList = () => {
+  const { sandboxImages, setCreateOpen } = useSandbox();
+
+  const onCreate = useCallback(() => {
+    setCreateOpen(true);
+  }, [setCreateOpen]);
+
   return (
     <div
       id="sandbox-grid"
@@ -32,8 +33,6 @@ const SandboxImageList = ({
           <SandboxImagesCard
             key={sandboxImage.id}
             sandboxImage={sandboxImage}
-            onClick={onSandboxClick}
-            menuItems={menuItems}
             zIndex={sandboxImages.length - index}
             id={`sandbox-card-${index}`}
           ></SandboxImagesCard>
@@ -43,9 +42,7 @@ const SandboxImageList = ({
         id="sandbox-create-btn"
         className="h-full min-h-[8rem] w-full rounded border-4 border-dashed border-gray-300 dark:border-gray-500 text-gray-300 dark:text-gray-500 flex justify-center transition items-center ease-in-out duration-300 bg-transparent cursor-pointer hover:bg-gray-500/10 dark:hover:bg-white/10"
         title="Create a personal workspace"
-        onClick={() => {
-          if (onCreateBtnClick) onCreateBtnClick();
-        }}
+        onClick={onCreate}
       >
         <PlusIcon className="w-5 h-5"></PlusIcon>
       </div>

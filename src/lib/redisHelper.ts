@@ -1,6 +1,7 @@
 import { redisClient } from "./redisClient";
 import { Container } from "./api/api";
 import moment from "moment";
+import { SectionUserInfo } from "./cnails";
 
 const redisKeyExpireTime = 86400;
 const creationTimeout = 120;
@@ -47,6 +48,7 @@ export type Workspace = {
    * the data for client to continue to update process in case client lose the data
    */
   data?: any;
+  sectionUserInfo?: SectionUserInfo;
 };
 
 const list = {

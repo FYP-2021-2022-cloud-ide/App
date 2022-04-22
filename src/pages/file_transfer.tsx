@@ -111,7 +111,15 @@ const Wrapped = () => {
 
   const tree1CanDrop = useCallback((_, { dragSource, dropTarget }) => {
     // can move to another tree
-    if (dropTarget == undefined || dragSource == undefined) return true;
+    if (dragSource == undefined) return true;
+
+    if (dropTarget == undefined && dragSource.parent == tree1RootId)
+      return false;
+
+    if (dropTarget == undefined) return true;
+
+    // cannot move to its parent because a node must be inside its parent already
+    if (dragSource.parent == dropTarget.id) return false;
 
     // cannot move a parent to children
     if (dropTarget.data.filePath.includes(dragSource.data.filePath))
@@ -126,9 +134,6 @@ const Wrapped = () => {
       dropTarget.data.fileType === "file"
     )
       return false;
-
-    // cannot move to its parent because a node must be inside its parent already
-    if (dragSource.parent == dropTarget.id) return false;
 
     // cannot move a file
     if (dropTarget.data.fileType == "file") return false;
@@ -333,6 +338,7 @@ const Wrapped = () => {
           canDrop={tree1CanDrop}
           getNodeActions={getNodeActions}
           getRootActions={getRootActions}
+          loadingText={"Loading files from Person Volume"}
         />
       </div>
       {/* cloud  */}
@@ -370,6 +376,7 @@ const Wrapped = () => {
             onToggle={tree2onToggle}
             canDrop={tree2canDrop}
             nothingText="Drag files from personal volume"
+            loadingText="Loading files from Google Drive"
           />
         )}
       </div>

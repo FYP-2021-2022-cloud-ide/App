@@ -12,31 +12,22 @@ import myToast from "./CustomToast";
 import EnvironmentList from "./EnvironmentList";
 import TemplateList from "./TemplateList";
 import { useForceUpdate } from "../hooks/useForceUpdate";
-import TempContainerToast from "./TempContainerToast";
-import { useWarning } from "../contexts/warning";
 import { useContainers } from "../contexts/containers";
 
 const EnvironmentTemplateWrapper = () => {
   const router = useRouter();
   const { sub } = useCnails();
-  const { fetchContainers, setContainers, createContainer, removeContainer } =
-    useContainers();
+  const { createContainer, removeContainer } = useContainers();
   const {
     environments,
     templates,
-    fetch,
     sectionUserInfo,
     setHighlightedEnv,
-    fetchEnvironments,
-    fetchTemplates,
-    updateTemplateInternal,
     removeEnvironment,
-    updateEnvironmentInternal,
     removeTemplate,
     publishTemplate,
     unpublishTemplate,
   } = useInstructor();
-  const { waitForConfirm } = useWarning();
   const [envCreateOpen, setEnvCreateOpen] = useState(false);
   const [envUpdateOpen, setEnvUpdateOpen] = useState(false);
   const [templateCreateOpen, setTemplateCreateOpen] = useState(false);
@@ -44,43 +35,6 @@ const EnvironmentTemplateWrapper = () => {
   const [envUpdateTarget, setEnvUpdateTarget] = useState<Environment>(null);
   const [templateUpdateTarget, setTemplateUpdateTarget] =
     useState<Template>(null);
-  const forceUpdate = useForceUpdate();
-
-  const addCreatingWorkspace = (
-    source: Environment | Template,
-    event:
-      | "ENV_CREATE"
-      | "ENV_UPDATE"
-      | "TEMPLATE_CREATE"
-      | "TEMPLATE_UPDATE"
-      | "TEMPLATE_START_WORKSPACE"
-  ) => {
-    setContainers((containers) => {
-      return [
-        ...containers,
-        {
-          title: source.name,
-          status: "CREATING",
-          subTitle: "",
-          startAt: "",
-          id: "",
-          type:
-            event == "ENV_CREATE" || event == "ENV_UPDATE" ? "ENV" : "TEMPLATE",
-          isTemporary: event != "TEMPLATE_START_WORKSPACE",
-          redisPatch: {
-            tempId: "",
-            cause: event,
-            containerId: "",
-            sourceId: source.id,
-            title: source.name,
-          },
-        },
-      ];
-    });
-  };
-
-  // if environments or templates has not fetch, don't need to go down
-  if (!environments || !templates) return <></>;
 
   return (
     <>
@@ -115,7 +69,6 @@ const EnvironmentTemplateWrapper = () => {
               onClick: () => {
                 if (templates.some((t) => t.environment_id === env.id)) {
                   setHighlightedEnv(env);
-                  forceUpdate();
                 } else myToast.warning(`No template is using ${env.name}.`);
               },
             },
@@ -131,50 +84,24 @@ const EnvironmentTemplateWrapper = () => {
                   });
                   return;
                 }
-                await createContainer(
-                  {
-                    memLimit: memory,
-                    numCPU: CPU,
-                    imageId: env.imageId,
-                    sub: sub,
-                    accessRight: "root",
-                    event: "ENV_UPDATE",
-                    title: env.name,
-                    sourceId: env.id,
-                    formData: {
-                      name: env.name,
-                      description: env.description,
-                      containerId: "",
-                      section_user_id: sectionUserInfo.sectionUserId,
-                      envId: env.id,
-                    },
+                await createContainer({
+                  memLimit: memory,
+                  numCPU: CPU,
+                  imageId: env.imageId,
+                  sub: sub,
+                  accessRight: "root",
+                  event: "ENV_UPDATE",
+                  title: env.name,
+                  sourceId: env.id,
+                  sectionUserInfo: sectionUserInfo,
+                  formData: {
+                    name: env.name,
+                    description: env.description,
+                    containerId: "",
+                    section_user_id: sectionUserInfo.sectionUserId,
+                    envId: env.id,
                   },
-                  "nothing"
-                  // (containerId) => {
-                  //   const id = myToast.custom(
-                  //     <TempContainerToast
-                  //       containerId={containerId}
-                  //       getToastId={() => id}
-                  //       onCancel={async () => {
-                  //         return await waitForConfirm(
-                  //           "Are you sure that you want to cancel the commit? All your changes in the workspace will not be saved and the environment will not be updated."
-                  //         );
-                  //       }}
-                  //       onOK={async () => {
-                  //         await updateEnvironmentInternal(env.id, containerId);
-                  //       }}
-                  //     ></TempContainerToast>,
-                  //     {
-                  //       className: "toaster toaster-custom ",
-                  //       icon: "🗂",
-                  //       id: containerId,
-                  //       duration: 99999 * 86400,
-                  //     },
-                  //     undefined,
-                  //     false
-                  //   );
-                  // }
-                );
+                });
               },
             },
           ]}
@@ -212,7 +139,7 @@ const EnvironmentTemplateWrapper = () => {
             },
             {
               text: template.containerId ? "Stop workspace" : "Start workspace",
-              show: template.status != "UPDATING_INTERNAL",
+              // show: template.status != "UPDATING_INTERNAL",
               onClick: async () => {
                 if (template.containerId) {
                   await removeContainer(template.containerId);
@@ -228,6 +155,7 @@ const EnvironmentTemplateWrapper = () => {
                     title: template.name,
                     sub: sub,
                     event: "TEMPLATE_START_WORKSPACE",
+                    sectionUserInfo: sectionUserInfo,
                   });
                 }
               },
@@ -261,56 +189,27 @@ const EnvironmentTemplateWrapper = () => {
                   });
                   return;
                 }
-                await createContainer(
-                  {
-                    memLimit: memory,
-                    numCPU: CPU,
-                    imageId: template.imageId,
-                    sub: sub,
-                    accessRight: "root",
-                    title: template.name,
-                    sourceId: template.id,
-                    event: "TEMPLATE_UPDATE",
-                    formData: {
-                      templateId: template.id,
-                      templateName: template.name,
-                      description: template.description,
-                      section_user_id: sectionUserInfo.sectionUserId,
-                      containerId: "",
-                      isExam: template.isExam,
-                      timeLimit: template.timeLimit,
-                      allow_notification: template.allow_notification,
-                    },
+                await createContainer({
+                  memLimit: memory,
+                  numCPU: CPU,
+                  imageId: template.imageId,
+                  sub: sub,
+                  accessRight: "root",
+                  title: template.name,
+                  sourceId: template.id,
+                  event: "TEMPLATE_UPDATE",
+                  sectionUserInfo: sectionUserInfo,
+                  formData: {
+                    templateId: template.id,
+                    templateName: template.name,
+                    description: template.description,
+                    section_user_id: sectionUserInfo.sectionUserId,
+                    containerId: "",
+                    isExam: template.isExam,
+                    timeLimit: template.timeLimit,
+                    allow_notification: template.allow_notification,
                   },
-                  "nothing"
-                  // (containerId) => {
-                  //   const id = myToast.custom(
-                  //     <TempContainerToast
-                  //       containerId={containerId}
-                  //       getToastId={() => id}
-                  //       onCancel={async () => {
-                  //         return await waitForConfirm(
-                  //           "Are you sure you want to cancel the commit? All your changes in the workspace will not be saved and the template will not be updated."
-                  //         );
-                  //       }}
-                  //       onOK={async () => {
-                  //         await updateTemplateInternal(
-                  //           template.id,
-                  //           containerId
-                  //         );
-                  //       }}
-                  //     ></TempContainerToast>,
-                  //     {
-                  //       className: "toaster toaster-temp-container ",
-                  //       icon: "🗂",
-                  //       id: containerId,
-                  //       duration: 99999 * 86400,
-                  //     },
-                  //     undefined,
-                  //     false
-                  //   );
-                  // }
-                );
+                });
               },
             },
           ]}

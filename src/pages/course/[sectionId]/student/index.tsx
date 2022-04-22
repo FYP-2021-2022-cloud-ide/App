@@ -34,47 +34,7 @@ const Wrapper = () => {
         courseTitle={sectionUserInfo.courseTitle}
         sectionCode={sectionUserInfo.sectionCode}
       ></CourseBar>
-      <WorkspacesList
-        workspaces={workspaces}
-        onClick={(workspace) => {
-          if (workspace.containerId) {
-            window.open(
-              "https://codespace.ust.dev/user/container/" +
-                workspace.containerId +
-                "/"
-            );
-          }
-        }}
-        menuItems={(workspace) => [
-          {
-            text: workspace.containerId ? "Stop workspace" : "Start workspace",
-            onClick: async () => {
-              if (!workspace.containerId) {
-                await myToast.promise(
-                  "Starting workspace...",
-                  createContainer({
-                    imageName: workspace.imageId,
-                    memLimit: memory,
-                    numCPU: CPU,
-                    section_user_id: sectionUserInfo.sectionUserId,
-                    template_id: workspace.id,
-                    accessRight: "student",
-                    useFresh: false,
-                    title: workspace.name,
-                    sub: sub,
-                    event: "WORKSPACE_START",
-                  })
-                );
-              } else {
-                await myToast.promise(
-                  "Stopping workspace...",
-                  removeContainer(workspace.containerId)
-                );
-              }
-            },
-          },
-        ]}
-      ></WorkspacesList>
+      <WorkspacesList />
     </div>
   );
 };

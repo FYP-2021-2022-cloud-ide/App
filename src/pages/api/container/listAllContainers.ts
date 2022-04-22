@@ -45,24 +45,23 @@ export default function handler(
           containers: await redisHelper.patch.workspaces(
             sub as string,
             containers.map((container) => {
-              // console.log(listContainerReply_Container_containerTypeToJSON(containers.type))
               return {
                 title: container.title,
                 subTitle: container.subTitle,
                 startAt: container.existedTime,
                 containerId: container.containerID,
-                // type:
-                //   (container.type ==
-                //     ListContainerReply_Container_containerType.SANDBOX &&
-                //     "SANDBOX") ||
-                //   (container.type ==
-                //     ListContainerReply_Container_containerType.TEMPLATE_WORKSPACE &&
-                //     "TEMPLATE") ||
-                //   undefined,
-                // sourceId: "",
-                // isTemporary:
-                //   container.type ==
-                //   ListContainerReply_Container_containerType.TEMPORARY,
+                type:
+                  (container.type ==
+                    ListContainerReply_Container_containerType.SANDBOX &&
+                    "SANDBOX") ||
+                  (container.type ==
+                    ListContainerReply_Container_containerType.TEMPLATE_WORKSPACE &&
+                    "TEMPLATE") ||
+                  undefined,
+                sourceId: "",
+                isTemporary:
+                  container.type ==
+                  ListContainerReply_Container_containerType.TEMPORARY,
               };
             })
           ),

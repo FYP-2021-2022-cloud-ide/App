@@ -27,6 +27,9 @@ type SectionRole = "INSTRUCTOR" | "STUDENT";
 type Environment = {
   id: string;
   imageId: string;
+  /**
+   * it is in fact the environment choice
+   */
   libraries: string;
   name: string;
   description: string;
@@ -76,7 +79,6 @@ type Template = {
     | "STOPPING_WORKSPACE"
     | "STARTING_UPDATE_WORKSPACE"
     | "STOPPING_UPDATE_WORKSPACE"
-    | "UPDATING_INTERNAL"
     | "DEFAULT";
 };
 

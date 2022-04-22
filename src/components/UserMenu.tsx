@@ -1,16 +1,32 @@
 import { Menu, Transition } from "@headlessui/react";
-import { Fragment } from "react";
+import { useRouter } from "next/router";
+import { Fragment, useMemo } from "react";
 import { useCnails } from "../contexts/cnails";
 
-interface UserMenuProps {
-  items: {
-    text: string;
-    onClick?: () => void;
-  }[];
-}
-
-export default function UserMenu({ items }: UserMenuProps) {
+export default function UserMenu() {
   const { sub, name, email } = useCnails();
+  const router = useRouter();
+
+  const items = useMemo(
+    () => [
+      {
+        text: "Report Issue",
+        onClick: () => {
+          window.open(
+            "https://github.com/FYP-2021-2022-cloud-ide/Public-Issues/issues"
+          );
+        },
+      },
+      {
+        text: "Sign Out",
+        onClick: () => {
+          router.push("/logout");
+        },
+      },
+    ],
+    []
+  );
+
   return (
     <div className={`w-fit  text-right top-16 `}>
       <Menu as="div" className="sm:relative text-left">

@@ -28,6 +28,7 @@ export default async function handler(
     title,
     sub,
     event, // it could be a student start workspace or instructor start template workspace
+    sectionUserInfo,
   } = JSON.parse(req.body) as AddTemplateContainerRequest;
   var docReq: AddContainerRequest = AddContainerRequest.fromPartial({
     sessionKey: fetchAppSession(req),
@@ -47,6 +48,7 @@ export default async function handler(
       sourceId: template_id,
       containerId: "",
       cause: event,
+      sectionUserInfo: sectionUserInfo,
     });
     grpcClient.addTemplateContainer(
       docReq,

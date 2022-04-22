@@ -58,7 +58,6 @@ export const patchTemplates = (
             return {
               ...template,
               containerId: container.id,
-              status: "UPDATING_INTERNAL",
             };
         }
       }

@@ -14,6 +14,7 @@ import React, {
 } from "react";
 import { DropEvent, FileRejection } from "react-dropzone";
 import useComponentVisible from "../../hooks/useComponentVisible";
+import Loader from "../Loader";
 import ContextMenu, { MenuItem } from "./ContextMenu";
 import { CustomData } from "./CustomNode";
 
@@ -148,6 +149,10 @@ export type Props = {
    * The tree data will never reveal the complete directory tree and therefore operations such as `open all` does not make sense.
    */
   showGlobalActionButtons?: boolean;
+  /**
+   * the loading text when data is not yet returned.
+   */
+  loadingText?: string;
 };
 
 type CustomTreeContextState = {
@@ -192,6 +197,7 @@ export const CustomTreeProvider = ({
     getNodeActions,
     getRootActions,
     canDrop,
+    loadingText,
   } = props;
   const ref = useRef<TreeMethods>();
   const openIdsRef = useRef<string[]>([]);
@@ -265,7 +271,12 @@ export const CustomTreeProvider = ({
     [handleMove]
   );
 
-  if (!data) return <></>;
+  if (!data)
+    return (
+      <Loader>
+        <p className="ml-2">{loadingText}</p>
+      </Loader>
+    );
 
   return (
     <CustomTreeContext.Provider

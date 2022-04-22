@@ -1,54 +1,65 @@
-import { XIcon } from "@heroicons/react/solid";
-import { useContainers } from "../contexts/containers";
+import { ClockIcon, XIcon } from "@heroicons/react/outline";
+import useContainerCard from "../hooks/useContainerCard";
+import { Container } from "../lib/cnails";
 import WorkspaceIndicator from "./WorkspaceIndicator";
 
 type Props = {
-  name: string;
-  tooltip: string;
-  containerId: string;
-  color: "yellow" | "green";
+  container: Container;
 };
 
-const EmbeddedWorkspaceCard = ({
-  name,
-  tooltip,
-  containerId,
-  color,
-}: Props) => {
-  const { removeContainer } = useContainers();
+/**
+ * it is only clickable when container id is ready.
+ * The color is
+ * @param
+ * @returns
+ */
+const EmbeddedWorkspaceCard = ({ container }: Props) => {
+  const { duration, onClick, onRemove, comment } = useContainerCard(container);
+  const { status } = container;
+  const name = container.isTemporary ? "Temporary Workspace" : container.title;
+
   return (
     <div
-      className={` rounded  border bg-white hover:bg-gray-100 dark:bg-black dark:hover:bg-gray-900 p-2 flex flex-row items-start justify-between border-gray-300 dark:border-gray-800 ${
-        color == "green" ? "cursor-pointer" : "cursor-default"
-      }`}
-      onClick={(e) => {
-        e.stopPropagation();
-        if (containerId)
-          window.open(
-            `https://codespace.ust.dev/user/container/${containerId}/`
-          );
-      }}
-      title={tooltip}
+      className="embedding-workspace"
+      data-status={status}
+      onClick={onClick}
+      title={comment}
     >
-      <div className="flex space-x-2 items-start">
-        <WorkspaceIndicator color={color}></WorkspaceIndicator>
-        <div className="min-h-[32px]">
-          <p className="text-xs font-bold text-gray-700 dark:text-gray-300">
+      <div className="flex flex-row items-start w-full">
+        <div className="mr-2">
+          <WorkspaceIndicator
+            color={status == "DEFAULT" ? "green" : "yellow"}
+          ></WorkspaceIndicator>
+        </div>
+        <div className="min-h-[32px] w-full">
+          <p
+            id="title"
+            className="text-xs font-bold text-gray-700 dark:text-gray-300 "
+          >
             {name}
           </p>
         </div>
+        {status == "DEFAULT" && (
+          <button id="remove-btn" title="remove workspace" onClick={onRemove}>
+            <XIcon className="w-3 h-3 text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400" />
+          </button>
+        )}
       </div>
-      {containerId && (
-        <button
-          title="remove workspace"
-          onClick={async (e) => {
-            e.stopPropagation();
-            removeContainer(containerId);
-          }}
-        >
-          <XIcon className="w-3 h-3 text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400" />
-        </button>
-      )}
+
+      <div className="w-full flex flex-row-reverse justify-between ">
+        <div id="duration" className="flex flex-row items-center space-x-1">
+          <ClockIcon className="h-4 w-4 text-gray-600 dark:text-gray-300 "></ClockIcon>
+          <div
+            id="duration-text"
+            className="font-medium text-xs text-gray-600 dark:text-gray-300"
+          >
+            {duration}
+          </div>
+        </div>
+        <p id="status" className="text-gray-500 dark:text-gray-400 text-xs">
+          {comment}
+        </p>
+      </div>
     </div>
   );
 };

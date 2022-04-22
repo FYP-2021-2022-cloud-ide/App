@@ -57,7 +57,7 @@ const ContainersList = () => {
                         ? container.redisPatch.tempId
                         : container.id
                     }
-                    {...container}
+                    container={container}
                     zIndex={containers.length - i}
                   ></ContainerCard>
                 );

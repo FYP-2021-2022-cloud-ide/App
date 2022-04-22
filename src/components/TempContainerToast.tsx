@@ -1,3 +1,6 @@
+import { useCallback } from "react";
+import { useContainers } from "../contexts/containers";
+import { useWarning } from "../contexts/warning";
 import { Container } from "../lib/cnails";
 import myToast from "./CustomToast";
 
@@ -10,15 +13,6 @@ type Props = {
    * the temp container Id
    */
   container: Container;
-  /**
-   * when to do if user click OK.
-   */
-  onOK: () => void | Promise<void>;
-  /**
-   * return a boolean of whether this toast will be dismissed.
-   * remember to handle the removeContainer by yourself
-   */
-  onCancel?: () => boolean | Promise<boolean>;
   setUpWorkspaceText?: string;
   cancelBtnText?: string;
   okBtnText?: string;
@@ -34,20 +28,34 @@ type Props = {
 const TempContainerToast = ({
   container,
   getToastId,
-  onOK,
   okBtnText,
   cancelBtnText,
-  onCancel,
 }: Props) => {
-  // useEffect(() => {
-  //   // if the container is closed somewhere else
-  //   const timeout = setTimeout(() => {
-  //     if (!containers.some((container) => container.id == containerId)) {
-  //       myToast.dismiss(getToastId());
-  //     }
-  //   }, 2000);
-  //   return () => clearTimeout(timeout);
-  // }, [containers, containerId, getToastId]);
+  const { removeContainer, commitTemporaryContainer } = useContainers();
+  const { waitForConfirm } = useWarning();
+  const onCancel = useCallback(async () => {
+    const question =
+      (container.redisPatch.cause == "ENV_CREATE" &&
+        "Are you sure you want to cancel the commit? All your changes in the workspace will not be saved and no environment will be built.") ||
+      (container.redisPatch.cause == "ENV_UPDATE" &&
+        "Are you sure that you want to cancel the commit? All your changes in the workspace will not be saved and the environment will not be updated.") ||
+      (container.redisPatch.cause == "TEMPLATE_CREATE" &&
+        "Are you sure you want to cancel the commmit? All you changes in the workspace will not be saved and no template will be created.") ||
+      (container.redisPatch.cause == "TEMPLATE_UPDATE" &&
+        "Are you sure you want to cancel the commit? All your changes in the workspace will not be saved and the template will not be updated.") ||
+      (container.redisPatch.cause == "SANDBOX_UPDATE" &&
+        "Are you sure that you want to cancel the commit. All your changes in the workspace will not be saved and personal workspace will not be updated.");
+    const confirm = await waitForConfirm(question);
+    if (confirm) {
+      await removeContainer(container.id);
+      myToast.dismiss(getToastId());
+    }
+  }, [container, removeContainer, waitForConfirm]);
+
+  const onOK = useCallback(async () => {
+    myToast.dismiss(getToastId());
+    await commitTemporaryContainer(container.id);
+  }, [commitTemporaryContainer]);
 
   return (
     <div className="flex flex-col space-y-2">
@@ -79,20 +87,13 @@ const TempContainerToast = ({
       <div className="flex flex-row space-x-2">
         <button
           className="btn btn-xs bg-gray-500 text-white hover:bg-gray-400 dark:bg-gray-400 dark:hover:bg-gray-500 border-none"
-          onClick={async () => {
-            if (onCancel && (await onCancel()) == false) return;
-            // cancel the build
-            myToast.dismiss(getToastId());
-          }}
+          onClick={onCancel}
         >
           {cancelBtnText ?? "Cancel"}
         </button>
         <button
           className="btn btn-xs bg-green-500 text-white hover:bg-green-600 border-none "
-          onClick={async () => {
-            myToast.dismiss(getToastId());
-            await onOK();
-          }}
+          onClick={onOK}
         >
           {okBtnText ?? "OK"}
         </button>

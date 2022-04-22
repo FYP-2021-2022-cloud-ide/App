@@ -7,49 +7,14 @@ import { useCnails } from "../contexts/cnails";
 import myToast from "./CustomToast";
 import { errorToToastDescription } from "../lib/errorHelper";
 import { CLICK_TO_REPORT } from "../lib/constants";
+import { useCourses } from "../contexts/courses";
 
 export interface props {
   courses: Course[];
 }
 
-type SortOrder = "time" | "title";
-
 const CoursesList = () => {
-  const [sortOrder, setSortOrder] = useState<SortOrder>("title");
-  const [courses, setCourses] = useState<Course[]>();
-  const { courseList } = generalAPI;
-  const { sub } = useCnails();
-  const fetchCourses = async () => {
-    const response = await courseList(sub);
-    if (response.success) {
-      const courses = response.courses.map((course) =>
-        Object.assign(
-          {},
-          {
-            ...course,
-            sectionRole: course.sectionRole.toUpperCase() as
-              | "INSTRUCTOR"
-              | "STUDENT",
-          }
-        )
-      );
-      setCourses(courses);
-    } else {
-      myToast.error(
-        {
-          title: "Fail to fetch courses",
-          description: errorToToastDescription(response.error),
-        }
-      )
-    }
-  };
-  useEffect(() => {
-    fetchCourses();
-  }, []);
-
-  // don't need to go down
-  if (!courses) return <></>;
-
+  const { courses, sortOrder } = useCourses();
   return (
     <div
       id="course-grid"
@@ -57,18 +22,16 @@ const CoursesList = () => {
     >
       {courses
         .sort((a, b) => {
-          if (sortOrder === "time")
-            return a.courseCode.localeCompare(b.courseCode);
           if (sortOrder === "title")
+            return a.courseCode.localeCompare(b.courseCode);
+          if (sortOrder === "time")
             return moment(a.lastUpdateTime) > moment(b.lastUpdateTime) ? -1 : 1;
           else return 0;
         })
         .map((course, index) => {
-          var link =
-            "/course/" +
-            course.sectionID +
-            "/" +
-            course.sectionRole.toLowerCase();
+          var link = `/course/${
+            course.sectionID
+          }/${course.sectionRole.toLowerCase()}`;
           return (
             <CourseCard
               key={course.sectionID}
