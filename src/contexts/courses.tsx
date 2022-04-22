@@ -1,8 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import myToast from "../components/CustomToast";
 import { generalAPI } from "../lib/api/generalAPI";
 import { Course } from "../lib/cnails";
-import { errorToToastDescription } from "../lib/errorHelper";
 import { useCnails } from "./cnails";
 
 type CourseContextState = {

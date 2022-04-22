@@ -133,24 +133,10 @@ export const ContainerProvider = ({ children }: ContainerProviderProps) => {
               myToast.warning(
                 "You have uncommited temporary workspaces. They will hold your workspace quota. If you don't plan to persist the changes in the programming environment, remember to stop the them."
               );
-            const c = newContainers.find((c) => c.id == container.id);
-            const id = myToast.custom(
-              <TempContainerToast
-                container={c}
-                getToastId={() => id}
-              ></TempContainerToast>,
-              {
-                className: "toaster toaster-temp-container ",
-                icon: "🗂",
-                id: container.id,
-                duration: 99999 * 86400,
-              },
-              undefined,
-              false
-            );
+            myToast.tempContainer(container);
           }
+          console.log("containers are different", newContainers);
         }
-        console.log("containers are different", newContainers);
         setContainers(newContainers);
       }
 
@@ -216,6 +202,7 @@ export const ContainerProvider = ({ children }: ContainerProviderProps) => {
       const container = containers.find(
         (container) => container.id == containerId
       );
+      setContainerStatus(container.id, "REMOVING");
       let response: SuccessStringResponse;
       if (container.isTemporary) {
         response = await myToast.promise(
@@ -354,6 +341,7 @@ export const ContainerProvider = ({ children }: ContainerProviderProps) => {
   }, []);
 
   if (!containers || !containerQuota) return <></>;
+
   return (
     <ContainerContext.Provider
       value={{

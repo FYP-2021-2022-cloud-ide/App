@@ -1,60 +1,24 @@
-import React, { useEffect } from "react";
-import Menu, { MenuItem } from "./CardMenu";
+import React from "react";
+import Menu from "./CardMenu";
 import { Template } from "../lib/cnails";
 import Tilt from "react-parallax-tilt";
 import { EyeIcon, EyeOffIcon, AcademicCapIcon } from "@heroicons/react/solid";
-import { useInstructor } from "../contexts/instructor";
 import useCleanTilt from "../hooks/useCleanTilt";
 import EmbeddedWorkspaceCard from "./EmbeddingWorkspaceCard";
-import { useContainers } from "../contexts/containers";
+import useTemplateCard from "../hooks/useTemplateCard";
 
 interface Props {
   template: Template;
-  highlighted?: Boolean;
-  onClick?: (template: Template) => void;
-  // onWorkspaceCardClick?: (template: Template) => void;
-  menuItems: (template: Template) => MenuItem[];
   zIndex?: number;
 }
 
 function TemplateCard(props: Props) {
-  const { template, onClick, menuItems, zIndex } = props;
-  const { highlightedEnv, setHighlightedEnv, getEnvironment } = useInstructor();
-  const { containers } = useContainers();
-  // const [status , setStatus ] =
+  const { template, zIndex } = props;
   const { ref, cleanStyle } = useCleanTilt(
     zIndex ? `z-index : ${zIndex};` : ""
   );
-  const env = getEnvironment(template.environment_id);
-  const container = containers.find(
-    (container) => container.redisPatch.sourceId == template.id
-  );
-
-  /**
-   * this hook highlight the template for 1000ms
-   */
-  useEffect(() => {
-    if (highlightedEnv && highlightedEnv.id === template.environment_id) {
-      // setHighlighted(false);
-      const id = setTimeout(() => {
-        setHighlightedEnv(undefined);
-      }, 1000);
-      return () => {
-        clearTimeout(id);
-      };
-    }
-  });
-
-  const comment =
-    (template.status == "CREATING" && "being created...") ||
-    (template.status == "REMOVING" && "being removed...") ||
-    (template.status == "UPDATING" && "being updated...") ||
-    (template.status == "STARTING_WORKSPACE" && "starting workspace...") ||
-    (template.status == "STOPPING_WORKSPACE" && "stopping workspace...") ||
-    (template.status == "STARTING_UPDATE_WORKSPACE" &&
-      "starting temporary workspace...") ||
-    (template.status == "STOPPING_UPDATE_WORKSPACE" &&
-      "stopping temporary workspace...");
+  const { onClick, isHighlighted, env, menuItems, container, comment } =
+    useTemplateCard(template);
 
   return (
     <Tilt
@@ -65,13 +29,9 @@ function TemplateCard(props: Props) {
       tiltReverse
     >
       <div
-        onClick={() => {
-          if (onClick) onClick(template);
-        }}
+        onClick={onClick}
         data-status={template.status}
-        data-highlighted={Boolean(
-          highlightedEnv && highlightedEnv.id === template.environment_id
-        )}
+        data-highlighted={isHighlighted}
         data-published={template.active}
         title={template.name}
         className="template-card"
@@ -101,7 +61,7 @@ function TemplateCard(props: Props) {
               </div>
             </div>
           </div>
-          <Menu items={menuItems(template)}></Menu>
+          <Menu items={menuItems}></Menu>
         </div>
 
         <div className="flex flex-col space-y-1">

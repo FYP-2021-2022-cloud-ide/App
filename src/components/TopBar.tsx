@@ -8,7 +8,6 @@ import {
 import UserMenu from "./UserMenu";
 import { useTheme } from "../contexts/theme";
 import NotiButton from "./NotiButton";
-import { useRouter } from "next/router";
 import { useCnails } from "../contexts/cnails";
 
 const TopBar = () => {

@@ -1,7 +1,5 @@
 import { NextPageContext } from "next";
-import { ChangeEventHandler, useCallback, useState } from "react";
 import CryingFace from "../components/CryingFace";
-import myToast from "../components/CustomToast";
 import sc from "../lib/statusCode.json";
 
 const defaultText =
@@ -14,11 +12,6 @@ const Error = ({
   statusCode: number;
   status?: any;
 }) => {
-  const [text, setText] = useState("");
-  // const onInputChange: ChangeEventHandler<HTMLTextAreaElement> = useCallback(
-  //   (e) => setText(e.currentTarget.value),
-  //   []
-  // );
   return (
     <div className="error-page">
       <div className="flex flex-col items-center space-y-2 min-w-[1/2] w-1/2">

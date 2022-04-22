@@ -21,8 +21,12 @@
   @apply flex flex-row items-center space-x-2;
 }
 
+.modal-form input[data-validate="false"] {
+  @apply border-red-400 border-2 bg-red-100 dark:bg-red-100  dark:border-red-400 dark:focus:outline-none text-gray-500 dark:text-gray-500 ring-2 ring-red-400 !important;
+}
+
 .modal-form .listbox-options {
-  @apply mb-10  absolute overflow-visible w-full py-1 mt-1  text-base bg-white dark:bg-gray-700 dark:text-gray-400 rounded-md shadow-lg shadow-black/30 max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm;
+  @apply z-10 mb-10  absolute overflow-visible w-full py-1 mt-1  text-base bg-white dark:bg-gray-700 dark:text-gray-400 rounded-md shadow-lg shadow-black/30 max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm;
 }
 
 /* button group  */
@@ -41,8 +45,4 @@
 
 .modal-form #btn-group #btn-cancel {
   @apply w-fit rounded-md px-4 py-2 bg-gray-400 hover:bg-gray-500 text-base leading-6 font-medium text-white shadow-sm  focus:border-blue-300 transition ease-in-out duration-150 sm:text-sm sm:leading-5;
-}
-
-.modal-form .validate-fail {
-  @apply border-red-400 border-2 bg-red-100 dark:bg-red-100  dark:border-red-400 dark:focus:outline-none text-gray-500 dark:text-gray-500 ring-2 ring-red-400 !important;
 }

@@ -31,6 +31,10 @@ import courseAPI from "../lib/api/courses";
 import { useWarning } from "./warning";
 import Loader from "../components/Loader";
 import { useSection } from "./section";
+import CreateEnvironmentForm from "../components/forms/CreateEnvironmentForm";
+import CreateTemplateForm from "../components/forms/CreateTemplateForm";
+import UpdateEnvironmentForm from "../components/forms/UpdateEnvironmentForm";
+import UpdateTemplateForm from "../components/forms/UpdateTemplateForm";
 
 type InstructorContextState = {
   // fetchSectionUserInfo: (sectionId: string) => Promise<void>;
@@ -127,6 +131,19 @@ type InstructorContextState = {
   getTemplateStudentWorkspaces: (
     templateId: string
   ) => Promise<StudentWorkspace[]>;
+  envCreateOpen: boolean;
+  setEnvCreateOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  envUpdateOpen: boolean;
+  setEnvUpdateOpen: React.Dispatch<React.SetStateAction<boolean>>;
+
+  templateCreateOpen: boolean;
+  setTemplateCreateOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  templateUpdateOpen: boolean;
+  setTemplateUpdateOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  envUpdateTarget: Environment;
+  setEnvUpdateTarget: React.Dispatch<React.SetStateAction<Environment>>;
+  templateUpdateTarget: Template;
+  setTemplateUpdateTarget: React.Dispatch<React.SetStateAction<Template>>;
 };
 
 const InstructorContext = createContext({} as InstructorContextState);
@@ -147,6 +164,13 @@ export const InstructorProvider = ({ children }: { children: JSX.Element }) => {
   const [highlightedEnv, setHighlightedEnv] = useState<Environment>();
   const { cancelablePromise } = useCancelablePromise();
   const { waitForConfirm } = useWarning();
+  const [envCreateOpen, setEnvCreateOpen] = useState(false);
+  const [envUpdateOpen, setEnvUpdateOpen] = useState(false);
+  const [templateCreateOpen, setTemplateCreateOpen] = useState(false);
+  const [templateUpdateOpen, setTemplateUpdateOpen] = useState(false);
+  const [envUpdateTarget, setEnvUpdateTarget] = useState<Environment>(null);
+  const [templateUpdateTarget, setTemplateUpdateTarget] =
+    useState<Template>(null);
 
   const getEnvironment = (id: string) =>
     environments.find((env) => env.id == id);
@@ -616,9 +640,47 @@ export const InstructorProvider = ({ children }: { children: JSX.Element }) => {
         unpublishTemplate,
         updateTemplateInternal,
         getTemplateStudentWorkspaces,
+        envCreateOpen,
+        setEnvCreateOpen,
+        envUpdateOpen,
+        setEnvUpdateOpen,
+        templateCreateOpen,
+        setTemplateCreateOpen,
+        templateUpdateOpen,
+        setTemplateUpdateOpen,
+        envUpdateTarget,
+        setEnvUpdateTarget,
+        templateUpdateTarget,
+        setTemplateUpdateTarget,
       }}
     >
       {children}
+      {/* environment create form  */}
+      <CreateEnvironmentForm
+        isOpen={envCreateOpen}
+        setOpen={setEnvCreateOpen}
+      />
+      {/* environment update form  */}
+      <UpdateEnvironmentForm
+        isOpen={envUpdateOpen && environments.length != 0}
+        setOpen={setEnvUpdateOpen}
+        target={envUpdateTarget}
+      />
+      {/* template create form   */}
+      <CreateTemplateForm
+        isOpen={templateCreateOpen && environments.length != 0}
+        setOpen={setTemplateCreateOpen}
+      />
+      {/* template update form  */}
+      <UpdateTemplateForm
+        isOpen={
+          templateUpdateOpen &&
+          environments.length != 0 &&
+          templates.length != 0
+        }
+        setOpen={setTemplateUpdateOpen}
+        target={templateUpdateTarget}
+      />
     </InstructorContext.Provider>
   );
 };

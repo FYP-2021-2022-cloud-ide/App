@@ -1,11 +1,10 @@
-import React, { useState, useCallback } from "react";
+import React from "react";
 import { NodeModel } from "@minoru/react-dnd-treeview";
 import FolderArrow from "./FolderArrow";
 import { TypeIcon } from "./TypeIcon";
-import { useDropzone } from "react-dropzone";
-import { isMobile } from "react-device-detect";
 import { useCustomTree } from "./customTreeContext";
 import useCustomNode from "./useCustomNode";
+import Leading from "./Leading";
 
 export type CustomData = {
   /**
@@ -34,33 +33,6 @@ export type Props = {
   isOpen: boolean;
 };
 
-const Leading = ({
-  depth,
-  droppable,
-}: {
-  depth: number;
-  droppable: boolean;
-}) => {
-  if (depth == 0 && !droppable)
-    return <div className="w-[24px] h-[24px] min-w-[24px]"></div>;
-  return (
-    <>
-      {Array(depth)
-        .fill(0)
-        .map((_, index) => {
-          return (
-            <div
-              key={index}
-              className="w-[24px] h-[24px] relative min-w-[24px]"
-            >
-              <div className="absolute h-full w-[1px] bg-gray-400 left-[50%]"></div>
-            </div>
-          );
-        })}
-    </>
-  );
-};
-
 const CustomNode = (props: Props) => {
   const { node, depth, isOpen } = props;
   const {
@@ -72,6 +44,8 @@ const CustomNode = (props: Props) => {
     onDragEnd,
     dragOver,
     handleToggle,
+    ref,
+    isFocus,
   } = useCustomNode(props);
   const { handleUpload } = useCustomTree();
   return (
@@ -82,7 +56,9 @@ const CustomNode = (props: Props) => {
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       draggable
-      className={` flex flex-row items-center px-2 hover:bg-blue-200 dark:hover:bg-white/10 w-full ${
+      ref={ref}
+      data-focus={isFocus}
+      className={` flex flex-row items-center px-2 hover:bg-blue-100 dark:hover:bg-white/10 w-full focus:border-green-300 ${
         dragOver && "bg-blue-200 dark:bg-gray-500"
       }`}
     >

@@ -1,5 +1,11 @@
 import flat from "flat";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import useUpdateEffect from "../../hooks/useUpdateEffect";
 import { fromStructureToData } from "./modalFormHelper";
 import { Props } from "./types";
@@ -14,6 +20,7 @@ interface ModalFormContextState<T> extends Props<T> {
    */
   changeData: (data: any, sectionId: string, entryId: string) => void;
   close: (isEnter?: boolean) => void;
+  onClose?: () => void;
 }
 
 const ModalFormContext = createContext({} as ModalFormContextState<any>);
@@ -42,31 +49,46 @@ export function ModalFormProvider<T>({
   /**
    * This hooks clean the form data when the form is closed
    */
-  useUpdateEffect(() => {
-    if (!isOpen) setData(fromStructureToData(formStructure));
-  }, [isOpen]);
+  // useUpdateEffect(() => {
+  //   if (!isOpen) setData(fromStructureToData(formStructure));
+  // }, [isOpen]);
 
-  const changeData = (value: any, sectionId: string, entryId: string) => {
-    const newData = flat.unflatten({
-      ...(flat.flatten(data) as object),
-      [`${sectionId}.${entryId}`]: value,
-    }) as T;
-    setData(newData);
-    if (onChange) onChange(newData, `${sectionId}.${entryId}`);
-  };
+  const changeData = useCallback(
+    (value: any, sectionId: string, entryId: string) => {
+      const newData = flat.unflatten({
+        ...(flat.flatten(data) as object),
+        [`${sectionId}.${entryId}`]: value,
+      }) as T;
+      setData(newData);
+      if (onChange) onChange(newData, `${sectionId}.${entryId}`);
+    },
+    [onChange, setData, data]
+  );
 
-  const close = (isEnter: boolean = false) => {
-    setOpen(false);
-    if (isEnter) {
-      if (onEnter) onEnter(data);
-    }
-  };
+  const close = useCallback(
+    (isEnter: boolean = false) => {
+      setOpen(false);
+      if (isEnter) {
+        if (onEnter) onEnter(data);
+      }
+    },
+    [onEnter, setOpen, data]
+  );
+
+  const onClose = useCallback(() => {
+    if (props.onClose) props.onClose(data);
+  }, [props.onClose, data]);
+
+  const onOpen = useCallback(() => {
+    setData(fromStructureToData(formStructure));
+    if (props.onOpen) props.onOpen();
+  }, [props.onOpen, setData, formStructure]);
 
   if (!data) return <></>;
 
   return (
     <ModalFormContext.Provider
-      value={{ data, setData, changeData, close, ...props }}
+      value={{ ...props, data, setData, changeData, close, onClose, onOpen }}
     >
       {children}
     </ModalFormContext.Provider>

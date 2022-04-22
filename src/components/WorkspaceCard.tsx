@@ -1,5 +1,5 @@
-import React, { useCallback } from "react";
-import CardMenu, { MenuItem } from "./CardMenu";
+import React from "react";
+import CardMenu from "./CardMenu";
 import { Workspace } from "../lib/cnails";
 import useCleanTilt from "../hooks/useCleanTilt";
 import Tilt from "react-parallax-tilt";

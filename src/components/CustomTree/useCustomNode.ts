@@ -4,6 +4,7 @@ import { useDropzone } from "react-dropzone";
 import { useCustomTree } from "./customTreeContext";
 import { Props } from "./CustomNode";
 import useDoubleClick from "../../hooks/useDoubleClick";
+import useOnClick from "../../hooks/useOnClick";
 
 const useCustomNode = (props: Props) => {
   const { node, isOpen } = props;
@@ -40,6 +41,17 @@ const useCustomNode = (props: Props) => {
         handleUpload(acceptedFiles, fileRejections, event, node);
     },
   });
+
+  const [isFocus, setIsFocus] = useState<boolean>(false);
+
+  const unfocus: (e: MouseEvent, inside: boolean) => void = useCallback(
+    (e, inside) => {
+      setIsFocus(inside);
+    },
+    []
+  );
+
+  const { ref } = useOnClick<HTMLButtonElement>(unfocus);
 
   const onSingleClick = useCallback(
     async (e: React.MouseEvent) => {
@@ -110,6 +122,8 @@ const useCustomNode = (props: Props) => {
     dragOver,
     getInputProps,
     handleToggle,
+    isFocus,
+    ref,
   };
 };
 

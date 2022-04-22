@@ -5,11 +5,10 @@ import { Environment } from "../lib/cnails";
 import useCleanTilt from "../hooks/useCleanTilt";
 import EmbeddingWorkspaceCard from "./EmbeddingWorkspaceCard";
 import { useContainers } from "../contexts/containers";
+import useEnvironmentCard from "../hooks/useEnvironmentCard";
 
 type Props = {
   environment: Environment;
-  onClick?: (environment: Environment) => void;
-  menuItems: (environment: Environment) => MenuItem[];
   zIndex?: number;
 };
 
@@ -51,25 +50,11 @@ const LoadingEnvCard = (props: Props) => {
 };
 
 function EnvironmentCard(props: Props) {
-  const { environment, onClick, menuItems, zIndex } = props;
+  const { environment, zIndex } = props;
+  const { menuItems, container, comment } = useEnvironmentCard(environment);
   const { ref, cleanStyle } = useCleanTilt(
     zIndex ? `z-index : ${zIndex};` : ""
   );
-  const { containers } = useContainers();
-  const status = environment.status;
-  const container = containers.find(
-    (container) => container.redisPatch.sourceId == environment.id
-  );
-
-  const comment =
-    (status == "CREATING" && "being created...") ||
-    (status == "REMOVING" && "being removed...") ||
-    (status == "UPDATING" && "being updated...") ||
-    (status == "STARTING_UPDATE_WORKSPACE" &&
-      "starting temporary workspace...") ||
-    (status == "STOPPING_UPDATE_WORKSPACE" &&
-      "stopping temporary workspace...") ||
-    (status == "UPDATING_INTERNAL" && "updating internal...");
 
   return (
     <Tilt
@@ -82,11 +67,8 @@ function EnvironmentCard(props: Props) {
       <div
         title={environment.name}
         className="env-card"
-        data-status={status}
-        data-container={Boolean(container)}
-        onClick={() => {
-          if (onClick) onClick(environment);
-        }}
+        data-status={environment.status}
+        data-container={Boolean(container && container.status == "DEFAULT")}
       >
         <div className="flex flex-row items-start">
           <div className="w-full">
@@ -109,14 +91,10 @@ function EnvironmentCard(props: Props) {
               </div>
             </div>
           </div>
-          <CardMenu items={menuItems(environment)}></CardMenu>
+          <CardMenu items={menuItems}></CardMenu>
         </div>
         <div className="flex flex-col space-y-1">
-          {container && (
-            <EmbeddingWorkspaceCard
-              container={container}
-            ></EmbeddingWorkspaceCard>
-          )}
+          {container && <EmbeddingWorkspaceCard container={container} />}
           <p id="status" className="text-xs  text-gray-400">
             {comment}
           </p>

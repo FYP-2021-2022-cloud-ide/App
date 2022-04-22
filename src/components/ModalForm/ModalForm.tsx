@@ -134,9 +134,7 @@ function Wrapped<T>() {
     <Modal
       isOpen={isOpen}
       setOpen={setOpen}
-      onClose={() => {
-        if (onClose) onClose(data);
-      }}
+      onClose={onClose}
       onOpen={onOpen}
       clickOutsideToClose={clickOutsideToClose}
       escToClose={escToClose}

@@ -8,9 +8,10 @@ import {
   InstructorProvider,
   useInstructor,
 } from "../../../../contexts/instructor";
-import EnvironmentTemplateWrapper from "../../../../components/EnvironmentTemplateWrapper";
 import AnnouncementForm from "../../../../components/forms/AnnouncementForm";
 import { SectionProvider } from "../../../../contexts/section";
+import EnvironmentList from "../../../../components/EnvironmentList";
+import TemplateList from "../../../../components/TemplateList";
 
 const Wrapper = () => {
   // data fetching from API
@@ -50,7 +51,10 @@ const Wrapper = () => {
             ]}
           ></CardMenu>
         </div>
-        <EnvironmentTemplateWrapper></EnvironmentTemplateWrapper>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 w-full">
+          <EnvironmentList />
+          <TemplateList />
+        </div>
       </div>
       <AnnouncementForm
         isOpen={announceFormOpen}
@@ -64,7 +68,7 @@ const Home = () => {
   return (
     <SectionProvider>
       <InstructorProvider>
-        <Wrapper></Wrapper>
+        <Wrapper />
       </InstructorProvider>
     </SectionProvider>
   );

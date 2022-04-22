@@ -25,14 +25,11 @@ const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
 });
 
 const MarkdownSupported = () => {
+  const onClick = useCallback(() => {
+    window.open("https://www.markdownguide.org/basic-syntax/");
+  }, []);
   return (
-    <a
-      className="markdown-support"
-      title="Markdown Basic"
-      onClick={() => {
-        window.open("https://www.markdownguide.org/basic-syntax/");
-      }}
-    >
+    <a className="markdown-support" title="Markdown Basic" onClick={onClick}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 640 512"
@@ -44,56 +41,6 @@ const MarkdownSupported = () => {
     </a>
   );
 };
-
-const MDE = memo(
-  ({
-    text: _text,
-    onChange,
-    onFocus,
-    mdeRef,
-  }: {
-    text: string;
-    onChange: (text: string) => void;
-    onFocus: () => void;
-    mdeRef: React.MutableRefObject<EasyMDE>;
-  }) => {
-    const options = useMemo(() => {
-      return {
-        spellChecker: false,
-        autofocus: false,
-        initialValue: _text,
-        // showIcons: ["undo"],
-        // side by side has low render performance so disable it
-        hideIcons: ["fullscreen", "side-by-side"],
-        sideBySideFullscreen: false,
-        indentWithTabs: false,
-        status: false,
-        maxHeight: "500px",
-        renderingConfig: {},
-        previewRender: () => {
-          return ReactDOMServer.renderToString(
-            <MyMarkDown text={mdeRef.current.codemirror.getValue()} />
-          );
-        },
-      };
-    }, []);
-    return (
-      <div>
-        <SimpleMDE
-          onChange={onChange}
-          onFocus={onFocus}
-          options={options}
-          getMdeInstance={(instance) => {
-            mdeRef.current = instance;
-          }}
-        />
-      </div>
-    );
-  },
-  (prevProps, nextProps) => {
-    return prevProps.onChange == nextProps.onChange;
-  }
-);
 
 function Component(props: EntryProps) {
   const [focusTrapActive, setFocusTrapActive] = useState(false);
@@ -117,13 +64,45 @@ function Component(props: EntryProps) {
 
   const onChange = useCallback(() => {
     changeData(mdeRef.current.codemirror.getValue(), sectionId, id);
-  }, [changeData]);
+  }, [changeData, mdeRef, sectionId, id]);
+
+  const onFocus = useCallback(() => {
+    setFocusTrapActive(true);
+  }, [setFocusTrapActive]);
+
+  const getMdeInstance = useCallback(
+    (instance) => {
+      mdeRef.current = instance;
+    },
+    [mdeRef]
+  );
+
+  const options = useMemo(() => {
+    return {
+      spellChecker: false,
+      autofocus: false,
+      // initialValue: ,
+      // showIcons: ["undo"],
+      // side by side has low render performance so disable it
+      hideIcons: ["fullscreen", "side-by-side"],
+      sideBySideFullscreen: false,
+      indentWithTabs: false,
+      status: false,
+      maxHeight: "500px",
+      renderingConfig: {},
+      previewRender: () => {
+        return ReactDOMServer.renderToString(
+          <MyMarkDown text={mdeRef.current.codemirror.getValue()} />
+        );
+      },
+    };
+  }, []);
 
   if (entry.type != "markdown") return <></>;
 
   return (
     <Custom {...props}>
-      {window && window.navigator ? (
+      {window && window.navigator && (
         <>
           <FocusTrap
             active={focusTrapActive}
@@ -136,20 +115,17 @@ function Component(props: EntryProps) {
             }}
           >
             <div>
-              <MDE
-                mdeRef={mdeRef}
-                text={data[sectionId][id]}
+              <SimpleMDE
                 onChange={onChange}
-                onFocus={() => {
-                  setFocusTrapActive(true);
-                }}
+                onFocus={onFocus}
+                options={options}
+                value={data[sectionId][id]}
+                getMdeInstance={getMdeInstance}
               />
               <MarkdownSupported></MarkdownSupported>
             </div>
           </FocusTrap>
         </>
-      ) : (
-        <></>
       )}
     </Custom>
   );

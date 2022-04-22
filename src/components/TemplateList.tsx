@@ -1,41 +1,31 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { DocumentTextIcon } from "@heroicons/react/outline";
 import { PlusCircleIcon } from "@heroicons/react/solid";
 //testing
 import EmptyDiv from "./EmptyDiv";
-import { Environment, Template } from "../lib/cnails";
 import TemplateCard from "./TemplateCard";
-import { MenuItem } from "./CardMenu";
+import myToast from "./CustomToast";
+import { useInstructor } from "../contexts/instructor";
 
-export type Props = {
-  templates: Template[];
-  environments: Environment[];
-  sectionUserID: string;
-  highlightedEnv?: Environment;
-  onCreate?: () => void;
-  onClick?: (template: Template) => void;
-  menuItems: (template: Template) => MenuItem[];
-};
+const TemplateList = () => {
+  const { environments, templates, setTemplateCreateOpen } = useInstructor();
 
-const TemplateList = ({
-  templates,
-  highlightedEnv,
-  onClick,
-  onCreate,
-  menuItems,
-}: Props) => {
+  const onCreate = useCallback(() => {
+    if (environments.length == 0)
+      myToast.warning(
+        "You need to have at least one environment before creating a template."
+      );
+    else {
+      setTemplateCreateOpen(true);
+    }
+  }, [setTemplateCreateOpen]);
+
   return (
     <div className="template-list">
       <div id="header">
         <DocumentTextIcon id="icon"></DocumentTextIcon>
         <div id="title">Templates</div>
-        <button
-          onClick={() => {
-            if (onCreate) onCreate();
-          }}
-          id="add"
-          title="create template"
-        >
+        <button onClick={onCreate} id="add" title="create template">
           <PlusCircleIcon></PlusCircleIcon>
         </button>
       </div>
@@ -54,21 +44,12 @@ const TemplateList = ({
                 }
               })
               .map((template, index) => {
-                const highlighted = Boolean(
-                  highlightedEnv &&
-                    template.environment_id === highlightedEnv.id
-                );
                 return (
                   <TemplateCard
                     key={template.id}
-                    highlighted={highlighted}
                     template={template}
-                    onClick={() => {
-                      if (onClick) onClick(template);
-                    }}
                     zIndex={templates.length - index}
-                    menuItems={menuItems}
-                  ></TemplateCard>
+                  />
                 );
               })}
           </div>

@@ -32,7 +32,6 @@ const Wrapped = () => {
     treeData1,
     treeData2,
     setTreeData1,
-    setTreeData2,
     progress1,
     progress2,
     setProgress1,
@@ -45,14 +44,8 @@ const Wrapped = () => {
     googleFilesRef,
     expandGoogleFolder,
   } = useFileTransfer();
-  const {
-    listFolders,
-    uploadFiles,
-    moveFile,
-    makeFolder,
-    removeFile,
-    downloadFileToUser,
-  } = localFileAPI;
+  const { listFolders, moveFile, removeFile, downloadFileToUser } =
+    localFileAPI;
   const { sub } = useCnails();
 
   const handleMove = useCallback(
@@ -320,12 +313,13 @@ const Wrapped = () => {
             )}
           </TooltipProvider>
           {progress1 && (
-            <p
-              id="progress-text"
-              className="text-gray-600 text-sm dark:text-gray-300"
-            >
-              {progress1}
-            </p>
+            <div className="select-none cursor-default text-gray-400 dark:text-gray-300 whitespace-nowrap flex flex-row flex-nowrap items-center">
+              <button
+                id="progress-text"
+                className=" btn btn-circle btn-lg btn-ghost loading  "
+              ></button>
+              <p>{progress1}</p>
+            </div>
           )}
         </div>
         <CustomTree

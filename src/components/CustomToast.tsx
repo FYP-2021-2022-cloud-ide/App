@@ -1,6 +1,8 @@
 import React from "react";
 import toast, { Toast } from "react-hot-toast";
+import { Container } from "../lib/cnails";
 import { CLICK_TO_DISMISS, CLICK_TO_REPORT } from "../lib/constants";
+import TempContainerToast from "./TempContainerToast";
 
 export const loadingTime = 3 * 60000;
 
@@ -147,6 +149,19 @@ const myToast = {
       },
       onClick,
       clickToDismiss
+    );
+  },
+  tempContainer: (container: Container) => {
+    myToast.custom(
+      <TempContainerToast container={container}></TempContainerToast>,
+      {
+        className: "toaster toaster-temp-container ",
+        icon: "🗂",
+        id: container.id,
+        duration: 99999 * 86400,
+      },
+      undefined,
+      false
     );
   },
   /**

@@ -8,12 +8,11 @@ import React, {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useRef,
   useState,
 } from "react";
 import { DropEvent, FileRejection } from "react-dropzone";
-import useComponentVisible from "../../hooks/useComponentVisible";
+import useOnClick from "../../hooks/useOnClick";
 import Loader from "../Loader";
 import ContextMenu, { MenuItem } from "./ContextMenu";
 import { CustomData } from "./CustomNode";
@@ -172,6 +171,7 @@ type CustomTreeContextState = {
     tree: NodeModel<CustomData>[],
     options: DropOptions<CustomData>
   ) => void;
+  lastActiveNodeRef?: React.MutableRefObject<string>;
 } & Omit<Props, "onLastActiveNodeChange">;
 
 const CustomTreeContext = createContext({} as CustomTreeContextState);
@@ -201,11 +201,15 @@ export const CustomTreeProvider = ({
   } = props;
   const ref = useRef<TreeMethods>();
   const openIdsRef = useRef<string[]>([]);
-  const {
-    ref: menuRef,
-    isComponentVisible: isMenuVisible,
-    setIsComponentVisible: setIsMenuVisible,
-  } = useComponentVisible(false);
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const closeMenu: (e: MouseEvent, inside: boolean) => void = useCallback(
+    (e, inside) => {
+      if (!inside) setIsMenuVisible(false);
+    },
+    [setIsMenuVisible]
+  );
+
+  const { ref: menuRef } = useOnClick<HTMLDivElement>(closeMenu);
   const [menuLocation, setMenuLocation] = useState([0, 0]);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const lastActiveNodeRef = useRef<string>();
@@ -307,6 +311,7 @@ export const CustomTreeProvider = ({
         closeAll,
         onDrop,
         canDrop,
+        lastActiveNodeRef,
       }}
     >
       {children}
