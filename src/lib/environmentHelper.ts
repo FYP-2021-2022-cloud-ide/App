@@ -16,37 +16,12 @@ export const patchEnvironments = (
   containers: Container[]
 ) => {
   return environments.map<Environment>((env) => {
-    for (let container of containers) {
-      if (
-        container.redisPatch.data &&
-        container.redisPatch.sourceId == env.id
-      ) {
-        // it is a temporary workspace to update this env
-        if (container.id == "")
-          return {
-            ...env,
-            status: "STARTING_UPDATE_WORKSPACE",
-          };
-        else {
-          if (container.status == "REMOVING") {
-            return {
-              ...env,
-              temporaryContainerId: "", // removing the container id
-              status: "STOPPING_UPDATE_WORKSPACE",
-            };
-          } else
-            return {
-              ...env,
-              temporaryContainerId: container.id,
-              status: "UPDATING_INTERNAL",
-            };
-        }
-      }
-    }
-    // no container is related this environment
+    const container = containers.find(
+      (container) => container.redisPatch.sourceId == env.id
+    );
     return {
       ...env,
-      temporaryContainerId: "",
+      temporaryContainerId: container ? container.id : "",
       status: "DEFAULT",
     };
   });

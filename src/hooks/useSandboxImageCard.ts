@@ -62,7 +62,7 @@ const useSandboxImageCard = (sandboxImage: SandboxImage): Return => {
         setUpdateOpen(true);
         setUpdateTarget(sandboxImage);
       },
-      // show: !Boolean(sandboxImage.containerId),
+      show: !Boolean(container),
     },
     {
       text: sandboxImage.containerId ? "Stop workspace" : "Start workspace",
@@ -84,11 +84,11 @@ const useSandboxImageCard = (sandboxImage: SandboxImage): Return => {
       onClick: async () => {
         await removeSandboxImage(sandboxImage.id);
       },
-      // show: !Boolean(sandboxImage.containerId),
+      show: !Boolean(container),
     },
     {
       text: "Update Internal",
-      // show: !Boolean(sandboxImage.containerId),
+      show: !Boolean(container),
       onClick: async () => {
         await createContainer({
           memLimit: 0,

@@ -18,54 +18,14 @@ export const patchSandboxes = (
   containers: Container[]
 ) => {
   return sandboxImages.map<SandboxImage>((si) => {
-    for (let container of containers) {
-      if (!container.isTemporary && container.redisPatch.sourceId == si.id) {
-        // it is a normal workspace
-        if (container.id == "")
-          return {
-            ...si,
-            status: "STARTING_WORKSPACE",
-          };
-        else {
-          if (container.status == "REMOVING")
-            return {
-              ...si,
-              status: "STOPPING_WORKSPACE",
-            };
-          else
-            return {
-              ...si,
-              containerId: container.id,
-              status: "DEFAULT",
-            };
-        }
-      }
-      if (container.redisPatch.sourceId == si.id) {
-        // it is a temporary workspace
-        if (container.id == "")
-          return {
-            ...si,
-            status: "STARTING_UPDATE_WORKSPACE",
-          };
-        else {
-          if (container.status == "REMOVING") {
-            return {
-              ...si,
-              status: "STOPPING_UPDATE_WORKSPACE",
-            };
-          } else
-            return {
-              ...si,
-              containerId: container.id,
-              status: "UPDATING_INTERNAL",
-            };
-        }
-      }
-    }
+    const container = containers.find(
+      (container) => container.redisPatch.sourceId == si.id
+    );
+
     // no sandbox is related to this environment
     return {
       ...si,
-      containerId: "",
+      containerId: container ? container.id : "",
       status: "DEFAULT",
     };
   }); // otherwise the returned array will have status : string which is not compatible with SandboxImage

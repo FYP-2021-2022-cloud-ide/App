@@ -19,5 +19,5 @@ div#course-list-tab #sort-order {
 }
 
 div#course-list-tab {
-  @apply flex flex-col md:flex-row md:w-full space-y-2 md:space-y-0 md:justify-between;
+  @apply flex flex-col lg:flex-row lg:w-full space-y-2 lg:space-y-0 lg:justify-between;
 }

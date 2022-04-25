@@ -1,5 +1,3 @@
-import { Container } from "./api/api";
-
 export const isTemporary = (event: string) => {
   if (
     event == "ENV_CREATE" ||
@@ -29,5 +27,5 @@ export const getType = (
     event == "SANDBOX_START_WORKSPACE"
   )
     return "SANDBOX";
-  return "STUDENT_WORKSPACE";
+  return "STUDENT_WORKSPACE"
 };

@@ -6,6 +6,7 @@ import { SandboxImage } from "../lib/cnails";
 import useCleanTilt from "../hooks/useCleanTilt";
 import WorkspaceIndicator from "./WorkspaceIndicator";
 import useSandboxImageCard from "../hooks/useSandboxImageCard";
+import { ClockIcon } from "@heroicons/react/outline";
 
 type Props = {
   sandboxImage: SandboxImage;
@@ -15,8 +16,8 @@ type Props = {
 
 const SandboxImagesCard = (props: Props) => {
   const { sandboxImage, zIndex, id } = props;
-  const { status, containerId } = sandboxImage;
-  const { onClick, color, menuItems, comment, container } =
+  const { status } = sandboxImage;
+  const { onClick, color, menuItems, comment, container, duration } =
     useSandboxImageCard(sandboxImage);
   const { ref, cleanStyle } = useCleanTilt(
     zIndex ? `z-index : ${zIndex};` : ""
@@ -63,9 +64,20 @@ const SandboxImagesCard = (props: Props) => {
           </div>
           <CardMenu items={menuItems} />
         </div>
-        <p id="status" className="text-xs  text-gray-400">
-          {comment}
-        </p>
+        <div className="w-full flex flex-row-reverse justify-between ">
+          <div id="duration" className="flex flex-row items-center space-x-1">
+            <ClockIcon className="h-4 w-4 text-gray-600 dark:text-gray-300 "></ClockIcon>
+            <div
+              id="duration-text"
+              className="font-medium text-xs text-gray-600 dark:text-gray-300"
+            >
+              {duration}
+            </div>
+          </div>
+          <p id="status" className="text-xs  text-gray-400">
+            {comment}
+          </p>
+        </div>
       </div>
     </Tilt>
   );

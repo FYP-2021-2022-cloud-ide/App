@@ -47,7 +47,17 @@ const TempContainerToast = ({
       </p>
 
       <pre className="bg-gray-100 dark:bg-gray-800 h-48 rounded-md overflow-scroll text-2xs hide-scroll p-2 max-w-[300px]">
-        {JSON.stringify(container.redisPatch, null, 2)}
+        {JSON.stringify(
+          {
+            cause: container.redisPatch.cause,
+            sourceId: container.redisPatch.sourceId,
+            data: container.redisPatch.data,
+            containerId: container.redisPatch.containerId,
+            requestAt: container.redisPatch.requestAt,
+          },
+          null,
+          2
+        )}
       </pre>
 
       <button className="btn btn-xs border-none" onClick={onClick}>

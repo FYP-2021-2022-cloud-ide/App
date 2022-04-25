@@ -13,60 +13,12 @@ export const patchTemplates = (
   containers: Container[]
 ) => {
   return templates.map<Template>((template) => {
-    for (let container of containers) {
-      if (
-        !container.isTemporary &&
-        container.redisPatch.sourceId == template.id
-      ) {
-        // it is a template workspace
-        if (container.id == "")
-          return {
-            ...template,
-            status: "STARTING_WORKSPACE",
-          };
-        else {
-          if (container.status == "REMOVING")
-            return {
-              ...template,
-              containerId: "", // clear the container id
-              status: "STOPPING_WORKSPACE",
-            };
-          else
-            return {
-              ...template,
-              containerId: container.id,
-              status: "DEFAULT",
-            };
-        }
-      }
-
-      if (container.redisPatch.sourceId == template.id) {
-        // this is a temporary workspace
-        if (container.id == "")
-          return {
-            ...template,
-            status: "STARTING_UPDATE_WORKSPACE",
-          };
-        else {
-          if (container.status == "REMOVING") {
-            return {
-              ...template,
-              containerId: "", // clear the container Id
-              status: "STOPPING_UPDATE_WORKSPACE",
-            };
-          } else
-            return {
-              ...template,
-              containerId: container.id,
-            };
-        }
-      }
-    }
-
-    // no template is related to this environment
+    const container = containers.find(
+      (container) => container.redisPatch.sourceId == template.id
+    );
     return {
       ...template,
-      containerId: "",
+      containerId: container ? container.id : "",
       status: "DEFAULT",
     };
   });

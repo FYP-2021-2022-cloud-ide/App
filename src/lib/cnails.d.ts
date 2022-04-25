@@ -43,14 +43,7 @@ type Environment = {
    * if the status is `REMOVING`, the remove request is being processed.
    * if the status is undefined or null, user see it normally.
    */
-  status:
-    | "CREATING"
-    | "REMOVING"
-    | "UPDATING"
-    | "STARTING_UPDATE_WORKSPACE"
-    | "UPDATING_INTERNAL"
-    | "STOPPING_UPDATE_WORKSPACE"
-    | "DEFAULT";
+  status: "CREATING" | "REMOVING" | "UPDATING" | "DEFAULT";
 };
 
 type Template = {
@@ -71,15 +64,7 @@ type Template = {
    * if status is `UDPATING`, the update request is being processed and user should not be able to update it.
    * if the status is undefined or null, card will show normally
    */
-  status?:
-    | "CREATING"
-    | "UPDATING"
-    | "REMOVING"
-    | "STARTING_WORKSPACE"
-    | "STOPPING_WORKSPACE"
-    | "STARTING_UPDATE_WORKSPACE"
-    | "STOPPING_UPDATE_WORKSPACE"
-    | "DEFAULT";
+  status?: "CREATING" | "UPDATING" | "REMOVING" | "DEFAULT";
 };
 
 type Course = {
@@ -121,16 +106,7 @@ type SandboxImage = {
    * if the sandbox image is `UPDATING`, the update request is being processed and should not let user update it
    * if the sandbox image is `REMOVING`, the remove request is being processed.
    */
-  status:
-    | "CREATING"
-    | "UPDATING"
-    | "REMOVING"
-    | "STARTING_WORKSPACE"
-    | "STOPPING_WORKSPACE"
-    | "STARTING_UPDATE_WORKSPACE"
-    | "STOPPING_UPDATE_WORKSPACE"
-    | "UPDATING_INTERNAL"
-    | "DEFAULT";
+  status: "CREATING" | "UPDATING" | "REMOVING" | "DEFAULT";
 };
 
 type ContainerList = {

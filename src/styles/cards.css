@@ -59,7 +59,8 @@
 .template-card[data-status="DEFAULT"] #loading-pulse,
 .template-card[data-status="DEFAULT"] #status,
 .template-card:not([data-status="DEFAULT"]) .menu,
-.template-card:not([data-status="DEFAULT"]) #description {
+.template-card:not([data-status="DEFAULT"]) #description,
+.template-card:not([data-status="DEFAULT"]) #attributes {
   @apply hidden;
 }
 
@@ -76,8 +77,9 @@
 /* sandbox card*/
 .sandbox-card[data-status="DEFAULT"] #loading-pulse,
 .sandbox-card[data-status="DEFAULT"] #status,
-.sandbox-card:not([data-status="DEFAULT"], [data-status="UPDATING_INTERNAL"])
-  .menu {
+.sandbox-card[data-container="false"] #duration,
+.sandbox-card:not([data-status="DEFAULT"]) .menu,
+.sandbox-card:not([data-status="DEFAULT"]) #description {
   @apply hidden;
 }
 
@@ -88,6 +90,7 @@
 /* workspace card */
 .workspace-card[data-status="DEFAULT"] #status,
 .workspace-card[data-status="DEFAULT"] #loading-pulse,
+.workspace-card[data-container="false"] #duration,
 .workspace-card:not([data-status="DEFAULT"]) #description,
 .workspace-card:not([data-status="DEFAULT"]) .menu,
 .workspace-card:not([data-status="DEFAULT"]) #attributes {
