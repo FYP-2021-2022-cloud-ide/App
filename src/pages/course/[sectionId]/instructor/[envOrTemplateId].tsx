@@ -1,8 +1,7 @@
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import DataTable, {
   createTheme,
-  PaginationComponentProps,
   TableColumn,
 } from "react-data-table-component";
 
@@ -26,6 +25,18 @@ const TemplateBoard = ({ template }: { template: Template }) => {
   useEffect(() => {
     async function fetch() {
       setData(await getTemplateStudentWorkspaces(template.id));
+      // setData(
+      //   exampleData.map((s) => {
+      //     return {
+      //       status: s.status == 2 ? "OFF" : "ON",
+      //       workspaceId: s.workspace,
+      //       student: {
+      //         name: s.name,
+      //         sub: s.sub,
+      //       },
+      //     };
+      //   })
+      // );
     }
     fetch();
   }, [template.id, getTemplateStudentWorkspaces]);
@@ -89,93 +100,6 @@ const TemplateBoard = ({ template }: { template: Template }) => {
 
   const options = [15, 20, 30, 50];
 
-  const PaginationComponent = (
-    props: PaginationComponentProps & {
-      selectedRows: Notification[];
-      userId: string;
-      removeNotification: any;
-      setSelectedRows: any;
-      fetchNotifications: any;
-      options: number[];
-    }
-  ) => {
-    const {
-      onChangeRowsPerPage,
-      rowCount,
-      rowsPerPage,
-      currentPage,
-      onChangePage,
-    } = props;
-    const top = rowsPerPage * (currentPage - 1) + 1;
-    const bottom = Math.min(rowsPerPage + top - 1, rowCount);
-    useEffect(() => {
-      onChangeRowsPerPage(15, currentPage);
-    }, []);
-    return (
-      <div className="flex flex-row bg-gray-100 dark:bg-black/50 rounded-b-md p-2 justify-between items-center rdt_pagination">
-        <div>{/* dummy*/}</div>
-        <div className="flex flex-row items-center space-x-2 text-sm">
-          <p>Rows per page : </p>
-          <select
-            className=" bg-gray-200 dark:bg-gray-600"
-            value={rowsPerPage}
-            onChange={(e) => {
-              onChangeRowsPerPage(Number(e.target.value), currentPage);
-            }}
-          >
-            {options.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-
-          <p>
-            {top}-{bottom} of {rowCount}
-          </p>
-          <div className="btn-group border-0 outline-none border-none flex-nowrap">
-            <button
-              disabled={currentPage == 1}
-              onClick={() => {
-                onChangePage(1, rowCount);
-              }}
-              className="btn btn-xs bg-gray-400 dark:bg-gray-800 dark:hover:bg-white/20 border-0 outline-none "
-            >
-              {"|<"}
-            </button>
-            <button
-              disabled={currentPage == 1}
-              onClick={() => {
-                onChangePage(currentPage - 1, rowCount);
-              }}
-              className="btn btn-xs bg-gray-400 dark:bg-gray-800 dark:hover:bg-white/20 border-0 outline-none"
-            >
-              {"<"}
-            </button>
-            <button
-              disabled={currentPage == Math.ceil(rowCount / rowsPerPage)}
-              onClick={() => {
-                onChangePage(currentPage + 1, rowCount);
-              }}
-              className="btn btn-xs bg-gray-400 dark:bg-gray-800 dark:hover:bg-white/20 border-0 outline-none"
-            >
-              {">"}
-            </button>
-            <button
-              disabled={currentPage == Math.ceil(rowCount / rowsPerPage)}
-              onClick={() => {
-                onChangePage(Math.ceil(rowCount / rowsPerPage), rowCount);
-              }}
-              className="btn btn-xs bg-gray-400 dark:bg-gray-800 dark:hover:bg-white/20 border-0 outline-none"
-            >
-              {">|"}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   createTheme(
     "good",
     {
@@ -199,7 +123,7 @@ const TemplateBoard = ({ template }: { template: Template }) => {
             defaultSortFieldId={"student"}
             data={data}
             theme="good"
-            paginationComponent={PaginationComponent}
+            // paginationComponent={PaginationComponent}
             pagination
           ></DataTable>
         </div>

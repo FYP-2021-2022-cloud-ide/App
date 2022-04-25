@@ -13,7 +13,7 @@ const CourseContext = createContext({} as CourseContextState);
 
 export const useCourses = () => useContext(CourseContext);
 
-type SortOrder = "time" | "title";
+export type SortOrder = "time" | "title";
 
 export const CourseProvider = ({ children }: { children: JSX.Element }) => {
   const [sortOrder, setSortOrder] = useState<SortOrder>("title");

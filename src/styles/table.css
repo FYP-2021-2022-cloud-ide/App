@@ -2,8 +2,8 @@
   @apply bg-gray-100 dark:bg-black/50 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-black/40 border-[#D5D6D8] dark:border-[#2F3947] !important;
 }
 
-.rdt_pagination {
-  @apply text-gray-700 dark:text-gray-300  border-t-[1px] border-[#D5D6D8] dark:border-[#2F3947] border-b border-l border-r;
+.rdt_Pagination {
+  @apply text-gray-700 dark:text-gray-300  border-t-[1px] border-[#D5D6D8] dark:border-[#2F3947] border-b border-l border-r bg-gray-100 dark:bg-black/50 rounded-b-md p-2 justify-between sm:items-center;
 }
 
 .rdt_Table {
@@ -19,8 +19,19 @@
 }
 
 /* this will affect the daisy ui button */
-.rdt_pagination .btn-disabled,
-.rdt_pagination .btn[disabled] {
+.rdt_Pagination .btn-disabled,
+.rdt_Pagination .btn[disabled] {
   --tw-bg-opacity: 0.3;
   --tw-text-opacity: 0.4;
+}
+
+.rdt_Pagination #pagination-first-page,
+.rdt_Pagination #pagination-previous-page,
+.rdt_Pagination #pagination-next-page,
+.rdt_Pagination #pagination-last-page {
+  @apply fill-gray-600 dark:fill-gray-300;
+}
+
+.rdt_Pagination button[aria-disabled="true"] {
+  @apply opacity-40;
 }

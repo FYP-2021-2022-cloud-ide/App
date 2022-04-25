@@ -48,7 +48,7 @@ const Wrapped = () => {
     localFileAPI;
   const { sub } = useCnails();
 
-  const handleMove = useCallback(
+  const tree1HandleMove = useCallback(
     async (args: HandleMoveArgs) => {
       if (args.sameTree == true) {
         const { treeData, options } = args;
@@ -133,7 +133,7 @@ const Wrapped = () => {
     return true;
   }, []);
 
-  const getNodeActions = useCallback(
+  const tree1GetNodeActions = useCallback(
     (node: NodeModel<CustomData>, args: GetNodeActionsArgs) => {
       const { open } = args;
       return [
@@ -200,7 +200,7 @@ const Wrapped = () => {
     ]
   );
 
-  const getRootActions = useCallback((args: GetRootActionsArgs) => {
+  const tree1GetRootActions = useCallback((args: GetRootActionsArgs) => {
     const { open } = args;
     return [
       {
@@ -218,7 +218,7 @@ const Wrapped = () => {
     ];
   }, []);
 
-  const handleMove2 = useCallback(
+  const tree2HandleMove = useCallback(
     async (args: HandleMoveArgs) => {
       if (args.sameTree == false) {
         const { dropTarget } = args;
@@ -327,11 +327,11 @@ const Wrapped = () => {
           rootId={tree1RootId}
           data={treeData1}
           onLastActiveNodeChange={onLastActiveNodeChange}
-          handleMove={handleMove}
+          handleMove={tree1HandleMove}
           handleUpload={handleUpload}
           canDrop={tree1CanDrop}
-          getNodeActions={getNodeActions}
-          getRootActions={getRootActions}
+          getNodeActions={tree1GetNodeActions}
+          getRootActions={tree1GetRootActions}
           loadingText={"Loading files from Person Volume"}
         />
       </div>
@@ -365,7 +365,7 @@ const Wrapped = () => {
             rootId={tree2RootId}
             data={treeData2}
             onLastActiveNodeChange={onLastActiveNodeChange}
-            handleMove={handleMove2}
+            handleMove={tree2HandleMove}
             showGlobalActionButtons={false}
             onToggle={tree2onToggle}
             canDrop={tree2canDrop}
