@@ -144,7 +144,7 @@ export const SandboxProvider = ({ children }: { children: JSX.Element }) => {
         sandboxImageId,
         title: name,
         description: description,
-        tempContainerId: "",
+        containerId: "",
         userId: userId,
       })
     );
@@ -169,7 +169,7 @@ export const SandboxProvider = ({ children }: { children: JSX.Element }) => {
         sandboxImageId: sandboxImage.id,
         title: sandboxImage.title,
         description: sandboxImage.description,
-        tempContainerId: containerId,
+        containerId: containerId,
         userId: userId,
       })
     );

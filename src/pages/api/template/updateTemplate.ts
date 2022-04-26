@@ -19,8 +19,8 @@ export default async function handler(
   res: NextApiResponse<SuccessStringResponse>
 ) {
   const {
-    templateId,
-    templateName,
+    id,
+    name,
     section_user_id,
     containerId,
     description,
@@ -30,8 +30,8 @@ export default async function handler(
   } = JSON.parse(req.body) as NextRequest;
   var docReq = UpdateTemplateRequest.fromPartial({
     sessionKey: fetchAppSession(req),
-    templateID: templateId,
-    name: templateName,
+    templateID: id,
+    name: name,
     sectionUserId: section_user_id,
     containerID: containerId,
     description: description,

@@ -110,7 +110,7 @@ const CreateTemplateForm = ({ isOpen, setOpen }: Props) => {
         title: data.name,
         sourceId: "",
         formData: {
-          templateName: data.name,
+          name: data.name,
           description: data.description,
           section_user_id: sectionUserInfo.sectionUserId,
           environment_id: data.environment.id,

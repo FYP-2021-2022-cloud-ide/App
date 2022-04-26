@@ -11,14 +11,14 @@ const TemplateList = () => {
   const { environments, templates, setTemplateCreateOpen } = useInstructor();
 
   const onCreate = useCallback(() => {
-    if (environments.length == 0)
+    if (environments.length == 0) {
       myToast.warning(
         "You need to have at least one environment before creating a template."
       );
-    else {
+    } else {
       setTemplateCreateOpen(true);
     }
-  }, [setTemplateCreateOpen]);
+  }, [setTemplateCreateOpen, environments]);
 
   return (
     <div className="template-list">

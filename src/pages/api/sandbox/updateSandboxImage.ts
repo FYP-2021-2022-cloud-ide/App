@@ -21,14 +21,14 @@ export default async function handler(
 ) {
   var client = grpcClient;
 
-  const { sandboxImageId, description, tempContainerId, title, userId } =
+  const { sandboxImageId, description, containerId, title, userId } =
     JSON.parse(req.body) as UpdateSandboxImageRequest;
 
   var docReq = UpdateSandBoxImageRequest.fromPartial({
     sessionKey: fetchAppSession(req),
     sandBoxImageId: sandboxImageId,
     description: description,
-    tempContainerId: tempContainerId,
+    tempContainerId: containerId,
     title: title,
     userId: userId,
   });

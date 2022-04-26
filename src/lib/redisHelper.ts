@@ -2,6 +2,7 @@ import { redisClient } from "./redisClient";
 import { Container } from "./api/api";
 import moment from "moment";
 import { SectionUserInfo } from "./cnails";
+import { isTemporary } from "./containerHelper";
 
 const redisKeyExpireTime = 86400;
 const creationTimeout = 120;

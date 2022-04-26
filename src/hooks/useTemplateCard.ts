@@ -52,16 +52,29 @@ const useTemplateCard = (template: Template) => {
     }
   });
 
-  const comment =
-    (template.status == "CREATING" && "being created...") ||
-    (template.status == "REMOVING" && "being removed...") ||
-    (template.status == "UPDATING" && "being updated...") ||
-    (template.status == "STARTING_WORKSPACE" && "starting workspace...") ||
-    (template.status == "STOPPING_WORKSPACE" && "stopping workspace...") ||
-    (template.status == "STARTING_UPDATE_WORKSPACE" &&
-      "starting temporary workspace...") ||
-    (template.status == "STOPPING_UPDATE_WORKSPACE" &&
-      "stopping temporary workspace...");
+  const getComment = () => {
+    if (container) {
+      const { isTemporary, status } = container;
+      if (isTemporary) {
+        return (
+          (status == "CREATING" && "starting temporary workspace...") ||
+          (status == "REMOVING" && "stopping temporary workspace...") ||
+          "internal being updated..."
+        );
+      }
+      return (
+        (status == "CREATING" && "starting workspace...") ||
+        (status == "REMOVING" && "stopping workspace...") ||
+        "running..."
+      );
+    }
+    return (
+      (status == "CREATING" && "being created...") ||
+      (status == "UPDATING" && "being updated...") ||
+      (status == "REMOVING" && "being removed...")
+    );
+  };
+  const comment = getComment();
 
   const menuItems = [
     {
@@ -69,7 +82,7 @@ const useTemplateCard = (template: Template) => {
       onClick: async () => {
         await removeTemplate(template.id);
       },
-      show: !Boolean(template.containerId),
+      show: !Boolean(template.containerId || template.active),
     },
     {
       text: "Update info",
@@ -77,7 +90,7 @@ const useTemplateCard = (template: Template) => {
         setTemplateUpdateTarget(template);
         setTemplateUpdateOpen(true);
       },
-      show: !Boolean(template.containerId),
+      show: !Boolean(template.containerId || template.active),
     },
     {
       text: template.containerId ? "Stop workspace" : "Start workspace",
@@ -121,7 +134,7 @@ const useTemplateCard = (template: Template) => {
     },
     {
       text: "Update Internal",
-      show: !Boolean(template.containerId),
+      show: !Boolean(template.containerId || template.active),
       onClick: async () => {
         if (template.active) {
           myToast.error({
@@ -142,8 +155,8 @@ const useTemplateCard = (template: Template) => {
           event: "TEMPLATE_UPDATE",
           sectionUserInfo: sectionUserInfo,
           formData: {
-            templateId: template.id,
-            templateName: template.name,
+            id: template.id,
+            name: template.name,
             description: template.description,
             section_user_id: sectionUserInfo.sectionUserId,
             containerId: "",

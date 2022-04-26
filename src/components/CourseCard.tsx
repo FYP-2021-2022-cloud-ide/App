@@ -25,7 +25,7 @@ function CourseCard({ link, course, zIndex }: CourseProps) {
     >
       <Link href={link}>
         <a className="">
-          <div className="course-card ">
+          <div className={`course-card`} style={{ zIndex: zIndex }}>
             <div className="flex flex-col w-full">
               <div className="flex flex-col items-start space-y-2 mb-3 ">
                 <p id="course-code">{`${course.courseCode} (${course.section})`}</p>

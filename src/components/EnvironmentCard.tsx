@@ -29,9 +29,10 @@ function EnvironmentCard(props: Props) {
     >
       <div
         title={environment.name}
-        className="env-card"
+        className={`env-card`}
+        style={{ zIndex: zIndex }}
         data-status={environment.status}
-        data-container={Boolean(container && container.status == "DEFAULT")}
+        data-container-status={container?.status}
       >
         <div className="flex flex-row items-start">
           <div className="w-full">

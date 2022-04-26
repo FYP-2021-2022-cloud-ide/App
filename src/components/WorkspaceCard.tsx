@@ -30,9 +30,10 @@ function WorkspaceCard({ workspace, zIndex }: Props) {
       <div
         onClick={onClick}
         data-status={workspace.status}
-        data-container={Boolean(container && container.status == "DEFAULT")}
+        data-container-status={container?.status}
         title={workspace.name}
-        className="workspace-card"
+        className={`workspace-card`}
+        style={{ zIndex: zIndex }}
       >
         <div className="flex flex-row w-full space-x-2 items-start justify-between">
           <div className="flex flex-row w-full">

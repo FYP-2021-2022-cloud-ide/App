@@ -527,7 +527,7 @@ export type UpdateSandboxImageRequest = {
   sandboxImageId: string;
   title: string;
   description: string;
-  tempContainerId: string;
+  containerId: string;
   userId: string;
 };
 
@@ -537,7 +537,7 @@ export type ListTemplatesRequest = {
 };
 
 export type AddTemplateRequest = {
-  templateName: string;
+  name: string;
   description: string;
   section_user_id: string;
   environment_id: string;
@@ -549,8 +549,8 @@ export type AddTemplateRequest = {
   allow_notification: boolean;
 };
 export type UpdateTemplateRequest = {
-  templateId: string;
-  templateName: string;
+  id: string;
+  name: string;
   description: string;
   section_user_id: string;
   containerId: string;

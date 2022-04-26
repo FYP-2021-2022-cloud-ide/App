@@ -65,12 +65,14 @@ const TempContainerToast = ({
       </button>
       <div className="flex flex-row space-x-2">
         <button
+          id="btn-cancel"
           className="btn btn-xs bg-gray-500 text-white hover:bg-gray-400 dark:bg-gray-400 dark:hover:bg-gray-500 border-none"
           onClick={onRemove}
         >
           {cancelBtnText}
         </button>
         <button
+          id="btn-ok"
           className="btn btn-xs bg-green-500 text-white hover:bg-green-600 border-none "
           onClick={onOK}
         >

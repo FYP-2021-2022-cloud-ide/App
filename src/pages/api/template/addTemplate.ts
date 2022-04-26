@@ -18,7 +18,7 @@ export default async function handler(
   res: NextApiResponse<TemplateAddResponse>
 ) {
   const {
-    templateName,
+    name,
     section_user_id,
     assignment_config_id,
     environment_id,
@@ -32,7 +32,7 @@ export default async function handler(
 
   var docReq = AddTemplateRequest.fromPartial({
     sessionKey: fetchAppSession(req),
-    name: templateName,
+    name: name,
     sectionUserId: section_user_id,
     environmentId: environment_id,
     assignmentConfigId: assignment_config_id,

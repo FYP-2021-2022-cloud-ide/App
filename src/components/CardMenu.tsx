@@ -1,5 +1,5 @@
 import { Menu, Transition } from "@headlessui/react";
-import { Fragment, MouseEventHandler } from "react";
+import { Fragment, MouseEventHandler, useCallback } from "react";
 import { MenuIcon } from "@heroicons/react/outline";
 
 export type MenuItem = {
@@ -28,15 +28,24 @@ export default function CardMenu({
   direction = "left",
   prefixElement,
 }: Props) {
+  const onMenuBtnClick: MouseEventHandler<HTMLElement> = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
   return (
     <>
       <Menu
         as="div"
-        className="menu relative inline-block text-left shrink-0 overflow-visible"
+        className="relative menu inline-block text-left shrink-0 overflow-visible"
       >
-        <Menu.Button className="inline-flex justify-end w-full py-2 text-sm font-medium rounded-md ">
-          <MenuIcon className="w-5 h-5 hover:scale-110 transition text-gray-600 dark:text-gray-300 ease-in-out duration-300 "></MenuIcon>
-        </Menu.Button>
+        <div onClick={onMenuBtnClick}>
+          <Menu.Button
+            as="button"
+            className="inline-flex justify-end w-full py-2 text-sm font-medium rounded-md "
+          >
+            <MenuIcon className="w-5 h-5 hover:scale-110 transition text-gray-600 dark:text-gray-300 ease-in-out duration-300 "></MenuIcon>
+          </Menu.Button>
+        </div>
         <Transition
           as={Fragment}
           enter="transition ease-out duration-100"
@@ -47,7 +56,9 @@ export default function CardMenu({
           leaveTo="transform opacity-0 scale-95"
         >
           <Menu.Items
-            className={`absolute ${direction == "left" ? "right-0" : "left-0"} 
+            className={`absolute transform ${
+              direction == "left" ? "right-0" : "left-0"
+            }
               bg-white dark:bg-gray-900 dark:text-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black dark:ring-gray-700 ring-opacity-5 focus:outline-none`}
           >
             <div className="p-1">

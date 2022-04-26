@@ -30,7 +30,6 @@
 .template-list #header button svg {
   @apply w-7 h-7 hover:scale-110 transition ease-in-out duration-300;
 }
-
 /* grid  */
 .env-grid,
 .template-grid,

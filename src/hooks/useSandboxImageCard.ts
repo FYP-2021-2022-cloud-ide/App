@@ -103,7 +103,7 @@ const useSandboxImageCard = (sandboxImage: SandboxImage): Return => {
             sandboxImageId: sandboxImage.id,
             title: sandboxImage.title,
             description: sandboxImage.description,
-            tempContainerId: "",
+            containerId: "",
             userId: userId,
           },
         });

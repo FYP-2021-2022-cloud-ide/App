@@ -57,7 +57,7 @@ const sandboxAPI = {
   },
 
   /**
-   * if the `tempContainerId` is an empty string, only db data will be updated
+   * if the `containerId` is an empty string, only db data will be updated
    */
   updateSandboxImage: async (
     req: UpdateSandboxImageRequest

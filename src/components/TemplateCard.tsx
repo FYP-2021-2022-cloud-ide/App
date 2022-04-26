@@ -33,8 +33,10 @@ function TemplateCard(props: Props) {
         data-status={template.status}
         data-highlighted={isHighlighted}
         data-published={template.active}
+        data-container-status={container?.status}
         title={template.name}
-        className="template-card"
+        className={`template-card`}
+        style={{ zIndex: zIndex }}
       >
         <div className="flex flex-row items-start justify-between">
           <div className="w-full">

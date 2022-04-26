@@ -34,8 +34,9 @@ const SandboxImagesCard = (props: Props) => {
       <div
         id={id}
         data-status={status}
-        data-container={Boolean(container && container.status == "DEFAULT")}
-        className="sandbox-card"
+        data-container-status={container?.status}
+        className={`sandbox-card`}
+        style={{ zIndex: zIndex }}
         onClick={onClick}
       >
         <div className=" flex flex-row items-start ">

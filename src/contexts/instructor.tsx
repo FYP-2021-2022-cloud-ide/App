@@ -412,7 +412,7 @@ export const InstructorProvider = ({ children }: { children: JSX.Element }) => {
     const response = await myToast.promise(
       "Building your templates...",
       templateAPI.addTemplate({
-        templateName: name,
+        name: name,
         description: description,
         section_user_id: sectionUserInfo.sectionUserId,
         environment_id: environmentId,
@@ -437,7 +437,7 @@ export const InstructorProvider = ({ children }: { children: JSX.Element }) => {
   };
 
   const updateTemplateInfo = async (
-    templateId: string,
+    id: string,
     name: string,
     description: string,
     isExam: boolean,
@@ -447,8 +447,8 @@ export const InstructorProvider = ({ children }: { children: JSX.Element }) => {
     const response = await myToast.promise(
       "Updating the template...",
       templateAPI.updateTemplate({
-        templateId,
-        templateName: name,
+        id,
+        name,
         description,
         section_user_id: sectionUserInfo.sectionUserId,
         containerId: "",
@@ -537,8 +537,8 @@ export const InstructorProvider = ({ children }: { children: JSX.Element }) => {
     const response = await myToast.promise(
       "Updating the templates...",
       templateAPI.updateTemplate({
-        templateId: template.id,
-        templateName: template.name,
+        id: template.id,
+        name: template.name,
         description: template.description,
         section_user_id: sectionUserInfo.sectionUserId,
         containerId: containerId,

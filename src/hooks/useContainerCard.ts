@@ -88,8 +88,8 @@ const useContainerCard = (container: Container) => {
         const confirm = await waitForConfirm(question);
         if (confirm) {
           setContainerStatus(container.id, "REMOVING");
-          await removeContainer(container.id);
           myToast.dismiss(container.id);
+          await removeContainer(container.id);
         }
       }
     },

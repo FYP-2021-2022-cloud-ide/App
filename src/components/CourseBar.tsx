@@ -22,7 +22,10 @@ interface Props {
 
 const CourseBar = ({ courseCode, sectionCode, courseTitle, role }: Props) => {
   return (
-    <div className="flex flex-row justify-start space-x-1 sm:space-x-2 items-center text-gray-700 dark:text-gray-300">
+    <div
+      id="course-bar"
+      className="flex flex-row justify-start space-x-1 sm:space-x-2 items-center text-gray-700 dark:text-gray-300"
+    >
       <TerminalIcon className="w-7 h-7"> </TerminalIcon>
       <p className="text-base sm:text-lg font-bold whitespace-nowrap">
         {courseCode} ({sectionCode})

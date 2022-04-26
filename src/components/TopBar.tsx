@@ -29,7 +29,9 @@ const TopBar = () => {
   return (
     <div
       className="topbar"
-      data-has-message={systemMessage && systemMessage.id && systemMessage.show}
+      data-has-message={Boolean(
+        systemMessage && systemMessage.id && systemMessage.show
+      )}
       id="topbar"
     >
       {systemMessage && systemMessage.id && systemMessage.show && (
